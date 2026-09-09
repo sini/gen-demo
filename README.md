@@ -19,10 +19,9 @@ This is v1 — one declaration per ruled construct: six positive constructs (C1-
 plane's byte-parity cell (T2b), and five planted-violation refusals (T5), against
 `gen-specs/gen-demo/2026-09-08-v1-constructs-spec.md` in den-ag-design.
 
-**v1.1** adds eight more positive constructs (C8-C15) and four more planted-violation refusals (T5
-rows 6-9), against `gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C7 rides
-gen-view's own unlanded work and is sequenced separately, to land in W1 — it is **not** part of this
-landing; see `## v1.1` below.
+**v1.1** adds nine more positive constructs (C7-C15) and six more planted-violation refusals (T5 rows
+6-11), against `gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C7 rode
+gen-view's own unlanded work (W1) and landed once that work reached the hub; see `## v1.1` below.
 
 Bead: `den-hoag-gen-demo-constructs-0k3ix`.
 
@@ -40,6 +39,7 @@ incremental plane's decision crossing.
 | C4 -- a movement | 0010, 0024 | a `selvage` channel walked on `tacks`, Λ read off C3's own relata names |
 | C5 -- a policy program | 0020, 0022, 0033 | a stable model admitting `piping:grosgrain:faille`, which becomes C2's dynamic edge |
 | C6 -- a delivery | 0028 | one `nixos` class realized on `pewter`; two Rider limbs (`welt`, `gusset`) that must NOT realize |
+| C7 -- the well-definedness gate | 0008 §3, 0030, 0019 | `genView.boundedWellDefinedSchedule` over `config.declaredEdges` (NOT C2's `edges`), contracted through `genGraph.mkNodeRef`/`mkDeclaredEdges`; the Check reads fields of the returned `gated`, never of its argument |
 | T2b -- byte parity | 0008 | `compose`/`override` warm arm byte-identical to a cold `compose`, guarded by `trace.mode` |
 | C8 -- the contribution protocol | 0012, 0014 | `genAssemble.assemble`/`union` over three contributions; shape unions commutatively, content folds by positional authority |
 | C9 -- a SHARE class | 0028 | `genClass` partitions declared content on `weave`, never on the kind boundary; core, gate and invariance all checked |
@@ -49,12 +49,13 @@ incremental plane's decision crossing.
 | C13 -- `foldLayers` | 0017 | `genAlgebra.record.foldLayers`, all three strategies plus the default channel in one call |
 | C14 -- the closed body-term algebra | 0013 row 2, 0023 | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell |
 | C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
-| T5 -- planted refusals | 0025 | nine enforcers, each driven red by name via `just refusals` |
+| T5 -- planted refusals | 0025 | eleven enforcers, each driven red by name via `just refusals` |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations; `aspect-cnf.nix` holds the key-category
-declaration that both the tree and the hub read; `flake.nix` holds the queries, C8-C15's own
-standalone fixtures, and all fifteen `checks`; the `justfile`'s `refusals` recipe holds T5's by-name
-half, which runs out of band because `builtins.tryEval` cannot read a refusal's message.
+declaration that both the tree and the hub read; `flake.nix` holds the queries, C7's gate over
+`config.declaredEdges`, C8-C15's own standalone fixtures, and all sixteen `checks`; the `justfile`'s
+`refusals` recipe holds T5's by-name half, which runs out of band because `builtins.tryEval` cannot
+read a refusal's message.
 
 ### The naming rule — invented kinds only
 
@@ -73,7 +74,7 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
 
 ## The CI contract
 
-`nix flake check` runs fifteen checks, and they are the acceptance criteria:
+`nix flake check` runs sixteen checks, and they are the acceptance criteria:
 
 1. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -106,14 +107,19 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     cell rather than in `just refusals`.
 15. **`cyclic-stratum`** — C15. `runScc`'s iterate-from-bottom ascent over a two-member SCC with an
     external `higherStrata` dependency, which the acyclic rebuilder cannot express at all.
+16. **`well-defined-schedule`** — C7. `genView.boundedWellDefinedSchedule` over `config.declaredEdges`,
+    read off fields of the returned `gated` record, never of its argument: the cyclic-SCC filter
+    (`[ ]`, over a real five-way partition) and the contracted accessor's own edge lookup
+    (`gated.edges "pewter"`). A hand-written record of the same fields satisfies this cell byte-for-
+    byte -- see Oracle 1b and `just refusals` row 11 below.
 
-T5's nine refusals are not among these fifteen: `builtins.tryEval` yields `success` and nothing else,
-so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by name
-through `just refusals` instead (below).
+T5's eleven refusals are not among these sixteen: `builtins.tryEval` yields `success` and nothing
+else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
+name through `just refusals` instead (below).
 
 **T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
-`just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the nine
-enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
+`just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the
+eleven enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
 
 ### Two arms, plus the by-name half
 
@@ -163,17 +169,25 @@ exactly this reason.
 
 ## v1.1
 
-Eight more positive constructs (C8-C15), one new `checks` cell per construct, and four more
-planted-violation refusals (T5 rows 6-9, `just refusals`), against
+Nine more positive constructs (C7-C15), one new `checks` cell per construct, and six more
+planted-violation refusals (T5 rows 6-11, `just refusals`), against
 `gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C12 interleaves into C1/C2/C5
 rather than standing alone: its promoted node joins C1's node set, its promoted edges join C2's edge
 set, and its own third policy declaration is admitted or refused by the *same* `mdl` C5 already
 built — the discriminator the spec names (seeding `productN "tensor"` in place of `"cartesian"`)
 drives exactly that promotion path red.
 
-**C7 is not part of this landing.** It rides gen-view's own unlanded work and is sequenced
-separately, to land in W1; nothing under C7, its seed rows, `just refusals` rows 10/11, or Oracle 1b
-was touched here.
+**C7 landed in this pass.** It rides gen-view's own W1 work (`boundedWellDefinedSchedule`,
+ADR-0008 §3), unreachable until the hub relocked to carry it; the relock is the commit ahead of
+this one. C7 gates `config.declaredEdges` directly -- not C2's `edges`, which additionally carries
+C5's policy-produced dynamic edge and C12's promoted coordinate edges -- so the corpus makes one
+graph claim and two doors read different sets from it. Its Check reads fields of the returned
+`gated` record, never of its argument: a cell over the argument would force gen-graph alone (already
+reached) and add nothing for gen-view (gate v0's CONSTRUCTION-1, `den-hoag-xgu75`). `just refusals`
+row 10 plants the cycle `pewter -> grosgrain -> damask -> pewter`; row 11 hands the gate a
+hand-assembled attrset carrying the same `index`/`dependencies` fields `mkDeclaredEdges` builds, no
+`_type` tag -- `genGraph.isDeclaredEdges` is purely nominal, so this door is the only
+construct-granular witness a hand-written stand-in cannot forge (Oracle 1b).
 
 ### The roster census
 

@@ -725,6 +725,33 @@
             tulle = cyclicLattice;
           };
         };
+
+        # ── C7 — the well-definedness gate over the declared edge set (ADR-0008 §3, ADR-0030,
+        # ADR-0019; gen-view). C2's OWN declarations, contracted. `mkDeclaredEdges` admits and
+        # ignores the `label` field, so the corpus's edge records ride through unchanged.
+        ref = genGraph.mkNodeRef { isRegistered = id: nodes ? ${id}; };
+        contracted =
+          es:
+          genGraph.mkDeclaredEdges (
+            map (
+              e:
+              e
+              // {
+                from = ref e.from;
+                to = ref e.to;
+              }
+            ) es
+          );
+        gated = genView.boundedWellDefinedSchedule {
+          nodes = builtins.attrNames nodes; # the registration set
+          declaredDependencies = contracted genValues.declaredEdges; # NOT C2's `edges`
+          equations = { }; # see OPEN 1
+          admitsCycle = _: false; # nothing here is declared circular
+        };
+        # THE CELL READS `gated`, NOT `contracted` — see the Check. A cell over the argument
+        # forces gen-graph only (already reached) and adds nothing for gen-view.
+        gatedSccs = (gated.condensation).sccs;
+        gatedEdges = gated.edges "pewter";
       in
       {
         imports = [
@@ -1119,6 +1146,27 @@
                     "tulle"
                   ];
                 }
+              );
+
+              # (16) C7 — the well-definedness gate. Fields of `gated` ITSELF, never of
+              # `contracted` (that would force gen-graph only, already reached — gate v0's
+              # CONSTRUCTION-1). Forcing `gated.condensation` and `gated.edges` also runs
+              # gen-view's own door (`graph.isDeclaredEdges`), its cyclic-SCC filter and its
+              # `admitsCycle` application — none of which gen-graph performs.
+              well-defined-schedule = asserts "well-defined-schedule" (
+                gatedSccs == [
+                  [ "damask" ]
+                  [ "faille" ]
+                  [ "seam:pewter:grosgrain" ]
+                  [ "grosgrain" ]
+                  [ "pewter" ]
+                ]
+                && (builtins.filter (scc: builtins.length scc > 1) gatedSccs) == [ ]
+                &&
+                  gatedEdges == [
+                    "grosgrain"
+                    "damask"
+                  ]
               );
             };
           };

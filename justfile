@@ -252,11 +252,78 @@ refusals:
       "gen-memo: cyclic member declares retired lattice key" \
       "$tmpdir/row9-red.err"
 
+    # ── row 10 -- C7's planted cycle (mirrors C7's own construction: C2's declared edges,
+    # contracted, gated by `boundedWellDefinedSchedule`). Plants `damask -> pewter`, closing
+    # `pewter -> grosgrain -> damask -> pewter`; the refusal must name that SCC. ──
+    row10='let
+      gen = (builtins.getFlake (toString ./.)).inputs.gen;
+      genGraph = gen.lib.substrate.graph;
+      genView = gen.lib.substrate.view;
+      nodes = { pewter = { }; damask = { }; grosgrain = { }; faille = { }; };
+      baseEdges = [
+        { from = "pewter"; to = "grosgrain"; label = "tacks"; }
+        { from = "grosgrain"; to = "damask"; label = "tacks"; }
+        { from = "pewter"; to = "damask"; label = "gathers"; }
+      ];
+      plantedEdges = baseEdges ++ (if PLANT then [ { from = "damask"; to = "pewter"; label = "tacks"; } ] else [ ]);
+      ref = genGraph.mkNodeRef { isRegistered = id: nodes ? ${id}; };
+      contracted = es: genGraph.mkDeclaredEdges (map (e: e // { from = ref e.from; to = ref e.to; }) es);
+      gated = genView.boundedWellDefinedSchedule {
+        nodes = builtins.attrNames nodes;
+        declaredDependencies = contracted plantedEdges;
+        equations = { };
+        admitsCycle = _: false;
+      };
+    in builtins.toJSON (builtins.filter (scc: builtins.length scc > 1) (gated.condensation).sccs)'
+    check "T5 row10 unplanted (declared edges stay acyclic)" "${row10/PLANT/false}" 0 "" \
+      "$tmpdir/row10-green.err" '[]'
+    check "T5 row10 planted   (damask -> pewter closes pewter -> grosgrain -> damask -> pewter)" \
+      "${row10/PLANT/true}" 1 \
+      "gen-view.boundedWellDefinedSchedule: the declared relation has a cyclic component \`admitsCycle\` does not admit: [[\"damask\",\"grosgrain\",\"pewter\"]]" \
+      "$tmpdir/row10-red.err"
+
+    # ── row 11 -- C7's DOOR (mirrors C7's construction, `declaredDependencies` swapped for a
+    # hand-assembled attrset carrying the same `index`/`dependencies` fields `mkDeclaredEdges`
+    # would build, but no `_type` tag). `isDeclaredEdges` is purely nominal, so this is the only
+    # construct-granular refusal a hand-written stand-in cannot forge (Oracle 1b). The unplanted
+    # arm is the live control: the value `mkDeclaredEdges` itself mints is accepted. ──
+    row11='let
+      gen = (builtins.getFlake (toString ./.)).inputs.gen;
+      genGraph = gen.lib.substrate.graph;
+      genView = gen.lib.substrate.view;
+      nodes = { pewter = { }; damask = { }; grosgrain = { }; faille = { }; };
+      baseEdges = [
+        { from = "pewter"; to = "grosgrain"; label = "tacks"; }
+        { from = "grosgrain"; to = "damask"; label = "tacks"; }
+        { from = "pewter"; to = "damask"; label = "gathers"; }
+      ];
+      ref = genGraph.mkNodeRef { isRegistered = id: nodes ? ${id}; };
+      minted = genGraph.mkDeclaredEdges (map (e: e // { from = ref e.from; to = ref e.to; }) baseEdges);
+      lookalikeIndex = { pewter = [ "grosgrain" "damask" ]; grosgrain = [ "damask" ]; };
+      handAssembled = { index = lookalikeIndex; dependencies = id: lookalikeIndex.${id} or [ ]; };
+      gated = genView.boundedWellDefinedSchedule {
+        nodes = builtins.attrNames nodes;
+        declaredDependencies = if DOOR then handAssembled else minted;
+        equations = { };
+        admitsCycle = _: false;
+      };
+    in builtins.toJSON (gated.edges "pewter")'
+    check "T5 row11 unplanted (the value mkDeclaredEdges minted is accepted)" "${row11/DOOR/false}" 0 "" \
+      "$tmpdir/row11-green.err" '["grosgrain","damask"]'
+    check "T5 row11 planted   (a hand-assembled lookalike, no _type tag, is refused by name)" \
+      "${row11/DOOR/true}" 1 \
+      "gen-view.boundedWellDefinedSchedule: field 'declaredDependencies' must be the relation \`gen-graph.mkDeclaredEdges\` returns; received an attrset that \`mkDeclaredEdges\` did not build" \
+      "$tmpdir/row11-red.err"
+
     # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
     # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
     # function above would pass a mismatched row/message pairing and the by-name half would be
     # measuring nothing. Extended to the v1.1 rows: row6's `bobbins` message against row9's
     # `retired lattice key` message, the two new rows furthest apart in both library and shape.
+    # Further extended to rows 10/11: both gate the same construct through the same door prefix
+    # (`gen-view.boundedWellDefinedSchedule:`), so this is the pair most likely to cross-match by
+    # accident -- row 10 refuses a cyclic component, row 11 refuses a non-minted attrset, and
+    # neither message may appear in the other's stderr.
     if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
       echo "FAIL control: row1's message leaked into row2's refusal"
       fail=1
@@ -269,8 +336,14 @@ refusals:
     elif grep -qF "retired lattice key" "$tmpdir/row6-red.err"; then
       echo "FAIL control: row9's message leaked into row6's refusal"
       fail=1
+    elif grep -qF "received an attrset that" "$tmpdir/row10-red.err"; then
+      echo "FAIL control: row11's message leaked into row10's refusal"
+      fail=1
+    elif grep -qF "cyclic component" "$tmpdir/row11-red.err"; then
+      echo "FAIL control: row10's message leaked into row11's refusal"
+      fail=1
     else
-      echo "ok   control (row1/row2 and row6/row9 refusals do not cross-match)"
+      echo "ok   control (row1/row2, row6/row9 and row10/row11 refusals do not cross-match)"
     fi
 
     exit $fail
