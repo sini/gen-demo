@@ -186,7 +186,9 @@ library merely being bound (e.g. as a `specialArgs` value) without anything call
 Measured by poisoning each roster member's `lib` with a run-unique `throw` and forcing every
 `.#checks.<system>` cell, exits read unpiped: a member is reached iff at least one cell reds under its
 own poison. Reproduce against a copy of this repo with one roster member's `lib` swapped for a
-throwing stub, then build every `.#checks.<system>.<cell>` (`just check` runs the whole set).
+throwing stub, then force every `.#checks.<system>.<cell>`'s **evaluation** with `nix flake check`
+(`just check` wraps it) — expect it to print `running 0 flake checks` and build nothing: the asserts
+sit in each derivation's argument, so evaluating is what forces the poison, not building.
 `gen-settings` poisoned is the discriminating negative control: every cell stays green (rc 0), showing
 the instrument discriminates and this corpus simply has nothing that forces `gen-settings`.
 
@@ -195,5 +197,5 @@ the instrument discriminates and this corpus simply has nothing that forces `gen
 - **After this landing:** 20 of 21 — unreached: `settings` only.
 - **Deferred by ruling, not by omission:** `settings`. ADR-0017 (owner-ruled 2026-08-06, amended
   2026-08-24) retires the `gen-settings` library itself; what survives re-homes as a framework-level
-  **feature**, and the retirement's execution is deferred with no work scheduled by the ruling. There
+  **feature**, and "the retirement's EXECUTION is deferred, no work scheduled by the ruling." There
   is no settings construct for this corpus to declare against until that execution lands.
