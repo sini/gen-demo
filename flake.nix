@@ -381,7 +381,7 @@
                     label = l;
                     to = bastingRelata.${l};
                   }) (builtins.attrNames bastingRelata)
-                && minted.nodes."basting:pewter:grosgrain" ? identity
+                && lib.hasPrefix "basting:" minted.nodes."basting:pewter:grosgrain".identity
               );
 
               # (3) C4 — the movement, and Λ read off C3's own relata.
@@ -399,6 +399,7 @@
                 (mdl.resolve pipingHead).included == true
                 && mdl.adjudication.outcome == "admitted"
                 && mdl.adjudication.searched == false
+                && mdl.adjudication.ground == "Van Gelder, Ross & Schlipf 1991, Corollary 5.6"
               );
 
               # (5) C6 — the delivery projection: the node set, the collected class, both Rider

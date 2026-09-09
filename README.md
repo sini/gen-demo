@@ -19,7 +19,7 @@ This is v1 — one declaration per ruled construct: six positive constructs (C1-
 plane's byte-parity cell (T2b), and five planted-violation refusals (T5), against
 `gen-specs/gen-demo/2026-09-08-v1-constructs-spec.md` in den-ag-design.
 
-Bead: `den-hoag-gen-demo-demo-constructs-0k3ix`.
+Bead: `den-hoag-gen-demo-constructs-0k3ix`.
 
 ## What v1 declares
 
@@ -81,6 +81,10 @@ T5's five refusals are not among these seven: `builtins.tryEval` yields `success
 so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by name
 through `just refusals` instead (below).
 
+**T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
+`just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the five
+enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
+
 ### Two arms, plus the by-name half
 
 ```sh
@@ -126,3 +130,9 @@ its own name — `buildRoots` is the live constructor. gen-aspects' `mkAspectMod
 declares `options.aspects` and `options.schema` together; it declares only `options.aspects` —
 `gen-modules/corpus.nix` declares `options.schema` itself, from the same `aspectSchema` value, for
 exactly this reason.
+
+## v1.1
+
+`gen-bind` is reached only through the hub's own target instantiation (`nixos-instantiate`); v1 has
+no declaration that exercises it directly. Under the growth rule that's an input to v1.1's roster
+census, not a defect of this landing.

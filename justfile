@@ -35,11 +35,19 @@ refusals:
     set -u
     fail=0
 
+    # A fresh dir per run -- two concurrent `just refusals` no longer collide on a fixed /tmp name.
+    tmpdir="$(mktemp -d)"
+    trap 'rm -rf "$tmpdir"' EXIT
+
     # $1 label, $2 nix expr, $3 wanted exit code, $4 required stderr substring (empty = none checked),
-    # $5 file to capture this row's stderr into (for the cross-row control at the end).
+    # $5 file to capture this row's stderr into (for the cross-row control at the end),
+    # $6 wanted stdout, exact match (empty = none checked -- the planted arms, which refuse before
+    # producing a value; every unplanted arm passes one, so a construction that refused everything
+    # cannot pass this arm by exiting 0 with the wrong (or no) value).
     check() {
-      local label="$1" expr="$2" want_exit="$3" want_grep="$4" errfile="$5"
-      nix eval --impure --raw --expr "$expr" >/dev/null 2>"$errfile"
+      local label="$1" expr="$2" want_exit="$3" want_grep="$4" errfile="$5" want_stdout="${6:-}"
+      local out
+      out="$(nix eval --impure --raw --expr "$expr" 2>"$errfile")"
       local ec=$?
       if [ "$ec" != "$want_exit" ]; then
         echo "FAIL $label: exit $ec, wanted $want_exit"
@@ -50,6 +58,13 @@ refusals:
       if [ -n "$want_grep" ] && ! grep -qF "$want_grep" "$errfile"; then
         echo "FAIL $label: required substring not in stderr"
         echo "  wanted: $want_grep"
+        fail=1
+        return
+      fi
+      if [ -n "$want_stdout" ] && [ "$out" != "$want_stdout" ]; then
+        echo "FAIL $label: stdout mismatch"
+        echo "  wanted: $want_stdout"
+        echo "  got:    $out"
         fail=1
         return
       fi
@@ -66,10 +81,11 @@ refusals:
         { pass = pass1; identifier = "basting:pewter:grosgrain"; kind = "basting"; content = { tension = "slack"; }; relata = { warp = "pewter"; weft = "grosgrain"; }; site = "c:basting"; }
       ];
     in builtins.toJSON (builtins.attrNames (genScope.mintStrata { kinds = { }; emitters = emitters PASS; }).nodes)'
-    check "T5 row1 unplanted (basting minted strictly later)" "${row1/PASS/1}" 0 "" /tmp/gen-demo-t5-row1-green.err
+    check "T5 row1 unplanted (basting minted strictly later)" "${row1/PASS/1}" 0 "" \
+      "$tmpdir/row1-green.err" '["basting:pewter:grosgrain","grosgrain","pewter"]'
     check "T5 row1 planted   (basting minted in the same pass)" "${row1/PASS/0}" 1 \
       "gen-scope.mintStrata: unresolved relatum 'pewter' (label 'warp', minting kind 'basting', pass 0)" \
-      /tmp/gen-demo-t5-row1-red.err
+      "$tmpdir/row1-red.err"
 
     # ── row 2 -- a policy relatum not in `frozen` (mirrors C5's program) ──
     row2='let
@@ -83,10 +99,11 @@ refusals:
         ];
       };
     in builtins.seq (mkProg FROZEN) "ok"'
-    check "T5 row2 unplanted (faille frozen)" "${row2/FROZEN/[ \"pewter\" \"damask\" \"grosgrain\" \"faille\" ]}" 0 "" /tmp/gen-demo-t5-row2-green.err
+    check "T5 row2 unplanted (faille frozen)" "${row2/FROZEN/[ \"pewter\" \"damask\" \"grosgrain\" \"faille\" ]}" 0 "" \
+      "$tmpdir/row2-green.err" "ok"
     check "T5 row2 planted   (faille not frozen)" "${row2/FROZEN/[ \"pewter\" \"damask\" \"grosgrain\" ]}" 1 \
       "gen-program: 'faille' is not in the frozen set of relata that strictly earlier passes settled (ADR-0016 ruling 7)" \
-      /tmp/gen-demo-t5-row2-red.err
+      "$tmpdir/row2-red.err"
 
     # ── row 3 -- a Λ ∩ L collision in the carrier (mirrors C4's carrier, the label renamed at C3's
     # own relata source, same seed the acceptance oracle uses to red C4 itself) ──
@@ -106,10 +123,11 @@ refusals:
           dataOrder = genView.dataOrder { channel = "selvage"; keyOf = _: "selvage"; };
         };
     in builtins.seq (mkCarrier "LABEL") "ok"'
-    check "T5 row3 unplanted (relatum labelled warp)" "${row3/LABEL/warp}" 0 "" /tmp/gen-demo-t5-row3-green.err
+    check "T5 row3 unplanted (relatum labelled warp)" "${row3/LABEL/warp}" 0 "" \
+      "$tmpdir/row3-green.err" "ok"
     check "T5 row3 planted   (relatum relabelled tacks, collides with L)" "${row3/LABEL/tacks}" 1 \
       "gen-view.carrier: 'tacks' is both a letter of L and a relatum label in Λ" \
-      /tmp/gen-demo-t5-row3-red.err
+      "$tmpdir/row3-red.err"
 
     # ── row 4 -- reading `.included` on an UNDEFINED atom (mirrors C5's model/resolve). The field
     # is FORCED here on purpose: reading the whole record instead exits 0 with the message rendered
@@ -126,10 +144,11 @@ refusals:
         complete = true;
       };
     in builtins.toJSON ((mkModel SELFNEG).resolve "nap:pewter").included'
-    check "T5 row4 unplanted (nap:pewter an ordinary fact)" "${row4/SELFNEG/false}" 0 "" /tmp/gen-demo-t5-row4-green.err
+    check "T5 row4 unplanted (nap:pewter an ordinary fact)" "${row4/SELFNEG/false}" 0 "" \
+      "$tmpdir/row4-green.err" "true"
     check "T5 row4 planted   (nap:pewter self-negates, UNDEFINED)" "${row4/SELFNEG/true}" 1 \
       "gen-program: the membership 'nap:pewter' is UNDEFINED — ADR-0020's third value" \
-      /tmp/gen-demo-t5-row4-red.err
+      "$tmpdir/row4-red.err"
 
     # ── row 5 -- `gen.aspectCnf` absent (mirrors C6's extra `project` call) ──
     row5='let
@@ -142,19 +161,20 @@ refusals:
         selectHosts = v: v.hosts or { };
       };
     in builtins.seq (mkProj WITHCNF) "ok"'
-    check "T5 row5 unplanted (cnf present)" "${row5/WITHCNF/true}" 0 "" /tmp/gen-demo-t5-row5-green.err
+    check "T5 row5 unplanted (cnf present)" "${row5/WITHCNF/true}" 0 "" \
+      "$tmpdir/row5-green.err" "ok"
     check "T5 row5 planted   (cnf absent)" "${row5/WITHCNF/false}" 1 \
       "gen-delivery: project: no category source — \`cnf\` is required and has no default." \
-      /tmp/gen-demo-t5-row5-red.err
+      "$tmpdir/row5-red.err"
 
     # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
     # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
     # function above would pass a mismatched row/message pairing and the by-name half would be
     # measuring nothing.
-    if grep -qF "unresolved relatum 'pewter'" /tmp/gen-demo-t5-row2-red.err; then
+    if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
       echo "FAIL control: row1's message leaked into row2's refusal"
       fail=1
-    elif grep -qF "not in the frozen set" /tmp/gen-demo-t5-row1-red.err; then
+    elif grep -qF "not in the frozen set" "$tmpdir/row1-red.err"; then
       echo "FAIL control: row2's message leaked into row1's refusal"
       fail=1
     else
