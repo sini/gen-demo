@@ -19,6 +19,11 @@ This is v1 — one declaration per ruled construct: six positive constructs (C1-
 plane's byte-parity cell (T2b), and five planted-violation refusals (T5), against
 `gen-specs/gen-demo/2026-09-08-v1-constructs-spec.md` in den-ag-design.
 
+**v1.1** adds eight more positive constructs (C8-C15) and four more planted-violation refusals (T5
+rows 6-9), against `gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C7 rides
+gen-view's own unlanded work and is sequenced separately, to land in W1 — it is **not** part of this
+landing; see `## v1.1` below.
+
 Bead: `den-hoag-gen-demo-constructs-0k3ix`.
 
 ## What v1 declares
@@ -36,12 +41,20 @@ incremental plane's decision crossing.
 | C5 -- a policy program | 0020, 0022, 0033 | a stable model admitting `piping:grosgrain:faille`, which becomes C2's dynamic edge |
 | C6 -- a delivery | 0028 | one `nixos` class realized on `pewter`; two Rider limbs (`welt`, `gusset`) that must NOT realize |
 | T2b -- byte parity | 0008 | `compose`/`override` warm arm byte-identical to a cold `compose`, guarded by `trace.mode` |
-| T5 -- planted refusals | 0025 | five enforcers, each driven red by name via `just refusals` |
+| C8 -- the contribution protocol | 0012, 0014 | `genAssemble.assemble`/`union` over three contributions; shape unions commutatively, content folds by positional authority |
+| C9 -- a SHARE class | 0028 | `genClass` partitions declared content on `weave`, never on the kind boundary; core, gate and invariance all checked |
+| C10 -- stratified dispatch | 0019 | `genDispatch` rules whose stratum is STAMPED by `deriveGroup` from their own declared `produces`, none written by hand |
+| C11 -- a federated packaged subgraph | 0011 §4, 0027 | `genLink.link {sources; wire;}` with a per-origin `keySemantics`; the declared capability survives the exchange |
+| C12 -- a derived product graph + policy-stratum promotion | 0016 rulings 1-2 | `genProduct.productN "cartesian"` over two graphs; the promoted cell joins C1's nodes, C2's edges, C5's own `mdl` |
+| C13 -- `foldLayers` | 0017 | `genAlgebra.record.foldLayers`, all three strategies plus the default channel in one call |
+| C14 -- the closed body-term algebra | 0013 row 2, 0023 | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell |
+| C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
+| T5 -- planted refusals | 0025 | nine enforcers, each driven red by name via `just refusals` |
 
-`gen-modules/corpus.nix` holds the declarations; `aspect-cnf.nix` holds the key-category declaration
-that both the tree and the hub read; `flake.nix` holds the queries and the seven `checks`; the
-`justfile`'s `refusals` recipe holds T5's by-name half, which runs out of band because
-`builtins.tryEval` cannot read a refusal's message.
+`gen-modules/corpus.nix` holds the C1-C6 declarations; `aspect-cnf.nix` holds the key-category
+declaration that both the tree and the hub read; `flake.nix` holds the queries, C8-C15's own
+standalone fixtures, and all fifteen `checks`; the `justfile`'s `refusals` recipe holds T5's by-name
+half, which runs out of band because `builtins.tryEval` cannot read a refusal's message.
 
 ### The naming rule — invented kinds only
 
@@ -60,7 +73,7 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
 
 ## The CI contract
 
-`nix flake check` runs seven checks, and they are the acceptance criteria:
+`nix flake check` runs fifteen checks, and they are the acceptance criteria:
 
 1. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -76,13 +89,30 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
 7. **`nixos-instantiate`** — the target instantiated, **not built**: the check writes
    `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
    NixOS evaluation and stops at the `.drv`.
+8. **`contribution-protocol`** — C8. Three contributions unioned; the node set is fixed under
+   permutation, the positionally-folded `spool` is not.
+9. **`share-class`** — C9. The partition on `weave`, the core's shared keys and values, the gate on
+   a real member, and the invariance check all in one cell.
+10. **`stratified-dispatch`** — C10. Each rule's stratum stamped by `deriveGroup`; the `sateen` rule
+    not firing against a `linen` context is the discriminator.
+11. **`federated-link`** — C11. The locally-declared capability equals what the requirer resolves to
+    after the exchange (ADR-0027's equivalence survival).
+12. **`product-promotion`** — C12. The product's own `dims` order, its cells, the promoted edge set,
+    a projection, and the policy program's admission of the promoted head, all read off one
+    `seamCoords` rather than restated.
+13. **`layered-fold`** — C13. All three `foldLayers` strategies plus the default channel in one call.
+14. **`body-term-algebra`** — C14. The resolved term, `knownFormers`, the crossing's primitives and
+    inert budget, and all three refusal arms as data — the one construct whose refusals live in this
+    cell rather than in `just refusals`.
+15. **`cyclic-stratum`** — C15. `runScc`'s iterate-from-bottom ascent over a two-member SCC with an
+    external `higherStrata` dependency, which the acyclic rebuilder cannot express at all.
 
-T5's five refusals are not among these seven: `builtins.tryEval` yields `success` and nothing else,
+T5's nine refusals are not among these fifteen: `builtins.tryEval` yields `success` and nothing else,
 so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by name
 through `just refusals` instead (below).
 
 **T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
-`just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the five
+`just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the nine
 enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
 
 ### Two arms, plus the by-name half
@@ -90,7 +120,7 @@ enforcers is invisible to `nix flake check` until someone runs `just refusals` b
 ```sh
 just check            # nix flake check
 just check-hub-main   # nix flake check --refresh --override-input gen github:sini/gen
-just refusals         # T5's five planted violations, each driven red by name, each with an unplanted control
+just refusals         # T5's nine planted violations, each driven red by name, each with an unplanted control
 ```
 
 The committed `flake.lock` is the **last-green pin**. The second arm evaluates the same corpus against
@@ -133,6 +163,35 @@ exactly this reason.
 
 ## v1.1
 
-`gen-bind` is reached only through the hub's own target instantiation (`nixos-instantiate`); v1 has
-no declaration that exercises it directly. Under the growth rule that's an input to v1.1's roster
-census, not a defect of this landing.
+Eight more positive constructs (C8-C15), one new `checks` cell per construct, and four more
+planted-violation refusals (T5 rows 6-9, `just refusals`), against
+`gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C12 interleaves into C1/C2/C5
+rather than standing alone: its promoted node joins C1's node set, its promoted edges join C2's edge
+set, and its own third policy declaration is admitted or refused by the *same* `mdl` C5 already
+built — the discriminator the spec names (seeding `productN "tensor"` in place of `"cartesian"`)
+drives exactly that promotion path red.
+
+**C7 is not part of this landing.** It rides gen-view's own unlanded work and is sequenced
+separately, to land in W1; nothing under C7, its seed rows, `just refusals` rows 10/11, or Oracle 1b
+was touched here.
+
+### The roster census
+
+The corpus's growth rule is "reached" against `gen/lib/mkGenLibs.nix`'s roster (22 top-level keys;
+`strata` is that roster's own bucket-lookup map, not a library, so 21 libraries). "Reached" is judged
+by **member access**, not by binding — T2b binds `genTypes`/`genPrelude` as `specialArgs` and never
+actually calls either, which is a bound-but-dead roster member, not a declaration that exercises it.
+
+Measured directly against this repository (`git grep -c '<name>\.' HEAD` for the pre-landing state,
+the same over the working tree for post-landing):
+
+- **Before this landing:** 9 of 21 — `aspects`, `delivery`, `graph`, `merge`, `program`, `schema`,
+  `scope`, `select`, `view`.
+- **After this landing:** 17 of 21 — the same nine, plus C8-C15's eight: `algebra`, `assemble`,
+  `bind`, `class`, `dispatch`, `link`, `memo`, `product`.
+- **Deferred by ruling, not by omission:** `settings`. ADR-0017 (owner-ruled 2026-08-06, amended
+  2026-08-24) retires the `gen-settings` library itself; what survives re-homes as a framework-level
+  **feature**, and "the retirement's EXECUTION is deferred, no work scheduled by the ruling." There is
+  no settings construct for this corpus to declare against until that execution lands.
+- **Unreached, no ruling attached:** `identity`, `prelude`, `types` — the remaining three, carried
+  forward as v1.2+ input, same as `gen-bind` was carried from v1 into this landing.

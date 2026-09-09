@@ -25,33 +25,98 @@
         genGraph,
         genSelect,
         genValues,
+        genAlgebra,
+        genBind,
+        genDispatch,
+        genAspects,
         ...
       }:
       let
         # `gen-view`, `gen-program` and `gen-delivery` are NOT among the eight module args
         # `flakeModules.genLibs` injects (`genAlgebra genSchema genAspects genScope genGraph genSelect
         # genBind genDispatch`, `gen/flakeModules/genLibs.nix`); they are reached through the published
-        # stratum buckets instead — `substrate.view` and `framework.{program,delivery}`.
+        # stratum buckets instead — `substrate.view` and `framework.{program,delivery}`. `genProduct`,
+        # `genMemo`, `genLink`, `genClass`, `genAssemble` and `genMerge` (v1.1) are reached the same
+        # way, for the same reason.
         genView = inputs.gen.lib.substrate.view;
         genProgram = inputs.gen.lib.framework.program;
         genDelivery = inputs.gen.lib.framework.delivery;
+        genProduct = inputs.gen.lib.substrate.product;
+        genMemo = inputs.gen.lib.substrate.memo;
+        genLink = inputs.gen.lib.aspects.link;
+        genClass = inputs.gen.lib.aspects.class;
+        genAssemble = inputs.gen.lib.framework.assemble;
+        genMerge = inputs.gen.lib.modules.merge;
+
+        # ── C12 — a derived product graph, and a policy-stratum promotion (ADR-0016 rulings 1
+        # and 2; gen-product) — computed ahead of C1 and C5 because its promoted node joins C1's
+        # node set and its promoted edges join C2's edge set, the same "one graph" discipline C5's
+        # own dynamic edge already follows.
+        thimbleProductGraph = genGraph.mkGraph {
+          edges = [
+            {
+              from = "pewter";
+              to = "damask";
+            }
+          ];
+        };
+        bobbinProductGraph = genGraph.mkGraph {
+          edges = [
+            {
+              from = "grosgrain";
+              to = "faille";
+            }
+          ];
+        };
+        seamSpace = genProduct.productN "cartesian" [
+          {
+            dim = "thimble";
+            graph = thimbleProductGraph;
+            key = i: i;
+            entryOf = i: i;
+          }
+          {
+            dim = "bobbin";
+            graph = bobbinProductGraph;
+            key = i: i;
+            entryOf = i: i;
+          }
+        ];
+        seamCell = genProduct.cell seamSpace {
+          thimble = "pewter";
+          bobbin = "grosgrain";
+        };
+        # ★ THE HEAD, THE RELATA AND THE EDGE LABELS ARE ALL READ OFF THE COORDINATE — never
+        # restated as literals. Oracle 3 row C12c is the guard that catches a literal in this spot.
+        seamCoords = seamSpace.product.coordsOf seamCell;
+        seamHead = "seam:${seamCoords.thimble}:${seamCoords.bobbin}";
 
         # ── C1 — kinds and nodes (ADR-0012) ──
-        # The node union across both registries. `damask` is the one C2 reaches only across two
-        # `tacks` hops; `faille` is the one no DECLARED edge reaches at all, which is what makes C5's
-        # dynamic edge observable rather than a sentence.
-        nodes = genValues.hosts // genValues.bobbins;
+        # The node union across both registries, plus C12's promoted coordinate node once C5's
+        # program admits it. `damask` is the one C2 reaches only across two `tacks` hops; `faille`
+        # is the one no DECLARED edge reaches at all, which is what makes C5's dynamic edge
+        # observable rather than a sentence.
+        nodes = genValues.hosts // genValues.bobbins // seamPromotion.nodes;
 
         scope = genScope.buildRoots {
           kinds = genScope.mkKinds (
             map (n: genScope.mkKind { name = n; }) [
               "thimble"
               "bobbin"
+              "seam"
             ]
           );
           parentGraph = genScope.vertices (builtins.attrNames nodes);
           decls = nodes;
-          types = builtins.mapAttrs (n: _: if genValues.hosts ? ${n} then "thimble" else "bobbin") nodes;
+          types = builtins.mapAttrs (
+            n: _:
+            if genValues.hosts ? ${n} then
+              "thimble"
+            else if genValues.bobbins ? ${n} then
+              "bobbin"
+            else
+              "seam"
+          ) nodes;
         };
 
         ev = genScope.eval {
@@ -62,10 +127,12 @@
 
         thimbles = builtins.attrNames (ev.nodesOfType "thimble");
         bobbinNodes = builtins.attrNames (ev.nodesOfType "bobbin");
+        seamNodes = builtins.attrNames (ev.nodesOfType "seam");
 
         # ── C5 — a policy program producing a dynamic edge (ADR-0020, ADR-0022, ADR-0033) ──
         # Computed ahead of C2 because its output joins C2's edge set: ONE graph (ADR-0012), never a
-        # second structure for the policy stratum's output.
+        # second structure for the policy stratum's output. C12's promotion is a SECOND head in this
+        # SAME program, never a program invented for that row.
         pipingHead = "piping:grosgrain:faille";
         prog = genProgram.program {
           frozen = [
@@ -88,6 +155,12 @@
                 "faille"
               ];
             }
+            {
+              head = seamHead;
+              pos = [ "nap:pewter" ];
+              neg = [ "scotched:pewter" ];
+              relata = map (d: seamCoords.${d}) seamSpace.product.dims;
+            }
           ];
         };
         mdl = genProgram.model {
@@ -109,10 +182,29 @@
             ]
           else
             [ ];
+        # THE PROMOTION — a coordinate promoted into a node of the one graph by giving it edges
+        # (ADR-0016 ruling 2). Both the node and its edges are read off `seamCoords`/`seamSpace`,
+        # never restated as literals.
+        seamPromotion =
+          if (mdl.resolve seamHead).included then
+            {
+              nodes.${seamHead} = { };
+              edges = map (d: {
+                from = seamHead;
+                to = seamCoords.${d};
+                label = d;
+              }) seamSpace.product.dims;
+            }
+          else
+            {
+              nodes = { };
+              edges = [ ];
+            };
 
         # ── C2 — edges, queried (ADR-0012, ADR-0019) ──
-        # `edges` IS the one graph: what the corpus declared, plus what C5's policy stratum admitted.
-        edges = genValues.declaredEdges ++ pipingEdge;
+        # `edges` IS the one graph: what the corpus declared, plus what C5's policy stratum admitted,
+        # plus C12's promoted coordinate edges.
+        edges = genValues.declaredEdges ++ pipingEdge ++ seamPromotion.edges;
         byLabel = lbl: id: map (e: e.to) (builtins.filter (e: e.label == lbl && e.from == id) edges);
         lg = genGraph.labeledFrom {
           nodes = builtins.attrNames nodes;
@@ -309,6 +401,330 @@
           ];
           specialArgs = t2bCtors;
         };
+
+        # ── C8 — the contribution protocol (ADR-0012, ADR-0014): shape unions commutatively,
+        # content folds by positional authority. Three contributions, only one carrying edges.
+        c8Thimbles = {
+          name = "thimbles";
+          vertices = [
+            "pewter"
+            "damask"
+          ];
+          decls = {
+            pewter = {
+              spool = "linen";
+              aspects = [ "stitch" ];
+            };
+            damask = {
+              spool = "sateen";
+              aspects = [ ];
+            };
+          };
+        };
+        c8Bobbins = {
+          name = "bobbins";
+          vertices = [
+            "grosgrain"
+            "faille"
+          ];
+          edgeGraphs = [
+            {
+              label = "tacks";
+              graph = genScope.edge "pewter" "grosgrain";
+            }
+          ];
+          decls = {
+            grosgrain = {
+              gauge = "fine";
+            };
+            faille = {
+              gauge = "coarse";
+            };
+          };
+        };
+        c8Overlay = {
+          name = "overlay"; # a later layer, no members of its own
+          vertices = [ ];
+          decls.pewter = {
+            spool = "gros-de-tours";
+            tacked = true;
+          };
+        };
+        c8Contributions = [
+          c8Thimbles
+          c8Bobbins
+          c8Overlay
+        ];
+        c8Assembled = genAssemble.assemble { contributions = c8Contributions; };
+        c8Unioned = genAssemble.union { contributions = c8Contributions; };
+        c8Permuted = genAssemble.union {
+          contributions = [
+            c8Overlay
+            c8Thimbles
+            c8Bobbins
+          ];
+        };
+
+        # ── C9 — a SHARE class over declared content (ADR-0028): the class partitions on `weave`,
+        # never on the kind boundary itself.
+        shareProjections = {
+          pewter = {
+            weave = "plain";
+            spool = "linen";
+          };
+          damask = {
+            weave = "plain";
+            spool = "sateen";
+          };
+          grosgrain = {
+            weave = "twill";
+            gauge = "fine";
+          };
+          faille = {
+            weave = "twill";
+            gauge = "coarse";
+          };
+        };
+        shareClasses = genClass.mkClasses {
+          nodes = shareProjections;
+          keyOf = _name: p: p.weave;
+        };
+        plainClass = lib.findFirst (c: c.key == "plain") null shareClasses;
+        plainCore = genClass.mkCore {
+          class = plainClass;
+          projection = "selvage";
+          projections = shareProjections;
+        };
+        pewterShared = genClass.applyCoreMerge {
+          core = plainCore;
+          memberProjection = shareProjections.pewter;
+        };
+        plainGate = genClass.gateCore {
+          core = plainCore;
+          candidate = pewterShared;
+          real = shareProjections.pewter;
+        };
+        plainInvariance = genClass.invariantUnder {
+          projection = "selvage";
+          projections = shareProjections;
+          class = plainClass;
+        };
+
+        # ── C10 — one stratified dispatch over an invented action family (ADR-0019): each rule's
+        # stratum is STAMPED by `deriveGroup` from its own declared `produces`, none written by hand.
+        seamActions = genDispatch.mkActions {
+          basting = [
+            "tack"
+            "gather"
+          ];
+          finishing = [ "hem" ];
+        };
+        seamRules = map (genDispatch.deriveGroup seamActions.groupOfKind) [
+          (genDispatch.mkRule {
+            identity = "tack-the-thimbles";
+            produces = [ "tack" ];
+            condition = {
+              spool = "linen";
+            };
+            produce = id: _: [ (seamActions.tack { node = id; }) ];
+          })
+          (genDispatch.mkRule {
+            identity = "hem-the-linen";
+            produces = [ "hem" ];
+            condition = {
+              spool = "linen";
+            };
+            produce = id: _: [ (seamActions.hem { node = id; }) ];
+          })
+          (genDispatch.mkRule {
+            identity = "gather-the-sateen";
+            produces = [ "gather" ];
+            condition = {
+              spool = "sateen";
+            };
+            produce = id: _: [ (seamActions.gather { node = id; }) ];
+          })
+        ];
+        seamDispatched = genDispatch.dispatch {
+          rules = seamRules;
+          id = "pewter";
+          context = {
+            spool = "linen";
+          };
+          match =
+            cond: _id: ctx:
+            cond.spool == ctx.spool;
+          classify = seamActions.classify;
+          groupOrder = [
+            "basting"
+            "finishing"
+          ];
+        };
+
+        # ── C11 — a packaged subgraph, federated (ADR-0011 §4, ADR-0027). gen-link ships no
+        # adapter/lens surface (measured, OPEN 2) — `link { sources; wire; }` with a per-origin
+        # `keySemantics` is what it ships, and that is what this declares.
+        selvageFacetOpt = genMerge.mkOption {
+          type = genMerge.types.raw;
+          default = null;
+        };
+        selvageFacets = {
+          selvageCap = {
+            category = "facet";
+            contract = "capability";
+            option = selvageFacetOpt;
+          };
+          selvageReq = {
+            category = "facet";
+            contract = "capability";
+            option = selvageFacetOpt;
+          };
+        };
+        mkSelvageRegistry =
+          modules:
+          let
+            selvageSchema = genAspects.mkAspectSchema { keySemantics = selvageFacets; };
+          in
+          genMerge.evalModuleTree {
+            modules = [
+              { options.schema = selvageSchema.schemaOption; }
+              (selvageSchema.mkAspectModule { })
+            ]
+            ++ modules;
+          };
+        mill = mkSelvageRegistry [
+          {
+            config.aspects.stitch.selvageCap = {
+              provides = [
+                "warp"
+                "weft"
+              ];
+            };
+          }
+        ];
+        loom = mkSelvageRegistry [
+          {
+            config.aspects.braid = {
+              selvageReq = {
+                requires = [ "warp" ];
+              };
+              includes = [ (genAspects.keyRef "mill/stitch") ];
+            };
+          }
+        ];
+        federated = genLink.link {
+          sources = [
+            {
+              registry = mill.config.aspects;
+              keySemantics = selvageFacets;
+              origin = [ "mill" ];
+            }
+            {
+              registry = loom.config.aspects;
+              keySemantics = selvageFacets;
+              origin = [ "loom" ];
+            }
+          ];
+          wire."loom/braid".selvageReq = "mill/stitch";
+        };
+        selvageProvides = genLink.providesOf selvageFacets mill.config.aspects.stitch;
+
+        # ── C13 — `foldLayers` over an invented layered record (ADR-0017): all three strategies
+        # plus the default channel in one call, so a fold that only did `replace` would be green
+        # under a broken `append`.
+        weaveLayers = [
+          {
+            spool = "linen";
+            tacks = [ "a" ];
+            meta.warp = 1;
+          }
+          {
+            spool = "sateen";
+            tacks = [ "b" ];
+            meta.weft = 2;
+          }
+        ];
+        folded = genAlgebra.record.foldLayers {
+          strategies = {
+            tacks = "append";
+            meta = "recursive";
+          };
+          defaults = {
+            gauge = "fine";
+          };
+          layers = weaveLayers;
+        };
+
+        # ── C14 — the closed, first-order body-term algebra (ADR-0013 table row 2, ADR-0023). A
+        # TargetId is LITERAL in the term, so no term can compute which fixpoint to read.
+        selvageTerm =
+          with genBind.crossing.term;
+          concat [
+            (lit "selvage-")
+            (readFrom "pewter" [ "spool" ])
+          ];
+        selvageEnv = {
+          targets.pewter = {
+            spool = "linen";
+          };
+          siblings = { };
+        };
+        selvageChecked = genBind.crossing.checkTerm selvageTerm;
+        selvageResolved = genBind.crossing.resolveTerm selvageEnv selvageTerm;
+        knownFormers = genBind.crossing.knownFormers;
+        crossingPrims = genBind.crossing.prims;
+        inertBudget = genBind.crossing.inertBudget;
+        readCtxHeadsOfSelvage = genBind.crossing.readCtxHeads selvageTerm;
+        # THE THREE REFUSAL ARMS — refusals are DATA (a `__crossingResult == "refusal"` record),
+        # never a throw, so all three are `checks` cells here rather than `just refusals` rows.
+        selvageBadLitChecked = genBind.crossing.checkTerm (
+          with genBind.crossing.term; lit { spool = _: "linen"; }
+        );
+        selvageBadReadFromResolved = genBind.crossing.resolveTerm selvageEnv (
+          with genBind.crossing.term; readFrom "sarcenet" [ "spool" ]
+        );
+        selvageBadVocabChecked = genBind.crossing.checkTerm { __bodyTerm = "Frobnicate"; };
+
+        # ── C15 — the cyclic stratum, solved (ADR-0008 §2, ADR-0033). Deliberately OUTSIDE
+        # `config.declaredEdges`: C7 gates that relation and it must stay acyclic, so this
+        # component gets its own node names and its own accessor.
+        cyclicAccessor = {
+          dependencies =
+            id:
+            {
+              chintz = [ "tulle" ];
+              tulle = [
+                "chintz"
+                "organdy"
+              ];
+            }
+            .${id} or [ ];
+          nodeData = id: { inherit id; };
+        };
+        cyclicReach =
+          acc: view: id:
+          lib.sort (a: b: a < b) (
+            lib.unique ([ id ] ++ lib.concatLists (map (d: view.${d} or [ ]) (acc.dependencies id)))
+          );
+        cyclicLattice = {
+          bottom = [ ];
+          join = a: b: lib.sort (x: y: x < y) (lib.unique (a ++ b));
+          maxIter = 8;
+        };
+        solvedScc = genMemo.runScc genScope.ascend {
+          accessor = cyclicAccessor;
+          recompute = cyclicReach;
+          store = { };
+          scc = [
+            "chintz"
+            "tulle"
+          ];
+          higherStrata.organdy = [ "organdy" ];
+          lattices = {
+            chintz = cyclicLattice;
+            tulle = cyclicLattice;
+          };
+        };
       in
       {
         imports = [
@@ -445,6 +861,264 @@
               # whole NixOS evaluation and writes the .drv, and stops there.
               nixos-instantiate = pkgs.writeText "gen-demo-pewter-drvpath" (
                 config.flake.nixosConfigurations.pewter.config.system.build.toplevel.drvPath
+              );
+
+              # (8) C8 — the contribution protocol: shape unions commutatively while content folds
+              # by positional authority. Permuting `overlay` to the front is the discriminator: the
+              # node SET stays fixed, the folded `spool` does not.
+              contribution-protocol = asserts "contribution-protocol" (
+                builtins.attrNames c8Assembled.nodes == [
+                  "damask"
+                  "faille"
+                  "grosgrain"
+                  "pewter"
+                ]
+                &&
+                  c8Assembled.nodeOrder == [
+                    "pewter"
+                    "damask"
+                    "grosgrain"
+                    "faille"
+                  ]
+                &&
+                  c8Unioned.decls.pewter == {
+                    aspects = [ "stitch" ];
+                    spool = "gros-de-tours";
+                    tacked = true;
+                  }
+                &&
+                  c8Permuted.decls.pewter == {
+                    aspects = [ "stitch" ];
+                    spool = "linen";
+                    tacked = true;
+                  }
+                && map (g: g.label) c8Unioned.edgeGraphs == [ "tacks" ]
+              );
+
+              # (9) C9 — a SHARE class over declared content (`weave`): the "keys narrow, the gate
+              # decides" discipline asserted as both the partition and the byte gate.
+              share-class = asserts "share-class" (
+                map (c: c.key) shareClasses == [
+                  "plain"
+                  "twill"
+                ]
+                &&
+                  map (c: c.members) shareClasses == [
+                    [
+                      "damask"
+                      "pewter"
+                    ]
+                    [
+                      "faille"
+                      "grosgrain"
+                    ]
+                  ]
+                &&
+                  map (c: c.archetype) shareClasses == [
+                    "damask"
+                    "faille"
+                  ]
+                && plainCore.sharedKeys == [ "weave" ]
+                && plainCore.values == { weave = "plain"; }
+                &&
+                  pewterShared == {
+                    spool = "linen";
+                    weave = "plain";
+                  }
+                && plainGate.gate == true
+                && plainGate.candidateDigest == plainGate.realDigest
+                &&
+                  plainInvariance == {
+                    divergingKeys = [ "spool" ];
+                    invariant = false;
+                  }
+              );
+
+              # (10) C10 — one stratified dispatch: each rule's stratum was STAMPED by
+              # `deriveGroup` from its own declared `produces`, none written by hand; the `sateen`
+              # rule not firing against a `linen` context is the discriminator.
+              stratified-dispatch = asserts "stratified-dispatch" (
+                map (x: x.group) seamRules == [
+                  "basting"
+                  "finishing"
+                  "basting"
+                ]
+                &&
+                  seamDispatched.actions == {
+                    basting = [
+                      {
+                        __action = "tack";
+                        node = "pewter";
+                      }
+                    ];
+                    finishing = [
+                      {
+                        __action = "hem";
+                        node = "pewter";
+                      }
+                    ];
+                  }
+                &&
+                  seamDispatched.orderedGroups == [
+                    "basting"
+                    "finishing"
+                  ]
+              );
+
+              # (11) C11 — a packaged subgraph, federated: the capability declared locally equals
+              # the capability the requirer resolves to after the exchange (ADR-0027's equivalence
+              # survival). gen-link ships no adapter/lens surface, measured (README finding), so
+              # `link` substitutes for the absent adapter.
+              federated-link = asserts "federated-link" (
+                selvageProvides == [
+                  "warp"
+                  "weft"
+                ]
+                &&
+                  federated.resolved == {
+                    "loom/braid" = [
+                      "warp"
+                      "weft"
+                    ];
+                  }
+                &&
+                  builtins.attrNames federated.nodes == [
+                    "loom/braid"
+                    "mill/stitch"
+                  ]
+                &&
+                  federated.graph.edges == [
+                    {
+                      from = "loom/braid";
+                      to = "mill/stitch";
+                    }
+                  ]
+                && (builtins.head federated.bound).relata == { selvageReq = "mill/stitch"; }
+                && lib.all (n: lib.hasPrefix "aspect:" n.identity) (builtins.attrValues federated.nodes)
+              );
+
+              # (12) C12 — a derived product graph and a policy-stratum promotion. The KIND is the
+              # discriminator (Oracle 3 drives this red by seeding `productN "tensor"`), and the
+              # coordinate coupling is guarded by the fact that both the head and the scope
+              # admission below are read off `seamCoords`, never restated.
+              product-promotion = asserts "product-promotion" (
+                seamSpace.product.dims == [
+                  "thimble"
+                  "bobbin"
+                ]
+                &&
+                  map (c: "${c.thimble}*${c.bobbin}") (genProduct.cells seamSpace) == [
+                    "damask*faille"
+                    "damask*grosgrain"
+                    "pewter*faille"
+                    "pewter*grosgrain"
+                  ]
+                &&
+                  map (
+                    cid:
+                    let
+                      c = genProduct.coordsOf seamSpace cid;
+                    in
+                    "${c.thimble}*${c.bobbin}"
+                  ) (seamSpace.edges seamCell) == [
+                    "damask*grosgrain"
+                    "pewter*faille"
+                  ]
+                && (genProduct.projectTo seamSpace "bobbin").projection.ofCell seamCell == "grosgrain"
+                && (mdl.resolve seamHead).included == true
+                && seamNodes == [ "seam:pewter:grosgrain" ]
+                &&
+                  thimbles == [
+                    "damask"
+                    "pewter"
+                  ]
+                &&
+                  bobbinNodes == [
+                    "faille"
+                    "grosgrain"
+                  ]
+              );
+
+              # (13) C13 — `foldLayers`: all three strategies plus the default channel in one call.
+              layered-fold = asserts "layered-fold" (
+                folded == {
+                  gauge = "fine";
+                  meta = {
+                    warp = 1;
+                    weft = 2;
+                  };
+                  spool = "sateen";
+                  tacks = [
+                    "a"
+                    "b"
+                  ];
+                }
+              );
+
+              # (14) C14 — the closed, first-order body-term algebra: refusals are DATA, never a
+              # throw, so all three refusal arms live in this one cell rather than in
+              # `just refusals` — the only construct of which that is true.
+              body-term-algebra = asserts "body-term-algebra" (
+                selvageResolved == {
+                  __crossingResult = "ok";
+                  value = "selvage-linen";
+                }
+                && selvageChecked.__crossingResult == "ok"
+                &&
+                  knownFormers == [
+                    "Lit"
+                    "ReadFrom"
+                    "ReadCtx"
+                    "If"
+                    "Attrs"
+                    "List"
+                    "Concat"
+                    "PathJoin"
+                    "Apply"
+                  ]
+                &&
+                  builtins.attrNames crossingPrims == [
+                    "attrNames"
+                    "concatStringsSep"
+                    "elemAt"
+                    "getAttr"
+                    "length"
+                    "toString"
+                  ]
+                &&
+                  inertBudget == {
+                    maxDepth = 32;
+                    maxNodes = 10000;
+                  }
+                && readCtxHeadsOfSelvage == [ ]
+                && selvageBadLitChecked.refusal.code == "lit-payload-function"
+                && selvageBadLitChecked.refusal.blamed == "supplier"
+                && selvageBadReadFromResolved.refusal.code == "readfrom-names-non-member"
+                &&
+                  selvageBadReadFromResolved.refusal.witness == {
+                    available = [ "pewter" ];
+                    target = "sarcenet";
+                  }
+                && selvageBadVocabChecked.refusal.code == "term-vocabulary"
+                && selvageBadVocabChecked.refusal.witness.former == "Frobnicate"
+              );
+
+              # (15) C15 — the cyclic stratum, solved: both members reach each other and the
+              # external `higherStrata` supplied, by `runScc`'s iterate-from-bottom ascent rather
+              # than the acyclic rebuilder, which cannot express a cycle at all.
+              cyclic-stratum = asserts "cyclic-stratum" (
+                solvedScc == {
+                  chintz = [
+                    "chintz"
+                    "organdy"
+                    "tulle"
+                  ];
+                  tulle = [
+                    "chintz"
+                    "organdy"
+                    "tulle"
+                  ];
+                }
               );
             };
           };
