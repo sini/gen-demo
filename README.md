@@ -57,7 +57,7 @@ projects **empty** — no error, no output, just an empty `nixosConfigurations`.
 
 ```sh
 just check            # nix flake check
-just check-hub-main   # nix flake check --override-input gen github:sini/gen
+just check-hub-main   # nix flake check --refresh --override-input gen github:sini/gen
 ```
 
 The committed `flake.lock` is the **last-green pin**. The second arm evaluates the same corpus against

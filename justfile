@@ -12,7 +12,7 @@ check:
 # ARM 2 — the same corpus against the hub's current main, so a hub landing that breaks the corpus
 # reads red immediately instead of waiting for a relock.
 check-hub-main:
-    nix flake check --override-input gen github:sini/gen
+    nix flake check --refresh --override-input gen github:sini/gen
 
 # NOT a check. The full build of the one target, verified once at delivery and on demand.
 build-target:
