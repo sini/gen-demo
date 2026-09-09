@@ -179,19 +179,21 @@ was touched here.
 
 The corpus's growth rule is "reached" against `gen/lib/mkGenLibs.nix`'s roster (22 top-level keys;
 `strata` is that roster's own bucket-lookup map, not a library, so 21 libraries). "Reached" is judged
-by **member access**, not by binding — T2b binds `genTypes`/`genPrelude` as `specialArgs` and never
-actually calls either, which is a bound-but-dead roster member, not a declaration that exercises it.
+by **evaluation**: a roster member is reached iff forcing the corpus's `.#checks.<system>` cells
+actually evaluates through its `lib` — not by a name appearing in this repo's text, and not by a
+library merely being bound (e.g. as a `specialArgs` value) without anything calling it.
 
-Measured directly against this repository (`git grep -c '<name>\.' HEAD` for the pre-landing state,
-the same over the working tree for post-landing):
+Measured by poisoning each roster member's `lib` with a run-unique `throw` and forcing every
+`.#checks.<system>` cell, exits read unpiped: a member is reached iff at least one cell reds under its
+own poison. Reproduce against a copy of this repo with one roster member's `lib` swapped for a
+throwing stub, then build every `.#checks.<system>.<cell>` (`just check` runs the whole set).
+`gen-settings` poisoned is the discriminating negative control: every cell stays green (rc 0), showing
+the instrument discriminates and this corpus simply has nothing that forces `gen-settings`.
 
-- **Before this landing:** 9 of 21 — `aspects`, `delivery`, `graph`, `merge`, `program`, `schema`,
-  `scope`, `select`, `view`.
-- **After this landing:** 17 of 21 — the same nine, plus C8-C15's eight: `algebra`, `assemble`,
-  `bind`, `class`, `dispatch`, `link`, `memo`, `product`.
+- **Before this landing:** 14 of 21 — unreached: `algebra`, `assemble`, `class`, `dispatch`, `link`,
+  `product`, `settings`.
+- **After this landing:** 20 of 21 — unreached: `settings` only.
 - **Deferred by ruling, not by omission:** `settings`. ADR-0017 (owner-ruled 2026-08-06, amended
   2026-08-24) retires the `gen-settings` library itself; what survives re-homes as a framework-level
-  **feature**, and "the retirement's EXECUTION is deferred, no work scheduled by the ruling." There is
-  no settings construct for this corpus to declare against until that execution lands.
-- **Unreached, no ruling attached:** `identity`, `prelude`, `types` — the remaining three, carried
-  forward as v1.2+ input, same as `gen-bind` was carried from v1 into this landing.
+  **feature**, and the retirement's execution is deferred with no work scheduled by the ruling. There
+  is no settings construct for this corpus to declare against until that execution lands.
