@@ -862,7 +862,7 @@
         };
         c16ArmToolkit = genScope.eval {
           scope = c16Assembled;
-          attributes.children = c16Structural.children;
+          attributes = c16Structural;
         };
 
         # C1's OWN flat assembly, read as `ev`/`scope` are already bound above — never rebuilt here.
@@ -872,7 +872,7 @@
         # pair above is what makes it non-vacuous.
         c16O5Toolkit = genScope.eval {
           inherit scope;
-          attributes.children = (genAssemble.structuralDecls scope.nodes).children;
+          attributes = genAssemble.structuralDecls scope.nodes;
         };
       in
       {

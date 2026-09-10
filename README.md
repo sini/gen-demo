@@ -133,7 +133,7 @@ twelve enforcers is invisible to `nix flake check` until someone runs `just refu
 ```sh
 just check            # nix flake check
 just check-hub-main   # nix flake check --refresh --override-input gen github:sini/gen
-just refusals         # T5's nine planted violations, each driven red by name, each with an unplanted control
+just refusals         # T5's twelve planted violations, each driven red by name, each with an unplanted control
 ```
 
 The committed `flake.lock` is the **last-green pin**. The second arm evaluates the same corpus against
