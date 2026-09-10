@@ -49,13 +49,14 @@ incremental plane's decision crossing.
 | C13 -- `foldLayers` | 0017 | `genAlgebra.record.foldLayers`, all three strategies plus the default channel in one call |
 | C14 -- the closed body-term algebra | 0013 row 2, 0023 | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell |
 | C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
-| T5 -- planted refusals | 0025 | eleven enforcers, each driven red by name via `just refusals` |
+| C16 -- the aspect graph, assembled | 0012, 0010 §3 | the corpus's own aspect facts (`genAspects.graphFacts`) contributed through `genAssemble`'s protocol alongside the node registry's membership dimension; queried through both gen-graph's labelled graph and gen-select's context |
+| T5 -- planted refusals | 0025 | twelve enforcers, each driven red by name via `just refusals` |
 
-`gen-modules/corpus.nix` holds the C1-C6 declarations; `aspect-cnf.nix` holds the key-category
-declaration that both the tree and the hub read; `flake.nix` holds the queries, C7's gate over
-`config.declaredEdges`, C8-C15's own standalone fixtures, and all sixteen `checks`; the `justfile`'s
-`refusals` recipe holds T5's by-name half, which runs out of band because `builtins.tryEval` cannot
-read a refusal's message.
+`gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
+holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
+queries, C7's gate over `config.declaredEdges`, C8-C16's own standalone fixtures, and all seventeen
+`checks`; the `justfile`'s `refusals` recipe holds T5's by-name half, which runs out of band because
+`builtins.tryEval` cannot read a refusal's message.
 
 ### The naming rule — invented kinds only
 
@@ -74,7 +75,7 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
 
 ## The CI contract
 
-`nix flake check` runs sixteen checks, and they are the acceptance criteria:
+`nix flake check` runs seventeen checks, and they are the acceptance criteria:
 
 1. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -112,14 +113,20 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     (`[ ]`, over a real five-way partition) and the contracted accessor's own edge lookup
     (`gated.edges "pewter"`). A hand-written record of the same fields satisfies this cell byte-for-
     byte -- see Oracle 1b and `just refusals` row 11 below.
+17. **`aspect-contribution`** — C16. The corpus's own aspect facts (`genAspects.graphFacts`)
+    contributed through `genAssemble`'s protocol alongside the node registry's declared membership;
+    the labelled graph `genGraph.labeledFrom`/`forgetLabels` produces and the selector context
+    `genSelect.adapters.registry.mkContext` builds over the PUBLISHED parent, both walked; oracle 5's
+    structural-helper substitution armed at C16's own non-flat assembly (`children`/`subtreeOf`
+    diverge) and at C1's flat one (the node set does not).
 
-T5's eleven refusals are not among these sixteen: `builtins.tryEval` yields `success` and nothing
+T5's twelve refusals are not among these seventeen: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `just refusals` instead (below).
 
 **T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
 `just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the
-eleven enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
+twelve enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
 
 ### Two arms, plus the by-name half
 
@@ -167,6 +174,14 @@ declares `options.aspects` and `options.schema` together; it declares only `opti
 `gen-modules/corpus.nix` declares `options.schema` itself, from the same `aspectSchema` value, for
 exactly this reason.
 
+**4. `gen-assemble` has a `types` contribution key it can never honour.** `kinds` is not among the
+seven contribution keys and `assemble` forwards none to `buildRoots`, so any non-empty `types` on any
+contribution aborts the assembly (`gen-scope.buildRoots: \`types\` declares kind(s) … but no \`kinds\`
+registry was supplied`) — measured on both a populated and an all-null `types` value; only an absent
+`types` is green. C16 declares no `types` and carries its per-node data through `decls` alone; whether
+the repair is an assembly-wide `kinds` parameter or retiring `types` from the record is a design
+question reported to `den-hoag-9wj6`, not resolved here.
+
 ## v1.1
 
 Nine more positive constructs (C7-C15), one new `checks` cell per construct, and six more
@@ -213,3 +228,26 @@ the instrument discriminates and this corpus simply has nothing that forces `gen
   2026-08-24) retires the `gen-settings` library itself; what survives re-homes as a framework-level
   **feature**, and "the retirement's EXECUTION is deferred, no work scheduled by the ruling." There
   is no settings construct for this corpus to declare against until that execution lands.
+
+## v1.2
+
+One more positive construct (C16) and one more planted-violation refusal (T5 row 12, `just
+refusals`), against `2026-09-09-gen-demo-aspect-contribution-spec.md` in den-ag-design. C16
+assembles the corpus's **own** aspect graph through `genAssemble`'s contribution protocol
+(ADR-0012, ADR-0010 §3 toolkit item): `genAspects.graphFacts` publishes the corpus's aspect nodes,
+its containment relation and its includes relation as plain data, and two contributions —
+the aspect facts and the node registry's declared membership — are unioned into one assembly.
+Both gen-graph's labelled graph (`labeledFrom`/`forgetLabels`, walked with `query`, `roots`,
+`leaves`, `cycles`) and gen-select's selector context (`adapters.registry.mkContext`, built over the
+PUBLISHED parent) are exercised over the result, and oracle 5's structural-helper substitution is
+armed a second way: at C16's own non-flat assembly, where `children`/`subtreeOf` diverge between the
+hand-written and toolkit forms, beside C1's flat one, where the node set does not move at all.
+
+`just refusals` row 12 plants the aspect includes contribution under the reserved label `I` —
+gen-scope's own import relation between scopes, not the aspect includes relation, and reaching for
+it because the words are near neighbours is exactly the collision `gen-assemble`'s reserved-label
+refusal exists to stop.
+
+**The roster census is unchanged by this landing: 20 of 21, `settings` unreached.** C16 calls no
+roster member C1-C15 did not already reach — `assemble` (C8), `scope`, `graph` and `select` are all
+already forced by earlier cells — so this landing moves nothing in the census above.

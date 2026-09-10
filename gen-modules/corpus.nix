@@ -126,5 +126,13 @@ in
     # a declared-but-unset class. Present in the body (not omitted), so the projected entry's key set
     # witnesses the declaration reached the submodule even though the value carries no content.
     aspects.stitch.gusset = null;
+
+    # ── C16 — THE ASPECT GRAPH ITSELF, given depth so its published facts are a GRAPH ──
+    aspects.hemline.placket.eyelet = { };
+    aspects.hemline.facing = { };
+    aspects.bartack.includes = [
+      config.aspects.hemline.placket   # a REFERENCE — resolves to the node "hemline/placket"
+      ({ node, ... }: { })             # INLINE CONTENT — its POSITION is published, it is not an edge
+    ];
   };
 }

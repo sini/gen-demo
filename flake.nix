@@ -752,6 +752,128 @@
         # forces gen-graph only (already reached) and adds nothing for gen-view.
         gatedSccs = (gated.condensation).sccs;
         gatedEdges = gated.edges "pewter";
+
+        # ── C16 — the aspect graph itself, assembled through the contribution protocol (ADR-0012,
+        # ADR-0010 §3). `cnf` is the SAME value `gen.aspectCnf` above takes, bound once and reused:
+        # the declaration cannot be read back out of the compose result. `genValues.aspects` is the
+        # nested aspect root the corpus declares.
+        c16Cnf = import ./aspect-cnf.nix;
+        c16Facts = genAspects.graphFacts c16Cnf genValues.aspects;
+
+        # CONTAINMENT travels as `parentGraph`, and the edge runs CHILD -> PARENT (gen-scope groups
+        # a `P` contribution's edges by `e.from` and reads `e.to` as the parent).
+        c16ParentGraph = genScope.overlays (
+          map (
+            id:
+            let
+              p = c16Facts.parentOf.${id};
+            in
+            if p == null then genScope.vertex id else genScope.edge id p
+          ) c16Facts.nodes
+        );
+
+        # INCLUDES travels under a label of the caller's own. NOT `I` — that is gen-scope's own
+        # import relation between scopes, reserved by gen-assemble at the entry.
+        c16IncludesGraph = genScope.overlays (
+          builtins.concatMap (id: map (t: genScope.edge id t) c16Facts.includesOf.${id}) c16Facts.nodes
+        );
+
+        c16AspectGraph = {
+          name = "aspect-graph";
+          vertices = c16Facts.nodes; # DECLARED membership; the only key that says a node exists
+          parentGraph = c16ParentGraph;
+          edgeGraphs = [
+            {
+              label = "declares";
+              graph = c16IncludesGraph;
+            }
+          ];
+          # A STATED PROJECTION of `nodeData`, not the raw record — `eyelet`/`includes` would
+          # otherwise enter the assembly twice, once as shape and once as content, and `id_hash` is
+          # internal addressing only (ADR-0016 ruling 5), read through the selector context below.
+          decls = builtins.mapAttrs (_: v: { inherit (v) key description; }) c16Facts.nodeData;
+        };
+
+        # THE SECOND CONTRIBUTION — the corpus's own node registry, which already declares aspect
+        # membership. The union point is only exercised because something else is in the list.
+        c16RegNodes = genValues.hosts // genValues.bobbins;
+        c16Registry = {
+          name = "node-registry";
+          vertices = builtins.attrNames c16RegNodes;
+          edgeGraphs = [
+            {
+              label = "members";
+              graph = genScope.overlays (
+                builtins.concatMap (id: map (a: genScope.edge id a) (genValues.hosts.${id}.aspects or [ ]))
+                  (builtins.attrNames genValues.hosts)
+              );
+            }
+          ];
+        };
+
+        c16Contributions = [
+          c16AspectGraph
+          c16Registry
+        ];
+        c16Union = genAssemble.union { contributions = c16Contributions; };
+        c16Assembled = genAssemble.assemble { contributions = c16Contributions; };
+
+        # ── the queries — §3.3's primitive table, both doors ──
+        #
+        # `c16Structural` is the same binding oracle 5's instance below substitutes — one call site
+        # defined once and reused by both. `c16LabelGraph` reads one label's graph back off the
+        # union (post-protocol); `c16Out` turns that graph into the `id -> [ids]` shape
+        # `labeledFrom`'s `perLabel` wants, by the same from/to convention as containment above.
+        c16Structural = genAssemble.structuralDecls c16Assembled.nodes;
+        c16LabelGraph = label: (builtins.head (builtins.filter (g: g.label == label) c16Union.edgeGraphs)).graph;
+        c16Out = g: id: map (e: e.to) (builtins.filter (e: e.from == id) g.edges);
+
+        c16Lg = genGraph.labeledFrom {
+          nodes = c16Assembled.nodeOrder;
+          perLabel = {
+            # THE INVERSION IS THE TOOLKIT'S, NOT HAND-ROLLED: `c16Structural.children` is
+            # `genAssemble.structuralDecls`'s own `_self: id: filterAttrs (_: n: n.parent == id) nodes`.
+            contains = id: builtins.attrNames (c16Structural.children null id);
+            declares = c16Out (c16LabelGraph "declares");
+            members = c16Out (c16LabelGraph "members");
+          };
+        };
+
+        # The context is built with `parent` = the PUBLISHED `parentOf`, NOT a key split and NOT
+        # `_: null` — the fix §3.4 names. `entryFor` is stated explicitly so the identity the
+        # context projects is gen-aspects' own `aspectId`. `sel.kind` is left unsupported (its
+        # default `null`): gen-aspects mints no kind value for an aspect node, so there is none to
+        # pass and none to invent.
+        c16Ctx = genSelect.adapters.registry.mkContext {
+          nodes = c16Facts.nodes;
+          data = id: c16Facts.nodeData.${id};
+          parent = id: c16Facts.parentOf.${id};
+          entryFor = id: c16Facts.nodeData.${id};
+        };
+
+        # ── oracle 5's instance — the structural-helper substitution, armed two ways ──
+        #
+        # C16's OWN non-flat assembly: the hand-written `children` (C1's own shape, nothing
+        # contained) against the toolkit's `structuralDecls`. The node set cannot move (identity is
+        # free by construction); `get`/`subtreeOf` DO move, which is the arming.
+        c16ArmHand = genScope.eval {
+          scope = c16Assembled;
+          attributes.children = _: _: { };
+        };
+        c16ArmToolkit = genScope.eval {
+          scope = c16Assembled;
+          attributes.children = c16Structural.children;
+        };
+
+        # C1's OWN flat assembly, read as `ev`/`scope` are already bound above — never rebuilt here.
+        # `structuralDecls` over C1's flat `scope.nodes` gives every node `parent == null` already,
+        # so `filterAttrs (_: n: n.parent == id) nodes` is `{ }` for every id — the same answer
+        # `ev`'s own hand-written `_: _: { }` gives. The node-set identity is the claim; the arming
+        # pair above is what makes it non-vacuous.
+        c16O5Toolkit = genScope.eval {
+          inherit scope;
+          attributes.children = (genAssemble.structuralDecls scope.nodes).children;
+        };
       in
       {
         imports = [
@@ -1167,6 +1289,177 @@
                     "grosgrain"
                     "damask"
                   ]
+              );
+
+              # (17) C16 — the aspect graph, assembled through the contribution protocol (ADR-0012,
+              # ADR-0010 §3 toolkit item). The corpus's own aspect facts, contributed alongside the
+              # node registry's declared membership, queried through gen-graph's labelled graph and
+              # gen-select's context; oracle 5's structural-helper substitution armed at C16's own
+              # non-flat assembly (children/subtreeOf diverge) and at C1's flat one (the node set
+              # does not).
+              aspect-contribution = asserts "aspect-contribution" (
+                # O1/O2 — the facts are a GRAPH, and they assemble; containment survives.
+                c16Facts.nodes == [
+                  "bartack"
+                  "hemline"
+                  "hemline/facing"
+                  "hemline/placket"
+                  "hemline/placket/eyelet"
+                  "stitch"
+                ]
+                && c16Assembled.nodeOrder == [
+                  "bartack"
+                  "hemline"
+                  "hemline/facing"
+                  "hemline/placket"
+                  "hemline/placket/eyelet"
+                  "stitch"
+                  "damask"
+                  "faille"
+                  "grosgrain"
+                  "pewter"
+                ]
+                && c16Assembled.nodes."hemline/placket".parent == "hemline"
+                && c16Assembled.nodes."hemline/placket".decls == {
+                  __edges = {
+                    declares = [ ];
+                    members = [ ];
+                  };
+                  description = "Aspect placket";
+                  key = "hemline/placket";
+                }
+                # O3 — containment travels CHILD -> PARENT.
+                && c16Union.parentGraph.edges == [
+                  {
+                    from = "hemline/facing";
+                    to = "hemline";
+                  }
+                  {
+                    from = "hemline/placket";
+                    to = "hemline";
+                  }
+                  {
+                    from = "hemline/placket/eyelet";
+                    to = "hemline/placket";
+                  }
+                ]
+                # O4 — includes travel under the caller's own label.
+                && map (g: g.label) c16Union.edgeGraphs == [
+                  "declares"
+                  "members"
+                ]
+                # O5 — the two contributions are ONE assembly, membership globally declared.
+                && c16Assembled.nodes."pewter".decls.__edges == {
+                  declares = [ ];
+                  members = [ "stitch" ];
+                }
+                && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
+                # O6 — the query walks the labelled graph the union produced.
+                && genGraph.query {
+                  graph = c16Lg;
+                  from = "hemline";
+                  follow = genGraph.regex.star (genGraph.regex.lit "contains");
+                } == [
+                  "hemline"
+                  "hemline/facing"
+                  "hemline/placket"
+                  "hemline/placket/eyelet"
+                ]
+                && genGraph.query {
+                  graph = c16Lg;
+                  from = "pewter";
+                  follow = genGraph.regex.seq [
+                    (genGraph.regex.lit "members")
+                    (genGraph.regex.star (genGraph.regex.lit "contains"))
+                  ];
+                } == [ "stitch" ]
+                && genGraph.query {
+                  graph = c16Lg;
+                  from = "bartack";
+                  follow = genGraph.regex.seq [
+                    (genGraph.regex.lit "declares")
+                    (genGraph.regex.star (genGraph.regex.lit "contains"))
+                  ];
+                } == [
+                  "hemline/placket"
+                  "hemline/placket/eyelet"
+                ]
+                && genGraph.roots (genGraph.forgetLabels c16Lg) == [
+                  "bartack"
+                  "damask"
+                  "faille"
+                  "grosgrain"
+                  "hemline"
+                  "pewter"
+                ]
+                && genGraph.leaves (genGraph.forgetLabels c16Lg) == [
+                  "damask"
+                  "faille"
+                  "grosgrain"
+                  "hemline/facing"
+                  "hemline/placket/eyelet"
+                  "stitch"
+                ]
+                && genGraph.cycles (genGraph.forgetLabels c16Lg) == [ ]
+                # O7 — the selector reads the PUBLISHED parent, not a key split.
+                && genSelect.matches (
+                  genSelect.descendant (genSelect.attrs { key = "hemline"; }) genSelect.star
+                ) "hemline/placket/eyelet" c16Ctx
+                && genSelect.matches
+                  (genSelect.child (genSelect.attrs { key = "hemline"; }) genSelect.star)
+                  "hemline/placket"
+                  c16Ctx
+                && !(
+                  genSelect.matches
+                    (genSelect.child (genSelect.attrs { key = "hemline"; }) genSelect.star)
+                    "hemline/placket/eyelet"
+                    c16Ctx
+                )
+                && genSelect.matches (genSelect.has (genSelect.attrs { key = "hemline/facing"; })) "hemline"
+                  c16Ctx
+                && c16Ctx.ancestors "hemline/placket/eyelet" == [
+                  "hemline/placket"
+                  "hemline"
+                ]
+                && c16Ctx.children "hemline" == [
+                  "hemline/facing"
+                  "hemline/placket"
+                ]
+                # O8 — `entryFor` is honoured and `sel.kind` is unsupported LOUDLY.
+                && !(
+                  builtins.tryEval (
+                    builtins.deepSeq (
+                      genSelect.matches (genSelect.kind genValues.schema.thimble) "hemline" c16Ctx
+                    ) true
+                  )
+                ).success
+                && (c16Ctx.data "hemline/placket").__identity.id_hash
+                  == c16Facts.nodeData."hemline/placket".id_hash
+                && (c16Ctx.data "hemline/placket").__identity.kind == null
+                # O9 — oracle 5's instance, armed both ways.
+                && c16ArmHand.get "hemline" "children" == { }
+                && builtins.attrNames (c16ArmToolkit.get "hemline" "children") == [
+                  "hemline/facing"
+                  "hemline/placket"
+                ]
+                && builtins.attrNames (c16ArmHand.subtreeOf "hemline") == [ "hemline" ]
+                && builtins.attrNames (c16ArmToolkit.subtreeOf "hemline") == [
+                  "hemline"
+                  "hemline/facing"
+                  "hemline/placket"
+                  "hemline/placket/eyelet"
+                ]
+                && ev.allNodes == c16O5Toolkit.allNodes
+                && ev.allNodeIds == [
+                  "damask"
+                  "faille"
+                  "grosgrain"
+                  "pewter"
+                  "seam:pewter:grosgrain"
+                ]
+                && c16O5Toolkit.allNodeIds == ev.allNodeIds
+                # comparator control, same run: two genuinely different node sets compare false.
+                && (ev.allNodeIds == c16Facts.nodes) == false
               );
             };
           };
