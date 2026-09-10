@@ -349,6 +349,14 @@
           graph = movementGraph;
         };
 
+        # ── C17 — the identity-key set closes at the KIND boundary (ADR-0016 ruling 5, ADR-0033) ──
+        # Read off the composed VALUES, not the delivery projection: an instance's `id_hash` and its
+        # published key set are schema data, and the projection carries neither.
+        c17Schema = inputs.gen.lib.substrate.schema;
+        c17Pewter = genValues.hosts.pewter;
+        c17Thimble = genValues.schema.thimble;
+        c17Bobbin = genValues.schema.bobbin;
+
         # ── C6 — a delivery to one target (ADR-0028) ──
         pewterClasses = builtins.attrNames config.gen.composed.hosts.pewter.classes;
         damaskClasses = builtins.attrNames config.gen.composed.hosts.damask.classes;
@@ -965,6 +973,51 @@
                 && mdl.adjudication.outcome == "admitted"
                 && mdl.adjudication.searched == false
                 && mdl.adjudication.ground == "Van Gelder, Ross & Schlipf 1991, Corollary 5.6"
+              );
+
+              # C17 — the identity-key set is CLOSED at the kind boundary, so an option contributed on
+              # the instance side has nowhere to attach in an identity. The corpus's `hosts` registry
+              # now carries an `extraModules` option (`shirring`); this asserts the option is really
+              # there AND that the stamp is byte-identical to the one the corpus carried before it
+              # existed. Both halves are load-bearing: the equality alone passes for a registry that
+              # dropped the caller's modules on the floor, which is a different library and a worse one.
+              #
+              # It also closes den-hoag-9l26n. `identityHashForKind` is the SOLE recompute path, and on
+              # a kind declared through gen-aspects' `schemaOption` — the shape this corpus uses, whose
+              # `options` attribute is EMPTY — it used to answer over `[ "name" ]` alone and disagree
+              # with the stamp on every instance. Since the derivation reads the kind's own evaluation
+              # it cannot disagree, and the pinned literal is what separates agreement from two
+              # derivations degenerating together.
+              #
+              # The live control is the OTHER kind: `bobbin` recomputes to its OWN stamp, over a
+              # different option set, and the two stamps differ — so the recompute is neither constant
+              # nor degenerate. (The gen-schema-DECLARED kind-value shape is controlled in gen-schema's
+              # own suite, `identity-key-closure.test-control-both-kind-value-shapes-mint-alike`; this
+              # corpus declares no such kind and inventing one here would test the fixture, not the
+              # corpus.)
+              #
+              # ★ THE WRONG-KIND ARM IS ABSENT, AND ITS ABSENCE IS A FINDING RATHER THAN A CHOICE.
+              # `id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match means the kind
+              # guess is wrong. Recomputing `bobbin` against a thimble instance does not return a
+              # non-matching hash: `identityHashForKind`'s accessor is `(k: instance.${k})`, unguarded,
+              # so it dies on `attribute 'gauge' missing` — an abort where the documented contract
+              # promises a miss. gen-schema's own `test-discriminates-kind` cannot see it because its
+              # two candidate kinds declare IDENTICAL option sets. Reported, not worked around; the
+              # repair is a library change and this dispatch may not make one.
+              option-set-closure = asserts "option-set-closure" (
+                c17Pewter.shirring == "gathered"
+                && c17Pewter.id_hash
+                  == "thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a"
+                &&
+                  c17Pewter._identityKeys == [
+                    "name"
+                    "spool"
+                  ]
+                && (c17Thimble.options or { }) == { }
+                && c17Schema.identityHashForKind c17Thimble c17Pewter == c17Pewter.id_hash
+                && c17Schema.identityHashForKind c17Bobbin genValues.bobbins.grosgrain
+                  == genValues.bobbins.grosgrain.id_hash
+                && genValues.bobbins.grosgrain.id_hash != c17Pewter.id_hash
               );
 
               # (5) C6 — the delivery projection: the node set, the collected class, both Rider

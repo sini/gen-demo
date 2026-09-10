@@ -34,7 +34,27 @@ in
   # imposed by the hub surface, not chosen here, and it is the only word in this corpus that the
   # naming rule above did not get to pick. Reported as a finding against the hub, not worked around —
   # `den-hoag-hub-hardcodes-hosts-mxpd5`. `bobbins` carries no such imposition and is free to invent.
-  options.hosts = genSchema.mkInstanceRegistry config.schema.thimble { };
+  # ── C17 — AN OPTION CONTRIBUTED ON THE INSTANCE SIDE, AND THE IDENTITY THAT DOES NOT MOVE ──
+  # `extraModules` is `mkInstanceRegistry`'s supported second inlet: its modules are imported BESIDE
+  # the kind into every instance's submodule, so `shirring` below is a real declared option carrying a
+  # real value on every thimble. It is NOT an identity key, and cannot become one: the key set closed
+  # at the KIND boundary, one stratum above this, before any module named here was seen. So this
+  # declaration has nowhere to attach in an identity — not refused, unexpressible.
+  #
+  # The corpus asserts it as a VALUE (C17): `hosts.pewter.id_hash` is byte-identical to the stamp the
+  # corpus carried before this option existed. Region 2's refusal is the other half and cannot be a
+  # cell — a throw is not a value — so it is `just refusals` row 13.
+  options.hosts = genSchema.mkInstanceRegistry config.schema.thimble {
+    extraModules = [
+      {
+        options.shirring = mkOption {
+          type = types.str;
+          default = "gathered";
+          description = "Instance-side content. Declared beside the kind, never part of the identity.";
+        };
+      }
+    ];
+  };
   options.bobbins = genSchema.mkInstanceRegistry config.schema.bobbin { };
 
   # THE DECLARED EDGES (ADR-0012, ADR-0019). Edges are data, never read off a projection; `flake.nix`

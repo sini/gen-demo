@@ -345,6 +345,51 @@ refusals:
       "gen-assemble: a contribution offers the reserved label(s) [\"I\"]" \
       "$tmpdir/row12-red.err"
 
+    # ── row 13 -- a KIND option contributed after an evaluation already minted, refused on the WARM
+    # re-compose (mirrors C17's closure from the other side) ──
+    #
+    # ★ IT IS A WARM RE-COMPOSE, NOT A COLD PLANT, AND THAT IS THE WHOLE ROW. Region 1 closes the
+    # INSTANCE side by construction, so an instance-side option is unexpressible in an identity rather
+    # than refused -- there is nothing for a by-name row to catch there, and C17 asserts it as a value
+    # instead. The KIND side has no such construction: within ONE evaluation a kind's option set simply
+    # is what it is. The move is only nameable where TWO evaluations are in hand, and the substrate
+    # holds two in exactly one place -- `warmFrom`. So this row builds the prior evaluation AND the
+    # warm re-compose in one expression, which is what makes a by-name refusal reachable from a single
+    # `nix eval` at all. A cold plant would exit 0 on BOTH arms and measure nothing.
+    #
+    # The two arms are ONE token apart: `internal = true` makes the planted option a declaration the
+    # identity reflection excludes, so it is still a dirty decl-side contribution -- the id_hash is
+    # re-merged either way -- and moves nothing. A refusal keyed on decl-side dirtiness alone would
+    # fire on BOTH arms and destroy reuse; the unplanted arm is what catches that, and its exact
+    # stdout is the corpus's own unmoved thimble stamp.
+    row13='let
+      gen = (builtins.getFlake (toString ./.)).inputs.gen;
+      genAspects = gen.lib.aspects.aspects;
+      genSchema = gen.lib.substrate.schema;
+      genMerge = gen.lib.modules.merge;
+      aspectSchema = genAspects.mkAspectSchema (import ./aspect-cnf.nix);
+      base = [
+        { imports = [ (aspectSchema.mkAspectModule { }) ]; }
+        { options.schema = aspectSchema.schemaOption; }
+        ({ config, ... }: { options.hosts = genSchema.mkInstanceRegistry config.schema.thimble { }; })
+        {
+          config.schema.thimble.options.aspects = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; };
+          config.schema.thimble.options.spool = genMerge.mkOption { type = genMerge.types.str; };
+          config.hosts.pewter = { aspects = [ "stitch" ]; spool = "linen"; };
+        }
+      ];
+      edit = [
+        { config.schema.thimble.options.grommet = genMerge.mkOption { type = genMerge.types.str; default = "plain"; internal = INTERNAL; }; }
+      ];
+      prior = genMerge.evalModuleTree { modules = base; };
+      warm = genMerge.evalModuleTree { modules = base ++ edit; warmFrom = prior; editedModules = edit; };
+    in warm.config.hosts.pewter.id_hash'
+    check "T5 row13 unplanted (planted option internal, no identity moves)" "${row13/INTERNAL/true}" 0 "" \
+      "$tmpdir/row13-green.err" 'thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a'
+    check "T5 row13 planted   (planted option is an identity key, pewter moves)" "${row13/INTERNAL/false}" 1 \
+      "gen-memo.identitiesHeld: minted identity moved on a warm re-compose at 'hosts.pewter'" \
+      "$tmpdir/row13-red.err"
+
     # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
     # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
     # function above would pass a mismatched row/message pairing and the by-name half would be

@@ -50,11 +50,12 @@ incremental plane's decision crossing.
 | C14 -- the closed body-term algebra | 0013 row 2, 0023 | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell |
 | C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
 | C16 -- the aspect graph, assembled | 0012, 0010 §3 | the corpus's own aspect facts (`genAspects.graphFacts`) contributed through `genAssemble`'s protocol alongside the node registry's membership dimension; queried through both gen-graph's labelled graph and gen-select's context |
-| T5 -- planted refusals | 0025 | twelve enforcers, each driven red by name via `just refusals` |
+| C17 -- option-set closure | 0016 ruling 5, 0033 | an `extraModules` option on `hosts` (`shirring`) that is real declared content and CANNOT be an identity key; `hosts.pewter.id_hash` byte-identical to the stamp minted before it existed |
+| T5 -- planted refusals | 0025 | thirteen enforcers, each driven red by name via `just refusals` |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C16's own standalone fixtures, and all seventeen
+queries, C7's gate over `config.declaredEdges`, C8-C16's own standalone fixtures, and all eighteen
 `checks`; the `justfile`'s `refusals` recipe holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -75,7 +76,7 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
 
 ## The CI contract
 
-`nix flake check` runs seventeen checks, and they are the acceptance criteria:
+`nix flake check` runs eighteen checks, and they are the acceptance criteria:
 
 1. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -119,21 +120,31 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     `genSelect.adapters.registry.mkContext` builds over the PUBLISHED parent, both walked; oracle 5's
     structural-helper substitution armed at C16's own non-flat assembly (`children`/`subtreeOf`
     diverge) and at C1's flat one (the node set does not).
+18. **`option-set-closure`** — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `hosts`
+    registry carries an `extraModules` option (`shirring`); the cell asserts the option really landed
+    AND that `hosts.pewter.id_hash` is byte-identical to
+    `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a`, the stamp minted
+    before it existed. Equality alone would pass for a registry that dropped the caller's modules, so
+    both halves are load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
+    `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, whose
+    `options` attribute is EMPTY because it is declared through gen-aspects' `schemaOption`. Live
+    control in the same cell: `bobbin` recomputes to its own stamp over a different option set, and
+    the two stamps differ.
 
-T5's twelve refusals are not among these seventeen: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these eighteen: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `just refusals` instead (below).
 
 **T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
 `just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the
-twelve enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
+thirteen enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
 
 ### Two arms, plus the by-name half
 
 ```sh
 just check            # nix flake check
 just check-hub-main   # nix flake check --refresh --override-input gen github:sini/gen
-just refusals         # T5's twelve planted violations, each driven red by name, each with an unplanted control
+just refusals         # T5's thirteen planted violations, each driven red by name, each with an unplanted control
 ```
 
 The committed `flake.lock` is the **last-green pin**. The second arm evaluates the same corpus against
@@ -181,6 +192,17 @@ registry was supplied`) — measured on both a populated and an all-null `types`
 `types` is green. C16 declares no `types` and carries its per-node data through `decls` alone; whether
 the repair is an assembly-wide `kinds` parameter or retiring `types` from the record is a design
 question reported to `den-hoag-9wj6`, not resolved here.
+
+**5. `identityHashForKind` ABORTS where its own documented contract promises a miss.**
+`gen-schema/lib/id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match the carried
+hash is a reliable *"not this kind"*, and kind-discovery is built on that. Recomputing the `bobbin`
+kind against a `thimble` instance does not return a non-matching hash: the accessor is
+`(k: instance.${k})`, unguarded, so it dies on `attribute 'gauge' missing` — an uncatchable
+interpreter error where the contract promises a value. It is invisible to gen-schema's own
+`test-discriminates-kind`, whose two candidate kinds declare IDENTICAL option sets and so never reach
+a key the instance lacks. C17 therefore carries no wrong-kind arm and says so at the cell. Found while
+writing that arm; the repair is a library change (the guard `mkIdentityModule` already grew for the
+same class) and is not made here.
 
 ## v1.1
 
@@ -251,3 +273,55 @@ refusal exists to stop.
 **The roster census is unchanged by this landing: 20 of 21, `settings` unreached.** C16 calls no
 roster member C1-C15 did not already reach — `assemble` (C8), `scope`, `graph` and `select` are all
 already forced by earlier cells — so this landing moves nothing in the census above.
+
+## v1.3
+
+One more positive construct (C17) and one more planted-violation refusal (T5 row 13, `just
+refusals`), against `2026-09-09-gen-option-set-closure-spec.md` in den-ag-design. Between them they
+declare the two halves of ONE property — an entity's identity is a function of its KIND's option set
+(ADR-0016 ruling 5), and that set closes at a boundary rather than drifting with whatever the
+fixpoint happened to gather (ADR-0033).
+
+**C17 is the half that is a construction, so it is asserted as a VALUE.** The `hosts` registry now
+carries an `extraModules` option, `shirring`, which is real declared content on every thimble. It
+cannot be an identity key and could not be made one: the key set closed at the kind boundary, one
+stratum above the instance submodule, before any module named in `extraModules` was seen. The
+contribution is not refused — it is unexpressible in an identity, which is why there is nothing here
+for a by-name row to catch. `hosts.pewter.id_hash` is byte-identical to the stamp the corpus carried
+before `shirring` existed, and the cell pins that literal rather than comparing two things the same
+edit would move.
+
+**T5 row 13 is the half that has no construction, so it is a refusal — and it is a WARM RE-COMPOSE.**
+Within one evaluation a kind's option set simply is what it is; the move is only nameable where TWO
+evaluations are in hand, and the substrate holds two in exactly one place, `warmFrom`. So the row
+builds the prior evaluation and the warm re-compose in a single expression, which is what makes a
+by-name refusal reachable from one `nix eval` at all. A COLD plant would exit 0 on both arms and
+measure nothing. The two arms are one token apart: `internal = true` leaves the planted `grommet` a
+decl-side contribution that re-merges `id_hash` and moves no identity, and the unplanted arm's exact
+stdout is the corpus's own unmoved stamp — so a refusal keyed on decl-side dirtiness alone, which
+would destroy reuse for every consumer, fails that arm.
+
+The refusal is `gen-memo`'s, over a fact `gen-merge` computes: the evaluator holds both evaluations
+and hands two maps of coordinate to minted identity to the incremental plane, which admits with an
+empty moved set or throws naming the coordinate, the kind, both identities and the contributing
+declarations.
+
+**`den-hoag-9l26n` closes on C17's cell.** On a kind declared through gen-aspects' `schemaOption` —
+the shape this corpus uses — the kind value's `options` attribute is EMPTY, so the sole recompute path
+used to answer over `[ "name" ]` alone and disagree with the stamp on every instance of it. Measured
+at this landing's two pins, same probe, same corpus shape:
+
+| | recompute | carried stamp | agree |
+|---|---|---|---|
+| hub `0c53726` (gen-schema `88c41cb`) | `thimble:500c2f78da6c6e81d7b62dbd6944eaebe9f46b566e5adbb2d5553ad023218020` | `thimble:d3dc9389…` | **false** |
+| hub `6421d65` (gen-schema `168cf21`) | `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a` | `thimble:d3dc9389…` | **true** |
+
+**The stamp itself did not move**, which is the other thing worth reading off that table: the closure
+changed which derivation produces the key set, not the key set. All seventeen prior cells evaluate to
+byte-identical `drvPath`s across the relock.
+
+**The roster census is unchanged by this landing: 20 of 21, `settings` unreached.** Measured, not
+assumed: `gen-settings` poisoned with a run-unique throwing stub leaves every cell green (rc 0), so
+nothing C17 adds forces it. Live control in the same run: `gen-schema` poisoned reds the run and the
+poison's own token appears in the output, so the instrument is not dead. C17 calls only `schema`,
+which C1 already forced.
