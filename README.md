@@ -120,7 +120,21 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     `genSelect.adapters.registry.mkContext` builds over the PUBLISHED parent, both walked; oracle 5's
     structural-helper substitution armed at C16's own non-flat assembly (`children`/`subtreeOf`
     diverge) and at C1's flat one (the node set does not).
-18. **`option-set-closure`** — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `hosts`
+18. **`aspect-foreign-reference`** — C16b. The corpus declares a FOREIGN reference —
+    `genAspects.keyRef "mill/stitch"`, a third position on `aspects.bartack.includes` — and the cell
+    asserts it is published as a REFERENCE and never as an edge: present in
+    `c16Facts.foreignIncludesOf` in the declaration's own `{ origin; path; key; }` shape, absent from
+    `c16Facts.includesOf`, and every `declares` edge in the assembled contribution naming a member of
+    its `vertices`. `aspect-cnf.nix` sets no `providerPrefix`, so this corpus's origin is `[ ]` and
+    the sugar's first segment `mill` makes the reference foreign by construction. The population is
+    stated because it IS one: three declared positions accounted for exactly once each across the
+    three relations — one checked edge, one inline body, one foreign reference — over six vertices
+    and one `declares` edge, with the totality control that a node declaring no foreign reference is
+    PRESENT with an empty list rather than absent. The declaration was UNDECLARABLE before
+    gen-aspects `3b6d41d`: the reference entered `includesOf`, became a `declares` edge to a
+    non-member, and `genAssemble`'s `requireDeclaredMembership` refused the whole contribution by
+    name.
+19. **`option-set-closure`** — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `hosts`
     registry carries an `extraModules` option (`shirring`); the cell asserts the option really landed
     AND that `hosts.pewter.id_hash` is byte-identical to
     `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a`, the stamp minted
@@ -132,7 +146,7 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     the two stamps differ. And the WRONG-kind arm, which Finding 5 recorded as absent until the
     accessor was guarded: recomputing `bobbin` against a thimble instance answers `null`, so a
     `findFirst` over candidate kinds passes over it rather than aborting.
-19. **`kinded-contribution`** — C18. The same facts assembled by BOTH paths: C1's direct
+20. **`kinded-contribution`** — C18. The same facts assembled by BOTH paths: C1's direct
     `genScope.buildRoots` call, and `genAssemble.assemble` with that same three-kind registry routed
     as `kinds`. The cell asserts the two records are IDENTICAL — `nodes`, `nodeOrder` and the
     registry all have to agree — with a negative control on the same comparator that changes one
