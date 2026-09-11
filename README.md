@@ -132,8 +132,16 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     the two stamps differ. And the WRONG-kind arm, which Finding 5 recorded as absent until the
     accessor was guarded: recomputing `bobbin` against a thimble instance answers `null`, so a
     `findFirst` over candidate kinds passes over it rather than aborting.
+19. **`kinded-contribution`** — C18. The same facts assembled by BOTH paths: C1's direct
+    `genScope.buildRoots` call, and `genAssemble.assemble` with that same three-kind registry routed
+    as `kinds`. The cell asserts the two records are IDENTICAL — `nodes`, `nodeOrder` and the
+    registry all have to agree — with a negative control on the same comparator that changes one
+    node's kind and reads false, and it reads the kinds back through the same `nodesOfType` door C1's
+    own queries use, so the equality is not two sides equally empty. It also asserts `kinds` is still
+    NOT an eighth contribution key: offered on a contribution it is refused by name. C1 could not be
+    written through the protocol before `gen-assemble` `d08cebf`, which is what Finding 4 recorded.
 
-T5's thirteen refusals are not among these eighteen: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these nineteen: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `just refusals` instead (below).
 
