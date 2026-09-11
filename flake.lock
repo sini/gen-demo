@@ -110,11 +110,11 @@
     },
     "gen-assemble": {
       "locked": {
-        "lastModified": 1788591982,
-        "narHash": "sha256-to+C5XtBi9us8bkgU+h/uQxDP1wl+otWaOj+/b5kIeM=",
+        "lastModified": 1789169877,
+        "narHash": "sha256-iJIhsKP+j19F9G87TE+8G9lGxzH8BE6GKYOY6fsbdYA=",
         "owner": "sini",
         "repo": "gen-assemble",
-        "rev": "b7bea1f4833f3f85f173a60232fdcd2bad990a3a",
+        "rev": "d08cebf2c0824a07cd6ea7da35425afb0c640262",
         "type": "github"
       },
       "original": {

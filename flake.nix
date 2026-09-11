@@ -826,6 +826,44 @@
         c16Union = genAssemble.union { contributions = c16Contributions; };
         c16Assembled = genAssemble.assemble { contributions = c16Contributions; };
 
+        # ── C18 — A KINDED NODE SET, ASSEMBLED THROUGH THE CONTRIBUTION PROTOCOL ──
+        #
+        # C1 calls `genScope.buildRoots` DIRECTLY, and until now it had to: `assemble` supplied no
+        # `kinds`, so a contribution carrying `types` was accepted at the protocol boundary and
+        # refused one layer down by the substrate's registry check. A framework wanting kinded nodes
+        # had to abandon the toolkit and write the constructor call itself — which is the exact
+        # duplication gen-assemble exists to remove, and this corpus's C1 was the evidence.
+        #
+        # ★ IT IS A SECOND PATH OVER C1's OWN FACTS, NOT A SECOND C1. C1's `scope` still feeds C2,
+        # C5 and C12 unchanged; moving it onto the toolkit would put a protocol change and a corpus
+        # refactor in one declaration. What C18 asserts is that the two paths produce the SAME
+        # RECORD, which is the two-paths-one-answer shape and is what makes README *Finding 4*'s
+        # second and third clauses false.
+        #
+        # `c18Types` is C1's own declared kinds read back off C1's answer, so the protocol path is
+        # given exactly the input the direct path was given rather than a second classifier written
+        # here that could drift from it.
+        c18Types = builtins.mapAttrs (_: n: n.type) scope.nodes;
+        c18ThroughTheProtocol =
+          types:
+          genAssemble.assemble {
+            contributions = [
+              {
+                name = "corpus";
+                vertices = builtins.attrNames nodes;
+                decls = nodes;
+                inherit types;
+              }
+            ];
+            kinds = genScope.mkKinds (
+              map (n: genScope.mkKind { name = n; }) [
+                "thimble"
+                "bobbin"
+                "seam"
+              ]
+            );
+          };
+
         # ── the queries — §3.3's primitive table, both doors ──
         #
         # `c16Structural` is the same binding oracle 5's instance below substitutes — one call site
@@ -1585,6 +1623,61 @@
                 # And the assembled view is UNMOVED by the new declaration: `bartack` still declares
                 # exactly its one checked edge. The reference was added without widening the graph.
                 && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
+              );
+
+              # (19) C18 — A KINDED NODE SET REACHES THE ASSEMBLY THROUGH THE PROTOCOL.
+              # C1 calls `genScope.buildRoots` directly because it had to: `assemble` supplied no
+              # `kinds`, so `types` — a key the contribution record declares itself TOTAL over — was
+              # accepted at the boundary and refused one layer down. The claim is that the toolkit
+              # path and the direct path now answer the SAME RECORD over the SAME FACTS, which is
+              # what retires the corpus's own README *Finding 4*.
+              #
+              # ★ THE CELL IS RED AGAINST THE PREVIOUS gen-assemble FOR A STRUCTURAL REASON, not a
+              # value mismatch: `assemble` had no `kinds` formal, so the call below is a
+              # `called with unexpected argument 'kinds'` abort there.
+              kinded-contribution = asserts "kinded-contribution" (
+                # O1 — WHOLE-RECORD EQUALITY, both paths, C1's own facts. Not a spot-check on one
+                # field: `nodes`, `nodeOrder` and the registry itself all have to agree.
+                (c18ThroughTheProtocol c18Types) == scope
+                # ★ NEGATIVE CONTROL, SAME COMPARATOR, SAME RUN: change ONE node's kind and the
+                # equality reads false. Without it the cell passes on any comparator that says true.
+                && ((c18ThroughTheProtocol (c18Types // { damask = "bobbin"; })) == scope) == false
+                # O2 — and the kinds SURVIVE the protocol as kinds, read through the same evaluator
+                # door C1's own queries use, so the equality above is not two sides equally empty.
+                && builtins.attrNames
+                     (
+                       (genScope.eval {
+                         scope = c18ThroughTheProtocol c18Types;
+                         attributes.children = _: _: { };
+                       }).nodesOfType
+                         "thimble"
+                     ) == thimbles
+                # CARDINALITY, read off this corpus rather than assumed: three kinds are declared,
+                # every node carries one, and the node set is the one C1 built.
+                && builtins.attrNames (c18ThroughTheProtocol c18Types).kinds.kinds == [
+                     "bobbin"
+                     "seam"
+                     "thimble"
+                   ]
+                && builtins.all (t: t != null) (builtins.attrValues c18Types)
+                && builtins.length (builtins.attrNames c18Types) == builtins.length (
+                     builtins.attrNames nodes
+                   )
+                # O3 — `kinds` is still NOT an eighth contribution key. Offered ON a contribution it
+                # is refused by name, so the routing bought the capability without widening the
+                # record the protocol declares itself total over.
+                &&
+                  !(builtins.tryEval (
+                    builtins.deepSeq (genAssemble.union {
+                      contributions = [
+                        {
+                          name = "corpus";
+                          vertices = builtins.attrNames nodes;
+                          kinds = genScope.mkKinds [ (genScope.mkKind { name = "thimble"; }) ];
+                        }
+                      ];
+                    }) 1
+                  )).success
               );
             };
           };

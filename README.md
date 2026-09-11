@@ -187,13 +187,30 @@ declares `options.aspects` and `options.schema` together; it declares only `opti
 `gen-modules/corpus.nix` declares `options.schema` itself, from the same `aspectSchema` value, for
 exactly this reason.
 
-**4. `gen-assemble` has a `types` contribution key it can never honour.** `kinds` is not among the
-seven contribution keys and `assemble` forwards none to `buildRoots`, so any non-empty `types` on any
-contribution aborts the assembly (`gen-scope.buildRoots: \`types\` declares kind(s) … but no \`kinds\`
-registry was supplied`) — measured on both a populated and an all-null `types` value; only an absent
-`types` is green. C16 declares no `types` and carries its per-node data through `decls` alone; whether
-the repair is an assembly-wide `kinds` parameter or retiring `types` from the record is a design
-question reported to `den-hoag-9wj6`, not resolved here.
+**4. RESOLVED, and C18 now carries the assembly the finding said was unwritable.** v1.3 recorded that
+`gen-assemble` had a `types` contribution key it could never honour: `assemble` forwarded no `kinds`
+to `buildRoots`, so any non-empty `types` on any contribution aborted the assembly
+(`gen-scope.buildRoots: \`types\` declares kind(s) … but no \`kinds\` registry was supplied`) —
+measured on both a populated and an all-null `types` value, with only an absent `types` green. That
+put the corpus's own C1 outside the protocol: it calls `genScope.buildRoots` directly with a
+three-kind registry because it had no other way to give a node a kind, which is the duplication the
+toolkit exists to remove. The all-null arm was a second defect and named a kind the author had not
+declared — `union`'s fold answered `{ }` for an id every layer passed over, and `{ }` is not `null`,
+so the substrate read it as a declared kind.
+
+**`kinds` is still NOT among the seven contribution keys, and that clause stands** — offered *on* a
+contribution it is refused by name against the same seven, which C18 asserts. What changed is where
+it is offered: the repair is `gen-assemble` `d08cebf`, relocked here, which routes `kinds` as a
+parameter of the `assemble` CALL, beside `strategies` and `strict`. The split is fact against
+vocabulary — a `types` entry is what one layer says about one node, so it folds by position; a kind
+registry carries the `below` relation every kind is ranked in, so it is one per assembly. The same
+landing stops the fold minting `{ }` from an absence, for both content families. C18 declares the
+same facts by both paths — the direct `buildRoots` call C1 already makes, and `assemble` with a
+`kinds` registry — and asserts the records are IDENTICAL, with a negative control that changes one
+node's kind and reads false on the same comparator. The design question this finding reported to
+`den-hoag-9wj6` is answered there and specified in
+`specs/2026-09-11-gen-assemble-types-protocol-gap-spec.md`. C16 still declares no `types` and carries
+its per-node data through `decls` alone; it no longer has to.
 
 **5. RESOLVED, and C17 now carries the arm whose absence was the finding.** v1.3 recorded that
 `identityHashForKind` ABORTED where its own documented contract promises a miss: recomputing the
