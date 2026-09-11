@@ -150,9 +150,23 @@ in
     # ── C16 — THE ASPECT GRAPH ITSELF, given depth so its published facts are a GRAPH ──
     aspects.hemline.placket.eyelet = { };
     aspects.hemline.facing = { };
+    # ★ THE THIRD ELEMENT IS A FOREIGN REFERENCE, AND IT IS THE ONE THIS CORPUS COULD NOT DECLARE
+    # BEFORE. This file carries no `providerPrefix` (`aspect-cnf.nix` sets only `keySemantics`), so
+    # the corpus's origin is `[ ]` — gen-link's named `self` state, meaning "assigned by whoever
+    # federates me". `keyRef`'s string sugar splits the FIRST SEGMENT off as the origin, so `mill` is
+    # the referent's origin and this reference is foreign BY CONSTRUCTION: `mill/stitch` names a node
+    # in a fixpoint this corpus does not hold, exactly as the `loom` registry's shipped
+    # `keyRef "mill/stitch"` does. gen-aspects cannot check it and does not pretend to — it is
+    # published in `foreignIncludesOf`, NOT as an edge in `includesOf`, so it never reaches
+    # `c16IncludesGraph` and never becomes a `declares` edge to a non-member.
+    #
+    # Declared here because it used to be UNDECLARABLE: with the reference in `includesOf` it became
+    # a `declares` edge whose `to` is no node of this graph, and gen-assemble's
+    # `requireDeclaredMembership` refused the whole contribution by name.
     aspects.bartack.includes = [
-      config.aspects.hemline.placket   # a REFERENCE — resolves to the node "hemline/placket"
-      ({ node, ... }: { })             # INLINE CONTENT — its POSITION is published, it is not an edge
+      config.aspects.hemline.placket     # a REFERENCE — resolves to the node "hemline/placket"
+      ({ node, ... }: { })               # INLINE CONTENT — its POSITION is published, not an edge
+      (genAspects.keyRef "mill/stitch")  # a FOREIGN REFERENCE — published as a ref, never an edge
     ];
   };
 }
