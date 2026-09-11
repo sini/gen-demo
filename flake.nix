@@ -996,14 +996,19 @@
               # corpus declares no such kind and inventing one here would test the fixture, not the
               # corpus.)
               #
-              # ★ THE WRONG-KIND ARM IS ABSENT, AND ITS ABSENCE IS A FINDING RATHER THAN A CHOICE.
-              # `id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match means the kind
-              # guess is wrong. Recomputing `bobbin` against a thimble instance does not return a
-              # non-matching hash: `identityHashForKind`'s accessor is `(k: instance.${k})`, unguarded,
-              # so it dies on `attribute 'gauge' missing` — an abort where the documented contract
-              # promises a miss. gen-schema's own `test-discriminates-kind` cannot see it because its
-              # two candidate kinds declare IDENTICAL option sets. Reported, not worked around; the
-              # repair is a library change and this dispatch may not make one.
+              # ★ THE WRONG-KIND ARM IS PRESENT, AND IT IS THE HALF KIND DISCOVERY ACTUALLY RUNS ON.
+              # `id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match the carried
+              # hash means the kind guess is wrong, and a `findFirst` over candidate kinds reaches
+              # that case on nearly every candidate. Recomputing `bobbin` against a thimble instance
+              # answers `null` — *not this kind* — because a thimble carries none of `bobbin`'s
+              # identity keys; `null` is not an identity, so the loop passes over it instead of
+              # dying. This arm used to be absent and the absence was reported as a finding: the
+              # accessor was unguarded and this expression aborted `attribute 'gauge' missing`, an
+              # uncatchable interpreter error where the contract promises a value. The guard is
+              # presence-only by design, so a candidate whose key the instance CARRIES at a value the
+              # mint refuses still propagates the mint's named refusal — a different terminal state,
+              # owned by the mint, and catchable. This corpus exercises the absent-key half, which is
+              # the one discovery iterates over.
               option-set-closure = asserts "option-set-closure" (
                 c17Pewter.shirring == "gathered"
                 && c17Pewter.id_hash
@@ -1018,6 +1023,7 @@
                 && c17Schema.identityHashForKind c17Bobbin genValues.bobbins.grosgrain
                   == genValues.bobbins.grosgrain.id_hash
                 && genValues.bobbins.grosgrain.id_hash != c17Pewter.id_hash
+                && c17Schema.identityHashForKind c17Bobbin c17Pewter == null
               );
 
               # (5) C6 — the delivery projection: the node set, the collected class, both Rider

@@ -129,7 +129,9 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, whose
     `options` attribute is EMPTY because it is declared through gen-aspects' `schemaOption`. Live
     control in the same cell: `bobbin` recomputes to its own stamp over a different option set, and
-    the two stamps differ.
+    the two stamps differ. And the WRONG-kind arm, which Finding 5 recorded as absent until the
+    accessor was guarded: recomputing `bobbin` against a thimble instance answers `null`, so a
+    `findFirst` over candidate kinds passes over it rather than aborting.
 
 T5's thirteen refusals are not among these eighteen: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
@@ -193,16 +195,20 @@ registry was supplied`) — measured on both a populated and an all-null `types`
 the repair is an assembly-wide `kinds` parameter or retiring `types` from the record is a design
 question reported to `den-hoag-9wj6`, not resolved here.
 
-**5. `identityHashForKind` ABORTS where its own documented contract promises a miss.**
-`gen-schema/lib/id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match the carried
-hash is a reliable *"not this kind"*, and kind-discovery is built on that. Recomputing the `bobbin`
-kind against a `thimble` instance does not return a non-matching hash: the accessor is
-`(k: instance.${k})`, unguarded, so it dies on `attribute 'gauge' missing` — an uncatchable
-interpreter error where the contract promises a value. It is invisible to gen-schema's own
-`test-discriminates-kind`, whose two candidate kinds declare IDENTICAL option sets and so never reach
-a key the instance lacks. C17 therefore carries no wrong-kind arm and says so at the cell. Found while
-writing that arm; the repair is a library change (the guard `mkIdentityModule` already grew for the
-same class) and is not made here.
+**5. RESOLVED, and C17 now carries the arm whose absence was the finding.** v1.3 recorded that
+`identityHashForKind` ABORTED where its own documented contract promises a miss: recomputing the
+`bobbin` kind against a `thimble` instance died on `attribute 'gauge' missing`, an uncatchable
+interpreter error from an unguarded `(k: instance.${k})`, where the DISCOVERY PROPERTY promises a
+reliable *"not this kind"*. gen-schema's own `test-discriminates-kind` could not see it — its two
+candidate kinds declare IDENTICAL option sets and so never reach a key the instance lacks — and C17
+therefore carried no wrong-kind arm. The repair is
+`gen-schema` `b7de7391f81d5a3f05bea3985e6a662da81634f4`, relocked here: the accessor is guarded on
+PRESENCE and the codomain is `identity | null`, so a candidate the instance cannot belong to answers
+`null` and a `findFirst` over candidate kinds passes over it. C17 asserts exactly that —
+`identityHashForKind c17Bobbin c17Pewter == null` — beside the right-kind recompute it already
+carried. The guard is presence-only by design, so a candidate whose identity key the instance
+*carries* at a value the mint refuses still propagates the mint's named refusal; that one is the
+mint's own ADR-0034 behaviour and is catchable, unlike the abort removed here.
 
 ## v1.1
 
