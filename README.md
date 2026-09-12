@@ -51,7 +51,7 @@ incremental plane's decision crossing.
 | C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
 | C16 -- the aspect graph, assembled | 0012, 0010 §3 | the corpus's own aspect facts (`genAspects.graphFacts`) contributed through `genAssemble`'s protocol alongside the node registry's membership dimension; queried through both gen-graph's labelled graph and gen-select's context |
 | C16b -- a foreign reference | 0011, 0012, 0014 | `genAspects.keyRef "mill/stitch"` on `aspects.bartack.includes`, published in `foreignIncludesOf` and never as a `declares` edge; total over every node, including the one declaring none |
-| C17 -- option-set closure | 0016 ruling 5, 0033 | an `extraModules` option on `hosts` (`shirring`) that is real declared content and CANNOT be an identity key; `hosts.pewter.id_hash` byte-identical to the stamp minted before it existed |
+| C17 -- option-set closure | 0016 ruling 5, 0033 | an `extraModules` option on `thimbles` (`shirring`) that is real declared content and CANNOT be an identity key; `thimbles.pewter.id_hash` byte-identical to the stamp minted before it existed |
 | C18 -- a kinded contribution | 0012, 0011 | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key |
 | T5 -- planted refusals | 0025 | thirteen enforcers, each driven red by name via `just refusals` |
 
@@ -70,12 +70,12 @@ framework's model into gen's acceptance criteria. Every kind, node and aspect na
 a nonsense word: `thimble`, `bobbin`, `pewter`, `damask`, `grosgrain`, `faille`, `stitch`, `welt`,
 `gusset`, `basting`. No den vocabulary appears anywhere.
 
-One exception, and it is **imposed rather than chosen**: the node registry is spelled `hosts`. The
-hub's `flakeModules/default.nix` calls gen-delivery's `project` without a `selectHosts`, so the
-projection takes that function's own default, `v: v.hosts or { }`. A registry under any other name
-projects **empty** — no error, no output, just an empty `nixosConfigurations`. See *Findings* below.
-The second registry, `bobbins`, carries no such imposition and is free to invent; C6's extra
-`project` call names it explicitly through `selectHosts`.
+**The one exception is gone.** The node registry used to be spelled `hosts`, because the hub called
+gen-delivery's `project` without a `selectHosts` and a registry under any other name projected
+**empty** — no error, no output, just an empty `nixosConfigurations`. The hub now takes the attribute
+path from the consumer (`gen.nodeRegistryPath`, ADR-0035), so both registries here are invented and
+each is the plural of its own kind: `thimbles`, reached THROUGH the hub, and `bobbins`, reached by
+C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
@@ -137,9 +137,9 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     gen-aspects `3b6d41d`: the reference entered `includesOf`, became a `declares` edge to a
     non-member, and `genAssemble`'s `requireDeclaredMembership` refused the whole contribution by
     name.
-19. **`option-set-closure`** — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `hosts`
+19. **`option-set-closure`** — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `thimbles`
     registry carries an `extraModules` option (`shirring`); the cell asserts the option really landed
-    AND that `hosts.pewter.id_hash` is byte-identical to
+    AND that `thimbles.pewter.id_hash` is byte-identical to
     `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a`, the stamp minted
     before it existed. Equality alone would pass for a registry that dropped the caller's modules, so
     both halves are load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
@@ -204,14 +204,14 @@ fix was one commit ahead, at `gen-merge` main `0c11b23`. v1 relocks to hub main
 arms are measured green at that pin. No workaround was needed here — the repair was the hub's own
 relock, as v0 predicted.
 
-**2. The hub hardcodes the node-registry name.** `flakeModules/default.nix` calls
-`genDelivery.project` with no `selectHosts` and exposes no option for one, so a consumer's node
-registry must literally be named `hosts`. It is the same family as the two defects that module's own
-header records as carried unfixed (`den-hoag-es9g`): the class-name hardcode and the
-witness-2 gap. It fails **silently** — the wrong name yields an empty projection, not an error.
-Worked around, not repaired here: `bobbins` is the second registry, under an invented name, reached
-through C6's extra `project` call with an explicit `selectHosts`
-(`den-hoag-hub-hardcodes-hosts-mxpd5`).
+**2. The hub hardcoded the node-registry name — REPAIRED.** `flakeModules/default.nix` called
+`genDelivery.project` with no `selectHosts` and exposed no option for one, so a consumer's node
+registry had to be named literally `hosts`, and a wrong name failed **silently** — an empty
+projection, not an error. It was the same family as the two defects that module's own header records
+as carried unfixed (`den-hoag-es9g`): the class-name hardcode and the witness-2 gap. Fixed under
+ADR-0035 (`den-hoag-hub-hardcodes-hosts-mxpd5`): the hub takes the attribute path from the consumer,
+and this corpus declares `gen.nodeRegistryPath = [ "thimbles" ]`. The sibling output key
+`gen.composed.hosts` is the same finding at another site and is **not** fixed here.
 
 **3. Two stale docs, met while building, still stale at the v1 pin.** gen-scope's README documents
 `eval { roots = …; }`; the formal argument is `scope`, and `buildNodes` is a tombstone that refuses
@@ -338,12 +338,12 @@ declare the two halves of ONE property — an entity's identity is a function of
 (ADR-0016 ruling 5), and that set closes at a boundary rather than drifting with whatever the
 fixpoint happened to gather (ADR-0033).
 
-**C17 is the half that is a construction, so it is asserted as a VALUE.** The `hosts` registry now
+**C17 is the half that is a construction, so it is asserted as a VALUE.** The `thimbles` registry now
 carries an `extraModules` option, `shirring`, which is real declared content on every thimble. It
 cannot be an identity key and could not be made one: the key set closed at the kind boundary, one
 stratum above the instance submodule, before any module named in `extraModules` was seen. The
 contribution is not refused — it is unexpressible in an identity, which is why there is nothing here
-for a by-name row to catch. `hosts.pewter.id_hash` is byte-identical to the stamp the corpus carried
+for a by-name row to catch. `thimbles.pewter.id_hash` is byte-identical to the stamp the corpus carried
 before `shirring` existed, and the cell pins that literal rather than comparing two things the same
 edit would move.
 

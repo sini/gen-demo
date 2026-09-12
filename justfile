@@ -154,11 +154,11 @@ refusals:
     row5='let
       gen = (builtins.getFlake (toString ./.)).inputs.gen;
       genDelivery = gen.lib.framework.delivery;
-      vals = { hosts.pewter = { aspects = [ "stitch" ]; }; hosts.damask = { aspects = [ ]; }; aspects.stitch.nixos = { foo = "bar"; }; };
+      vals = { thimbles.pewter = { aspects = [ "stitch" ]; }; thimbles.damask = { aspects = [ ]; }; aspects.stitch.nixos = { foo = "bar"; }; };
       mkProj = withCnf: genDelivery.project {
         values = vals;
         cnf = if withCnf then (import ./aspect-cnf.nix) else null;
-        selectHosts = v: v.hosts or { };
+        selectHosts = v: v.thimbles or { };
       };
     in builtins.toJSON (builtins.attrNames (mkProj WITHCNF).nodes)'
     check "T5 row5 unplanted (cnf present)" "${row5/WITHCNF/true}" 0 "" \
@@ -371,11 +371,11 @@ refusals:
       base = [
         { imports = [ (aspectSchema.mkAspectModule { }) ]; }
         { options.schema = aspectSchema.schemaOption; }
-        ({ config, ... }: { options.hosts = genSchema.mkInstanceRegistry config.schema.thimble { }; })
+        ({ config, ... }: { options.thimbles = genSchema.mkInstanceRegistry config.schema.thimble { }; })
         {
           config.schema.thimble.options.aspects = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; };
           config.schema.thimble.options.spool = genMerge.mkOption { type = genMerge.types.str; };
-          config.hosts.pewter = { aspects = [ "stitch" ]; spool = "linen"; };
+          config.thimbles.pewter = { aspects = [ "stitch" ]; spool = "linen"; };
         }
       ];
       edit = [
@@ -383,11 +383,11 @@ refusals:
       ];
       prior = genMerge.evalModuleTree { modules = base; };
       warm = genMerge.evalModuleTree { modules = base ++ edit; warmFrom = prior; editedModules = edit; };
-    in warm.config.hosts.pewter.id_hash'
+    in warm.config.thimbles.pewter.id_hash'
     check "T5 row13 unplanted (planted option internal, no identity moves)" "${row13/INTERNAL/true}" 0 "" \
       "$tmpdir/row13-green.err" 'thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a'
     check "T5 row13 planted   (planted option is an identity key, pewter moves)" "${row13/INTERNAL/false}" 1 \
-      "gen-memo.identitiesHeld: minted identity moved on a warm re-compose at 'hosts.pewter'" \
+      "gen-memo.identitiesHeld: minted identity moved on a warm re-compose at 'thimbles.pewter'" \
       "$tmpdir/row13-red.err"
 
     # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal

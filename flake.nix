@@ -100,7 +100,7 @@
         # program admits it. `damask` is the one C2 reaches only across two `tacks` hops; `faille`
         # is the one no DECLARED edge reaches at all, which is what makes C5's dynamic edge
         # observable rather than a sentence.
-        nodes = genValues.hosts // genValues.bobbins // seamPromotion.nodes;
+        nodes = genValues.thimbles // genValues.bobbins // seamPromotion.nodes;
 
         scope = genScope.buildRoots {
           kinds = genScope.mkKinds (
@@ -114,7 +114,7 @@
           decls = nodes;
           types = builtins.mapAttrs (
             n: _:
-            if genValues.hosts ? ${n} then
+            if genValues.thimbles ? ${n} then
               "thimble"
             else if genValues.bobbins ? ${n} then
               "bobbin"
@@ -245,7 +245,7 @@
           data = id: nodes.${id};
           parent = _: null;
           kind = thimbleKind;
-          kindFor = id: if genValues.hosts ? ${id} then thimbleKind else genValues.schema.bobbin;
+          kindFor = id: if genValues.thimbles ? ${id} then thimbleKind else genValues.schema.bobbin;
         };
         selPewter = genSelect.matches (genSelect.kind thimbleKind) "pewter" selCtx;
         selGrosgrain = genSelect.matches (genSelect.kind thimbleKind) "grosgrain" selCtx;
@@ -357,7 +357,7 @@
         # Read off the composed VALUES, not the delivery projection: an instance's `id_hash` and its
         # published key set are schema data, and the projection carries neither.
         c17Schema = inputs.gen.lib.substrate.schema;
-        c17Pewter = genValues.hosts.pewter;
+        c17Pewter = genValues.thimbles.pewter;
         c17Thimble = genValues.schema.thimble;
         c17Bobbin = genValues.schema.bobbin;
 
@@ -366,12 +366,14 @@
         damaskClasses = builtins.attrNames config.gen.composed.hosts.damask.classes;
         stitchKeySet = builtins.attrNames config.gen.composed.aspects.stitch;
 
-        # The registry stays spelled `hosts` (den-hoag-hub-hardcodes-hosts-mxpd5: the hub's `project`
-        # call carries no `selectHosts`, so any other name projects empty with no error). Calling
+        # A SECOND ROUTE TO A PROJECTION, kept deliberately. `gen.nodeRegistryPath` now carries the
+        # first registry's name to the hub (ADR-0035), but it is ONE attribute path
+        # (`nullOr (listOf str)`): the hub can name either registry, never both. Collapsing the two
+        # routes would take a hub that accepts several, which is its own row. Calling
         # `realize` directly is rejected — it takes `terminals`, so the corpus would have to rebuild
         # the hub's unexported `terminalOf` bridge, and a corpus that reimplements the surface it
         # tests has stopped testing it. Taken instead: one extra check calling `project` directly with
-        # `selectHosts` naming the second registry under a name the hub does not impose.
+        # `selectHosts`, so gen-delivery's own selector stays exercised beside the hub's option.
         bobbinProjection = genDelivery.project {
           values = genValues;
           cnf = import ./aspect-cnf.nix;
@@ -808,7 +810,7 @@
 
         # THE SECOND CONTRIBUTION — the corpus's own node registry, which already declares aspect
         # membership. The union point is only exercised because something else is in the list.
-        c16RegNodes = genValues.hosts // genValues.bobbins;
+        c16RegNodes = genValues.thimbles // genValues.bobbins;
         c16Registry = {
           name = "node-registry";
           vertices = builtins.attrNames c16RegNodes;
@@ -816,8 +818,8 @@
             {
               label = "members";
               graph = genScope.overlays (
-                builtins.concatMap (id: map (a: genScope.edge id a) (genValues.hosts.${id}.aspects or [ ]))
-                  (builtins.attrNames genValues.hosts)
+                builtins.concatMap (id: map (a: genScope.edge id a) (genValues.thimbles.${id}.aspects or [ ]))
+                  (builtins.attrNames genValues.thimbles)
               );
             }
           ];
@@ -949,7 +951,7 @@
           # corpus's own lock). The key is omitted outright, not conditioned false, so ARM 1 stays
           # green on the committed pin while ARM 2 exercises the option against the hub's main.
           (lib.optionalAttrs (options.gen ? nodeRegistryPath) {
-            nodeRegistryPath = [ "hosts" ];
+            nodeRegistryPath = [ "thimbles" ];
           })
         ];
 
@@ -1100,7 +1102,7 @@
               );
 
               # C17 — the identity-key set is CLOSED at the kind boundary, so an option contributed on
-              # the instance side has nowhere to attach in an identity. The corpus's `hosts` registry
+              # the instance side has nowhere to attach in an identity. The corpus's `thimbles` registry
               # now carries an `extraModules` option (`shirring`); this asserts the option is really
               # there AND that the stamp is byte-identical to the one the corpus carried before it
               # existed. Both halves are load-bearing: the equality alone passes for a registry that

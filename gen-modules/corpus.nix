@@ -27,13 +27,14 @@ in
 
   options.schema = aspectSchema.schemaOption;
 
-  # ── THE NODE REGISTRIES, AND WHY THE FIRST IS SPELLED `hosts` ──
-  # The hub's `flakeModules/default.nix` calls `gen-delivery`'s `project` without a `selectHosts`,
-  # so the projection takes that function's default — `v: v.hosts or { }`. A registry under any other
-  # name projects EMPTY and `nixosConfigurations` comes out `{ }`: no error, no output. The name is
-  # imposed by the hub surface, not chosen here, and it is the only word in this corpus that the
-  # naming rule above did not get to pick. Reported as a finding against the hub, not worked around —
-  # `den-hoag-hub-hardcodes-hosts-mxpd5`. `bobbins` carries no such imposition and is free to invent.
+  # ── THE NODE REGISTRIES, BOTH UNDER INVENTED NAMES ──
+  # The hub's `flakeModules/default.nix` used to call `gen-delivery`'s `project` without a
+  # `selectHosts`, so the projection took that function's default — `v: v.hosts or { }` — and a
+  # registry under any other name projected EMPTY: no error, no output, an empty
+  # `nixosConfigurations`. The hub now takes the attribute path from the consumer through
+  # `gen.nodeRegistryPath` (ADR-0035, `den-hoag-hub-hardcodes-hosts-mxpd5`), so no word here is
+  # imposed. Both registries are the plural of their own kind; `flake.nix` names the first one to
+  # the hub, and C6 names the second to `gen-delivery` directly.
   # ── C17 — AN OPTION CONTRIBUTED ON THE INSTANCE SIDE, AND THE IDENTITY THAT DOES NOT MOVE ──
   # `extraModules` is `mkInstanceRegistry`'s supported second inlet: its modules are imported BESIDE
   # the kind into every instance's submodule, so `shirring` below is a real declared option carrying a
@@ -41,10 +42,10 @@ in
   # at the KIND boundary, one stratum above this, before any module named here was seen. So this
   # declaration has nowhere to attach in an identity — not refused, unexpressible.
   #
-  # The corpus asserts it as a VALUE (C17): `hosts.pewter.id_hash` is byte-identical to the stamp the
+  # The corpus asserts it as a VALUE (C17): `thimbles.pewter.id_hash` is byte-identical to the stamp the
   # corpus carried before this option existed. Region 2's refusal is the other half and cannot be a
   # cell — a throw is not a value — so it is `just refusals` row 13.
-  options.hosts = genSchema.mkInstanceRegistry config.schema.thimble {
+  options.thimbles = genSchema.mkInstanceRegistry config.schema.thimble {
     extraModules = [
       {
         options.shirring = mkOption {
@@ -87,11 +88,11 @@ in
 
     # THE FOUR NODES. `damask` is the one C2 reaches only across two `tacks` hops; `faille` is the one
     # no DECLARED edge reaches at all, which is what makes C5's dynamic edge observable.
-    hosts.pewter = {
+    thimbles.pewter = {
       aspects = [ "stitch" ];
       spool = "linen";
     };
-    hosts.damask = {
+    thimbles.damask = {
       aspects = [ ];
       spool = "sateen";
     };
