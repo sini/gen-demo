@@ -50,13 +50,16 @@ incremental plane's decision crossing.
 | C14 -- the closed body-term algebra | 0013 row 2, 0023 | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell |
 | C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
 | C16 -- the aspect graph, assembled | 0012, 0010 §3 | the corpus's own aspect facts (`genAspects.graphFacts`) contributed through `genAssemble`'s protocol alongside the node registry's membership dimension; queried through both gen-graph's labelled graph and gen-select's context |
+| C16b -- a foreign reference | 0011, 0012, 0014 | `genAspects.keyRef "mill/stitch"` on `aspects.bartack.includes`, published in `foreignIncludesOf` and never as a `declares` edge; total over every node, including the one declaring none |
 | C17 -- option-set closure | 0016 ruling 5, 0033 | an `extraModules` option on `hosts` (`shirring`) that is real declared content and CANNOT be an identity key; `hosts.pewter.id_hash` byte-identical to the stamp minted before it existed |
+| C18 -- a kinded contribution | 0012, 0011 | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key |
 | T5 -- planted refusals | 0025 | thirteen enforcers, each driven red by name via `just refusals` |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C16's own standalone fixtures, and all eighteen
-`checks`; the `justfile`'s `refusals` recipe holds T5's by-name half, which runs out of band because
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all twenty-one
+`checks`, including its own `construct-index` cell over this file's two indices; the `justfile`'s
+`refusals` recipe holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
 ### The naming rule — invented kinds only
@@ -76,7 +79,7 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
 
 ## The CI contract
 
-`nix flake check` runs eighteen checks, and they are the acceptance criteria:
+`nix flake check` runs twenty-one checks, and they are the acceptance criteria:
 
 1. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -154,8 +157,16 @@ The second registry, `bobbins`, carries no such imposition and is free to invent
     own queries use, so the equality is not two sides equally empty. It also asserts `kinds` is still
     NOT an eighth contribution key: offered on a contribution it is refused by name. C1 could not be
     written through the protocol before `gen-assemble` `d08cebf`, which is what Finding 4 recorded.
+21. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+    rather than against each other. Two hand-maintained surfaces recorded the same construct set —
+    this numbered list, and the `## What v1 declares` table above — and drifted twice in three
+    landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
+    the numbered list's own names equal `builtins.attrNames` of the evaluated `checks` attrset, and
+    that the table's rows equal the construct labels this list attributes each check to, plus T5 (the
+    one construct with no check cell); both comparisons report how many entries they scanned against
+    how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these nineteen: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these twenty-one: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `just refusals` instead (below).
 

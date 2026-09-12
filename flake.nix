@@ -943,9 +943,74 @@
                 pkgs.runCommand "gen-demo-${name}" { } "touch $out"
               else
                 throw "gen-demo: check '${name}' failed";
+
+            # den-hoag-bl06m — this file carries TWO hand-maintained indices over its own
+            # construct set (the numbered CI-contract list below, and the "## What v1 declares"
+            # table), and they drifted twice in three landings because a repair fixed the one it
+            # was looking at. Rather than trust either by eye, this derives BOTH from `checkNames`
+            # (the evaluated `checks` attrset, including this cell's own name) and README.md's
+            # OWN attribution text, and reports how many entries it scanned against how many it
+            # expected — a comparison that passes without saying so is not an oracle over the set
+            # it claims to cover.
+            readmeIndexCheck =
+              checkNames:
+              pkgs.runCommand "gen-demo-construct-index"
+                {
+                  readme = ./README.md;
+                  checkNamesFile = builtins.toFile "gen-demo-check-names.txt" (
+                    builtins.concatStringsSep "\n" checkNames
+                  );
+                  nativeBuildInputs = [
+                    pkgs.gnugrep
+                    pkgs.gawk
+                    pkgs.diffutils
+                  ];
+                }
+                ''
+                  set -euo pipefail
+
+                  # surface 1: the numbered CI-contract list's own check names vs the evaluated
+                  # `checks` attrset. This is the invariant the first two hand-repairs kept —
+                  # deriving it means a THIRD unlisted check reds here instead of waiting on a
+                  # fourth hand-repair.
+                  awk '/^## The CI contract/,/^### Two arms/' "$readme" \
+                    | grep -oP '^\d+\.\s+\*\*`\K[a-z0-9-]+(?=`\*\*)' | sort -u > numbered-names.txt
+                  sort -u "$checkNamesFile" > expected-names.txt
+                  numberedCount=$(wc -l < numbered-names.txt)
+                  expectedNameCount=$(wc -l < expected-names.txt)
+                  echo "numbered CI-contract list: $numberedCount names scanned against $expectedNameCount evaluated checks"
+                  if ! diff -u expected-names.txt numbered-names.txt > names.diff; then
+                    echo "the numbered CI-contract list disagrees with the evaluated checks attrset:"
+                    cat names.diff
+                    exit 1
+                  fi
+
+                  # surface 2: the "## What v1 declares" table's rows vs the construct labels the
+                  # numbered list attributes each check to (the text right after its em-dash, up to
+                  # the first "." or ","), plus T5 — the one construct with no check cell.
+                  awk '/^## The CI contract/,/^### Two arms/' "$readme" \
+                    | grep -oP '^\d+\.\s+\*\*`[a-z0-9-]+`\*\*\s+—\s+\K[^.]*?(?=[.,]|$)' \
+                    | grep -oP '\bC[0-9]+b?\b|\bT[0-9]+b?\b' | sort -u > derived-constructs.txt
+                  { cat derived-constructs.txt; echo T5; } | sort -u > expected-constructs.txt
+                  awk '/^## What v1 declares/,/^### The naming rule/' "$readme" \
+                    | grep -oP '^\| \K[A-Za-z0-9]+(?= -- )' | sort -u > table-rows.txt
+                  scanned=$(wc -l < table-rows.txt)
+                  expectedConstructCount=$(wc -l < expected-constructs.txt)
+                  echo "'## What v1 declares' table: scanned $scanned rows against $expectedConstructCount expected constructs"
+                  if ! diff -u expected-constructs.txt table-rows.txt > table.diff; then
+                    echo "the table disagrees with the construct set the numbered list (by evaluation) attributes to each check:"
+                    cat table.diff
+                    exit 1
+                  fi
+
+                  {
+                    echo "numbered CI-contract list: $numberedCount names agree with $expectedNameCount evaluated checks"
+                    echo "'## What v1 declares' table: scanned $scanned rows agree with $expectedConstructCount expected constructs"
+                  } > $out
+                '';
           in
           {
-            checks = {
+            checks = let constructChecks = {
               # (1) C1 + C2 — the assembled graph, queried, both doors. Red if a kind, a node, an
               # edge, gen-scope's registration, gen-graph's query, or gen-select's second door stops
               # working.
@@ -1679,6 +1744,8 @@
                     }) 1
                   )).success
               );
+            }; in constructChecks // {
+              construct-index = readmeIndexCheck (builtins.attrNames constructChecks ++ [ "construct-index" ]);
             };
           };
       }
