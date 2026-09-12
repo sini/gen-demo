@@ -21,6 +21,10 @@
       {
         lib,
         config,
+        # Read only from INSIDE a value (the `gen` merge below), never to decide this module's own
+        # top-level key set — that would be circular: the module system needs this module's
+        # declarations to finish computing `options`.
+        options,
         genScope,
         genGraph,
         genSelect,
@@ -929,8 +933,25 @@
 
         systems = [ "x86_64-linux" ];
 
-        gen.tree = ./gen-modules;
-        gen.aspectCnf = import ./aspect-cnf.nix;
+        # `mkMerge` under ONE `gen` attrset, never a chain of top-level `//`: `//` shallow-updates
+        # `gen` and SILENTLY DROPS the keys of the earlier operand, after which `requireCnf` fires
+        # and reads exactly like a wiring failure.
+        gen = lib.mkMerge [
+          {
+            tree = ./gen-modules;
+            aspectCnf = import ./aspect-cnf.nix;
+          }
+          # THE NODE REGISTRY (ADR-0035): the hub no longer spells this word itself, so the corpus
+          # names the attribute path of its own registry. Guarded on `options.gen ?
+          # nodeRegistryPath` for the same reason `gen-schema/examples/demo` guards `aspectCnf`:
+          # the option is undeclared at the committed pin, and DEFINING it there — even as `null` —
+          # is itself "the option `gen.nodeRegistryPath' does not exist" (measured: exit 1 on this
+          # corpus's own lock). The key is omitted outright, not conditioned false, so ARM 1 stays
+          # green on the committed pin while ARM 2 exercises the option against the hub's main.
+          (lib.optionalAttrs (options.gen ? nodeRegistryPath) {
+            nodeRegistryPath = [ "hosts" ];
+          })
+        ];
 
         perSystem =
           { pkgs, ... }:
