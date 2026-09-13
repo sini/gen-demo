@@ -17,7 +17,7 @@
 }:
 let
   aspectSchema = genAspects.mkAspectSchema (import ../aspect-cnf.nix);
-  inherit (genMerge) mkOption types;
+  inherit (genMerge) mkMerge mkOption types;
 in
 {
   # `mkAspectModule` declares `options.aspects` and threads schema-declared options into every
@@ -58,6 +58,23 @@ in
   };
   options.bobbins = genSchema.mkInstanceRegistry config.schema.bobbin { };
 
+  # ── THE DELIVERY TARGET VIEW (`den-hoag-uedvp`) ──
+  # `gen.nodeRegistryPath` names ONE attribute path, and that cardinality is the ruling, not a
+  # limitation: a consumer has as many REGISTRIES as it declares kinds, while the delivery TARGET SET
+  # is one. So the corpus declares the union of its two registries as its own option and names THAT
+  # path to the hub. `haberdashery` is an invented collective and deliberately NOT the plural of a
+  # kind — it is a view, not a registry, so `mkInstanceRegistry` is the wrong constructor for it.
+  #
+  # `mkMerge` and not `//` is the mechanism. `//` is right-wins: a node declared in both registries
+  # would be silently dropped from the delivery set at exit 0 with no diagnostic. `attrsOf raw` fed by
+  # `mkMerge` puts the collision on the module system's own conflicting-definitions refusal, which
+  # names the offending attribute — `just refusals` row 14 pins that message.
+  options.haberdashery = mkOption {
+    type = types.attrsOf types.raw;
+    default = { };
+    description = "The delivery target view: every node of both registries, under one name.";
+  };
+
   # THE DECLARED EDGES (ADR-0012, ADR-0019). Edges are data, never read off a projection; `flake.nix`
   # unions them with the dynamic edge C5's policy program admits and queries the result as one graph.
   options.declaredEdges = mkOption {
@@ -67,6 +84,12 @@ in
   };
 
   config = {
+    # THE VIEW, unioned from the two registries below.
+    haberdashery = mkMerge [
+      config.thimbles
+      config.bobbins
+    ];
+
     # THE TWO KINDS.
     schema.thimble = {
       options.aspects = mkOption {

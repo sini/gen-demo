@@ -390,6 +390,35 @@ refusals:
       "gen-memo.identitiesHeld: minted identity moved on a warm re-compose at 'thimbles.pewter'" \
       "$tmpdir/row13-red.err"
 
+    # ── row 14 -- a node declared in BOTH registries, colliding in the delivery target view
+    # (mirrors the corpus's `options.haberdashery`, `den-hoag-uedvp`) ──
+    #
+    # `gen.nodeRegistryPath` names ONE attribute path because it names a delivery-target VIEW, so a
+    # consumer with several registries declares their union as its own option. THE COLLISION RULE IS
+    # THE MODULE SYSTEM'S, not one gen writes, and this row is what pins that: `attrsOf raw` fed by
+    # `mkMerge` refuses a node declared in both, BY NAME. The rejected `//` is the reason the row
+    # exists -- it is right-wins, so the same corpus spelled with `//` drops `pewter` from the
+    # delivery set at exit 0 with zero diagnostics. Nothing in gen can refuse that spelling, so the
+    # `mkMerge` arm's refusal is the only thing holding the ruled construction in place.
+    row14='let
+      gen = (builtins.getFlake (toString ./.)).inputs.gen;
+      genMerge = gen.lib.modules.merge;
+      reg = genMerge.mkOption { type = genMerge.types.attrsOf genMerge.types.raw; default = { }; };
+      mod = { config, ... }: {
+        options = { thimbles = reg; bobbins = reg; haberdashery = reg; };
+        config = {
+          thimbles.pewter = { spool = "linen"; };
+          bobbins.BOBBIN = { gauge = "fine"; };
+          haberdashery = genMerge.mkMerge [ config.thimbles config.bobbins ];
+        };
+      };
+    in builtins.toJSON (builtins.attrNames (gen.lib.compose { modules = [ mod ]; }).values.haberdashery.pewter)'
+    check "T5 row14 unplanted (bobbins.grosgrain, no node in both registries)" "${row14/BOBBIN/grosgrain}" 0 "" \
+      "$tmpdir/row14-green.err" '["spool"]'
+    check "T5 row14 planted   (bobbins.pewter, the same node in both registries)" "${row14/BOBBIN/pewter}" 1 \
+      "gen-merge: the option \`haberdashery.pewter' has conflicting definitions" \
+      "$tmpdir/row14-red.err"
+
     # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
     # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
     # function above would pass a mismatched row/message pairing and the by-name half would be
@@ -398,7 +427,11 @@ refusals:
     # Further extended to rows 10/11: both gate the same construct through the same door prefix
     # (`gen-view.boundedWellDefinedSchedule:`), so this is the pair most likely to cross-match by
     # accident -- row 10 refuses a cyclic component, row 11 refuses a non-minted attrset, and
-    # neither message may appear in the other's stderr.
+    # neither message may appear in the other's stderr. Extended again to row 14 against row 5, its
+    # message-distant sibling: both rows are about the DELIVERY TARGET SET (row 5 the projection's
+    # missing category source, row 14 a collision in the view it selects over) while their refusals
+    # come from different libraries and share no token, so a leak either way would mean the by-name
+    # half is matching the area rather than the message.
     if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
       echo "FAIL control: row1's message leaked into row2's refusal"
       fail=1
@@ -417,8 +450,14 @@ refusals:
     elif grep -qF "cyclic component" "$tmpdir/row11-red.err"; then
       echo "FAIL control: row10's message leaked into row11's refusal"
       fail=1
+    elif grep -qF "no category source" "$tmpdir/row14-red.err"; then
+      echo "FAIL control: row5's message leaked into row14's refusal"
+      fail=1
+    elif grep -qF "has conflicting definitions" "$tmpdir/row5-red.err"; then
+      echo "FAIL control: row14's message leaked into row5's refusal"
+      fail=1
     else
-      echo "ok   control (row1/row2, row6/row9 and row10/row11 refusals do not cross-match)"
+      echo "ok   control (row1/row2, row6/row9, row10/row11 and row5/row14 refusals do not cross-match)"
     fi
 
     exit $fail

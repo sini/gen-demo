@@ -366,14 +366,17 @@
         damaskClasses = builtins.attrNames config.gen.composed.hosts.damask.classes;
         stitchKeySet = builtins.attrNames config.gen.composed.aspects.stitch;
 
-        # A SECOND ROUTE TO A PROJECTION, kept deliberately. `gen.nodeRegistryPath` now carries the
-        # first registry's name to the hub (ADR-0035), but it is ONE attribute path
-        # (`nullOr (listOf str)`): the hub can name either registry, never both. Collapsing the two
-        # routes would take a hub that accepts several, which is its own row. Calling
-        # `realize` directly is rejected — it takes `terminals`, so the corpus would have to rebuild
-        # the hub's unexported `terminalOf` bridge, and a corpus that reimplements the surface it
-        # tests has stopped testing it. Taken instead: one extra check calling `project` directly with
-        # `selectHosts`, so gen-delivery's own selector stays exercised beside the hub's option.
+        # A SECOND ROUTE TO A PROJECTION, kept deliberately — and the cardinality is NO LONGER the
+        # reason. `gen.nodeRegistryPath` names ONE attribute path because it names a delivery-target
+        # VIEW and a view is singular (`den-hoag-uedvp`); the corpus declares the union of both
+        # registries as `options.haberdashery` and names THAT path, so the hub now reaches every node
+        # of both. What keeps this call is the reason the comment already gave second: it is the
+        # corpus's only DIRECT exercise of `gen-delivery.project`'s `selectHosts` formal, which
+        # survives the ruling and would be lost with the call. Calling `realize` directly is
+        # rejected — it takes `terminals`, so the corpus would have to rebuild the hub's unexported
+        # `terminalOf` bridge, and a corpus that reimplements the surface it tests has stopped
+        # testing it. Taken instead: one extra check calling `project` directly with `selectHosts`,
+        # so gen-delivery's own selector stays exercised beside the hub's option.
         bobbinProjection = genDelivery.project {
           values = genValues;
           cnf = import ./aspect-cnf.nix;
@@ -951,7 +954,7 @@
           # corpus's own lock). The key is omitted outright, not conditioned false, so ARM 1 stays
           # green on the committed pin while ARM 2 exercises the option against the hub's main.
           (lib.optionalAttrs (options.gen ? nodeRegistryPath) {
-            nodeRegistryPath = [ "thimbles" ];
+            nodeRegistryPath = [ "haberdashery" ];
           })
         ];
 
@@ -1158,6 +1161,8 @@
               delivery-projection = asserts "delivery-projection" (
                 builtins.attrNames config.gen.composed.hosts == [
                   "damask"
+                  "faille"
+                  "grosgrain"
                   "pewter"
                 ]
                 && pewterClasses == [ "nixos" ]
