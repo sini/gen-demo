@@ -188,9 +188,9 @@ in
     # a `declares` edge whose `to` is no node of this graph, and gen-assemble's
     # `requireDeclaredMembership` refused the whole contribution by name.
     aspects.bartack.includes = [
-      config.aspects.hemline.placket     # a REFERENCE — resolves to the node "hemline/placket"
-      ({ node, ... }: { })               # INLINE CONTENT — its POSITION is published, not an edge
-      (genAspects.keyRef "mill/stitch")  # a FOREIGN REFERENCE — published as a ref, never an edge
+      config.aspects.hemline.placket # a REFERENCE — resolves to the node "hemline/placket"
+      ({ node, ... }: { }) # INLINE CONTENT — its POSITION is published, not an edge
+      (genAspects.keyRef "mill/stitch") # a FOREIGN REFERENCE — published as a ref, never an edge
     ];
   };
 }

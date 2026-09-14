@@ -821,8 +821,9 @@
             {
               label = "members";
               graph = genScope.overlays (
-                builtins.concatMap (id: map (a: genScope.edge id a) (genValues.thimbles.${id}.aspects or [ ]))
-                  (builtins.attrNames genValues.thimbles)
+                builtins.concatMap (id: map (a: genScope.edge id a) (genValues.thimbles.${id}.aspects or [ ])) (
+                  builtins.attrNames genValues.thimbles
+                )
               );
             }
           ];
@@ -880,7 +881,8 @@
         # union (post-protocol); `c16Out` turns that graph into the `id -> [ids]` shape
         # `labeledFrom`'s `perLabel` wants, by the same from/to convention as containment above.
         c16Structural = genAssemble.structuralDecls c16Assembled.nodes;
-        c16LabelGraph = label: (builtins.head (builtins.filter (g: g.label == label) c16Union.edgeGraphs)).graph;
+        c16LabelGraph =
+          label: (builtins.head (builtins.filter (g: g.label == label) c16Union.edgeGraphs)).graph;
         c16Out = g: id: map (e: e.to) (builtins.filter (e: e.from == id) g.edges);
 
         c16Lg = genGraph.labeledFrom {
@@ -1036,745 +1038,752 @@
                 '';
           in
           {
-            checks = let constructChecks = {
-              # (1) C1 + C2 — the assembled graph, queried, both doors. Red if a kind, a node, an
-              # edge, gen-scope's registration, gen-graph's query, or gen-select's second door stops
-              # working.
-              graph-query = asserts "graph-query" (
-                thimbles == [
-                  "damask"
-                  "pewter"
-                ]
-                &&
-                  bobbinNodes == [
-                    "faille"
-                    "grosgrain"
-                  ]
-                &&
-                  tacked == [
-                    "damask"
-                    "faille"
-                    "grosgrain"
-                    "pewter"
-                  ]
-                &&
-                  gathered == [
-                    "damask"
-                    "pewter"
-                  ]
-                && selPewter == true
-                && selGrosgrain == false
-              );
-
-              # (2) C3 — the binding node minted, identified by its labelled relata. The expected
-              # edges are read off `bastingRelata` by construction — same source C4's carrier reads —
-              # rather than restated as literal labels, so a relabelling at the shared source cannot
-              # make this check collaterally red for the wrong reason (C3 still mints; only the
-              # carrier's own disjointness is what a relabelling seed is meant to move).
-              binding-node = asserts "binding-node" (
-                builtins.attrNames minted.nodes == [
-                  "basting:pewter:grosgrain"
-                  "grosgrain"
-                  "pewter"
-                ]
-                &&
-                  minted.edges == map (l: {
-                    from = "basting:pewter:grosgrain";
-                    label = l;
-                    to = bastingRelata.${l};
-                  }) (builtins.attrNames bastingRelata)
-                && lib.hasPrefix "basting:" minted.nodes."basting:pewter:grosgrain".identity
-              );
-
-              # (3) C4 — the movement, and Λ read off C3's own relata.
-              movement = asserts "movement" (
-                moved.value == [ "cambric" ]
-                &&
-                  builtins.attrNames bastingRelata == [
-                    "warp"
-                    "weft"
-                  ]
-              );
-
-              # (4) C5 — the policy program's stable model, total, and the derived edge admitted.
-              policy-edge = asserts "policy-edge" (
-                (mdl.resolve pipingHead).included == true
-                && mdl.adjudication.outcome == "admitted"
-                && mdl.adjudication.searched == false
-                && mdl.adjudication.ground == "Van Gelder, Ross & Schlipf 1991, Corollary 5.6"
-              );
-
-              # C17 — the identity-key set is CLOSED at the kind boundary, so an option contributed on
-              # the instance side has nowhere to attach in an identity. The corpus's `thimbles` registry
-              # now carries an `extraModules` option (`shirring`); this asserts the option is really
-              # there AND that the stamp is byte-identical to the one the corpus carried before it
-              # existed. Both halves are load-bearing: the equality alone passes for a registry that
-              # dropped the caller's modules on the floor, which is a different library and a worse one.
-              #
-              # It also closes den-hoag-9l26n. `identityHashForKind` is the SOLE recompute path, and on
-              # a kind declared through gen-aspects' `schemaOption` — the shape this corpus uses, whose
-              # `options` attribute is EMPTY — it used to answer over `[ "name" ]` alone and disagree
-              # with the stamp on every instance. Since the derivation reads the kind's own evaluation
-              # it cannot disagree, and the pinned literal is what separates agreement from two
-              # derivations degenerating together.
-              #
-              # The live control is the OTHER kind: `bobbin` recomputes to its OWN stamp, over a
-              # different option set, and the two stamps differ — so the recompute is neither constant
-              # nor degenerate. (The gen-schema-DECLARED kind-value shape is controlled in gen-schema's
-              # own suite, `identity-key-closure.test-control-both-kind-value-shapes-mint-alike`; this
-              # corpus declares no such kind and inventing one here would test the fixture, not the
-              # corpus.)
-              #
-              # ★ THE WRONG-KIND ARM IS PRESENT, AND IT IS THE HALF KIND DISCOVERY ACTUALLY RUNS ON.
-              # `id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match the carried
-              # hash means the kind guess is wrong, and a `findFirst` over candidate kinds reaches
-              # that case on nearly every candidate. Recomputing `bobbin` against a thimble instance
-              # answers `null` — *not this kind* — because a thimble carries none of `bobbin`'s
-              # identity keys; `null` is not an identity, so the loop passes over it instead of
-              # dying. This arm used to be absent and the absence was reported as a finding: the
-              # accessor was unguarded and this expression aborted `attribute 'gauge' missing`, an
-              # uncatchable interpreter error where the contract promises a value. The guard is
-              # presence-only by design, so a candidate whose key the instance CARRIES at a value the
-              # mint refuses still propagates the mint's named refusal — a different terminal state,
-              # owned by the mint, and catchable. This corpus exercises the absent-key half, which is
-              # the one discovery iterates over.
-              option-set-closure = asserts "option-set-closure" (
-                c17Pewter.shirring == "gathered"
-                && c17Pewter.id_hash
-                  == "thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a"
-                &&
-                  c17Pewter._identityKeys == [
-                    "name"
-                    "spool"
-                  ]
-                && (c17Thimble.options or { }) == { }
-                && c17Schema.identityHashForKind c17Thimble c17Pewter == c17Pewter.id_hash
-                && c17Schema.identityHashForKind c17Bobbin genValues.bobbins.grosgrain
-                  == genValues.bobbins.grosgrain.id_hash
-                && genValues.bobbins.grosgrain.id_hash != c17Pewter.id_hash
-                && c17Schema.identityHashForKind c17Bobbin c17Pewter == null
-              );
-
-              # (5) C6 — the delivery projection: the node set, the collected class, both Rider
-              # limbs absent from it despite both being present in the aspect body, and the bobbin
-              # door under an invented name.
-              delivery-projection = asserts "delivery-projection" (
-                builtins.attrNames config.gen.composed.hosts == [
-                  "damask"
-                  "faille"
-                  "grosgrain"
-                  "pewter"
-                ]
-                && pewterClasses == [ "nixos" ]
-                && damaskClasses == [ ]
-                &&
-                  stitchKeySet == [
-                    "description"
-                    "gusset"
-                    "id_hash"
-                    "includes"
-                    "key"
-                    "meta"
-                    "name"
-                    "nixos"
-                    "welt"
-                  ]
-                &&
-                  bobbinProjectedNodes == [
-                    "faille"
-                    "grosgrain"
-                  ]
-              );
-
-              # (6) T2b — the warm decision, byte-identical to the cold one, with the guard included:
-              # without `warm.trace.mode == "warm"` both arms could be cold and the comparison would
-              # measure nothing.
-              warm-parity = asserts "warm-parity" (
-                builtins.toJSON cold.values == builtins.toJSON warm.values
-                && builtins.toJSON cold.provenance == builtins.toJSON warm.provenance
-                && (warm.trace.mode or null) == "warm"
-                && !(cold ? trace)
-              );
-
-              # (7) the target instantiated, not built. Forcing the drvPath into a file runs the
-              # whole NixOS evaluation and writes the .drv, and stops there.
-              nixos-instantiate = pkgs.writeText "gen-demo-pewter-drvpath" (
-                config.flake.nixosConfigurations.pewter.config.system.build.toplevel.drvPath
-              );
-
-              # (8) C8 — the contribution protocol: shape unions commutatively while content folds
-              # by positional authority. Permuting `overlay` to the front is the discriminator: the
-              # node SET stays fixed, the folded `spool` does not.
-              contribution-protocol = asserts "contribution-protocol" (
-                builtins.attrNames c8Assembled.nodes == [
-                  "damask"
-                  "faille"
-                  "grosgrain"
-                  "pewter"
-                ]
-                &&
-                  c8Assembled.nodeOrder == [
-                    "pewter"
-                    "damask"
-                    "grosgrain"
-                    "faille"
-                  ]
-                &&
-                  c8Unioned.decls.pewter == {
-                    aspects = [ "stitch" ];
-                    spool = "gros-de-tours";
-                    tacked = true;
-                  }
-                &&
-                  c8Permuted.decls.pewter == {
-                    aspects = [ "stitch" ];
-                    spool = "linen";
-                    tacked = true;
-                  }
-                && map (g: g.label) c8Unioned.edgeGraphs == [ "tacks" ]
-              );
-
-              # (9) C9 — a SHARE class over declared content (`weave`): the "keys narrow, the gate
-              # decides" discipline asserted as both the partition and the byte gate.
-              share-class = asserts "share-class" (
-                map (c: c.key) shareClasses == [
-                  "plain"
-                  "twill"
-                ]
-                &&
-                  map (c: c.members) shareClasses == [
-                    [
+            checks =
+              let
+                constructChecks = {
+                  # (1) C1 + C2 — the assembled graph, queried, both doors. Red if a kind, a node, an
+                  # edge, gen-scope's registration, gen-graph's query, or gen-select's second door stops
+                  # working.
+                  graph-query = asserts "graph-query" (
+                    thimbles == [
                       "damask"
                       "pewter"
                     ]
-                    [
+                    &&
+                      bobbinNodes == [
+                        "faille"
+                        "grosgrain"
+                      ]
+                    &&
+                      tacked == [
+                        "damask"
+                        "faille"
+                        "grosgrain"
+                        "pewter"
+                      ]
+                    &&
+                      gathered == [
+                        "damask"
+                        "pewter"
+                      ]
+                    && selPewter == true
+                    && selGrosgrain == false
+                  );
+
+                  # (2) C3 — the binding node minted, identified by its labelled relata. The expected
+                  # edges are read off `bastingRelata` by construction — same source C4's carrier reads —
+                  # rather than restated as literal labels, so a relabelling at the shared source cannot
+                  # make this check collaterally red for the wrong reason (C3 still mints; only the
+                  # carrier's own disjointness is what a relabelling seed is meant to move).
+                  binding-node = asserts "binding-node" (
+                    builtins.attrNames minted.nodes == [
+                      "basting:pewter:grosgrain"
+                      "grosgrain"
+                      "pewter"
+                    ]
+                    &&
+                      minted.edges == map (l: {
+                        from = "basting:pewter:grosgrain";
+                        label = l;
+                        to = bastingRelata.${l};
+                      }) (builtins.attrNames bastingRelata)
+                    && lib.hasPrefix "basting:" minted.nodes."basting:pewter:grosgrain".identity
+                  );
+
+                  # (3) C4 — the movement, and Λ read off C3's own relata.
+                  movement = asserts "movement" (
+                    moved.value == [ "cambric" ]
+                    &&
+                      builtins.attrNames bastingRelata == [
+                        "warp"
+                        "weft"
+                      ]
+                  );
+
+                  # (4) C5 — the policy program's stable model, total, and the derived edge admitted.
+                  policy-edge = asserts "policy-edge" (
+                    (mdl.resolve pipingHead).included == true
+                    && mdl.adjudication.outcome == "admitted"
+                    && mdl.adjudication.searched == false
+                    && mdl.adjudication.ground == "Van Gelder, Ross & Schlipf 1991, Corollary 5.6"
+                  );
+
+                  # C17 — the identity-key set is CLOSED at the kind boundary, so an option contributed on
+                  # the instance side has nowhere to attach in an identity. The corpus's `thimbles` registry
+                  # now carries an `extraModules` option (`shirring`); this asserts the option is really
+                  # there AND that the stamp is byte-identical to the one the corpus carried before it
+                  # existed. Both halves are load-bearing: the equality alone passes for a registry that
+                  # dropped the caller's modules on the floor, which is a different library and a worse one.
+                  #
+                  # It also closes den-hoag-9l26n. `identityHashForKind` is the SOLE recompute path, and on
+                  # a kind declared through gen-aspects' `schemaOption` — the shape this corpus uses, whose
+                  # `options` attribute is EMPTY — it used to answer over `[ "name" ]` alone and disagree
+                  # with the stamp on every instance. Since the derivation reads the kind's own evaluation
+                  # it cannot disagree, and the pinned literal is what separates agreement from two
+                  # derivations degenerating together.
+                  #
+                  # The live control is the OTHER kind: `bobbin` recomputes to its OWN stamp, over a
+                  # different option set, and the two stamps differ — so the recompute is neither constant
+                  # nor degenerate. (The gen-schema-DECLARED kind-value shape is controlled in gen-schema's
+                  # own suite, `identity-key-closure.test-control-both-kind-value-shapes-mint-alike`; this
+                  # corpus declares no such kind and inventing one here would test the fixture, not the
+                  # corpus.)
+                  #
+                  # ★ THE WRONG-KIND ARM IS PRESENT, AND IT IS THE HALF KIND DISCOVERY ACTUALLY RUNS ON.
+                  # `id-hash.nix`'s DISCOVERY PROPERTY says a recompute that does not match the carried
+                  # hash means the kind guess is wrong, and a `findFirst` over candidate kinds reaches
+                  # that case on nearly every candidate. Recomputing `bobbin` against a thimble instance
+                  # answers `null` — *not this kind* — because a thimble carries none of `bobbin`'s
+                  # identity keys; `null` is not an identity, so the loop passes over it instead of
+                  # dying. This arm used to be absent and the absence was reported as a finding: the
+                  # accessor was unguarded and this expression aborted `attribute 'gauge' missing`, an
+                  # uncatchable interpreter error where the contract promises a value. The guard is
+                  # presence-only by design, so a candidate whose key the instance CARRIES at a value the
+                  # mint refuses still propagates the mint's named refusal — a different terminal state,
+                  # owned by the mint, and catchable. This corpus exercises the absent-key half, which is
+                  # the one discovery iterates over.
+                  option-set-closure = asserts "option-set-closure" (
+                    c17Pewter.shirring == "gathered"
+                    && c17Pewter.id_hash == "thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a"
+                    &&
+                      c17Pewter._identityKeys == [
+                        "name"
+                        "spool"
+                      ]
+                    && (c17Thimble.options or { }) == { }
+                    && c17Schema.identityHashForKind c17Thimble c17Pewter == c17Pewter.id_hash
+                    &&
+                      c17Schema.identityHashForKind c17Bobbin genValues.bobbins.grosgrain
+                      == genValues.bobbins.grosgrain.id_hash
+                    && genValues.bobbins.grosgrain.id_hash != c17Pewter.id_hash
+                    && c17Schema.identityHashForKind c17Bobbin c17Pewter == null
+                  );
+
+                  # (5) C6 — the delivery projection: the node set, the collected class, both Rider
+                  # limbs absent from it despite both being present in the aspect body, and the bobbin
+                  # door under an invented name.
+                  delivery-projection = asserts "delivery-projection" (
+                    builtins.attrNames config.gen.composed.hosts == [
+                      "damask"
                       "faille"
                       "grosgrain"
+                      "pewter"
                     ]
-                  ]
-                &&
-                  map (c: c.archetype) shareClasses == [
-                    "damask"
-                    "faille"
-                  ]
-                && plainCore.sharedKeys == [ "weave" ]
-                && plainCore.values == { weave = "plain"; }
-                &&
-                  pewterShared == {
-                    spool = "linen";
-                    weave = "plain";
-                  }
-                && plainGate.gate == true
-                && plainGate.candidateDigest == plainGate.realDigest
-                &&
-                  plainInvariance == {
-                    divergingKeys = [ "spool" ];
-                    invariant = false;
-                  }
-              );
+                    && pewterClasses == [ "nixos" ]
+                    && damaskClasses == [ ]
+                    &&
+                      stitchKeySet == [
+                        "description"
+                        "gusset"
+                        "id_hash"
+                        "includes"
+                        "key"
+                        "meta"
+                        "name"
+                        "nixos"
+                        "welt"
+                      ]
+                    &&
+                      bobbinProjectedNodes == [
+                        "faille"
+                        "grosgrain"
+                      ]
+                  );
 
-              # (10) C10 — one stratified dispatch: each rule's stratum was STAMPED by
-              # `deriveGroup` from its own declared `produces`, none written by hand; the `sateen`
-              # rule not firing against a `linen` context is the discriminator.
-              stratified-dispatch = asserts "stratified-dispatch" (
-                map (x: x.group) seamRules == [
-                  "basting"
-                  "finishing"
-                  "basting"
-                ]
-                &&
-                  seamDispatched.actions == {
-                    basting = [
-                      {
-                        __action = "tack";
-                        node = "pewter";
-                      }
-                    ];
-                    finishing = [
-                      {
-                        __action = "hem";
-                        node = "pewter";
-                      }
-                    ];
-                  }
-                &&
-                  seamDispatched.orderedGroups == [
-                    "basting"
-                    "finishing"
-                  ]
-              );
+                  # (6) T2b — the warm decision, byte-identical to the cold one, with the guard included:
+                  # without `warm.trace.mode == "warm"` both arms could be cold and the comparison would
+                  # measure nothing.
+                  warm-parity = asserts "warm-parity" (
+                    builtins.toJSON cold.values == builtins.toJSON warm.values
+                    && builtins.toJSON cold.provenance == builtins.toJSON warm.provenance
+                    && (warm.trace.mode or null) == "warm"
+                    && !(cold ? trace)
+                  );
 
-              # (11) C11 — a packaged subgraph, federated: the capability declared locally equals
-              # the capability the requirer resolves to after the exchange (ADR-0027's equivalence
-              # survival). gen-link ships no adapter/lens surface, measured (README finding), so
-              # `link` substitutes for the absent adapter.
-              federated-link = asserts "federated-link" (
-                selvageProvides == [
-                  "warp"
-                  "weft"
-                ]
-                &&
-                  federated.resolved == {
-                    "loom/braid" = [
+                  # (7) the target instantiated, not built. Forcing the drvPath into a file runs the
+                  # whole NixOS evaluation and writes the .drv, and stops there.
+                  nixos-instantiate = pkgs.writeText "gen-demo-pewter-drvpath" (
+                    config.flake.nixosConfigurations.pewter.config.system.build.toplevel.drvPath
+                  );
+
+                  # (8) C8 — the contribution protocol: shape unions commutatively while content folds
+                  # by positional authority. Permuting `overlay` to the front is the discriminator: the
+                  # node SET stays fixed, the folded `spool` does not.
+                  contribution-protocol = asserts "contribution-protocol" (
+                    builtins.attrNames c8Assembled.nodes == [
+                      "damask"
+                      "faille"
+                      "grosgrain"
+                      "pewter"
+                    ]
+                    &&
+                      c8Assembled.nodeOrder == [
+                        "pewter"
+                        "damask"
+                        "grosgrain"
+                        "faille"
+                      ]
+                    &&
+                      c8Unioned.decls.pewter == {
+                        aspects = [ "stitch" ];
+                        spool = "gros-de-tours";
+                        tacked = true;
+                      }
+                    &&
+                      c8Permuted.decls.pewter == {
+                        aspects = [ "stitch" ];
+                        spool = "linen";
+                        tacked = true;
+                      }
+                    && map (g: g.label) c8Unioned.edgeGraphs == [ "tacks" ]
+                  );
+
+                  # (9) C9 — a SHARE class over declared content (`weave`): the "keys narrow, the gate
+                  # decides" discipline asserted as both the partition and the byte gate.
+                  share-class = asserts "share-class" (
+                    map (c: c.key) shareClasses == [
+                      "plain"
+                      "twill"
+                    ]
+                    &&
+                      map (c: c.members) shareClasses == [
+                        [
+                          "damask"
+                          "pewter"
+                        ]
+                        [
+                          "faille"
+                          "grosgrain"
+                        ]
+                      ]
+                    &&
+                      map (c: c.archetype) shareClasses == [
+                        "damask"
+                        "faille"
+                      ]
+                    && plainCore.sharedKeys == [ "weave" ]
+                    && plainCore.values == { weave = "plain"; }
+                    &&
+                      pewterShared == {
+                        spool = "linen";
+                        weave = "plain";
+                      }
+                    && plainGate.gate == true
+                    && plainGate.candidateDigest == plainGate.realDigest
+                    &&
+                      plainInvariance == {
+                        divergingKeys = [ "spool" ];
+                        invariant = false;
+                      }
+                  );
+
+                  # (10) C10 — one stratified dispatch: each rule's stratum was STAMPED by
+                  # `deriveGroup` from its own declared `produces`, none written by hand; the `sateen`
+                  # rule not firing against a `linen` context is the discriminator.
+                  stratified-dispatch = asserts "stratified-dispatch" (
+                    map (x: x.group) seamRules == [
+                      "basting"
+                      "finishing"
+                      "basting"
+                    ]
+                    &&
+                      seamDispatched.actions == {
+                        basting = [
+                          {
+                            __action = "tack";
+                            node = "pewter";
+                          }
+                        ];
+                        finishing = [
+                          {
+                            __action = "hem";
+                            node = "pewter";
+                          }
+                        ];
+                      }
+                    &&
+                      seamDispatched.orderedGroups == [
+                        "basting"
+                        "finishing"
+                      ]
+                  );
+
+                  # (11) C11 — a packaged subgraph, federated: the capability declared locally equals
+                  # the capability the requirer resolves to after the exchange (ADR-0027's equivalence
+                  # survival). gen-link ships no adapter/lens surface, measured (README finding), so
+                  # `link` substitutes for the absent adapter.
+                  federated-link = asserts "federated-link" (
+                    selvageProvides == [
                       "warp"
                       "weft"
-                    ];
-                  }
-                &&
-                  builtins.attrNames federated.nodes == [
-                    "loom/braid"
-                    "mill/stitch"
-                  ]
-                &&
-                  federated.graph.edges == [
-                    {
-                      from = "loom/braid";
-                      to = "mill/stitch";
-                    }
-                  ]
-                && (builtins.head federated.bound).relata == { selvageReq = "mill/stitch"; }
-                && lib.all (n: lib.hasPrefix "aspect:" n.identity) (builtins.attrValues federated.nodes)
-              );
-
-              # (12) C12 — a derived product graph and a policy-stratum promotion. The KIND is the
-              # discriminator (Oracle 3 drives this red by seeding `productN "tensor"`), and the
-              # coordinate coupling is guarded by the fact that both the head and the scope
-              # admission below are read off `seamCoords`, never restated.
-              product-promotion = asserts "product-promotion" (
-                seamSpace.product.dims == [
-                  "thimble"
-                  "bobbin"
-                ]
-                &&
-                  map (c: "${c.thimble}*${c.bobbin}") (genProduct.cells seamSpace) == [
-                    "damask*faille"
-                    "damask*grosgrain"
-                    "pewter*faille"
-                    "pewter*grosgrain"
-                  ]
-                &&
-                  map (
-                    cid:
-                    let
-                      c = genProduct.coordsOf seamSpace cid;
-                    in
-                    "${c.thimble}*${c.bobbin}"
-                  ) (seamSpace.edges seamCell) == [
-                    "damask*grosgrain"
-                    "pewter*faille"
-                  ]
-                && (genProduct.projectTo seamSpace "bobbin").projection.ofCell seamCell == "grosgrain"
-                && (mdl.resolve seamHead).included == true
-                && seamNodes == [ "seam:pewter:grosgrain" ]
-                &&
-                  thimbles == [
-                    "damask"
-                    "pewter"
-                  ]
-                &&
-                  bobbinNodes == [
-                    "faille"
-                    "grosgrain"
-                  ]
-              );
-
-              # (13) C13 — `foldLayers`: all three strategies plus the default channel in one call.
-              layered-fold = asserts "layered-fold" (
-                folded == {
-                  gauge = "fine";
-                  meta = {
-                    warp = 1;
-                    weft = 2;
-                  };
-                  spool = "sateen";
-                  tacks = [
-                    "a"
-                    "b"
-                  ];
-                }
-              );
-
-              # (14) C14 — the closed, first-order body-term algebra: refusals are DATA, never a
-              # throw, so all three refusal arms live in this one cell rather than in
-              # `just refusals` — the only construct of which that is true.
-              body-term-algebra = asserts "body-term-algebra" (
-                selvageResolved == {
-                  __crossingResult = "ok";
-                  value = "selvage-linen";
-                }
-                && selvageChecked.__crossingResult == "ok"
-                &&
-                  knownFormers == [
-                    "Lit"
-                    "ReadFrom"
-                    "ReadCtx"
-                    "If"
-                    "Attrs"
-                    "List"
-                    "Concat"
-                    "PathJoin"
-                    "Apply"
-                  ]
-                &&
-                  builtins.attrNames crossingPrims == [
-                    "attrNames"
-                    "concatStringsSep"
-                    "elemAt"
-                    "getAttr"
-                    "length"
-                    "toString"
-                  ]
-                &&
-                  inertBudget == {
-                    maxDepth = 32;
-                    maxNodes = 10000;
-                  }
-                && readCtxHeadsOfSelvage == [ ]
-                && selvageBadLitChecked.refusal.code == "lit-payload-function"
-                && selvageBadLitChecked.refusal.blamed == "supplier"
-                && selvageBadReadFromResolved.refusal.code == "readfrom-names-non-member"
-                &&
-                  selvageBadReadFromResolved.refusal.witness == {
-                    available = [ "pewter" ];
-                    target = "sarcenet";
-                  }
-                && selvageBadVocabChecked.refusal.code == "term-vocabulary"
-                && selvageBadVocabChecked.refusal.witness.former == "Frobnicate"
-              );
-
-              # (15) C15 — the cyclic stratum, solved: both members reach each other and the
-              # external `higherStrata` supplied, by `runScc`'s iterate-from-bottom ascent rather
-              # than the acyclic rebuilder, which cannot express a cycle at all.
-              cyclic-stratum = asserts "cyclic-stratum" (
-                solvedScc == {
-                  chintz = [
-                    "chintz"
-                    "organdy"
-                    "tulle"
-                  ];
-                  tulle = [
-                    "chintz"
-                    "organdy"
-                    "tulle"
-                  ];
-                }
-              );
-
-              # (16) C7 — the well-definedness gate. Fields of `gated` ITSELF, never of
-              # `contracted` (that would force gen-graph only, already reached — gate v0's
-              # CONSTRUCTION-1). Forcing `gated.condensation` and `gated.edges` also runs
-              # gen-view's own door (`graph.isDeclaredEdges`), its cyclic-SCC filter and its
-              # `admitsCycle` application — none of which gen-graph performs.
-              well-defined-schedule = asserts "well-defined-schedule" (
-                gatedSccs == [
-                  [ "damask" ]
-                  [ "faille" ]
-                  [ "seam:pewter:grosgrain" ]
-                  [ "grosgrain" ]
-                  [ "pewter" ]
-                ]
-                && (builtins.filter (scc: builtins.length scc > 1) gatedSccs) == [ ]
-                &&
-                  gatedEdges == [
-                    "grosgrain"
-                    "damask"
-                  ]
-              );
-
-              # (17) C16 — the aspect graph, assembled through the contribution protocol (ADR-0012,
-              # ADR-0010 §3 toolkit item). The corpus's own aspect facts, contributed alongside the
-              # node registry's declared membership, queried through gen-graph's labelled graph and
-              # gen-select's context; oracle 5's structural-helper substitution armed at C16's own
-              # non-flat assembly (children/subtreeOf diverge) and at C1's flat one (the node set
-              # does not).
-              aspect-contribution = asserts "aspect-contribution" (
-                # O1/O2 — the facts are a GRAPH, and they assemble; containment survives.
-                c16Facts.nodes == [
-                  "bartack"
-                  "hemline"
-                  "hemline/facing"
-                  "hemline/placket"
-                  "hemline/placket/eyelet"
-                  "stitch"
-                ]
-                && c16Assembled.nodeOrder == [
-                  "bartack"
-                  "hemline"
-                  "hemline/facing"
-                  "hemline/placket"
-                  "hemline/placket/eyelet"
-                  "stitch"
-                  "damask"
-                  "faille"
-                  "grosgrain"
-                  "pewter"
-                ]
-                && c16Assembled.nodes."hemline/placket".parent == "hemline"
-                && c16Assembled.nodes."hemline/placket".decls == {
-                  __edges = {
-                    declares = [ ];
-                    members = [ ];
-                  };
-                  description = "Aspect placket";
-                  key = "hemline/placket";
-                }
-                # O3 — containment travels CHILD -> PARENT.
-                && c16Union.parentGraph.edges == [
-                  {
-                    from = "hemline/facing";
-                    to = "hemline";
-                  }
-                  {
-                    from = "hemline/placket";
-                    to = "hemline";
-                  }
-                  {
-                    from = "hemline/placket/eyelet";
-                    to = "hemline/placket";
-                  }
-                ]
-                # O4 — includes travel under the caller's own label.
-                && map (g: g.label) c16Union.edgeGraphs == [
-                  "declares"
-                  "members"
-                ]
-                # O5 — the two contributions are ONE assembly, membership globally declared.
-                && c16Assembled.nodes."pewter".decls.__edges == {
-                  declares = [ ];
-                  members = [ "stitch" ];
-                }
-                && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
-                # O6 — the query walks the labelled graph the union produced.
-                && genGraph.query {
-                  graph = c16Lg;
-                  from = "hemline";
-                  follow = genGraph.regex.star (genGraph.regex.lit "contains");
-                } == [
-                  "hemline"
-                  "hemline/facing"
-                  "hemline/placket"
-                  "hemline/placket/eyelet"
-                ]
-                && genGraph.query {
-                  graph = c16Lg;
-                  from = "pewter";
-                  follow = genGraph.regex.seq [
-                    (genGraph.regex.lit "members")
-                    (genGraph.regex.star (genGraph.regex.lit "contains"))
-                  ];
-                } == [ "stitch" ]
-                && genGraph.query {
-                  graph = c16Lg;
-                  from = "bartack";
-                  follow = genGraph.regex.seq [
-                    (genGraph.regex.lit "declares")
-                    (genGraph.regex.star (genGraph.regex.lit "contains"))
-                  ];
-                } == [
-                  "hemline/placket"
-                  "hemline/placket/eyelet"
-                ]
-                && genGraph.roots (genGraph.forgetLabels c16Lg) == [
-                  "bartack"
-                  "damask"
-                  "faille"
-                  "grosgrain"
-                  "hemline"
-                  "pewter"
-                ]
-                && genGraph.leaves (genGraph.forgetLabels c16Lg) == [
-                  "damask"
-                  "faille"
-                  "grosgrain"
-                  "hemline/facing"
-                  "hemline/placket/eyelet"
-                  "stitch"
-                ]
-                && genGraph.cycles (genGraph.forgetLabels c16Lg) == [ ]
-                # O7 — the selector reads the PUBLISHED parent, not a key split.
-                && genSelect.matches (
-                  genSelect.descendant (genSelect.attrs { key = "hemline"; }) genSelect.star
-                ) "hemline/placket/eyelet" c16Ctx
-                && genSelect.matches
-                  (genSelect.child (genSelect.attrs { key = "hemline"; }) genSelect.star)
-                  "hemline/placket"
-                  c16Ctx
-                && !(
-                  genSelect.matches
-                    (genSelect.child (genSelect.attrs { key = "hemline"; }) genSelect.star)
-                    "hemline/placket/eyelet"
-                    c16Ctx
-                )
-                && genSelect.matches (genSelect.has (genSelect.attrs { key = "hemline/facing"; })) "hemline"
-                  c16Ctx
-                && c16Ctx.ancestors "hemline/placket/eyelet" == [
-                  "hemline/placket"
-                  "hemline"
-                ]
-                && c16Ctx.children "hemline" == [
-                  "hemline/facing"
-                  "hemline/placket"
-                ]
-                # O8 — `entryFor` is honoured and `sel.kind` is unsupported LOUDLY.
-                && !(
-                  builtins.tryEval (
-                    builtins.deepSeq (
-                      genSelect.matches (genSelect.kind genValues.schema.thimble) "hemline" c16Ctx
-                    ) true
-                  )
-                ).success
-                && (c16Ctx.data "hemline/placket").__identity.id_hash
-                  == c16Facts.nodeData."hemline/placket".id_hash
-                && (c16Ctx.data "hemline/placket").__identity.kind == null
-                # O9 — oracle 5's instance, armed both ways.
-                && c16ArmHand.get "hemline" "children" == { }
-                && builtins.attrNames (c16ArmToolkit.get "hemline" "children") == [
-                  "hemline/facing"
-                  "hemline/placket"
-                ]
-                && builtins.attrNames (c16ArmHand.subtreeOf "hemline") == [ "hemline" ]
-                && builtins.attrNames (c16ArmToolkit.subtreeOf "hemline") == [
-                  "hemline"
-                  "hemline/facing"
-                  "hemline/placket"
-                  "hemline/placket/eyelet"
-                ]
-                && ev.allNodes == c16O5Toolkit.allNodes
-                && ev.allNodeIds == [
-                  "damask"
-                  "faille"
-                  "grosgrain"
-                  "pewter"
-                  "seam:pewter:grosgrain"
-                ]
-                && c16O5Toolkit.allNodeIds == ev.allNodeIds
-                # comparator control, same run: two genuinely different node sets compare false.
-                && (ev.allNodeIds == c16Facts.nodes) == false
-              );
-
-              # (18) C16b — A FOREIGN REFERENCE IS PUBLISHED AS A REFERENCE AND NEVER AS AN EDGE.
-              # The corpus declares `keyRef "mill/stitch"` at `aspects.bartack.includes` (see
-              # `gen-modules/corpus.nix`): this file carries no `providerPrefix`, so the corpus's
-              # origin is `[ ]` — gen-link's `self`, "assigned by whoever federates me" — and the
-              # sugar's origin is its first segment, `mill`. gen-aspects cannot check that reference
-              # and no longer pretends to: it leaves `includesOf`, which now carries ONLY edges the
-              # library checked, and arrives in `foreignIncludesOf` in the declaration's own
-              # `{ origin; path; key; }` shape.
-              #
-              # ★ THIS DECLARATION WAS UNWRITABLE BEFORE. With the reference in `includesOf` it
-              # became a `declares` edge whose `to` is no vertex of this graph, and gen-assemble's
-              # `requireDeclaredMembership` refused the whole contribution by name. The cell is
-              # therefore red against the previous gen-aspects for two independent reasons: the
-              # relation it reads did not exist, and the corpus it reads did not evaluate.
-              #
-              # ★★ CARDINALITY IS STATED BECAUSE THE POPULATION IS TINY. `bartack.includes` is the
-              # only `includes` list in the whole corpus and it holds THREE positions — one checked
-              # edge, one inline body, one foreign reference. Clause 3 below is a universal over a
-              # population of ONE edge across SIX vertices, and a run that did not say so would be
-              # reporting a vacuous truth. Every figure here was read off this corpus, not copied.
-              aspect-foreign-reference = asserts "aspect-foreign-reference" (
-                # O6a — the reference is PUBLISHED, in the declaration's own shape. Structured, not
-                # a rendered "mill/stitch": the qualifier is recoverable without re-splitting a
-                # string, which is the second source the relation exists to avoid.
-                c16Facts.foreignIncludesOf."bartack" == [
-                  {
-                    origin = [ "mill" ];
-                    path = [ "stitch" ];
-                    key = "stitch";
-                  }
-                ]
-                # O6b — and it is NOT an edge. `includesOf` carries the one reference this library
-                # COULD check, and nothing else; the foreign one did not merely fail to resolve, it
-                # is not in this relation at all.
-                && c16Facts.includesOf."bartack" == [ "hemline/placket" ]
-                && !(builtins.elem "mill/stitch" c16Facts.includesOf."bartack")
-                # CONTROL: the relation is TOTAL over `nodes` — a node with no foreign reference is
-                # PRESENT with an empty list, so an absent key and "none declared" are not the same
-                # answer, and O6a above cannot be read as "the only key that exists".
-                && builtins.attrNames c16Facts.foreignIncludesOf == c16Facts.nodes
-                && c16Facts.foreignIncludesOf."stitch" == [ ]
-                # O6c — EVERY `declares` edge in the assembled contribution names a MEMBER. This is
-                # the widening `danglingIncludeRefusal` names and `requireDeclaredMembership`
-                # catches, asserted here at the contribution gen-demo actually builds.
-                && builtins.all (
-                     e: builtins.elem e.from c16AspectGraph.vertices && builtins.elem e.to c16AspectGraph.vertices
-                   ) (builtins.head c16AspectGraph.edgeGraphs).graph.edges
-                # CARDINALITY, all four figures from this corpus's own evaluation. The three
-                # declared positions are accounted for EXACTLY ONCE across the three relations, so
-                # neither clause above can pass by a position having been dropped.
-                && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 1
-                && builtins.length c16AspectGraph.vertices == 6
-                && builtins.length (
-                     builtins.concatLists (builtins.attrValues c16Facts.foreignIncludesOf)
-                   ) == 1
-                && builtins.length genValues.aspects.bartack.includes == 3
-                && (
-                     builtins.length c16Facts.includesOf."bartack"
-                     + builtins.length c16Facts.foreignIncludesOf."bartack"
-                     + builtins.length c16Facts.unresolvedIncludesOf."bartack"
-                   ) == 3
-                # And the assembled view is UNMOVED by the new declaration: `bartack` still declares
-                # exactly its one checked edge. The reference was added without widening the graph.
-                && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
-              );
-
-              # (19) C18 — A KINDED NODE SET REACHES THE ASSEMBLY THROUGH THE PROTOCOL.
-              # C1 calls `genScope.buildRoots` directly because it had to: `assemble` supplied no
-              # `kinds`, so `types` — a key the contribution record declares itself TOTAL over — was
-              # accepted at the boundary and refused one layer down. The claim is that the toolkit
-              # path and the direct path now answer the SAME RECORD over the SAME FACTS, which is
-              # what retires the corpus's own README *Finding 4*.
-              #
-              # ★ THE CELL IS RED AGAINST THE PREVIOUS gen-assemble FOR A STRUCTURAL REASON, not a
-              # value mismatch: `assemble` had no `kinds` formal, so the call below is a
-              # `called with unexpected argument 'kinds'` abort there.
-              kinded-contribution = asserts "kinded-contribution" (
-                # O1 — WHOLE-RECORD EQUALITY, both paths, C1's own facts. Not a spot-check on one
-                # field: `nodes`, `nodeOrder` and the registry itself all have to agree.
-                (c18ThroughTheProtocol c18Types) == scope
-                # ★ NEGATIVE CONTROL, SAME COMPARATOR, SAME RUN: change ONE node's kind and the
-                # equality reads false. Without it the cell passes on any comparator that says true.
-                && ((c18ThroughTheProtocol (c18Types // { damask = "bobbin"; })) == scope) == false
-                # O2 — and the kinds SURVIVE the protocol as kinds, read through the same evaluator
-                # door C1's own queries use, so the equality above is not two sides equally empty.
-                && builtins.attrNames
-                     (
-                       (genScope.eval {
-                         scope = c18ThroughTheProtocol c18Types;
-                         attributes.children = _: _: { };
-                       }).nodesOfType
-                         "thimble"
-                     ) == thimbles
-                # CARDINALITY, read off this corpus rather than assumed: three kinds are declared,
-                # every node carries one, and the node set is the one C1 built.
-                && builtins.attrNames (c18ThroughTheProtocol c18Types).kinds.kinds == [
-                     "bobbin"
-                     "seam"
-                     "thimble"
-                   ]
-                && builtins.all (t: t != null) (builtins.attrValues c18Types)
-                && builtins.length (builtins.attrNames c18Types) == builtins.length (
-                     builtins.attrNames nodes
-                   )
-                # O3 — `kinds` is still NOT an eighth contribution key. Offered ON a contribution it
-                # is refused by name, so the routing bought the capability without widening the
-                # record the protocol declares itself total over.
-                &&
-                  !(builtins.tryEval (
-                    builtins.deepSeq (genAssemble.union {
-                      contributions = [
+                    ]
+                    &&
+                      federated.resolved == {
+                        "loom/braid" = [
+                          "warp"
+                          "weft"
+                        ];
+                      }
+                    &&
+                      builtins.attrNames federated.nodes == [
+                        "loom/braid"
+                        "mill/stitch"
+                      ]
+                    &&
+                      federated.graph.edges == [
                         {
-                          name = "corpus";
-                          vertices = builtins.attrNames nodes;
-                          kinds = genScope.mkKinds [ (genScope.mkKind { name = "thimble"; }) ];
+                          from = "loom/braid";
+                          to = "mill/stitch";
                         }
+                      ]
+                    && (builtins.head federated.bound).relata == { selvageReq = "mill/stitch"; }
+                    && lib.all (n: lib.hasPrefix "aspect:" n.identity) (builtins.attrValues federated.nodes)
+                  );
+
+                  # (12) C12 — a derived product graph and a policy-stratum promotion. The KIND is the
+                  # discriminator (Oracle 3 drives this red by seeding `productN "tensor"`), and the
+                  # coordinate coupling is guarded by the fact that both the head and the scope
+                  # admission below are read off `seamCoords`, never restated.
+                  product-promotion = asserts "product-promotion" (
+                    seamSpace.product.dims == [
+                      "thimble"
+                      "bobbin"
+                    ]
+                    &&
+                      map (c: "${c.thimble}*${c.bobbin}") (genProduct.cells seamSpace) == [
+                        "damask*faille"
+                        "damask*grosgrain"
+                        "pewter*faille"
+                        "pewter*grosgrain"
+                      ]
+                    &&
+                      map (
+                        cid:
+                        let
+                          c = genProduct.coordsOf seamSpace cid;
+                        in
+                        "${c.thimble}*${c.bobbin}"
+                      ) (seamSpace.edges seamCell) == [
+                        "damask*grosgrain"
+                        "pewter*faille"
+                      ]
+                    && (genProduct.projectTo seamSpace "bobbin").projection.ofCell seamCell == "grosgrain"
+                    && (mdl.resolve seamHead).included == true
+                    && seamNodes == [ "seam:pewter:grosgrain" ]
+                    &&
+                      thimbles == [
+                        "damask"
+                        "pewter"
+                      ]
+                    &&
+                      bobbinNodes == [
+                        "faille"
+                        "grosgrain"
+                      ]
+                  );
+
+                  # (13) C13 — `foldLayers`: all three strategies plus the default channel in one call.
+                  layered-fold = asserts "layered-fold" (
+                    folded == {
+                      gauge = "fine";
+                      meta = {
+                        warp = 1;
+                        weft = 2;
+                      };
+                      spool = "sateen";
+                      tacks = [
+                        "a"
+                        "b"
                       ];
-                    }) 1
-                  )).success
-              );
-            }; in constructChecks // {
-              construct-index = readmeIndexCheck (builtins.attrNames constructChecks ++ [ "construct-index" ]);
-            };
+                    }
+                  );
+
+                  # (14) C14 — the closed, first-order body-term algebra: refusals are DATA, never a
+                  # throw, so all three refusal arms live in this one cell rather than in
+                  # `just refusals` — the only construct of which that is true.
+                  body-term-algebra = asserts "body-term-algebra" (
+                    selvageResolved == {
+                      __crossingResult = "ok";
+                      value = "selvage-linen";
+                    }
+                    && selvageChecked.__crossingResult == "ok"
+                    &&
+                      knownFormers == [
+                        "Lit"
+                        "ReadFrom"
+                        "ReadCtx"
+                        "If"
+                        "Attrs"
+                        "List"
+                        "Concat"
+                        "PathJoin"
+                        "Apply"
+                      ]
+                    &&
+                      builtins.attrNames crossingPrims == [
+                        "attrNames"
+                        "concatStringsSep"
+                        "elemAt"
+                        "getAttr"
+                        "length"
+                        "toString"
+                      ]
+                    &&
+                      inertBudget == {
+                        maxDepth = 32;
+                        maxNodes = 10000;
+                      }
+                    && readCtxHeadsOfSelvage == [ ]
+                    && selvageBadLitChecked.refusal.code == "lit-payload-function"
+                    && selvageBadLitChecked.refusal.blamed == "supplier"
+                    && selvageBadReadFromResolved.refusal.code == "readfrom-names-non-member"
+                    &&
+                      selvageBadReadFromResolved.refusal.witness == {
+                        available = [ "pewter" ];
+                        target = "sarcenet";
+                      }
+                    && selvageBadVocabChecked.refusal.code == "term-vocabulary"
+                    && selvageBadVocabChecked.refusal.witness.former == "Frobnicate"
+                  );
+
+                  # (15) C15 — the cyclic stratum, solved: both members reach each other and the
+                  # external `higherStrata` supplied, by `runScc`'s iterate-from-bottom ascent rather
+                  # than the acyclic rebuilder, which cannot express a cycle at all.
+                  cyclic-stratum = asserts "cyclic-stratum" (
+                    solvedScc == {
+                      chintz = [
+                        "chintz"
+                        "organdy"
+                        "tulle"
+                      ];
+                      tulle = [
+                        "chintz"
+                        "organdy"
+                        "tulle"
+                      ];
+                    }
+                  );
+
+                  # (16) C7 — the well-definedness gate. Fields of `gated` ITSELF, never of
+                  # `contracted` (that would force gen-graph only, already reached — gate v0's
+                  # CONSTRUCTION-1). Forcing `gated.condensation` and `gated.edges` also runs
+                  # gen-view's own door (`graph.isDeclaredEdges`), its cyclic-SCC filter and its
+                  # `admitsCycle` application — none of which gen-graph performs.
+                  well-defined-schedule = asserts "well-defined-schedule" (
+                    gatedSccs == [
+                      [ "damask" ]
+                      [ "faille" ]
+                      [ "seam:pewter:grosgrain" ]
+                      [ "grosgrain" ]
+                      [ "pewter" ]
+                    ]
+                    && (builtins.filter (scc: builtins.length scc > 1) gatedSccs) == [ ]
+                    &&
+                      gatedEdges == [
+                        "grosgrain"
+                        "damask"
+                      ]
+                  );
+
+                  # (17) C16 — the aspect graph, assembled through the contribution protocol (ADR-0012,
+                  # ADR-0010 §3 toolkit item). The corpus's own aspect facts, contributed alongside the
+                  # node registry's declared membership, queried through gen-graph's labelled graph and
+                  # gen-select's context; oracle 5's structural-helper substitution armed at C16's own
+                  # non-flat assembly (children/subtreeOf diverge) and at C1's flat one (the node set
+                  # does not).
+                  aspect-contribution = asserts "aspect-contribution" (
+                    # O1/O2 — the facts are a GRAPH, and they assemble; containment survives.
+                    c16Facts.nodes == [
+                      "bartack"
+                      "hemline"
+                      "hemline/facing"
+                      "hemline/placket"
+                      "hemline/placket/eyelet"
+                      "stitch"
+                    ]
+                    &&
+                      c16Assembled.nodeOrder == [
+                        "bartack"
+                        "hemline"
+                        "hemline/facing"
+                        "hemline/placket"
+                        "hemline/placket/eyelet"
+                        "stitch"
+                        "damask"
+                        "faille"
+                        "grosgrain"
+                        "pewter"
+                      ]
+                    && c16Assembled.nodes."hemline/placket".parent == "hemline"
+                    &&
+                      c16Assembled.nodes."hemline/placket".decls == {
+                        __edges = {
+                          declares = [ ];
+                          members = [ ];
+                        };
+                        description = "Aspect placket";
+                        key = "hemline/placket";
+                      }
+                    # O3 — containment travels CHILD -> PARENT.
+                    &&
+                      c16Union.parentGraph.edges == [
+                        {
+                          from = "hemline/facing";
+                          to = "hemline";
+                        }
+                        {
+                          from = "hemline/placket";
+                          to = "hemline";
+                        }
+                        {
+                          from = "hemline/placket/eyelet";
+                          to = "hemline/placket";
+                        }
+                      ]
+                    # O4 — includes travel under the caller's own label.
+                    &&
+                      map (g: g.label) c16Union.edgeGraphs == [
+                        "declares"
+                        "members"
+                      ]
+                    # O5 — the two contributions are ONE assembly, membership globally declared.
+                    &&
+                      c16Assembled.nodes."pewter".decls.__edges == {
+                        declares = [ ];
+                        members = [ "stitch" ];
+                      }
+                    && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
+                    # O6 — the query walks the labelled graph the union produced.
+                    &&
+                      genGraph.query {
+                        graph = c16Lg;
+                        from = "hemline";
+                        follow = genGraph.regex.star (genGraph.regex.lit "contains");
+                      } == [
+                        "hemline"
+                        "hemline/facing"
+                        "hemline/placket"
+                        "hemline/placket/eyelet"
+                      ]
+                    &&
+                      genGraph.query {
+                        graph = c16Lg;
+                        from = "pewter";
+                        follow = genGraph.regex.seq [
+                          (genGraph.regex.lit "members")
+                          (genGraph.regex.star (genGraph.regex.lit "contains"))
+                        ];
+                      } == [ "stitch" ]
+                    &&
+                      genGraph.query {
+                        graph = c16Lg;
+                        from = "bartack";
+                        follow = genGraph.regex.seq [
+                          (genGraph.regex.lit "declares")
+                          (genGraph.regex.star (genGraph.regex.lit "contains"))
+                        ];
+                      } == [
+                        "hemline/placket"
+                        "hemline/placket/eyelet"
+                      ]
+                    &&
+                      genGraph.roots (genGraph.forgetLabels c16Lg) == [
+                        "bartack"
+                        "damask"
+                        "faille"
+                        "grosgrain"
+                        "hemline"
+                        "pewter"
+                      ]
+                    &&
+                      genGraph.leaves (genGraph.forgetLabels c16Lg) == [
+                        "damask"
+                        "faille"
+                        "grosgrain"
+                        "hemline/facing"
+                        "hemline/placket/eyelet"
+                        "stitch"
+                      ]
+                    && genGraph.cycles (genGraph.forgetLabels c16Lg) == [ ]
+                    # O7 — the selector reads the PUBLISHED parent, not a key split.
+                    && genSelect.matches (genSelect.descendant (genSelect.attrs {
+                      key = "hemline";
+                    }) genSelect.star) "hemline/placket/eyelet" c16Ctx
+                    && genSelect.matches (genSelect.child (genSelect.attrs {
+                      key = "hemline";
+                    }) genSelect.star) "hemline/placket" c16Ctx
+                    && !(genSelect.matches (genSelect.child (genSelect.attrs {
+                      key = "hemline";
+                    }) genSelect.star) "hemline/placket/eyelet" c16Ctx)
+                    && genSelect.matches (genSelect.has (genSelect.attrs { key = "hemline/facing"; })) "hemline" c16Ctx
+                    &&
+                      c16Ctx.ancestors "hemline/placket/eyelet" == [
+                        "hemline/placket"
+                        "hemline"
+                      ]
+                    &&
+                      c16Ctx.children "hemline" == [
+                        "hemline/facing"
+                        "hemline/placket"
+                      ]
+                    # O8 — `entryFor` is honoured and `sel.kind` is unsupported LOUDLY.
+                    && !(builtins.tryEval (
+                      builtins.deepSeq (genSelect.matches (genSelect.kind genValues.schema.thimble) "hemline" c16Ctx) true
+                    )).success
+                    && (c16Ctx.data "hemline/placket").__identity.id_hash == c16Facts.nodeData."hemline/placket".id_hash
+                    && (c16Ctx.data "hemline/placket").__identity.kind == null
+                    # O9 — oracle 5's instance, armed both ways.
+                    && c16ArmHand.get "hemline" "children" == { }
+                    &&
+                      builtins.attrNames (c16ArmToolkit.get "hemline" "children") == [
+                        "hemline/facing"
+                        "hemline/placket"
+                      ]
+                    && builtins.attrNames (c16ArmHand.subtreeOf "hemline") == [ "hemline" ]
+                    &&
+                      builtins.attrNames (c16ArmToolkit.subtreeOf "hemline") == [
+                        "hemline"
+                        "hemline/facing"
+                        "hemline/placket"
+                        "hemline/placket/eyelet"
+                      ]
+                    && ev.allNodes == c16O5Toolkit.allNodes
+                    &&
+                      ev.allNodeIds == [
+                        "damask"
+                        "faille"
+                        "grosgrain"
+                        "pewter"
+                        "seam:pewter:grosgrain"
+                      ]
+                    && c16O5Toolkit.allNodeIds == ev.allNodeIds
+                    # comparator control, same run: two genuinely different node sets compare false.
+                    && (ev.allNodeIds == c16Facts.nodes) == false
+                  );
+
+                  # (18) C16b — A FOREIGN REFERENCE IS PUBLISHED AS A REFERENCE AND NEVER AS AN EDGE.
+                  # The corpus declares `keyRef "mill/stitch"` at `aspects.bartack.includes` (see
+                  # `gen-modules/corpus.nix`): this file carries no `providerPrefix`, so the corpus's
+                  # origin is `[ ]` — gen-link's `self`, "assigned by whoever federates me" — and the
+                  # sugar's origin is its first segment, `mill`. gen-aspects cannot check that reference
+                  # and no longer pretends to: it leaves `includesOf`, which now carries ONLY edges the
+                  # library checked, and arrives in `foreignIncludesOf` in the declaration's own
+                  # `{ origin; path; key; }` shape.
+                  #
+                  # ★ THIS DECLARATION WAS UNWRITABLE BEFORE. With the reference in `includesOf` it
+                  # became a `declares` edge whose `to` is no vertex of this graph, and gen-assemble's
+                  # `requireDeclaredMembership` refused the whole contribution by name. The cell is
+                  # therefore red against the previous gen-aspects for two independent reasons: the
+                  # relation it reads did not exist, and the corpus it reads did not evaluate.
+                  #
+                  # ★★ CARDINALITY IS STATED BECAUSE THE POPULATION IS TINY. `bartack.includes` is the
+                  # only `includes` list in the whole corpus and it holds THREE positions — one checked
+                  # edge, one inline body, one foreign reference. Clause 3 below is a universal over a
+                  # population of ONE edge across SIX vertices, and a run that did not say so would be
+                  # reporting a vacuous truth. Every figure here was read off this corpus, not copied.
+                  aspect-foreign-reference = asserts "aspect-foreign-reference" (
+                    # O6a — the reference is PUBLISHED, in the declaration's own shape. Structured, not
+                    # a rendered "mill/stitch": the qualifier is recoverable without re-splitting a
+                    # string, which is the second source the relation exists to avoid.
+                    c16Facts.foreignIncludesOf."bartack" == [
+                      {
+                        origin = [ "mill" ];
+                        path = [ "stitch" ];
+                        key = "stitch";
+                      }
+                    ]
+                    # O6b — and it is NOT an edge. `includesOf` carries the one reference this library
+                    # COULD check, and nothing else; the foreign one did not merely fail to resolve, it
+                    # is not in this relation at all.
+                    && c16Facts.includesOf."bartack" == [ "hemline/placket" ]
+                    && !(builtins.elem "mill/stitch" c16Facts.includesOf."bartack")
+                    # CONTROL: the relation is TOTAL over `nodes` — a node with no foreign reference is
+                    # PRESENT with an empty list, so an absent key and "none declared" are not the same
+                    # answer, and O6a above cannot be read as "the only key that exists".
+                    && builtins.attrNames c16Facts.foreignIncludesOf == c16Facts.nodes
+                    && c16Facts.foreignIncludesOf."stitch" == [ ]
+                    # O6c — EVERY `declares` edge in the assembled contribution names a MEMBER. This is
+                    # the widening `danglingIncludeRefusal` names and `requireDeclaredMembership`
+                    # catches, asserted here at the contribution gen-demo actually builds.
+                    && builtins.all (
+                      e: builtins.elem e.from c16AspectGraph.vertices && builtins.elem e.to c16AspectGraph.vertices
+                    ) (builtins.head c16AspectGraph.edgeGraphs).graph.edges
+                    # CARDINALITY, all four figures from this corpus's own evaluation. The three
+                    # declared positions are accounted for EXACTLY ONCE across the three relations, so
+                    # neither clause above can pass by a position having been dropped.
+                    && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 1
+                    && builtins.length c16AspectGraph.vertices == 6
+                    && builtins.length (builtins.concatLists (builtins.attrValues c16Facts.foreignIncludesOf)) == 1
+                    && builtins.length genValues.aspects.bartack.includes == 3
+                    &&
+                      (
+                        builtins.length c16Facts.includesOf."bartack"
+                        + builtins.length c16Facts.foreignIncludesOf."bartack"
+                        + builtins.length c16Facts.unresolvedIncludesOf."bartack"
+                      ) == 3
+                    # And the assembled view is UNMOVED by the new declaration: `bartack` still declares
+                    # exactly its one checked edge. The reference was added without widening the graph.
+                    && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
+                  );
+
+                  # (19) C18 — A KINDED NODE SET REACHES THE ASSEMBLY THROUGH THE PROTOCOL.
+                  # C1 calls `genScope.buildRoots` directly because it had to: `assemble` supplied no
+                  # `kinds`, so `types` — a key the contribution record declares itself TOTAL over — was
+                  # accepted at the boundary and refused one layer down. The claim is that the toolkit
+                  # path and the direct path now answer the SAME RECORD over the SAME FACTS, which is
+                  # what retires the corpus's own README *Finding 4*.
+                  #
+                  # ★ THE CELL IS RED AGAINST THE PREVIOUS gen-assemble FOR A STRUCTURAL REASON, not a
+                  # value mismatch: `assemble` had no `kinds` formal, so the call below is a
+                  # `called with unexpected argument 'kinds'` abort there.
+                  kinded-contribution = asserts "kinded-contribution" (
+                    # O1 — WHOLE-RECORD EQUALITY, both paths, C1's own facts. Not a spot-check on one
+                    # field: `nodes`, `nodeOrder` and the registry itself all have to agree.
+                    (c18ThroughTheProtocol c18Types) == scope
+                    # ★ NEGATIVE CONTROL, SAME COMPARATOR, SAME RUN: change ONE node's kind and the
+                    # equality reads false. Without it the cell passes on any comparator that says true.
+                    && ((c18ThroughTheProtocol (c18Types // { damask = "bobbin"; })) == scope) == false
+                    # O2 — and the kinds SURVIVE the protocol as kinds, read through the same evaluator
+                    # door C1's own queries use, so the equality above is not two sides equally empty.
+                    &&
+                      builtins.attrNames (
+                        (genScope.eval {
+                          scope = c18ThroughTheProtocol c18Types;
+                          attributes.children = _: _: { };
+                        }).nodesOfType
+                          "thimble"
+                      ) == thimbles
+                    # CARDINALITY, read off this corpus rather than assumed: three kinds are declared,
+                    # every node carries one, and the node set is the one C1 built.
+                    &&
+                      builtins.attrNames (c18ThroughTheProtocol c18Types).kinds.kinds == [
+                        "bobbin"
+                        "seam"
+                        "thimble"
+                      ]
+                    && builtins.all (t: t != null) (builtins.attrValues c18Types)
+                    && builtins.length (builtins.attrNames c18Types) == builtins.length (builtins.attrNames nodes)
+                    # O3 — `kinds` is still NOT an eighth contribution key. Offered ON a contribution it
+                    # is refused by name, so the routing bought the capability without widening the
+                    # record the protocol declares itself total over.
+                    && !(builtins.tryEval (
+                      builtins.deepSeq (genAssemble.union {
+                        contributions = [
+                          {
+                            name = "corpus";
+                            vertices = builtins.attrNames nodes;
+                            kinds = genScope.mkKinds [ (genScope.mkKind { name = "thimble"; }) ];
+                          }
+                        ];
+                      }) 1
+                    )).success
+                  );
+                };
+              in
+              constructChecks
+              // {
+                construct-index = readmeIndexCheck (builtins.attrNames constructChecks ++ [ "construct-index" ]);
+              };
           };
       }
     );

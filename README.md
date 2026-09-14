@@ -31,29 +31,29 @@ Four nodes across two kinds, three declared edges, one policy program admitting 
 edge, a binding node, a movement, a delivery to one target through two registries, and the
 incremental plane's decision crossing.
 
-| construct | ADR | what it is here |
-| --- | --- | --- |
-| C1 -- kinds and nodes | 0012 | two kinds (`thimble`, `bobbin`), four nodes (`pewter`, `damask`, `grosgrain`, `faille`) |
-| C2 -- edges, queried | 0012, 0019 | `declaredEdges` plus C5's dynamic edge, ONE graph, one named query (`tacks*piping*`) |
-| C3 -- a binding node | 0016 | `basting:pewter:grosgrain`, minted at pass 1 over two pass-0 relata |
-| C4 -- a movement | 0010, 0024 | a `selvage` channel walked on `tacks`, Λ read off C3's own relata names |
-| C5 -- a policy program | 0020, 0022, 0033 | a stable model admitting `piping:grosgrain:faille`, which becomes C2's dynamic edge |
-| C6 -- a delivery | 0028 | one `nixos` class realized on `pewter`; two Rider limbs (`welt`, `gusset`) that must NOT realize |
-| C7 -- the well-definedness gate | 0008 §3, 0030, 0019 | `genView.boundedWellDefinedSchedule` over `config.declaredEdges` (NOT C2's `edges`), contracted through `genGraph.mkNodeRef`/`mkDeclaredEdges`; the Check reads fields of the returned `gated`, never of its argument |
-| T2b -- byte parity | 0008 | `compose`/`override` warm arm byte-identical to a cold `compose`, guarded by `trace.mode` |
-| C8 -- the contribution protocol | 0012, 0014 | `genAssemble.assemble`/`union` over three contributions; shape unions commutatively, content folds by positional authority |
-| C9 -- a SHARE class | 0028 | `genClass` partitions declared content on `weave`, never on the kind boundary; core, gate and invariance all checked |
-| C10 -- stratified dispatch | 0019 | `genDispatch` rules whose stratum is STAMPED by `deriveGroup` from their own declared `produces`, none written by hand |
-| C11 -- a federated packaged subgraph | 0011 §4, 0027 | `genLink.link {sources; wire;}` with a per-origin `keySemantics`; the declared capability survives the exchange |
-| C12 -- a derived product graph + policy-stratum promotion | 0016 rulings 1-2 | `genProduct.productN "cartesian"` over two graphs; the promoted cell joins C1's nodes, C2's edges, C5's own `mdl` |
-| C13 -- `foldLayers` | 0017 | `genAlgebra.record.foldLayers`, all three strategies plus the default channel in one call |
-| C14 -- the closed body-term algebra | 0013 row 2, 0023 | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell |
-| C15 -- a cyclic stratum, solved | 0008 §2, 0033 | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set |
-| C16 -- the aspect graph, assembled | 0012, 0010 §3 | the corpus's own aspect facts (`genAspects.graphFacts`) contributed through `genAssemble`'s protocol alongside the node registry's membership dimension; queried through both gen-graph's labelled graph and gen-select's context |
-| C16b -- a foreign reference | 0011, 0012, 0014 | `genAspects.keyRef "mill/stitch"` on `aspects.bartack.includes`, published in `foreignIncludesOf` and never as a `declares` edge; total over every node, including the one declaring none |
-| C17 -- option-set closure | 0016 ruling 5, 0033 | an `extraModules` option on `thimbles` (`shirring`) that is real declared content and CANNOT be an identity key; `thimbles.pewter.id_hash` byte-identical to the stamp minted before it existed |
-| C18 -- a kinded contribution | 0012, 0011 | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key |
-| T5 -- planted refusals | 0025 | thirteen enforcers, each driven red by name via `refusals` |
+| construct                                                 | ADR                 | what it is here                                                                                                                                                                                                                        |
+| --------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1 -- kinds and nodes                                     | 0012                | two kinds (`thimble`, `bobbin`), four nodes (`pewter`, `damask`, `grosgrain`, `faille`)                                                                                                                                                |
+| C2 -- edges, queried                                      | 0012, 0019          | `declaredEdges` plus C5's dynamic edge, ONE graph, one named query (`tacks*piping*`)                                                                                                                                                   |
+| C3 -- a binding node                                      | 0016                | `basting:pewter:grosgrain`, minted at pass 1 over two pass-0 relata                                                                                                                                                                    |
+| C4 -- a movement                                          | 0010, 0024          | a `selvage` channel walked on `tacks`, Λ read off C3's own relata names                                                                                                                                                                |
+| C5 -- a policy program                                    | 0020, 0022, 0033    | a stable model admitting `piping:grosgrain:faille`, which becomes C2's dynamic edge                                                                                                                                                    |
+| C6 -- a delivery                                          | 0028                | one `nixos` class realized on `pewter`; two Rider limbs (`welt`, `gusset`) that must NOT realize                                                                                                                                       |
+| C7 -- the well-definedness gate                           | 0008 §3, 0030, 0019 | `genView.boundedWellDefinedSchedule` over `config.declaredEdges` (NOT C2's `edges`), contracted through `genGraph.mkNodeRef`/`mkDeclaredEdges`; the Check reads fields of the returned `gated`, never of its argument                  |
+| T2b -- byte parity                                        | 0008                | `compose`/`override` warm arm byte-identical to a cold `compose`, guarded by `trace.mode`                                                                                                                                              |
+| C8 -- the contribution protocol                           | 0012, 0014          | `genAssemble.assemble`/`union` over three contributions; shape unions commutatively, content folds by positional authority                                                                                                             |
+| C9 -- a SHARE class                                       | 0028                | `genClass` partitions declared content on `weave`, never on the kind boundary; core, gate and invariance all checked                                                                                                                   |
+| C10 -- stratified dispatch                                | 0019                | `genDispatch` rules whose stratum is STAMPED by `deriveGroup` from their own declared `produces`, none written by hand                                                                                                                 |
+| C11 -- a federated packaged subgraph                      | 0011 §4, 0027       | `genLink.link {sources; wire;}` with a per-origin `keySemantics`; the declared capability survives the exchange                                                                                                                        |
+| C12 -- a derived product graph + policy-stratum promotion | 0016 rulings 1-2    | `genProduct.productN "cartesian"` over two graphs; the promoted cell joins C1's nodes, C2's edges, C5's own `mdl`                                                                                                                      |
+| C13 -- `foldLayers`                                       | 0017                | `genAlgebra.record.foldLayers`, all three strategies plus the default channel in one call                                                                                                                                              |
+| C14 -- the closed body-term algebra                       | 0013 row 2, 0023    | `genBind.crossing.term`, a literal `TargetId`; three refusal arms carried as data in the same check cell                                                                                                                               |
+| C15 -- a cyclic stratum, solved                           | 0008 §2, 0033       | `genMemo.runScc` over a two-member SCC with a higher-stratum dependency, deliberately outside C2's acyclic edge set                                                                                                                    |
+| C16 -- the aspect graph, assembled                        | 0012, 0010 §3       | the corpus's own aspect facts (`genAspects.graphFacts`) contributed through `genAssemble`'s protocol alongside the node registry's membership dimension; queried through both gen-graph's labelled graph and gen-select's context      |
+| C16b -- a foreign reference                               | 0011, 0012, 0014    | `genAspects.keyRef "mill/stitch"` on `aspects.bartack.includes`, published in `foreignIncludesOf` and never as a `declares` edge; total over every node, including the one declaring none                                              |
+| C17 -- option-set closure                                 | 0016 ruling 5, 0033 | an `extraModules` option on `thimbles` (`shirring`) that is real declared content and CANNOT be an identity key; `thimbles.pewter.id_hash` byte-identical to the stamp minted before it existed                                        |
+| C18 -- a kinded contribution                              | 0012, 0011          | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key |
+| T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                             |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
@@ -81,24 +81,24 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 `nix flake check` runs twenty-one checks, and they are the acceptance criteria:
 
-1. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
-   gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
-   explicit per-id `kindFor` over the heterogeneous node union.
-2. **`binding-node`** — C3. The binding minted, identified by its own labelled relata.
-3. **`movement`** — C4. The movement's value, and Λ read off C3's own relata names by construction.
-4. **`policy-edge`** — C5. The policy program's stable model, total, and the derived edge admitted.
-5. **`delivery-projection`** — C6. The node set, the one collected class, both Rider limbs absent
-   from the classes despite both being present in the aspect body, and the bobbin door under an
-   invented name.
-6. **`warm-parity`** — T2b. The warm decision byte-identical to a cold one, with the guard
-   (`trace.mode == "warm"`) included.
-7. **`nixos-instantiate`** — the target instantiated, **not built**: the check writes
-   `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
-   NixOS evaluation and stops at the `.drv`.
-8. **`contribution-protocol`** — C8. Three contributions unioned; the node set is fixed under
-   permutation, the positionally-folded `spool` is not.
-9. **`share-class`** — C9. The partition on `weave`, the core's shared keys and values, the gate on
-   a real member, and the invariance check all in one cell.
+01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
+    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
+    explicit per-id `kindFor` over the heterogeneous node union.
+02. **`binding-node`** — C3. The binding minted, identified by its own labelled relata.
+03. **`movement`** — C4. The movement's value, and Λ read off C3's own relata names by construction.
+04. **`policy-edge`** — C5. The policy program's stable model, total, and the derived edge admitted.
+05. **`delivery-projection`** — C6. The node set, the one collected class, both Rider limbs absent
+    from the classes despite both being present in the aspect body, and the bobbin door under an
+    invented name.
+06. **`warm-parity`** — T2b. The warm decision byte-identical to a cold one, with the guard
+    (`trace.mode == "warm"`) included.
+07. **`nixos-instantiate`** — the target instantiated, **not built**: the check writes
+    `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
+    NixOS evaluation and stops at the `.drv`.
+08. **`contribution-protocol`** — C8. Three contributions unioned; the node set is fixed under
+    permutation, the positionally-folded `spool` is not.
+09. **`share-class`** — C9. The partition on `weave`, the core's shared keys and values, the gate on
+    a real member, and the invariance check all in one cell.
 10. **`stratified-dispatch`** — C10. Each rule's stratum stamped by `deriveGroup`; the `sateen` rule
     not firing against a `linen` context is the discriminator.
 11. **`federated-link`** — C11. The locally-declared capability equals what the requirer resolves to
@@ -226,12 +226,7 @@ exactly this reason.
 **4. RESOLVED, and C18 now carries the assembly the finding said was unwritable.** v1.3 recorded that
 `gen-assemble` had a `types` contribution key it could never honour: `assemble` forwarded no `kinds`
 to `buildRoots`, so any non-empty `types` on any contribution aborted the assembly
-(`gen-scope.buildRoots: \`types\` declares kind(s) … but no \`kinds\` registry was supplied`) —
-measured on both a populated and an all-null `types` value, with only an absent `types` green. That
-put the corpus's own C1 outside the protocol: it calls `genScope.buildRoots` directly with a
-three-kind registry because it had no other way to give a node a kind, which is the duplication the
-toolkit exists to remove. The all-null arm was a second defect and named a kind the author had not
-declared — `union`'s fold answered `{ }` for an id every layer passed over, and `{ }` is not `null`,
+(`gen-scope.buildRoots: \`types\` declares kind(s) … but no \`kinds\` registry was supplied`) — measured on both a populated and an all-null `types`value, with only an absent`types`green. That put the corpus's own C1 outside the protocol: it calls`genScope.buildRoots`directly with a three-kind registry because it had no other way to give a node a kind, which is the duplication the toolkit exists to remove. The all-null arm was a second defect and named a kind the author had not declared —`union`'s fold answered `{ }`for an id every layer passed over, and`{ }`is not`null\`,
 so the substrate read it as a declared kind.
 
 **`kinds` is still NOT among the seven contribution keys, and that clause stands** — offered *on* a
@@ -312,8 +307,7 @@ the instrument discriminates and this corpus simply has nothing that forces `gen
 
 ## v1.2
 
-One more positive construct (C16) and one more planted-violation refusal (T5 row 12, `just
-refusals`), against `2026-09-09-gen-demo-aspect-contribution-spec.md` in den-ag-design. C16
+One more positive construct (C16) and one more planted-violation refusal (T5 row 12, `just refusals`), against `2026-09-09-gen-demo-aspect-contribution-spec.md` in den-ag-design. C16
 assembles the corpus's **own** aspect graph through `genAssemble`'s contribution protocol
 (ADR-0012, ADR-0010 §3 toolkit item): `genAspects.graphFacts` publishes the corpus's aspect nodes,
 its containment relation and its includes relation as plain data, and two contributions —
@@ -335,8 +329,7 @@ already forced by earlier cells — so this landing moves nothing in the census 
 
 ## v1.3
 
-One more positive construct (C17) and one more planted-violation refusal (T5 row 13, `just
-refusals`), against `2026-09-09-gen-option-set-closure-spec.md` in den-ag-design. Between them they
+One more positive construct (C17) and one more planted-violation refusal (T5 row 13, `just refusals`), against `2026-09-09-gen-option-set-closure-spec.md` in den-ag-design. Between them they
 declare the two halves of ONE property — an entity's identity is a function of its KIND's option set
 (ADR-0016 ruling 5), and that set closes at a boundary rather than drifting with whatever the
 fixpoint happened to gather (ADR-0033).
@@ -370,10 +363,10 @@ the shape this corpus uses — the kind value's `options` attribute is EMPTY, so
 used to answer over `[ "name" ]` alone and disagree with the stamp on every instance of it. Measured
 at this landing's two pins, same probe, same corpus shape:
 
-| | recompute | carried stamp | agree |
-|---|---|---|---|
+|                                      | recompute                                                                  | carried stamp       | agree     |
+| ------------------------------------ | -------------------------------------------------------------------------- | ------------------- | --------- |
 | hub `0c53726` (gen-schema `88c41cb`) | `thimble:500c2f78da6c6e81d7b62dbd6944eaebe9f46b566e5adbb2d5553ad023218020` | `thimble:d3dc9389…` | **false** |
-| hub `6421d65` (gen-schema `168cf21`) | `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a` | `thimble:d3dc9389…` | **true** |
+| hub `6421d65` (gen-schema `168cf21`) | `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a` | `thimble:d3dc9389…` | **true**  |
 
 **The stamp itself did not move**, which is the other thing worth reading off that table: the closure
 changed which derivation produces the key set, not the key set. All seventeen prior cells evaluate to
