@@ -53,13 +53,13 @@ incremental plane's decision crossing.
 | C16b -- a foreign reference | 0011, 0012, 0014 | `genAspects.keyRef "mill/stitch"` on `aspects.bartack.includes`, published in `foreignIncludesOf` and never as a `declares` edge; total over every node, including the one declaring none |
 | C17 -- option-set closure | 0016 ruling 5, 0033 | an `extraModules` option on `thimbles` (`shirring`) that is real declared content and CANNOT be an identity key; `thimbles.pewter.id_hash` byte-identical to the stamp minted before it existed |
 | C18 -- a kinded contribution | 0012, 0011 | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key |
-| T5 -- planted refusals | 0025 | thirteen enforcers, each driven red by name via `just refusals` |
+| T5 -- planted refusals | 0025 | thirteen enforcers, each driven red by name via `refusals` |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all twenty-one
-`checks`, including its own `construct-index` cell over this file's two indices; the `justfile`'s
-`refusals` recipe holds T5's by-name half, which runs out of band because
+`checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
 ### The naming rule — invented kinds only
@@ -109,14 +109,14 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 13. **`layered-fold`** — C13. All three `foldLayers` strategies plus the default channel in one call.
 14. **`body-term-algebra`** — C14. The resolved term, `knownFormers`, the crossing's primitives and
     inert budget, and all three refusal arms as data — the one construct whose refusals live in this
-    cell rather than in `just refusals`.
+    cell rather than in `refusals`.
 15. **`cyclic-stratum`** — C15. `runScc`'s iterate-from-bottom ascent over a two-member SCC with an
     external `higherStrata` dependency, which the acyclic rebuilder cannot express at all.
 16. **`well-defined-schedule`** — C7. `genView.boundedWellDefinedSchedule` over `config.declaredEdges`,
     read off fields of the returned `gated` record, never of its argument: the cyclic-SCC filter
     (`[ ]`, over a real five-way partition) and the contracted accessor's own edge lookup
     (`gated.edges "pewter"`). A hand-written record of the same fields satisfies this cell byte-for-
-    byte -- see Oracle 1b and `just refusals` row 11 below.
+    byte -- see Oracle 1b and `refusals` row 11 below.
 17. **`aspect-contribution`** — C16. The corpus's own aspect facts (`genAspects.graphFacts`)
     contributed through `genAssemble`'s protocol alongside the node registry's declared membership;
     the labelled graph `genGraph.labeledFrom`/`forgetLabels` produces and the selector context
@@ -168,18 +168,21 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 T5's thirteen refusals are not among these twenty-one: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
-name through `just refusals` instead (below).
+name through `refusals` instead (below).
 
 **T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
-`just check` nor `just check-hub-main` runs the `refusals` recipe, so a regression in any of the
-thirteen enforcers is invisible to `nix flake check` until someone runs `just refusals` by hand.
+`check-lock` nor `check-hub-main` runs `ci/refusals.sh`, so a regression in any of the
+thirteen enforcers is invisible to `nix flake check` until someone runs `refusals` by hand.
 
 ### Two arms, plus the by-name half
 
+These are devshell commands, declared in `ci/flake.nix` beside the `ci`, `fmt` and `repl` that
+gen-harness supplies. `direnv` loads them from `.envrc`; without it, `nix develop ./ci`.
+
 ```sh
-just check            # nix flake check
-just check-hub-main   # nix flake check --refresh --override-input gen github:sini/gen
-just refusals         # T5's thirteen planted violations, each driven red by name, each with an unplanted control
+check-lock            # nix flake check
+check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen
+refusals              # T5's thirteen planted violations, each driven red by name, each with an unplanted control
 ```
 
 The committed `flake.lock` is the **last-green pin**. The second arm evaluates the same corpus against
@@ -189,7 +192,7 @@ waiting for a relock.
 The full build of the target is **not** a check — it is verified once at delivery and on demand:
 
 ```sh
-just build-target     # nix build .#nixosConfigurations.pewter.config.system.build.toplevel
+build-target          # nix build .#nixosConfigurations.pewter.config.system.build.toplevel
 ```
 
 ## Findings against the hub
@@ -263,7 +266,7 @@ mint's own ADR-0034 behaviour and is catchable, unlike the abort removed here.
 ## v1.1
 
 Nine more positive constructs (C7-C15), one new `checks` cell per construct, and six more
-planted-violation refusals (T5 rows 6-11, `just refusals`), against
+planted-violation refusals (T5 rows 6-11, `refusals`), against
 `gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C12 interleaves into C1/C2/C5
 rather than standing alone: its promoted node joins C1's node set, its promoted edges join C2's edge
 set, and its own third policy declaration is admitted or refused by the *same* `mdl` C5 already
@@ -276,7 +279,7 @@ this one. C7 gates `config.declaredEdges` directly -- not C2's `edges`, which ad
 C5's policy-produced dynamic edge and C12's promoted coordinate edges -- so the corpus makes one
 graph claim and two doors read different sets from it. Its Check reads fields of the returned
 `gated` record, never of its argument: a cell over the argument would force gen-graph alone (already
-reached) and add nothing for gen-view (gate v0's CONSTRUCTION-1, `den-hoag-xgu75`). `just refusals`
+reached) and add nothing for gen-view (gate v0's CONSTRUCTION-1, `den-hoag-xgu75`). `refusals`
 row 10 plants the cycle `pewter -> grosgrain -> damask -> pewter`; row 11 hands the gate a
 hand-assembled attrset carrying the same `index`/`dependencies` fields `mkDeclaredEdges` builds, no
 `_type` tag -- `genGraph.isDeclaredEdges` is purely nominal, so this door is the only
@@ -294,7 +297,7 @@ Measured by poisoning each roster member's `lib` with a run-unique `throw` and f
 `.#checks.<system>` cell, exits read unpiped: a member is reached iff at least one cell reds under its
 own poison. Reproduce against a copy of this repo with one roster member's `lib` swapped for a
 throwing stub, then force every `.#checks.<system>.<cell>`'s **evaluation** with `nix flake check`
-(`just check` wraps it) — expect it to print `running 0 flake checks` and build nothing: the asserts
+(`check-lock` wraps it) — expect it to print `running 0 flake checks` and build nothing: the asserts
 sit in each derivation's argument, so evaluating is what forces the poison, not building.
 `gen-settings` poisoned is the discriminating negative control: every cell stays green (rc 0), showing
 the instrument discriminates and this corpus simply has nothing that forces `gen-settings`.
@@ -321,7 +324,7 @@ PUBLISHED parent) are exercised over the result, and oracle 5's structural-helpe
 armed a second way: at C16's own non-flat assembly, where `children`/`subtreeOf` diverge between the
 hand-written and toolkit forms, beside C1's flat one, where the node set does not move at all.
 
-`just refusals` row 12 plants the aspect includes contribution under the reserved label `I` —
+`refusals` row 12 plants the aspect includes contribution under the reserved label `I` —
 gen-scope's own import relation between scopes, not the aspect includes relation, and reaching for
 it because the words are near neighbours is exactly the collision `gen-assemble`'s reserved-label
 refusal exists to stop.
