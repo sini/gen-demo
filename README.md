@@ -311,7 +311,7 @@ the instrument discriminates and this corpus simply has nothing that forces `gen
 
 ## v1.2
 
-One more positive construct (C16) and one more planted-violation refusal (T5 row 12, `just refusals`), against `2026-09-09-gen-demo-aspect-contribution-spec.md` in den-ag-design. C16
+One more positive construct (C16) and one more planted-violation refusal (T5 row 12, `refusals`), against `2026-09-09-gen-demo-aspect-contribution-spec.md` in den-ag-design. C16
 assembles the corpus's **own** aspect graph through `genAssemble`'s contribution protocol
 (ADR-0012, ADR-0010 §3 toolkit item): `genAspects.graphFacts` publishes the corpus's aspect nodes,
 its containment relation and its includes relation as plain data, and two contributions —
@@ -333,7 +333,7 @@ already forced by earlier cells — so this landing moves nothing in the census 
 
 ## v1.3
 
-One more positive construct (C17) and one more planted-violation refusal (T5 row 13, `just refusals`), against `2026-09-09-gen-option-set-closure-spec.md` in den-ag-design. Between them they
+One more positive construct (C17) and one more planted-violation refusal (T5 row 13, `refusals`), against `2026-09-09-gen-option-set-closure-spec.md` in den-ag-design. Between them they
 declare the two halves of ONE property — an entity's identity is a function of its KIND's option set
 (ADR-0016 ruling 5), and that set closes at a boundary rather than drifting with whatever the
 fixpoint happened to gather (ADR-0033).

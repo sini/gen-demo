@@ -44,7 +44,7 @@ in
   #
   # The corpus asserts it as a VALUE (C17): `thimbles.pewter.id_hash` is byte-identical to the stamp the
   # corpus carried before this option existed. Region 2's refusal is the other half and cannot be a
-  # cell — a throw is not a value — so it is `just refusals` row 13.
+  # cell — a throw is not a value — so it is `refusals` row 13.
   options.thimbles = genSchema.mkInstanceRegistry config.schema.thimble {
     extraModules = [
       {
@@ -68,7 +68,7 @@ in
   # `mkMerge` and not `//` is the mechanism. `//` is right-wins: a node declared in both registries
   # would be silently dropped from the delivery set at exit 0 with no diagnostic. `attrsOf raw` fed by
   # `mkMerge` puts the collision on the module system's own conflicting-definitions refusal, which
-  # names the offending attribute — `just refusals` row 14 pins that message.
+  # names the offending attribute — `refusals` row 14 pins that message.
   options.haberdashery = mkOption {
     type = types.attrsOf types.raw;
     default = { };

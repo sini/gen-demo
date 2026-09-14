@@ -693,7 +693,7 @@
         inertBudget = genBind.crossing.inertBudget;
         readCtxHeadsOfSelvage = genBind.crossing.readCtxHeads selvageTerm;
         # THE THREE REFUSAL ARMS — refusals are DATA (a `__crossingResult == "refusal"` record),
-        # never a throw, so all three are `checks` cells here rather than `just refusals` rows.
+        # never a throw, so all three are `checks` cells here rather than `refusals` rows.
         selvageBadLitChecked = genBind.crossing.checkTerm (
           with genBind.crossing.term; lit { spool = _: "linen"; }
         );
@@ -1400,7 +1400,7 @@
 
                   # (14) C14 — the closed, first-order body-term algebra: refusals are DATA, never a
                   # throw, so all three refusal arms live in this one cell rather than in
-                  # `just refusals` — the only construct of which that is true.
+                  # `refusals` — the only construct of which that is true.
                   body-term-algebra = asserts "body-term-algebra" (
                     selvageResolved == {
                       __crossingResult = "ok";
