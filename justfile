@@ -456,7 +456,7 @@ refusals:
     # ── row 16 -- the PROTOCOL path: the same registry as a call parameter to the framework
     # toolkit, which is how C18 routes it. The refusal reaches `assemble`'s caller from the
     # substrate, with no guard of gen-assemble's own -- which is what makes one door enough. ──
-    row16="$registry"'builtins.toJSON (builtins.attrNames (gen.lib.framework.assemble {
+    row16="$registry"'builtins.toJSON (builtins.attrNames (gen.lib.framework.assemble.assemble {
       contributions = [ { name = "selvedge"; vertices = [ "selvage" ]; decls.selvage = { }; types.selvage = "bolt"; } ];
       kinds = REGISTRY;
     }).nodes)'
