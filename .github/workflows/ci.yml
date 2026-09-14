@@ -22,7 +22,12 @@ jobs:
       # on every run and reds whenever the hub moves ahead of gen-demo's deliberate relock — a
       # permanently red main for a repository whose pin advances by decision. It stays the human
       # act `check-hub-main` until that is ruled on; scheduling it is not this workflow's to take.
-      - run: nix flake check
+      # CI EVALUATES; IT DOES NOT BUILD. `--no-build` still forces the checks' derivations —
+      # so the `nixos` target is INSTANTIATED to its `toplevel.drvPath`, which is what
+      # den-hoag-g87v term 2 contracts — while the system itself is never realised. The full
+      # build is a LOCAL validation rule (owner-ruled 2026-09-14); a bare `nix flake check`
+      # realises the NixOS system and exhausted the runner's disk (run 34907234688).
+      - run: nix flake check --no-build
       # The plane: the harness's five checks, plus the batch asserter over `ci/tests`.
       - run: nix flake check ./ci
       # T5's by-name half (ADR-0025). `builtins.tryEval` cannot read a refusal's message, so these
