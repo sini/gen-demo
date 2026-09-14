@@ -170,9 +170,13 @@ T5's thirteen refusals are not among these twenty-one: `builtins.tryEval` yields
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
-**T5 has no standing CI gate.** By ruled default (spec OPEN 2: *"Default: `just refusals`"*), neither
-`check-lock` nor `check-hub-main` runs `ci/refusals.sh`, so a regression in any of the
-thirteen enforcers is invisible to `nix flake check` until someone runs `refusals` by hand.
+**T5's standing gate is the workflow, not a check cell.** Neither `check-lock` nor `check-hub-main`
+runs `ci/refusals.sh` — a refusal's message is unreadable to any `checks.default` cell, which is the
+whole reason this half runs out of band. So `.github/workflows/ci.yml` runs it as its own step, and
+the spec's ruled default (OPEN 2: *"Default: `just refusals`"*) is now scheduled rather than left to
+someone running it by hand. `ci/tests/refusals-pairing.nix` gates the other half: a row that loses
+its planted or unplanted arm reds `nix flake check ./ci` even though the script itself would still
+exit 0 on the arms it kept.
 
 ### Two arms, plus the by-name half
 

@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      # ARM 1 — the corpus against its committed lock, and the step this repository exists for:
+      # the twenty-one `checks` cells live on the ROOT flake, not in `ci/`, so the stock
+      # `working-directory: ci` form would run none of them.
+      #
+      # ARM 2 (`nix flake check --refresh --override-input gen github:sini/gen`) is deliberately
+      # NOT here. It is owner-ruled contract under den-hoag-g87v term 2, but it hits the network
+      # on every run and reds whenever the hub moves ahead of gen-demo's deliberate relock — a
+      # permanently red main for a repository whose pin advances by decision. It stays the human
+      # act `check-hub-main` until that is ruled on; scheduling it is not this workflow's to take.
+      - run: nix flake check
+      # The plane: the harness's five checks, plus the batch asserter over `ci/tests`.
+      - run: nix flake check ./ci
+      # T5's by-name half (ADR-0025). `builtins.tryEval` cannot read a refusal's message, so these
+      # seventeen rows cannot be `checks` cells and this is the step that schedules them — the gap
+      # row16 escaped through was a missing scheduler, not a missing analyser.
+      - run: nix develop ./ci --command refusals
+      - run: nix fmt -- --ci
+        working-directory: ci
