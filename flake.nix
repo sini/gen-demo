@@ -1382,6 +1382,28 @@
                       ]
                   );
 
+                  # C12c — the coordinate's PROVENANCE, standing (owner override 2026-09-14, exit
+                  # sitting Q10, den-hoag-eh6x8). The fourteen other Oracle 3 rows guard a VALUE a
+                  # cell already reads; a value assertion cannot tell "`seamHead` computed from
+                  # `seamCoords`" apart from "`seamHead` restated as the same literal" — both
+                  # evaluate to the identical string, `"seam:pewter:grosgrain"`. So this cell reads
+                  # no value at all: it reads the corpus's OWN SOURCE for the one line binding
+                  # `seamHead` and requires it to interpolate BOTH `seamCoords.thimble` and
+                  # `seamCoords.bobbin`. A literal has no such line. Without this cell, ADR-0016
+                  # ruling 2 — "the promoted node must be a function of the product or the ruling
+                  # is prose" — is prose.
+                  seam-head-provenance =
+                    let
+                      seamHeadDef = lib.findFirst (lib.hasInfix "seamHead = ") null (
+                        lib.splitString "\n" (builtins.readFile ./flake.nix)
+                      );
+                    in
+                    asserts "seam-head-provenance" (
+                      seamHeadDef != null
+                      && lib.hasInfix "seamCoords.thimble" seamHeadDef
+                      && lib.hasInfix "seamCoords.bobbin" seamHeadDef
+                    );
+
                   # (13) C13 — `foldLayers`: all three strategies plus the default channel in one call.
                   layered-fold = asserts "layered-fold" (
                     folded == {

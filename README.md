@@ -57,7 +57,7 @@ incremental plane's decision crossing.
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all twenty-one
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all twenty-two
 `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
@@ -79,7 +79,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs twenty-one checks, and they are the acceptance criteria:
+`nix flake check` runs twenty-two checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -157,7 +157,15 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     own queries use, so the equality is not two sides equally empty. It also asserts `kinds` is still
     NOT an eighth contribution key: offered on a contribution it is refused by name. C1 could not be
     written through the protocol before `gen-assemble` `d08cebf`, which is what Finding 4 recorded.
-21. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+21. **`seam-head-provenance`** — C12c, den-hoag-eh6x8. Owner-overridden standing guard: the other
+    Oracle 3 rows guard a VALUE a cell already reads, and a value assertion cannot tell "`seamHead`
+    computed from `seamCoords`" apart from "`seamHead` restated as the same literal" — both evaluate
+    to `"seam:pewter:grosgrain"`. This cell reads no value; it reads the corpus's own `flake.nix`
+    source for the one line binding `seamHead` and requires it to interpolate BOTH
+    `seamCoords.thimble` and `seamCoords.bobbin`. A literal has no such line and reds this cell by
+    name while leaving every value cell — including `product-promotion` — unmoved, because the
+    literal and the derivation produce the identical string.
+22. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -166,7 +174,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these twenty-one: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these twenty-two: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
