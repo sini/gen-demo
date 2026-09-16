@@ -6,26 +6,16 @@
     # surface, with no library code of its own and no direct pin on any gen-* member.
     gen.url = "github:sini/gen";
 
-    # ★ C22's ONE EXCEPTION, AND IT IS A DIRECT SIBLING INPUT, NEVER A `follows` ONTO THE HUB.
-    # The hub's own `gen-bind` has not yet been bumped past den-hoag-gcr8x's extent peer-read
-    # shape (Q5 Arm A) at the time C22 is staged, and — measured this session — it CANNOT be
-    # bumped by a bare relock: `mkSystemTerminal` grew a new required `class` argument in that
-    # landing (`{ evaluator, locateConfig }:` at the hub's still-pinned `1f06d34…` vs.
-    # `{ evaluator, locateConfig, class }:` at gcr8x's `27860c8…`), and the hub's own
-    # `flakeModules/default.nix:262` default `nixos` terminal calls `mkSystemTerminal` without
-    # one. A `gen.inputs.gen-bind.follows` override was tried first and DRIVEN RED: it moves the
-    # hub's transitive edge globally, so its own `nixos` terminal throws that same missing-`class`
-    # error, and 24 of the corpus's other checks (everything routed through the hub's default
-    # delivery, not just this one) fail with it — confirmed by a same-instrument, same-run control
-    # (`nix flake check`: a fresh unmodified clone exits 0 "all checks passed!"; the identical
-    # clone with only the `follows` line added exits 1 on the hub's own call site). This exception
-    # avoids that: C22 imports gen-bind's OWN standalone entry directly (`import "${gen-bind}" { }`,
-    # the same self-resolving shim gen-bind's own `ci/flake.nix` and `gen-delivery`'s use), so the
-    # hub's `genBind` module arg — and everything else built on it — never moves. Drop this input
-    # once the hub's own `gen-bind` pin reaches or passes gcr8x's landed sha (which itself first
-    # needs the hub's `flakeModules/default.nix:262` call site to add `class = "nixos";` — a hub-repo
-    # edit outside this dispatch's scope, reported not repaired, per den-hoag-gcr8x-extent-build-v0).
-    gen-bind.url = "github:sini/gen-bind";
+    # ★ THE SIBLING `gen-bind` INPUT C22 CARRIED IS GONE, AND ITS OWN DROP CONDITION IS WHY. It
+    # existed because the hub's `gen-bind` pin sat behind den-hoag-gcr8x's extent peer-read shape,
+    # and it said to drop it "once the hub's own `gen-bind` pin reaches or passes gcr8x's landed
+    # sha". Measured BY NODE PATH at the drop (den-hoag-c22-sibling-exception-vacuous-2upv0), and a
+    # clone's HEAD is not a source: `27860c87…` reads identically in the hub's own lock at the
+    # revision this flake pins, in the `gen-bind` node of THIS lock, and at the hub's `main`. The
+    # exception had stopped discriminating, so it was carrying nothing but the appearance of a
+    # sanctioned carve-out — and C22 now takes the ordinary path, the hub's `genBind` module arg.
+    # There is no longer any direct pin on a `gen-*` member here, which is the claim the first
+    # comment above makes and the one this repository exists to keep true.
 
     # The systems the one `nixos` target is built with are the hub's own nixpkgs, so
     # `--override-input gen github:sini/gen` moves the target's nixpkgs with the hub rather than
@@ -1087,15 +1077,14 @@
         # thunkBindings?;}`), so composing them needs the same thin wrapper gen-bind's
         # own O-1/O-2 oracle cells use (`ci/tests/crossing-extent-peer.nix`).
         #
-        # `genBindNew`, NOT the hub's `genBind` module arg — see the ★ note on the
-        # `gen-bind` input above. Called with `{ }`: gen-bind's own standalone root
-        # entry (`default.nix`) resolves its own `prelude`/`graph` through its own
-        # `ci/flake.lock`-pinned defaults, the same channel its own `ci/flake.nix`
-        # and `gen-delivery`'s standalone shim use — never through the hub.
-        genBindNew = import "${inputs.gen-bind}" { };
+        # The hub's `genBind` module arg, the ordinary path every other construct
+        # here takes. C22 landed on a direct sibling input instead, because the hub's
+        # `gen-bind` pin was then behind the shape this construct reads; that
+        # exception stated its own drop condition, the condition is met, and dropping
+        # it is what its text specified — see the ★ note on the inputs above.
         flounceAdapterOf =
           readerId:
-          (genBindNew.crossing.mkSystemTerminal {
+          (genBind.crossing.mkSystemTerminal {
             evaluator = a: builtins.attrNames a.specialArgs.nodes;
             locateConfig = x: x;
             class = "notion";
