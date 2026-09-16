@@ -1369,6 +1369,33 @@
           cellIds = [ seamCell ];
           coordsFor = _cell: seamSpace.product.coordsOf; # under-applied: returns a function, not coords
         };
+
+        # ── C23 — `attrs` as a NULLARY CONTAINER STRATEGY (den-hoag-241d7, ADR-0014's constructing
+        # arm + ADR-0027). The engine's `attrs` stated a checker and nothing else: no empty value and
+        # no fold, so an option of that type THREW when nothing defined it — where every container
+        # type yields its empty — and two modules contributing disjoint keys COLLIDED instead of
+        # being unioned. A container that cannot be empty and cannot be contributed to from two
+        # places is not a container, and a corpus whose modules are written by different hands hits
+        # both on its first day.
+        #
+        # Declared on the corpus's own invented vocabulary rather than on a real option, for C15's
+        # reason: a fixture that borrows a live declaration greens when something ELSE is repaired.
+        c23Decl = {
+          options.selvedge = genMerge.mkOption { type = genMerge.types.attrs; };
+        };
+        # No definition anywhere and NO `default` — the defaultless half is the whole row. A `default
+        # = { }` would green this from the declaration side and say nothing about the type.
+        c23Undefined = (genMerge.evalModuleTree { modules = [ c23Decl ]; }).config.selvedge;
+        # Two modules, disjoint keys. The fold has to UNION them: picking either definition, or
+        # refusing, is the pre-component behaviour.
+        c23Disjoint =
+          (genMerge.evalModuleTree {
+            modules = [
+              c23Decl
+              { config.selvedge.warp = "flax"; }
+              { config.selvedge.weft = "tussah"; }
+            ];
+          }).config.selvedge;
       in
       {
         imports = [
@@ -2561,6 +2588,28 @@
                     # proposition goes false with nothing red. Relational — `c17Pewter.id_hash`, never
                     # a digest literal — so the no-literals ruling is untouched.
                     && c21NoInheritIdhash == c17Pewter.id_hash
+                  );
+
+                  # (30) C23 — an undefined, defaultless `attrs` option IS the empty container, not a
+                  # throw. Reads the VALUE and not a `tryEval` success bit: the failure this cell has
+                  # to catch is a repair that makes the option resolve to `null`, or to a nested
+                  # shape, while still "succeeding" — a bit-reading cell passes all of those.
+                  # DRIVEN RED: dropping `whenEmpty.value` from the construction reds THIS cell and
+                  # leaves the union cell below green.
+                  attrs-undefined-yields-empty = asserts "attrs-undefined-yields-empty" (c23Undefined == { });
+
+                  # (31) C23 — two modules contributing DISJOINT keys to one `attrs` option both
+                  # survive. The empty value alone does not buy this: a type can state an empty and
+                  # still have no fold, and then the corpus's second contributor is the one that
+                  # reds. Pinned as an equality over the whole attrset rather than a key-presence
+                  # test, so a fold that unions the keys but loses a VALUE is caught here too.
+                  # DRIVEN RED: a fold returning one definition reds THIS cell and leaves the
+                  # empty-value cell above green.
+                  attrs-unions-disjoint-contributions = asserts "attrs-unions-disjoint-contributions" (
+                    c23Disjoint == {
+                      warp = "flax";
+                      weft = "tussah";
+                    }
                   );
                 };
               in

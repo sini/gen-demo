@@ -58,11 +58,12 @@ incremental plane's decision crossing.
 | C20 -- the product adapter's totality doors, real data    | 0035, 0025 item 1   | `adapters.product.mkContext`'s `coordsFor`, wired to C12's real `seamSpace.product.coordsOf`; an under-applied `coordsFor` over the SAME real space now refuses at construction instead of writing a residual function into `__coords`                                                                                                |
 | C21 -- the stamp survives the relocation                  | 0016 ruling 7, 0033 | the corpus's `thimble` composed the retired way (`imports = [ config.schema.hank ]`) and the relocated way (`inherits = [ "hank" ]`, gen-schema's staged `evalSchema`) mints one `id_hash`; dropping the inheritance MOVES it, which is what makes the equality non-vacuous                                                           |
 | C22 -- a bounded extent peer-read                         | 0026                | gen-bind's `mkSystemTerminal` adapter over a real `genDelivery.realize`; one node carries an invented mark admitting no label, and its handed `specialArgs.nodes` is bounded to empty while the mark is named on every withheld peer                                                                                                  |
+| C23 -- `attrs` is a nullary container strategy            | 0014, 0027          | an `attrs` option undefined and defaultless resolves to `{ }` instead of throwing, and two modules contributing disjoint keys are unioned rather than collided; the type stated a checker and nothing else before den-hoag-241d7                                                                                                      |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                            |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty-two
 `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
@@ -84,7 +85,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs thirty checks, and they are the acceptance criteria:
+`nix flake check` runs thirty-two checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -227,7 +228,14 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     The withheld half is read straight off the adapter — bypassing `realize` — because ADR-0026's one
     stated requirement on a consuming implementation is that a boundary refusal NAME the mark that
     caused it, and `realize`'s own carriage never surfaces a withheld set at all.
-30. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+30. **`attrs-undefined-yields-empty`** — C23, den-hoag-241d7. An `attrs` option with no definition
+    anywhere and no `default` resolves to `{ }`. Reads the VALUE and never a `tryEval` bit: a repair
+    that yields `null`, or a nested shape, still "succeeds", and only an equality catches it.
+31. **`attrs-unions-disjoint-contributions`** — C23, den-hoag-241d7. Two modules contributing
+    disjoint keys to one `attrs` option both survive. The empty value alone does not buy this — a
+    type can state an empty and still state no fold — so this is the container strategy's second
+    half and not a restatement of the cell above.
+32. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -236,7 +244,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these thirty: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these thirty-two: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
