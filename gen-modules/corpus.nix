@@ -18,14 +18,50 @@
 let
   aspectSchema = genAspects.mkAspectSchema (import ../aspect-cnf.nix);
   inherit (genMerge) mkMerge mkOption types;
+
+  # §2.6's staged pass — the kind bodies moved verbatim out of `config`, below, and evaluated by
+  # gen-schema's OWN `evalModuleTree` (never this file's `config`). `schema.thimble`/`schema.bobbin`
+  # is the frozen result these registries and `options.schema` both read.
+  schema = genSchema.evalSchema {
+    inherit (aspectSchema) schemaOption;
+    modules = [
+      {
+        config.schema.thimble = {
+          options.aspects = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Aspect keys this node is a member of.";
+          };
+          options.spool = mkOption {
+            type = types.str;
+            description = "An arbitrary attribute, here so the kind carries content of its own.";
+          };
+        };
+        config.schema.bobbin = {
+          options.gauge = mkOption {
+            type = types.str;
+            description = "An arbitrary attribute on the second kind, carrying content of its own.";
+          };
+        };
+      }
+    ];
+  };
 in
 {
   # `mkAspectModule` declares `options.aspects` and threads schema-declared options into every
   # instance. It does NOT declare `options.schema` despite what its comment in gen-aspects says, so
-  # the schema option is declared here from the same aspect-aware `schemaOption`.
+  # the schema option is declared here -- now as a plain read-only republication of the frozen pass
+  # above, not the aspect-aware `schemaOption` itself (that lives on the staged pass's `modules`).
   imports = [ (aspectSchema.mkAspectModule { }) ];
 
-  options.schema = aspectSchema.schemaOption;
+  # Reading a strictly-earlier pass's frozen output is precisely what staging licenses; it is the
+  # declaration-plane read (`config.schema.<k>` composed live) that the relocation removes.
+  # Republished so `flake.nix`'s `genValues.schema.<k>` reads keep working unchanged.
+  options.schema = mkOption {
+    type = types.raw;
+    default = schema;
+    description = "The frozen result of the staged evalSchema pass above -- read-only.";
+  };
 
   # ── THE NODE REGISTRIES, BOTH UNDER INVENTED NAMES ──
   # The hub's `flakeModules/default.nix` used to call `gen-delivery`'s `project` without a
@@ -45,7 +81,7 @@ in
   # The corpus asserts it as a VALUE (C17): `thimbles.pewter.id_hash` is byte-identical to the stamp the
   # corpus carried before this option existed. Region 2's refusal is the other half and cannot be a
   # cell — a throw is not a value — so it is `refusals` row 13.
-  options.thimbles = genSchema.mkInstanceRegistry config.schema.thimble {
+  options.thimbles = genSchema.mkInstanceRegistry schema.thimble {
     extraModules = [
       {
         options.shirring = mkOption {
@@ -56,7 +92,7 @@ in
       }
     ];
   };
-  options.bobbins = genSchema.mkInstanceRegistry config.schema.bobbin { };
+  options.bobbins = genSchema.mkInstanceRegistry schema.bobbin { };
 
   # ── THE DELIVERY TARGET VIEW (`den-hoag-uedvp`) ──
   # `gen.nodeRegistryPath` names ONE attribute path, and that cardinality is the ruling, not a
@@ -90,24 +126,8 @@ in
       config.bobbins
     ];
 
-    # THE TWO KINDS.
-    schema.thimble = {
-      options.aspects = mkOption {
-        type = types.listOf types.str;
-        default = [ ];
-        description = "Aspect keys this node is a member of.";
-      };
-      options.spool = mkOption {
-        type = types.str;
-        description = "An arbitrary attribute, here so the kind carries content of its own.";
-      };
-    };
-    schema.bobbin = {
-      options.gauge = mkOption {
-        type = types.str;
-        description = "An arbitrary attribute on the second kind, carrying content of its own.";
-      };
-    };
+    # THE TWO KINDS now live on the staged pass above, in `schema`'s `let`-bound `modules` --
+    # moved verbatim out of `config` (§2.6), not declared here any more.
 
     # THE FOUR NODES. `damask` is the one C2 reaches only across two `tacks` hops; `faille` is the one
     # no DECLARED edge reaches at all, which is what makes C5's dynamic edge observable.

@@ -56,11 +56,12 @@ incremental plane's decision crossing.
 | C18 -- a kinded contribution                              | 0012, 0011          | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key                                                                                                |
 | C19 -- the discrete/monotone separation                   | 0019, 0020, 0012    | `discreteCtx` clears a two-node cycle's declared in-flight accessors at gen-select's seven non-monotone positions (Datafun's split); `not`/`attrs`/`when` refuse against the writable cycle, `has`/`parentMatches` still answer                                                                                                       |
 | C20 -- the product adapter's totality doors, real data    | 0035, 0025 item 1   | `adapters.product.mkContext`'s `coordsFor`, wired to C12's real `seamSpace.product.coordsOf`; an under-applied `coordsFor` over the SAME real space now refuses at construction instead of writing a residual function into `__coords`                                                                                                |
+| C21 -- the stamp survives the relocation                  | 0016 ruling 7, 0033 | the corpus's `thimble` composed the retired way (`imports = [ config.schema.hank ]`) and the relocated way (`inherits = [ "hank" ]`, gen-schema's staged `evalSchema`) mints one `id_hash`; dropping the inheritance MOVES it, which is what makes the equality non-vacuous                                                           |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                            |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all twenty-two
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all twenty-nine
 `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
@@ -82,7 +83,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs twenty-seven checks, and they are the acceptance criteria:
+`nix flake check` runs twenty-nine checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -201,7 +202,25 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     swaps in the SAME `coordsOf`, deliberately under-applied by one argument, and now refuses
     (named throw, `tryEval`-caught) instead of writing a residual function into `__coords` that
     every downstream coord-selector match would have read as a silent, wrong `false`.
-27. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+27. **`corpus-stamp-relocation-invariant`** — C21, den-hoag-ppv0z. The EQUALITY half. A `thimble`
+    composed the RETIRED way (`imports = [ config.schema.hank ]`, read live off the tree being
+    declared) and the RELOCATED way (`inherits = [ "hank" ]`, resolved by gen-schema's staged
+    `evalSchema` pass) mint the SAME `id_hash`, over the corpus's real instrument — gen-aspects'
+    own `schemaOption`, `mkInstanceRegistry`, and C17's `extraModules` inlet. Relational, never a
+    literal digest: the digests this pair was designed against were measured at another lock, and
+    asserting one here would relay a figure across a rev boundary. The retired arm is APPARATUS,
+    not a survival of the migrated class — the reference value has to be built the old way or
+    there is nothing for the new way to be compared against.
+28. **`corpus-stamp-no-inherit-discriminator`** — C21, den-hoag-ppv0z. The PERTURBATION half, and
+    what stops the cell above being two agreeing arms. The same staged tree with the parent
+    dropped mints a DIFFERENT stamp, so the equality is non-vacuous: the instrument is shown to
+    discriminate on the exact axis the equality asserts. The perturbed arm lands on
+    `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a` — the corpus's own
+    published stamp, the one `ci/refusals.sh` row 13 pins — which is what shows the instrument is
+    the corpus's and not a lookalike. Each cell was driven RED independently while the other
+    stayed green: dropping the `inherits` built-in from `evalSchema` reds the equality alone, and
+    making the parent's option non-identifying reds this one alone.
+29. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -210,7 +229,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these twenty-seven: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these twenty-nine: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
