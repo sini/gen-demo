@@ -44,13 +44,23 @@ in
       };
       expected = {
         # Stated as a DELTA against what `refusals.sh` carried before, never as an absolute target
-        # lifted from a document: 37 arms / 18 paired was read off the script at gen-demo `7aef15c`,
-        # and den-hoag-i546n's rows 20 and 21 are ordinary paired rows — +4 arms, +2 paired.
-        totalArms = 41;
-        paired = 20;
-        # Row 17 is the deliberate exception and the only one: it is a THIRD PLANTED arm, asserting
-        # that the forged registry refuses CATCHABLY rather than by overflowing the stack, so it has
-        # no unplanted counterpart to carry. Adding a row here is a decision, not a fixture update.
+        # lifted from a document: 41 arms / 20 paired was read off the script at gen-demo `3c53cbd`
+        # (den-hoag-4kh.53.13's row22/row23 land in this same file but carry no `T5`/planted/
+        # unplanted label — 0 of this regex's arms, by design and stated in their own comment — so
+        # they move neither figure). den-hoag-n03z's row24 is an ordinary paired row — +2 arms,
+        # +1 paired.
+        totalArms = 43;
+        paired = 21;
+        # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
+        # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
+        # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
+        # "planted" is the only way it registers at all — a deliberate decision, not a fixture
+        # update. row24's catchable check is a THIRD arm alongside an already-complete planted+
+        # unplanted pair; that pair alone fully discharges the pairing discipline for row24, so its
+        # catchable arm is additional and orthogonal, not itself planted-only. Labelling it "T5
+        # row24 catchable" (a distinct word, not "planted") keeps it correctly outside this regex's
+        # population instead of manufacturing a spurious `plantedOnly` entry for a row that is not
+        # one-sided.
         plantedOnly = [ "17" ];
         unplantedOnly = [ ];
       };
