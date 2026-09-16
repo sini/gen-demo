@@ -353,6 +353,171 @@
           graph = movementGraph;
         };
 
+        # ── C4b — element identity: a diamond is one element, a collision is two, and a key that
+        # splits an element refuses by name (ADR-0024 arm F, den-hoag-2vzn) ──
+        #
+        # ★★ ONE CELL CANNOT CARRY BOTH, MEASURED AT THE BINDING. `compositions.movement` fixes its
+        # key to a constant (`a: _: a.channel`), so a movement declaration reaches the one-group case
+        # only and cannot reach the spanning refusal at all. The spanning cell below is therefore
+        # built on `compositions.registry`, whose `entityOf` is caller-supplied.
+        #
+        # ★★★ TWO INDEPENDENT MASKERS REDUCE A DOUBLED DIAMOND TO ONE, AND THIS DECLARATION DEFEATS
+        # BOTH: an ASYMMETRIC admission (`tacks(gimping|tacks)*|gimping(tacks)*`, never the
+        # symmetric `(tacks|gimping)*` a caller might reach for, which folds both arrivals to one
+        # derivative-state class before the element check ever runs) and a `labelOrder` with BOTH
+        # letters in ONE layer (`endOfPath = -1`) — the exact shape `gen-view/ci/fixture.nix` ships
+        # as `flatOrder`. C4's own `movementCarrier` defeats neither: it declares a single-letter
+        # alphabet with `layers = [ [ "tacks" ] ]` and cannot carry this cell.
+        diamondLabels = genView.edgeLabels {
+          letters = [
+            "tacks"
+            "gimping"
+          ];
+        };
+        diamondCarrier = genView.carrier {
+          labels = diamondLabels;
+          relations = genView.relations { names = [ "gimp" ]; };
+          relatumLabels = genView.relatumLabels { names = [ ]; };
+          labelWellFormedness = genView.labelWellFormedness {
+            alphabet = diamondLabels;
+            expression = "tacks(gimping|tacks)*|gimping(tacks)*";
+          };
+          labelOrder = genView.labelOrder {
+            alphabet = diamondLabels;
+            layers = [
+              [
+                "tacks"
+                "gimping"
+              ]
+            ];
+            endOfPath = -1;
+          };
+          dataOrder = genView.dataOrder {
+            channel = "settled";
+            keyOf = _: "settled";
+          };
+        };
+
+        # `pewter` reaches `grosgrain` by two routes — one `tacks` hop, one `gimping` hop — leaving
+        # DIFFERENT residual admission states; one `gimp` datum authored at `grosgrain`.
+        diamondGraph = genView.scopeGraph {
+          carrier = diamondCarrier;
+          scopes = [
+            "pewter"
+            "grosgrain"
+            "faille"
+          ];
+          edges = {
+            tacks = id: if id == "pewter" then [ "grosgrain" ] else [ ];
+            gimping = id: if id == "pewter" then [ "grosgrain" ] else [ ];
+          };
+          data = [
+            {
+              scope = "grosgrain";
+              relation = "gimp";
+              datum = [ "cambric" ];
+            }
+          ];
+        };
+        diamondMoved = genView.viewRelation {
+          definition = genView.compositions.movement {
+            channel = "selvage";
+            relation = "gimp";
+            root = "pewter";
+            direction = "outbound";
+            admission = diamondCarrier.labelWellFormedness;
+            order = diamondCarrier.labelOrder;
+            wellFormed = _: true;
+            empty = [ ];
+            tieSet = genView.tieSets.refuse;
+            combine = genView.combines.listAppend;
+            dedup = genView.dedups.none;
+          };
+          marks = _: [ ];
+          graph = diamondGraph;
+        };
+
+        # The same datum content declared at `grosgrain` TWICE and at `faille` ONCE: three
+        # declarations, one content. Element identity is `(producer, ordinal)` — the declaration
+        # coordinate, never path-multiplicity — so three declarations mint three elements even
+        # though every one of them carries the identical datum.
+        collisionGraph = genView.scopeGraph {
+          carrier = diamondCarrier;
+          scopes = [
+            "pewter"
+            "grosgrain"
+            "faille"
+          ];
+          edges = {
+            tacks =
+              id:
+              if id == "pewter" then
+                [
+                  "grosgrain"
+                  "faille"
+                ]
+              else
+                [ ];
+          };
+          data = [
+            {
+              scope = "grosgrain";
+              relation = "gimp";
+              datum = [ "cambric" ];
+            }
+            {
+              scope = "grosgrain";
+              relation = "gimp";
+              datum = [ "cambric" ];
+            }
+            {
+              scope = "faille";
+              relation = "gimp";
+              datum = [ "cambric" ];
+            }
+          ];
+        };
+        collisionMoved = genView.viewRelation {
+          definition = genView.compositions.movement {
+            channel = "selvage";
+            relation = "gimp";
+            root = "pewter";
+            direction = "outbound";
+            admission = diamondCarrier.labelWellFormedness;
+            order = diamondCarrier.labelOrder;
+            wellFormed = _: true;
+            empty = [ ];
+            tieSet = genView.tieSets.union;
+            combine = genView.combines.listAppend;
+            dedup = genView.dedups.none;
+          };
+          marks = _: [ ];
+          graph = collisionGraph;
+        };
+
+        # ★ THE ONLY DECLARATION IN THE CORPUS THAT REACHES THE SPANNING REFUSAL. `compositions.
+        # registry`'s key is caller-supplied (`entityOf`); reading the DIAMOND's own residual
+        # admission state makes the two arrivals of `diamondGraph`'s one authored element carry two
+        # DIFFERENT keys, which is exactly what a competition key may never do.
+        splitKeyed = genView.viewRelation {
+          definition = genView.compositions.registry {
+            channel = "selvage";
+            relation = "gimp";
+            root = "pewter";
+            direction = "outbound";
+            admission = diamondCarrier.labelWellFormedness;
+            order = diamondCarrier.labelOrder;
+            wellFormed = _: true;
+            empty = [ ];
+            tieSet = genView.tieSets.union;
+            combine = genView.combines.listAppend;
+            dedup = genView.dedups.none;
+            entityOf = c: c.admission;
+          };
+          marks = _: [ ];
+          graph = diamondGraph;
+        };
+
         # ── C17 — the identity-key set closes at the KIND boundary (ADR-0016 ruling 5, ADR-0033) ──
         # Read off the composed VALUES, not the delivery projection: an instance's `id_hash` and its
         # published key set are schema data, and the projection carries neither.
@@ -989,6 +1154,22 @@
         # the writable cycle §1.1 names: "a" admits "b" as a child iff "b" does NOT already carry
         # the key its own admission would give it.
         c19NegTerm = genSelect.not (genSelect.has (genSelect.attrs { key = "b"; }));
+
+        # ── C20 — gen-select's product adapter wired to a REAL gen-product coordinate graph
+        # (den-hoag-4kh.53.52 G2/G3), not a mock: C12's own `seamSpace`/`seamCell` supply
+        # `coordsFor`'s real return value, so `adapters.product.mkContext` is exercised against
+        # real gen-product data for the first time anywhere in the swept ecosystem. The armed
+        # variant swaps in a deliberately under-applied `coordsFor` (mode C, den-hoag-g8lo) over
+        # the SAME real space, to exhibit the totality door this landing added to
+        # `lib/adapters/product.nix` in the same expression as the working arm.
+        c20Ctx = genSelect.adapters.product.mkContext {
+          cellIds = [ seamCell ];
+          coordsFor = cell: seamSpace.product.coordsOf cell;
+        };
+        c20ArmedCtx = genSelect.adapters.product.mkContext {
+          cellIds = [ seamCell ];
+          coordsFor = _cell: seamSpace.product.coordsOf; # under-applied: returns a function, not coords
+        };
       in
       {
         imports = [
@@ -1156,6 +1337,70 @@
                         "warp"
                         "weft"
                       ]
+                  );
+
+                  # C4b — element identity: a diamond is one element (the two-route arrival to
+                  # `grosgrain` collapses to `diamondMoved.value == [ "cambric" ]` and does not
+                  # refuse under `tieSet = refuse`), and a collision is NOT a coincidence in content:
+                  # `collisionGraph`'s three declarations -- two authored at `grosgrain`, one at
+                  # `faille`, all three carrying the identical datum -- mint three elements, never
+                  # fewer, because identity is the declaration coordinate `(producer, ordinal)` and
+                  # never the content nor the path that reached it.
+                  movement-element-identity = asserts "movement-element-identity" (
+                    (builtins.tryEval (builtins.deepSeq diamondMoved.value diamondMoved.value)).success
+                    && diamondMoved.value == [ "cambric" ]
+                    && builtins.length collisionMoved.contributions == 3
+                    &&
+                      map (c: c.element.producer) collisionMoved.contributions == [
+                        "grosgrain"
+                        "grosgrain"
+                        "faille"
+                      ]
+                    &&
+                      builtins.length (
+                        builtins.attrNames (
+                          builtins.groupBy (e: builtins.toJSON e) (map (c: c.element) collisionMoved.contributions)
+                        )
+                      ) == 3
+                  );
+
+                  # registry-split-key-refuses -- named for `registry` and not for `movement`,
+                  # because it declares `compositions.registry`: movement's key is a constant and
+                  # cannot reach the spanning refusal at all, so a cell named `movement-...` would
+                  # misname its own subject, which is the shape this library refuses elsewhere.
+                  # `splitKeyed` reads the diamond's own residual admission state as its competition
+                  # key, so the one authored element at `grosgrain` survives under two different
+                  # keys and refuses BY NAME, catchably -- the refusal idiom is gen-demo's own,
+                  # referenced rather than invented (`frayed-dangling-includes-refused` above).
+                  # Live control in the same cell: the identical declaration keyed on `c.scope`
+                  # instead evaluates, because both arrivals share one producer scope, and carries
+                  # exactly one contribution.
+                  registry-split-key-refuses = asserts "registry-split-key-refuses" (
+                    !(builtins.tryEval (builtins.deepSeq splitKeyed.value splitKeyed.value)).success
+                    && (
+                      let
+                        splitKeyedControl = genView.viewRelation {
+                          definition = genView.compositions.registry {
+                            channel = "selvage";
+                            relation = "gimp";
+                            root = "pewter";
+                            direction = "outbound";
+                            admission = diamondCarrier.labelWellFormedness;
+                            order = diamondCarrier.labelOrder;
+                            wellFormed = _: true;
+                            empty = [ ];
+                            tieSet = genView.tieSets.union;
+                            combine = genView.combines.listAppend;
+                            dedup = genView.dedups.none;
+                            entityOf = c: c.scope;
+                          };
+                          marks = _: [ ];
+                          graph = diamondGraph;
+                        };
+                      in
+                      (builtins.tryEval (builtins.deepSeq splitKeyedControl.value splitKeyedControl.value)).success
+                      && builtins.length splitKeyedControl.contributions == 1
+                    )
                   );
 
                   # (4) C5 — the policy program's stable model, total, and the derived edge admitted.
@@ -2038,6 +2283,20 @@
                     # O6b — CONTROL. the SAME `sel.attrs` answers against an in-flight `children`,
                     # which `attrs` never itself observes.
                     && genSelect.matches (genSelect.attrs { key = "b"; }) "b" (c19Ctx [ "b" ] [ "children" ]) == true
+                  );
+
+                  # (24) C20 — gen-select's product adapter, real coordsOf data (den-hoag-4kh.53.52).
+                  # RED (pre-landing): a malformed `coordsFor`'s result wrote straight into `__coords`
+                  # and every coord-selector match against it read a plausible, silent, WRONG `false`
+                  # — never a refusal (`lib/adapters/product.nix` had no door at all). GREEN: the same
+                  # malformed `coordsFor` is now caught at construction, before any match runs.
+                  product-adapter-totality = asserts "product-adapter-totality" (
+                    # the working arm: real coordsOf flows through the adapter unchanged.
+                    (c20Ctx.data seamCell).__coords == seamSpace.product.coordsOf seamCell
+                    # the armed arm: the SAME real space, deliberately under-applied `coordsFor`
+                    # (mode C, den-hoag-g8lo), now refuses (named throw, `tryEval`-caught) instead
+                    # of writing a residual function into `__coords`.
+                    && !(builtins.tryEval (builtins.deepSeq (c20ArmedCtx.data seamCell).__coords true)).success
                   );
                 };
               in
