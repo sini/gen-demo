@@ -2413,6 +2413,16 @@
                   # identity key) reds THIS cell and leaves the equality green.
                   corpus-stamp-no-inherit-discriminator = asserts "corpus-stamp-no-inherit-discriminator" (
                     c21NoInheritIdhash != c21HeadIdhash
+                    # ★ AND THE INSTRUMENT IS THE CORPUS'S, ASSERTED RATHER THAN DOCUMENTED. Strip the
+                    # inheritance and this tree must collapse onto the LIVE corpus node's own stamp —
+                    # `genValues.thimbles.pewter`, the same value C17 pins and `ci/refusals.sh` row 13
+                    # asserts. Without this conjunct the two cells above measure a tree that differs
+                    # from the corpus by exactly the parent, while the README row and this construct's
+                    # header state the invariant over THE CORPUS: an author editing `c21ThimbleWith`'s
+                    # option set moves all three arms together, both cells stay green, and the stated
+                    # proposition goes false with nothing red. Relational — `c17Pewter.id_hash`, never
+                    # a digest literal — so the no-literals ruling is untouched.
+                    && c21NoInheritIdhash == c17Pewter.id_hash
                   );
                 };
               in
