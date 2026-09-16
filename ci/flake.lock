@@ -82,11 +82,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1789336305,
-        "narHash": "sha256-qp+7Y22XF3L5xWjSoJPhySaR9v4qdYnm6pCge/5+Kek=",
+        "lastModified": 1789532088,
+        "narHash": "sha256-8bDi6+J0Qaz1RmMuNU+WUpTW9Qm8ftm33N1aodZUr10=",
         "owner": "sini",
         "repo": "gen-harness",
-        "rev": "b12b5e3b349922d3bc5929bfcab9b58742d9d2a1",
+        "rev": "25f0840ed4e09009dcaf7a942b2b918037afc219",
         "type": "github"
       },
       "original": {

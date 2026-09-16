@@ -16,8 +16,13 @@
       testModules = ./tests;
       # `ci/refusals.sh` is read by `tests/refusals-pairing.nix`, so it is declared: the guard's
       # subject is the bytes the evaluator sees, and an untracked script would give the cell a
-      # different file from the one the commit carries.
-      readRoots = [ ./refusals.sh ];
+      # different file from the one the commit carries. `worktree-precommit-check.sh` is declared for
+      # the same reason: it is the artefact the `worktree-check` command executes, so the evaluator
+      # must reach the committed bytes rather than whatever the working tree happens to hold.
+      readRoots = [
+        ./refusals.sh
+        ./worktree-precommit-check.sh
+      ];
       extraModules = [
         # gen-demo is the ACCEPTANCE CORPUS, not an ecosystem library: it is absent from the
         # register roster (`gen/lib/mkGenLibs.nix`) and unreferenced by the hub, so no capability
@@ -66,6 +71,13 @@
                 help = "The T5 plane (ADR-0025) - every enforcer planted and unplanted, refused BY NAME";
                 command = ''
                   exec "$FLAKE_ROOT/ci/refusals.sh"
+                '';
+              }
+              {
+                name = "worktree-check";
+                help = "den-hoag-0gsn0's declaration - a linked worktree self-provisions its pre-commit config on checkout";
+                command = ''
+                  exec "$FLAKE_ROOT/ci/worktree-precommit-check.sh"
                 '';
               }
             ];

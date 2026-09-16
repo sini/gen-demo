@@ -502,6 +502,78 @@ check "T5 row19 planted   (children declared in flight, sel.not refuses by name 
   "sel.not observes the in-flight accessor \`children\` at a NON-MONOTONE position" \
   "$tmpdir/row19-red.err"
 
+# ── rows 20/21 -- den-hoag-i546n's thunk-authorization guards (ADR-0023(c) site 3, ADR-0025 item 1).
+# Both plant against `gen.lib.substrate.bind.crossing` and both mint their own identity: ADR-0016
+# §2.3.1 forbids `hashIdentity` in production, and gen-bind's own fixtures name the test-only stand-in
+# `_testHashIdentity` (`gen-bind/ci/tests/_crossing-fixtures.nix`), so the plant carries one by that
+# name rather than reaching for the published surface. `mkOperations` is applied and its `.value`
+# merged over the raw vocabulary because the identity function is the operations' formal, not the
+# vocabulary's.
+row20='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  x0 = gen.lib.substrate.bind.crossing;
+  _testHashIdentity = kind: labels: relatumOf:
+    builtins.hashString "sha256" (kind + "@" + builtins.concatStringsSep "|" (
+      builtins.map (l: l + "=" + relatumOf l) (builtins.sort (a: b: a < b) labels)
+    ));
+  x = x0 // (x0.mkOperations { hashIdentity = _testHashIdentity; }).value;
+  c = x.contractTerm;
+  imp = { merge = "one"; contract = c.any; required = true; sealed = false; origin = "fixture"; satisfiedBy = null; };
+  supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins = { }; };
+  proj = (x.registerSupply supply).value.projection;
+  f = x.declare { imports.host = imp; exports = { }; } { kind = "body"; };
+  l = x.link "igloo" proj supply f.value;
+  adapter = {
+    bindFormals = vals: body: body // { bound = vals; };
+    bindArgEnv = vals: { argEnv = vals; };
+    wrapFn = fn: { wrapFnOf = fn; };
+    wrapUnit = body: units: { inherit body units; };
+    interpret = x.interpret;
+    thunkBindings = [ "THUNKNAME" ];
+  };
+  r = x.close "igloo" proj { members = [ ]; } adapter l.value;
+in if x.isRefusal r then throw "gen-bind:${r.refusal.code}:${builtins.concatStringsSep "," (r.refusal.witness.unmatched or [ ])}" else "ok"'
+check "T5 row20 unplanted (thunkBindings names host, which crosses)" "${row20/THUNKNAME/host}" 0 "" \
+  "$tmpdir/row20-green.err" 'ok'
+check "T5 row20 planted   (thunkBindings names nope, which never crosses -- ADR-0023(c) site 3)" \
+  "${row20/THUNKNAME/nope}" 1 \
+  "gen-bind:thunk-bindings-unmatched:nope" \
+  "$tmpdir/row20-red.err"
+
+# Row 21 is the SHAPE guard rather than the membership one, and `null` is its unplanted arm on
+# purpose: null is the total absent-authorization state the formal admits, so the green arm proves the
+# guard admits "no thunks declared" instead of refusing every adapter that omits the key.
+row21='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  x0 = gen.lib.substrate.bind.crossing;
+  _testHashIdentity = kind: labels: relatumOf:
+    builtins.hashString "sha256" (kind + "@" + builtins.concatStringsSep "|" (
+      builtins.map (l: l + "=" + relatumOf l) (builtins.sort (a: b: a < b) labels)
+    ));
+  x = x0 // (x0.mkOperations { hashIdentity = _testHashIdentity; }).value;
+  c = x.contractTerm;
+  imp = { merge = "one"; contract = c.any; required = true; sealed = false; origin = "fixture"; satisfiedBy = null; };
+  supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins = { }; };
+  proj = (x.registerSupply supply).value.projection;
+  f = x.declare { imports.host = imp; exports = { }; } { kind = "body"; };
+  l = x.link "igloo" proj supply f.value;
+  adapter = {
+    bindFormals = vals: body: body // { bound = vals; };
+    bindArgEnv = vals: { argEnv = vals; };
+    wrapFn = fn: { wrapFnOf = fn; };
+    wrapUnit = body: units: { inherit body units; };
+    interpret = x.interpret;
+    thunkBindings = THUNKSHAPE;
+  };
+  r = x.close "igloo" proj { members = [ ]; } adapter l.value;
+in if x.isRefusal r then throw "gen-bind:${r.refusal.code}:${r.refusal.witness.reason or "NO-REASON"}" else "ok"'
+check "T5 row21 unplanted (thunkBindings is null, the total absent-authorization state)" "${row21/THUNKSHAPE/null}" 0 "" \
+  "$tmpdir/row21-green.err" 'ok'
+check "T5 row21 planted   (thunkBindings is a string, not null or a list -- ADR-0025 item 1)" \
+  "${row21/THUNKSHAPE/\"not-a-list\"}" 1 \
+  "gen-bind:adapter-malformed:thunkBindings is null or a list of names, not string" \
+  "$tmpdir/row21-red.err"
+
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be
@@ -514,7 +586,9 @@ check "T5 row19 planted   (children declared in flight, sel.not refuses by name 
 # message-distant sibling: both rows are about the DELIVERY TARGET SET (row 5 the projection's
 # missing category source, row 14 a collision in the view it selects over) while their refusals
 # come from different libraries and share no token, so a leak either way would mean the by-name
-# half is matching the area rather than the message.
+# half is matching the area rather than the message. Extended once more to rows 20/21, which are the
+# rows 10/11 case in gen-bind: both refuse the SAME `close` call through the same `gen-bind:` door,
+# differing only in which guard fires, so they are the pair most able to cross-match by accident.
 if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
   echo "FAIL control: row1's message leaked into row2's refusal"
   fail=1
@@ -539,8 +613,14 @@ elif grep -qF "no category source" "$tmpdir/row14-red.err"; then
 elif grep -qF "has conflicting definitions" "$tmpdir/row5-red.err"; then
   echo "FAIL control: row14's message leaked into row5's refusal"
   fail=1
+elif grep -qF "thunk-bindings-unmatched" "$tmpdir/row21-red.err"; then
+  echo "FAIL control: row20's message leaked into row21's refusal"
+  fail=1
+elif grep -qF "adapter-malformed" "$tmpdir/row20-red.err"; then
+  echo "FAIL control: row21's message leaked into row20's refusal"
+  fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11 and row5/row14 refusals do not cross-match)"
+  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14 and row20/row21 refusals do not cross-match)"
 fi
 
 exit $fail

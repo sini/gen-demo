@@ -95,11 +95,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789175870,
-        "narHash": "sha256-VruwyV/kslVtU1tUbkofpGH4yKsEvuI96cSNHDdOZVo=",
+        "lastModified": 1789532954,
+        "narHash": "sha256-HRHozzS7YaCtFK3ZQJEMSiQ265Z44YRhFYIhkM3Getg=",
         "owner": "sini",
         "repo": "gen-aspects",
-        "rev": "0242be43f769a08a02649b9c1d984409a1ae29b4",
+        "rev": "085579937ab35c8b7978e54badd67f2f26dce776",
         "type": "github"
       },
       "original": {
@@ -131,11 +131,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789175870,
-        "narHash": "sha256-CIxJLZ0IaL/ykgLktqxQ/9vtAn58Rcn7uRnwq3boIHo=",
+        "lastModified": 1789529070,
+        "narHash": "sha256-MPgSFDJURGiFIFAomZhpI0G5rZEcl3VieerFMATcL/I=",
         "owner": "sini",
         "repo": "gen-bind",
-        "rev": "7be5924e2681df6a4a99cdbb01e177450aec27b3",
+        "rev": "cc4dff0c95c86a9b6f5ca2bf62e78f3894bfc160",
         "type": "github"
       },
       "original": {

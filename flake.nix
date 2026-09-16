@@ -819,7 +819,23 @@
           # A STATED PROJECTION of `nodeData`, not the raw record — `eyelet`/`includes` would
           # otherwise enter the assembly twice, once as shape and once as content, and `id_hash` is
           # internal addressing only (ADR-0016 ruling 5), read through the selector context below.
-          decls = builtins.mapAttrs (_: v: { inherit (v) key description; }) c16Facts.nodeData;
+          #
+          # ★ TOTAL OVER `vertices`, AND THE HETEROGENEITY IT ABSORBS IS THE LIBRARY'S OWN RULING.
+          # gen-aspects' membership predicate admits a GUARD LEAF as a node — `walk.nix`, verbatim:
+          # "a nested aspect or a guard leaf is a node, class content is not" — and a guard record
+          # carries neither `key` nor `description`, only `{ __guard; fragments; meta; name; }`. So
+          # `inherit (v) key description` was total only while this corpus declared no guard at an
+          # aspect key; `aspects.stitch.trim` (den-hoag-sezf's witness 2) made it abort
+          # `attribute 'description' missing`. The walk id is the right name to fall back to and not
+          # merely an available one: `facts.nix` rules the node id the origin-qualified WALK POSITION
+          # and deliberately NOT `identity.key`, because a guard record's minted key is its
+          # predicate-and-body hash rather than its position, so `id` is the only name a guard leaf
+          # has here. `description = null` is gen-aspects' own representable absence, the same answer
+          # `gusset` gives for a declared-but-unset class.
+          decls = builtins.mapAttrs (id: v: {
+            key = v.key or id;
+            description = v.description or null;
+          }) c16Facts.nodeData;
         };
 
         # THE SECOND CONTRIBUTION — the corpus's own node registry, which already declares aspect
@@ -1215,6 +1231,7 @@
                     && damaskClasses == [ ]
                     &&
                       stitchKeySet == [
+                        "binding"
                         "description"
                         "gusset"
                         "id_hash"
@@ -1223,7 +1240,30 @@
                         "meta"
                         "name"
                         "nixos"
+                        "trim"
                         "welt"
+                      ]
+                    # den-hoag-sezf's TWO WITNESSES, read as VALUES rather than as key names. The key
+                    # set above is satisfied by a key that merged WRONGLY, so on its own it is a meter
+                    # that greens on the defect; these two say what the freeform keys carry.
+                    #
+                    # `binding` (Arm A) — two cross-module definitions of an undeclared freeform key
+                    # whose value is a list. Pre-fix the raw `{ _type = "merge"; contents = …; }`
+                    # marker reached this attribute verbatim; post-fix `merge.mergeDefaultOption`
+                    # concatenates in declaration order.
+                    &&
+                      config.gen.composed.aspects.stitch.binding == [
+                        "bias"
+                        "hem"
+                      ]
+                    # `trim` (Arm B) — two GUARD-RECORD definitions at one freeform key, merged into
+                    # ONE carrier holding both fragments. Pre-fix this aborted uncatchably in
+                    # `flatten`/`walk`; the bodies are read in order so a carrier that dropped or
+                    # duplicated a fragment reads red.
+                    &&
+                      map (f: f.body) config.gen.composed.aspects.stitch.trim.fragments == [
+                        "piping"
+                        "cording"
                       ]
                     &&
                       bobbinProjectedNodes == [
@@ -1610,6 +1650,14 @@
                   # does not).
                   aspect-contribution = asserts "aspect-contribution" (
                     # O1/O2 — the facts are a GRAPH, and they assemble; containment survives.
+                    #
+                    # ★ `stitch/trim` IS A NODE, AND ITS PRESENCE IS den-hoag-sezf's WITNESS 2 READ
+                    # STRUCTURALLY. `aspects.stitch.trim` is a guard record, and gen-aspects' walk
+                    # admits a guard leaf as a node. Pre-fix the two cross-module definitions merged
+                    # to a raw `{ _type = "merge"; contents = …; }` marker, which carries no
+                    # `__guard` and is therefore NOT a guard leaf — so the node would be silently
+                    # ABSENT from this list rather than present. The membership assertion below
+                    # discriminates the fix from the defect on its own, without reading the value.
                     c16Facts.nodes == [
                       "bartack"
                       "hemline"
@@ -1617,6 +1665,7 @@
                       "hemline/placket"
                       "hemline/placket/eyelet"
                       "stitch"
+                      "stitch/trim"
                     ]
                     &&
                       c16Assembled.nodeOrder == [
@@ -1626,6 +1675,7 @@
                         "hemline/placket"
                         "hemline/placket/eyelet"
                         "stitch"
+                        "stitch/trim"
                         "damask"
                         "faille"
                         "grosgrain"
@@ -1641,7 +1691,24 @@
                         description = "Aspect placket";
                         key = "hemline/placket";
                       }
-                    # O3 — containment travels CHILD -> PARENT.
+                    # …and the guard leaf's projection is PINNED rather than left to whatever the
+                    # `or` fallbacks happen to produce: its `key` is its walk id (a guard record has
+                    # no `key` of its own) and its `description` is the representable absence. Both
+                    # arms of the projection above are therefore exercised by this cell, not just the
+                    # nested-aspect one.
+                    &&
+                      c16Assembled.nodes."stitch/trim".decls == {
+                        __edges = {
+                          declares = [ ];
+                          members = [ ];
+                        };
+                        description = null;
+                        key = "stitch/trim";
+                      }
+                    # O3 — containment travels CHILD -> PARENT, for a guard leaf exactly as for a
+                    # nested aspect: the parent comes from the walk position, not from the record's
+                    # `meta`, which is what lets a guard leaf (whose `meta.loc` gen-merge stamps) hold
+                    # an edge at all.
                     &&
                       c16Union.parentGraph.edges == [
                         {
@@ -1655,6 +1722,10 @@
                         {
                           from = "hemline/placket/eyelet";
                           to = "hemline/placket";
+                        }
+                        {
+                          from = "stitch/trim";
+                          to = "stitch";
                         }
                       ]
                     # O4 — includes travel under the caller's own label.
@@ -1683,6 +1754,11 @@
                         "hemline/placket/eyelet"
                       ]
                     &&
+                      # `members` then `contains*` — the host's DECLARED membership followed by
+                      # containment, so the closure now reaches the guard leaf under `stitch` as well
+                      # as `stitch` itself. `pewter`'s own `members` edge is still the single one
+                      # (asserted at O5 below); the second answer is the `contains` step, which is the
+                      # point of running the star rather than a `members` literal.
                       genGraph.query {
                         graph = c16Lg;
                         from = "pewter";
@@ -1690,7 +1766,10 @@
                           (genGraph.regex.lit "members")
                           (genGraph.regex.star (genGraph.regex.lit "contains"))
                         ];
-                      } == [ "stitch" ]
+                      } == [
+                        "stitch"
+                        "stitch/trim"
+                      ]
                     &&
                       genGraph.query {
                         graph = c16Lg;
@@ -1713,13 +1792,15 @@
                         "pewter"
                       ]
                     &&
+                      # `stitch` is no longer a leaf and that is not an omission: its guard leaf is
+                      # its child, so the containment edge moved the leaf one level down.
                       genGraph.leaves (genGraph.forgetLabels c16Lg) == [
                         "damask"
                         "faille"
                         "grosgrain"
                         "hemline/facing"
                         "hemline/placket/eyelet"
-                        "stitch"
+                        "stitch/trim"
                       ]
                     && genGraph.cycles (genGraph.forgetLabels c16Lg) == [ ]
                     # O7 — the selector reads the PUBLISHED parent, not a key split.
@@ -1796,8 +1877,10 @@
                   # ★★ CARDINALITY IS STATED BECAUSE THE POPULATION IS TINY. `bartack.includes` is the
                   # only `includes` list in the whole corpus and it holds THREE positions — one checked
                   # edge, one inline body, one foreign reference. Clause 3 below is a universal over a
-                  # population of ONE edge across SIX vertices, and a run that did not say so would be
-                  # reporting a vacuous truth. Every figure here was read off this corpus, not copied.
+                  # population of ONE edge across SEVEN vertices, and a run that did not say so would
+                  # be reporting a vacuous truth. Every figure here was read off this corpus, not
+                  # copied — the seventh vertex is `stitch/trim`, the guard leaf den-hoag-sezf's
+                  # witness 2 declares, and the totality control below covers it like any other node.
                   aspect-foreign-reference = asserts "aspect-foreign-reference" (
                     # O6a — the reference is PUBLISHED, in the declaration's own shape. Structured, not
                     # a rendered "mill/stitch": the qualifier is recoverable without re-splitting a
@@ -1829,7 +1912,7 @@
                     # declared positions are accounted for EXACTLY ONCE across the three relations, so
                     # neither clause above can pass by a position having been dropped.
                     && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 1
-                    && builtins.length c16AspectGraph.vertices == 6
+                    && builtins.length c16AspectGraph.vertices == 7
                     && builtins.length (builtins.concatLists (builtins.attrValues c16Facts.foreignIncludesOf)) == 1
                     && builtins.length genValues.aspects.bartack.includes == 3
                     &&

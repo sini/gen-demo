@@ -171,6 +171,22 @@ in
     # witnesses the declaration reached the submodule even though the value carries no content.
     aspects.stitch.gusset = null;
 
+    # den-hoag-sezf's corpus declaration (ADR-0018) — witness 1 half. `binding` is an UNDECLARED
+    # freeform key (absent from `aspect-cnf.nix`'s `keySemantics`), so it falls through to the
+    # plain-value merge path Arm A fixes. The SECOND definition lives in
+    # `gen-modules/multidef-witness.nix`, a separate file `import-tree` loads as its own module —
+    # a real cross-module collision, not one literal attrset defining a key twice. Pre-fix this
+    # leaked the raw `{ _type = "merge"; contents = [...]; }` marker verbatim; post-fix it routes
+    # through `merge.mergeDefaultOption` and concatenates like any other list-valued option.
+    aspects.stitch.binding = [ "bias" ];
+
+    # witness 2 half. `trim` carries a guard record (`genAspects.guard`/`pred.host`, the base form
+    # `whenHost` is sugar for) at the SAME freeform key, again completed in
+    # `multidef-witness.nix`. Pre-fix this aborted `flatten` uncatchably; post-fix the two defs merge
+    # into one fragment carrier, discharged per node downstream — at `pewter` this fragment survives
+    # and the other (guarded on `damask`) does not.
+    aspects.stitch.trim = genAspects.guard (genAspects.pred.host "pewter") "piping";
+
     # ── C16 — THE ASPECT GRAPH ITSELF, given depth so its published facts are a GRAPH ──
     aspects.hemline.placket.eyelet = { };
     aspects.hemline.facing = { };
