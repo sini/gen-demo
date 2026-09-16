@@ -1396,6 +1396,26 @@
               { config.selvedge.weft = "tussah"; }
             ];
           }).config.selvedge;
+
+        # ── C24 — ADR-0023 (b)'s DECLARED INTERIM, PRICED ON THE CORPUS'S OWN CROSSED PAYLOAD
+        # (den-hoag-9ivu, ADR-0023). Limb (b) turned the unstated crossing violations into declared
+        # opt-outs with their price recorded, and site 5's price — `injectAdapter`'s, stated in
+        # gen-bind's `lib/crossing-adapter-set.nix` — is the only one addressed to a CONSUMER:
+        # "substrate-built gen TYPE objects cross this boundary. They are inert HERE only because
+        # `_module.args` is not type-walked by the consuming module system." gen-demo is that
+        # consumer, so the corpus is where the price stops being a sentence and becomes a reading.
+        #
+        # Sites 1 (`applyContracts`) and 4 (`configGate`) are NOT declarable here and this is not an
+        # omission: each declaration's own (iii) clause states there is no crossing route through any
+        # shipped Adapter to reach them by — `injectAdapter`, `mkSystemTerminal` and `mkFlakeTerminal`
+        # all set `bindArgEnv = null`. Site 3 (`resolveThunks`) is already declared, by the thunk-
+        # authorization rows 20/21 on the T5 plane, and site 6 (`bindFormals`) by C22's terminal.
+        c24Payload = config.gen.composed.values;
+        c24Crossed = (genBind.crossing.injectAdapter.bindFormals c24Payload { })._module.args;
+        # Read at the crossed value's OWN TOP LEVEL, never a transitive walk: the transitive form is
+        # the interim's own O-INJ-2 and lives in gen-bind, and a corpus cell restating it would be a
+        # second copy of someone else's oracle rather than a consumer's reading.
+        c24PlainAt = v: !(builtins.any builtins.isFunction (builtins.attrValues v));
       in
       {
         imports = [
@@ -2610,6 +2630,26 @@
                       warp = "flax";
                       weft = "tussah";
                     }
+                  );
+
+                  # (32) C24 — ADR-0023 (b)'s interim price, read by the consumer that pays it
+                  # (den-hoag-9ivu). Four arms, and the first two are a matched pair so neither can
+                  # pass for the wrong reason: the crossed payload is NOT all-plain at a position the
+                  # SUBSTRATE writes (`schema.thimble` carries gen-schema's own `__functor`), while a
+                  # position the substrate writes as data IS plain (`thimbles.pewter`) — a predicate
+                  # that called everything impure would satisfy the first arm alone.
+                  # The remaining two are the crossing itself: plain data arrives verbatim, and the
+                  # closure arrives EXECUTABLE — applying it inside this evaluation is the price's own
+                  # words ("a substrate closure executes in the target"), not an inference from a type.
+                  # RED (what this cell exists to catch): the interim ending unannounced. If site 5
+                  # ever narrows to provably-plain-data — ADR-0023 (c), den-hoag-i546n — the closure
+                  # stops crossing and this cell reds, which is the corpus noticing that the declared
+                  # opt-out it records is no longer the system's behaviour.
+                  injection-payload-price = asserts "injection-payload-price" (
+                    !(c24PlainAt c24Payload.schema.thimble)
+                    && c24PlainAt c24Payload.thimbles.pewter
+                    && c24Crossed.declaredEdges == c24Payload.declaredEdges
+                    && (c24Crossed.schema.thimble { }) ? imports
                   );
                 };
               in
