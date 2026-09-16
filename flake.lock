@@ -148,6 +148,25 @@
         "type": "github"
       }
     },
+    "gen-bind_2": {
+      "inputs": {
+        "gen-graph": "gen-graph_2",
+        "gen-prelude": "gen-prelude_2"
+      },
+      "locked": {
+        "lastModified": 1789560874,
+        "narHash": "sha256-g7WXpedTei3uaTFXbnw4pAXyO8kJ13P29TV6U5pOSGU=",
+        "owner": "sini",
+        "repo": "gen-bind",
+        "rev": "27860c870ccbe6a69a72b9cf3bc1f9ee9a4e6843",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sini",
+        "repo": "gen-bind",
+        "type": "github"
+      }
+    },
     "gen-class": {
       "inputs": {
         "gen-prelude": [
@@ -209,6 +228,27 @@
       "inputs": {
         "gen-prelude": [
           "gen",
+          "gen-prelude"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789489741,
+        "narHash": "sha256-7u3cxVKTc5JIs3e45KwqaVxZKfpH1xsTa+7uFinwuHw=",
+        "owner": "sini",
+        "repo": "gen-graph",
+        "rev": "019e34f410fc49af254ceced7e01ade74f29a6e7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sini",
+        "repo": "gen-graph",
+        "type": "github"
+      }
+    },
+    "gen-graph_2": {
+      "inputs": {
+        "gen-prelude": [
+          "gen-bind",
           "gen-prelude"
         ]
       },
@@ -347,6 +387,21 @@
         "owner": "sini",
         "repo": "gen-prelude",
         "rev": "f7b0957001fa03a652419614da780998ba233f7f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sini",
+        "repo": "gen-prelude",
+        "type": "github"
+      }
+    },
+    "gen-prelude_2": {
+      "locked": {
+        "lastModified": 1782849654,
+        "narHash": "sha256-RuSmZU9Sny31YFYfPkagesMDKqGgkQQoNrm4O5Imw2c=",
+        "owner": "sini",
+        "repo": "gen-prelude",
+        "rev": "9e3f4c947c76a11ffec04e020ac7e2a3fe306c47",
         "type": "github"
       },
       "original": {
@@ -606,6 +661,7 @@
       "inputs": {
         "flake-parts": "flake-parts",
         "gen": "gen",
+        "gen-bind": "gen-bind_2",
         "nixpkgs": [
           "gen",
           "nixpkgs"

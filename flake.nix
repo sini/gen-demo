@@ -6,6 +6,27 @@
     # surface, with no library code of its own and no direct pin on any gen-* member.
     gen.url = "github:sini/gen";
 
+    # ★ C22's ONE EXCEPTION, AND IT IS A DIRECT SIBLING INPUT, NEVER A `follows` ONTO THE HUB.
+    # The hub's own `gen-bind` has not yet been bumped past den-hoag-gcr8x's extent peer-read
+    # shape (Q5 Arm A) at the time C22 is staged, and — measured this session — it CANNOT be
+    # bumped by a bare relock: `mkSystemTerminal` grew a new required `class` argument in that
+    # landing (`{ evaluator, locateConfig }:` at the hub's still-pinned `1f06d34…` vs.
+    # `{ evaluator, locateConfig, class }:` at gcr8x's `27860c8…`), and the hub's own
+    # `flakeModules/default.nix:262` default `nixos` terminal calls `mkSystemTerminal` without
+    # one. A `gen.inputs.gen-bind.follows` override was tried first and DRIVEN RED: it moves the
+    # hub's transitive edge globally, so its own `nixos` terminal throws that same missing-`class`
+    # error, and 24 of the corpus's other checks (everything routed through the hub's default
+    # delivery, not just this one) fail with it — confirmed by a same-instrument, same-run control
+    # (`nix flake check`: a fresh unmodified clone exits 0 "all checks passed!"; the identical
+    # clone with only the `follows` line added exits 1 on the hub's own call site). This exception
+    # avoids that: C22 imports gen-bind's OWN standalone entry directly (`import "${gen-bind}" { }`,
+    # the same self-resolving shim gen-bind's own `ci/flake.nix` and `gen-delivery`'s use), so the
+    # hub's `genBind` module arg — and everything else built on it — never moves. Drop this input
+    # once the hub's own `gen-bind` pin reaches or passes gcr8x's landed sha (which itself first
+    # needs the hub's `flakeModules/default.nix:262` call site to add `class = "nixos";` — a hub-repo
+    # edit outside this dispatch's scope, reported not repaired, per den-hoag-gcr8x-extent-build-v0).
+    gen-bind.url = "github:sini/gen-bind";
+
     # The systems the one `nixos` target is built with are the hub's own nixpkgs, so
     # `--override-input gen github:sini/gen` moves the target's nixpkgs with the hub rather than
     # holding it fixed against a hub that has moved on.
@@ -1015,6 +1036,88 @@
           };
         };
 
+        # ── C22 — a bounded extent peer-read (ADR-0026 reuse; gen-bind's extent
+        # peer-read shape, Q5 Arm A,
+        # specs/2026-09-08-gen-bind-extent-peer-read-shape-spec.md, den-hoag-gcr8x).
+        # Deliberately OUTSIDE `config.gen.composed`, the same way C15's cyclic stratum
+        # is: its own invented nodes, its own accessor. Three nodes over one invented
+        # kind, a complete peer relation, one node carrying an invented mark that
+        # admits no label. The REAL `mkSystemTerminal` adapter and the REAL
+        # `genDelivery.realize` (never a hand-written fold) bound the marked node's
+        # handed peer set to empty and name the mark on every withheld member, while
+        # the unmarked node's handed set stays the whole class.
+        flounceNodes = [
+          "grommet"
+          "bodkin"
+          "awl"
+        ];
+        flouncePeerGraph = genGraph.labeledFrom {
+          nodes = flounceNodes;
+          perLabel.kin = _id: flounceNodes;
+        };
+        flounceMarksOf =
+          id:
+          if id == "grommet" then
+            [
+              {
+                name = "batting";
+                admits = _label: false;
+              }
+            ]
+          else
+            [ ];
+        flounceExtent = builtins.listToAttrs (
+          map (n: {
+            name = n;
+            value = { };
+          }) flounceNodes
+        );
+        flounceProjected.nodes = builtins.listToAttrs (
+          map (n: {
+            name = n;
+            value = {
+              bindings = { };
+              classes.notion = [ { } ];
+            };
+          }) flounceNodes
+        );
+        # `realize`'s own per-node carriage (`{name;modules;bindings;extent;
+        # extraModules;passthrough?;}`) is a different shape from the Adapter's
+        # carriage (`{extent;extraModules;peerGraph;marksOf;readerId;passthrough?;
+        # thunkBindings?;}`), so composing them needs the same thin wrapper gen-bind's
+        # own O-1/O-2 oracle cells use (`ci/tests/crossing-extent-peer.nix`).
+        #
+        # `genBindNew`, NOT the hub's `genBind` module arg — see the ★ note on the
+        # `gen-bind` input above. Called with `{ }`: gen-bind's own standalone root
+        # entry (`default.nix`) resolves its own `prelude`/`graph` through its own
+        # `ci/flake.lock`-pinned defaults, the same channel its own `ci/flake.nix`
+        # and `gen-delivery`'s standalone shim use — never through the hub.
+        genBindNew = import "${inputs.gen-bind}" { };
+        flounceAdapterOf =
+          readerId:
+          (genBindNew.crossing.mkSystemTerminal {
+            evaluator = a: builtins.attrNames a.specialArgs.nodes;
+            locateConfig = x: x;
+            class = "notion";
+          }).adapter
+            {
+              extent = flounceExtent;
+              extraModules = [ ];
+              peerGraph = flouncePeerGraph;
+              marksOf = flounceMarksOf;
+              inherit readerId;
+            };
+        flounceTerminal =
+          carriage:
+          let
+            a = flounceAdapterOf carriage.name;
+          in
+          a.wrapUnit (a.bindFormals carriage.bindings carriage.modules) [ ];
+        flounceRealized = genDelivery.realize {
+          projected = flounceProjected;
+          terminals.notion = flounceTerminal;
+        };
+
         # ── C7 — the well-definedness gate over the declared edge set (ADR-0008 §3, ADR-0030,
         # ADR-0019; gen-view). C2's OWN declarations, contracted. `mkDeclaredEdges` admits and
         # ignores the `label` field, so the corpus's edge records ride through unchanged.
@@ -1960,6 +2063,41 @@
                         "tulle"
                       ];
                     }
+                  );
+
+                  # extent-peer-bounded — C22, den-hoag-gcr8x. `grommet` carries the `batting`
+                  # mark, which admits no label, so its handed `specialArgs.nodes` is bounded to
+                  # empty; `bodkin` and `awl` carry no mark and are handed the whole class,
+                  # including themselves (the relation carries self-loops). The withheld half is
+                  # read straight off the adapter — bypassing `realize` — because ADR-0026's one
+                  # stated requirement on a consuming implementation is that a boundary refusal
+                  # NAME the mark that caused it, and `realize`'s own carriage never surfaces a
+                  # withheld set at all.
+                  extent-peer-bounded = asserts "extent-peer-bounded" (
+                    flounceRealized.notion.grommet == [ ]
+                    &&
+                      flounceRealized.notion.bodkin == [
+                        "awl"
+                        "bodkin"
+                        "grommet"
+                      ]
+                    &&
+                      flounceRealized.notion.awl == [
+                        "awl"
+                        "bodkin"
+                        "grommet"
+                      ]
+                    && (flounceAdapterOf "grommet").peerRelation.admitted == [ ]
+                    &&
+                      builtins.sort builtins.lessThan (
+                        map (w: w.target) (flounceAdapterOf "grommet").peerRelation.withheld
+                      ) == [
+                        "awl"
+                        "bodkin"
+                        "grommet"
+                      ]
+                    && builtins.all (w: w.marks == [ "batting" ]) (flounceAdapterOf "grommet").peerRelation.withheld
+                    && (flounceAdapterOf "bodkin").peerRelation.withheld == [ ]
                   );
 
                   # (16) C7 — the well-definedness gate. Fields of `gated` ITSELF, never of
