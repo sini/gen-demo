@@ -79,7 +79,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs twenty-two checks, and they are the acceptance criteria:
+`nix flake check` runs twenty-three checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -165,7 +165,13 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     `seamCoords.thimble` and `seamCoords.bobbin`. A literal has no such line and reds this cell by
     name while leaving every value cell — including `product-promotion` — unmoved, because the
     literal and the derivation produce the identical string.
-22. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+22. **`frayed-dangling-includes-refused`** — den-hoag-lk06. A local includes entry naming a key
+    absent from the registry is refused by gen-link's `rewrite.originStamp`, catchably, rather than
+    aborting past `tryEval` as an interpreter "attribute missing". gen-aspects synthesizes a key for
+    any bare attrset placed in `includes` regardless of what the author wrote there, so an anonymous
+    entry and a named-but-wrong-key one are one class; `frayed` links alone, never joining the
+    mill/loom federation's sources, for the isolation reason given at its declaration.
+23. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -174,7 +180,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these twenty-two: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these twenty-three: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 

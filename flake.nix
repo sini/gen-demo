@@ -646,6 +646,17 @@
         };
         selvageProvides = genLink.providesOf selvageFacets mill.config.aspects.stitch;
 
+        # `frayed` is deliberately never added to `federated`'s `sources` below — the dangling entry
+        # it carries would refuse the WHOLE `originStamp` call gen-link performs per source, so
+        # folding it into the shared mill/loom federation would collaterally break every other C11
+        # assertion that forces `federated` (den-hoag-lk06, mirroring the isolation gen-link's own
+        # fixture keeps for the identical reason). It links alone, below.
+        frayed = mkSelvageRegistry [
+          {
+            config.aspects.snag.includes = [ { } ];
+          }
+        ];
+
         # ── C13 — `foldLayers` over an invented layered record (ADR-0017): all three strategies
         # plus the default channel in one call, so a fold that only did `replace` would be green
         # under a broken `append`.
@@ -1338,6 +1349,29 @@
                       ]
                     && (builtins.head federated.bound).relata == { selvageReq = "mill/stitch"; }
                     && lib.all (n: lib.hasPrefix "aspect:" n.identity) (builtins.attrValues federated.nodes)
+                  );
+
+                  # A local includes entry naming a key absent from BOTH `nodesByKey` and
+                  # `refByToken` is refused by gen-link's `rewrite.originStamp`, catchably
+                  # (den-hoag-lk06, ADR-0016 ruling 5). gen-aspects synthesizes a key for any bare
+                  # attrset placed in `includes` regardless of what the author wrote there, so an
+                  # anonymous entry and a named-but-wrong-key one are one class; `frayed` links
+                  # ALONE — never joining `federated`'s sources above — for the isolation reason
+                  # given at its declaration.
+                  frayed-dangling-includes-refused = asserts "frayed-dangling-includes-refused" (
+                    !(builtins.tryEval (
+                      builtins.deepSeq
+                        (genLink.link {
+                          sources = [
+                            {
+                              registry = frayed.config.aspects;
+                              keySemantics = selvageFacets;
+                              origin = [ "frayed" ];
+                            }
+                          ];
+                        }).manifest
+                        true
+                    )).success
                   );
 
                   # (12) C12 — a derived product graph and a policy-stratum promotion. The KIND is the
