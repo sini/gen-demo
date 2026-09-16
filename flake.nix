@@ -942,6 +942,37 @@
           inherit scope;
           attributes = genAssemble.structuralDecls scope.nodes;
         };
+
+        # ── C19 — the discrete/monotone separation (den-hoag-0hwn; ADR-0019, ADR-0020, ADR-0012)
+        #
+        # Arntzenius & Krishnaswami (2016) split a typing context into a discrete ∆ and a monotone
+        # Γ, and type every non-monotone operation (¬, =, a caller-supplied function) under a
+        # CLEARED Γ. gen has no type-level split, so `gen-select/lib/match.nix`'s `discreteCtx`
+        # clears the VALUE instead: a context declares which of its accessors read a graph still
+        # under construction (`ctx.inFlight`), and the non-monotone positions — `not`, `attrs`,
+        # `when`, `parentMatches` among them — refuse to observe a declared accessor rather than
+        # answer against a value that has not settled.
+        #
+        # ONE two-node fixture, built through `adapters.registry.mkContext` like C16's own context
+        # above: "b" is a child of "a", and carries `key = "b"` in its own data, under the SAME
+        # condition — `builtins.elem "b" acc` — closing `parent`/`data` over one accumulator
+        # rather than a live fixpoint, which is all a two-value probe needs to exhibit both the
+        # answer RED gives and the refusal GREEN gives at the same read.
+        c19Ctx =
+          acc: inFlight:
+          genSelect.adapters.registry.mkContext {
+            nodes = [
+              "a"
+              "b"
+            ];
+            data = id: if id == "b" && builtins.elem "b" acc then { key = "b"; } else { };
+            parent = id: if id == "b" && builtins.elem "b" acc then "a" else null;
+            entryFor = _: null; # neither node is entity-backed; kind matching is not this cell's business
+            inherit inFlight;
+          };
+        # the writable cycle §1.1 names: "a" admits "b" as a child iff "b" does NOT already carry
+        # the key its own admission would give it.
+        c19NegTerm = genSelect.not (genSelect.has (genSelect.attrs { key = "b"; }));
       in
       {
         imports = [
@@ -1863,6 +1894,67 @@
                         ];
                       }) 1
                     )).success
+                  );
+
+                  # (20) C19 — THE DISCRETE/MONOTONE SEPARATION (den-hoag-0hwn). `sel.not` (and six
+                  # more positions — `attrs`, `when`, `entity`, `kind`, `coord`, `parentMatches`) is
+                  # ANTITONE in `ctx`: growing the graph under construction can flip such a
+                  # selector's answer, and nothing in gen refused a negative edge in a cycle being
+                  # written against it. `discreteCtx` clears a context's declared `inFlight`
+                  # accessors at exactly those non-monotone positions — Datafun's discrete/monotone
+                  # split (Arntzenius & Krishnaswami 2016), applied at evaluation time because gen
+                  # has no type-level ∆/Γ to clear instead.
+                  #
+                  # O1/O2 are the writable cycle itself, both seeds: "b" is a child of "a" iff "b"
+                  # does not already carry the key its own admission would give it, unstable either
+                  # way (RED's own `fromEmpty=true, fromB=false`). O3/O5/O6b are the controls that
+                  # keep O1/O4/O6a from reading as a blanket refusal: the class is the READ an
+                  # accessor is put to, not the tag carrying it. A9 (the refusal is actionable) is
+                  # NOT asserted here — `tryEval` exposes only `{success, value}`, never the thrown
+                  # text — and is instead a new pairing on `ci/refusals.sh` /
+                  # `ci/tests/refusals-pairing.nix` (den-hoag-9mo), alongside its existing pairings.
+                  monotone-separation = asserts "monotone-separation" (
+                    # O1 — the cycle REFUSES when `children` is declared in flight, at BOTH seeds
+                    # (the refusal fires at `not`'s own site, before `acc` is ever read).
+                    !(builtins.tryEval (
+                      builtins.deepSeq (genSelect.matches c19NegTerm "a" (c19Ctx [ ] [ "children" ])) true
+                    )).success
+                    && !(builtins.tryEval (
+                      builtins.deepSeq (genSelect.matches c19NegTerm "a" (c19Ctx [ "b" ] [ "children" ])) true
+                    )).success
+                    # O2 — CONTROL. the SAME selector and fixture, `inFlight = [ ]`: it ANSWERS, and
+                    # the two seeds give the two values RED gives — so O1 is not a blanket refusal.
+                    && genSelect.matches c19NegTerm "a" (c19Ctx [ ] [ ]) == true
+                    && genSelect.matches c19NegTerm "a" (c19Ctx [ "b" ] [ ]) == false
+                    # O3 — CONTROL. the Datafun-permitted case: `not` over a DISCRETE accessor
+                    # (`parent`, never declared in flight) still answers inside the same in-flight
+                    # context O1 refuses in.
+                    &&
+                      genSelect.matches (genSelect.not (genSelect.parentMatches genSelect.star)) "a" (
+                        c19Ctx [ "b" ] [ "children" ]
+                      ) == true
+                    # O4 — `sel.when` reaching an in-flight accessor refuses with NO `not` anywhere
+                    # in the term — the class is the read, not a negation syntactically present.
+                    && !(builtins.tryEval (
+                      builtins.deepSeq (genSelect.matches (genSelect.when (id: c: c.children id != [ ])) "a" (
+                        c19Ctx [ "b" ] [ "children" ]
+                      )) true
+                    )).success
+                    # O5 — CONTROL. a MONOTONE observation of the SAME in-flight accessor
+                    # (`sel.has`, no `not`) is not refused.
+                    &&
+                      genSelect.matches (genSelect.has (genSelect.attrs { key = "b"; })) "a" (
+                        c19Ctx [ "b" ] [ "children" ]
+                      ) == true
+                    # O6a — the class is the READ: `sel.attrs` refuses against an in-flight `data`.
+                    && !(builtins.tryEval (
+                      builtins.deepSeq (genSelect.matches (genSelect.attrs { key = "b"; }) "b" (
+                        c19Ctx [ "b" ] [ "data" ]
+                      )) true
+                    )).success
+                    # O6b — CONTROL. the SAME `sel.attrs` answers against an in-flight `children`,
+                    # which `attrs` never itself observes.
+                    && genSelect.matches (genSelect.attrs { key = "b"; }) "b" (c19Ctx [ "b" ] [ "children" ]) == true
                   );
                 };
               in

@@ -53,6 +53,7 @@ incremental plane's decision crossing.
 | C16b -- a foreign reference                               | 0011, 0012, 0014    | `genAspects.keyRef "mill/stitch"` on `aspects.bartack.includes`, published in `foreignIncludesOf` and never as a `declares` edge; total over every node, including the one declaring none                                              |
 | C17 -- option-set closure                                 | 0016 ruling 5, 0033 | an `extraModules` option on `thimbles` (`shirring`) that is real declared content and CANNOT be an identity key; `thimbles.pewter.id_hash` byte-identical to the stamp minted before it existed                                        |
 | C18 -- a kinded contribution                              | 0012, 0011          | the same node set assembled through BOTH paths -- C1's direct `genScope.buildRoots` call and `genAssemble.assemble` with `kinds` routed as a call parameter -- asserted IDENTICAL; `kinds` still refused as an eighth contribution key |
+| C19 -- the discrete/monotone separation                   | 0019, 0020, 0012    | `discreteCtx` clears a two-node cycle's declared in-flight accessors at gen-select's seven non-monotone positions (Datafun's split); `not`/`attrs`/`when` refuse against the writable cycle, `has`/`parentMatches` still answer        |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                             |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
@@ -79,7 +80,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs twenty-three checks, and they are the acceptance criteria:
+`nix flake check` runs twenty-four checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -171,7 +172,16 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     any bare attrset placed in `includes` regardless of what the author wrote there, so an anonymous
     entry and a named-but-wrong-key one are one class; `frayed` links alone, never joining the
     mill/loom federation's sources, for the isolation reason given at its declaration.
-23. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+23. **`monotone-separation`** — C19, den-hoag-0hwn. `discreteCtx` clears a context's declared
+    `ctx.inFlight` accessors at gen-select's seven non-monotone positions (Datafun's discrete/monotone
+    split, applied at evaluation time since gen has no type-level ∆/Γ to clear instead). A two-node
+    fixture over `adapters.registry.mkContext` exercises the writable cycle at both seeds: `not`,
+    `attrs` and `when` refuse catchably when the accessor they would read is declared in flight, while
+    a frozen ctx, the monotone `has`, and `parentMatches` over the untouched `parent` accessor all
+    still answer — the class is the read an accessor is put to, not the tag carrying it. A9 (the
+    refusal is actionable) is not asserted here; it is a pairing on `ci/refusals.sh` instead, since
+    `tryEval` exposes only `success`, never the thrown text.
+24. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -180,7 +190,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these twenty-three: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these twenty-four: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
