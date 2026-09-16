@@ -43,8 +43,8 @@ in
         unplantedOnly = lib.subtractLists planted unplanted;
       };
       expected = {
-        totalArms = 33;
-        paired = 16;
+        totalArms = 35;
+        paired = 17;
         # Row 17 is the deliberate exception and the only one: it is a THIRD PLANTED arm, asserting
         # that the forged registry refuses CATCHABLY rather than by overflowing the stack, so it has
         # no unplanted counterpart to carry. Adding a row here is a decision, not a fixture update.

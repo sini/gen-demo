@@ -461,6 +461,24 @@ row17="$registry"'if (builtins.tryEval (builtins.deepSeq (genScope.buildRoots {
 check "T5 row17 planted   (the forged registry refuses CATCHABLY, not by overflowing)" "$row17" 0 "" \
   "$tmpdir/row17.err" 'CAUGHT'
 
+# ── row 18 -- exportType's republished functor, at the natural door: a redeclared option whose
+# second declaration disagrees only on WHICH type governed the merge (mirrors interface.nix's
+# importType/exportType retention and gen-schema's mkRefinedType, the motivating consumer) ──
+row18='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genSchema = gen.lib.substrate.schema;
+  genMerge = gen.lib.modules.merge;
+  refinedInt = genSchema.refined genMerge.types.int [ genSchema.refinements.tcpPort ];
+  base = { options.grommet = genMerge.mkOption { type = refinedInt; }; };
+  second = { options.grommet = genMerge.mkOption { type = SECOND; }; };
+  tree = genMerge.evalModuleTree { modules = [ base second ]; };
+in tree.options.grommet.type.functor.name'
+check "T5 row18 unplanted (grommet redeclared refined, functor identity holds)" "${row18/SECOND/refinedInt}" 0 "" \
+  "$tmpdir/row18-green.err" 'refined<int>'
+check "T5 row18 planted   (grommet redeclared bare int, functor identity dropped)" "${row18/SECOND/genMerge.types.int}" 1 \
+  "which the first type's own \`functor' does not reconcile" \
+  "$tmpdir/row18-red.err"
+
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be
