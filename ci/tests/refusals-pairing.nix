@@ -48,9 +48,11 @@ in
         # (den-hoag-4kh.53.13's row22/row23 land in this same file but carry no `T5`/planted/
         # unplanted label — 0 of this regex's arms, by design and stated in their own comment — so
         # they move neither figure). den-hoag-n03z's row24 is an ordinary paired row — +2 arms,
-        # +1 paired.
-        totalArms = 43;
-        paired = 21;
+        # +1 paired. den-hoag-row12-message-cells-wrong-plane-x2stm's rows 25 and 26 are two more
+        # ordinary paired rows — +4 arms, +2 paired — and row26's third arm is labelled "control"
+        # (a distinct word, row24's reasoning below) so it stays outside this regex's population.
+        totalArms = 47;
+        paired = 23;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it

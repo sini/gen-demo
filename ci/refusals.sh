@@ -691,6 +691,72 @@ check "T5 row24 planted   (the spawn key collides with a second registered root'
 check "T5 row24 catchable  (the collision refuses CATCHABLY, not by overflowing)" "$row24catch" 0 "" \
   "$tmpdir/row24-catch.err" 'CAUGHT'
 
+# ── rows 25/26 -- `attrs` as a nullary container strategy, the two arms that must read the MESSAGE
+# (den-hoag-241d7's spec rows 5 and 10; den-hoag-row12-message-cells-wrong-plane-x2stm).
+#
+# THEY LIVE HERE AND NOT IN `constructChecks`, AND THAT IS THE WHOLE POINT. Both inputs below THREW
+# before the container strategy landed, so a cell asserting only the `tryEval` failure bit passes on
+# the UNREPAIRED tree -- an oracle that cannot fail for the thing it was written to catch. What
+# changed is the MESSAGE, which `tryEval` cannot read (header, above), so the discrimination is only
+# available on this plane. Each row's `want_grep` is therefore the POST-component string: at
+# gen-merge `08fcdd1e` row 25 refuses with "the option `selvedge' has conflicting definitions" and
+# row 26 with "a definition for option `selvedge' is not of the expected type", and neither contains
+# the substring its row requires.
+#
+# The construction mirrors C23's own `selvedge` declaration rather than importing it, as every row
+# here does; `_file` is set because naming the offending FILE is half of what each message owes.
+row25='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genMerge = gen.lib.modules.merge;
+  decl = { options.selvedge = genMerge.mkOption { type = genMerge.types.attrs; }; };
+in builtins.toJSON (genMerge.evalModuleTree {
+  modules = [
+    decl
+    { _file = "/corpus/a.nix"; config.selvedge.warp = "flax"; }
+    { _file = "/corpus/b.nix"; config.selvedge.SECONDKEY = "tussah"; }
+  ];
+}).config.selvedge'
+
+check "T5 row25 unplanted (two files, disjoint keys -- the fold unions them)" "${row25/SECONDKEY/weft}" 0 "" \
+  "$tmpdir/row25-green.err" '{"warp":"flax","weft":"tussah"}'
+check "T5 row25 planted   (two files, the SAME key -- refused naming the key and both files)" \
+  "${row25/SECONDKEY/warp}" 1 \
+  "has \`attrs' definitions that collide at \`warp' (/corpus/b.nix, /corpus/a.nix)" \
+  "$tmpdir/row25-red.err"
+
+# Row 26's third arm is a CONTROL, not an unplanted counterpart, so it is labelled with a distinct
+# word and stays outside the pairing population the way row24's `catchable` does: `attrsOf int` over
+# the SAME rejected definition is the partition this row exists to keep `attrs` out of, and it aborts
+# UNCATCHABLY. That is also why it cannot be a conjunct of any `checks` cell -- it would take the
+# corpus evaluation down rather than red one cell.
+row26Base='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genMerge = gen.lib.modules.merge;
+  decl = { options.selvedge = genMerge.mkOption { type = TYPE; }; };
+in builtins.toJSON (genMerge.evalModuleTree {
+  modules = [
+    decl
+    { _file = "/corpus/bad.nix"; config.selvedge = DEFN; }
+  ];
+}).config.selvedge'
+row26attrsetDefn='{ warp = "flax"; }'
+row26attrs="${row26Base//TYPE/genMerge.types.attrs}"
+row26="${row26attrs/DEFN/$row26attrsetDefn}"
+row26planted="${row26attrs/DEFN/\"not-an-attrset\"}"
+row26control="${row26Base//TYPE/(genMerge.types.attrsOf genMerge.types.int)}"
+row26control="${row26control/DEFN/\"not-an-attrset\"}"
+
+check "T5 row26 unplanted (an attrset definition the fold consumes)" "$row26" 0 "" \
+  "$tmpdir/row26-green.err" '{"warp":"flax"}'
+check "T5 row26 planted   (a string definition attrs cannot consume -- refused naming the file)" \
+  "$row26planted" 1 \
+  "has definitions \`attrs' cannot consume (/corpus/bad.nix)" \
+  "$tmpdir/row26-red.err"
+check "T5 row26 control   (attrsOf int over the SAME definition aborts UNCATCHABLY -- the partition)" \
+  "$row26control" 1 \
+  'expected a set but found a string' \
+  "$tmpdir/row26-control.err"
+
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be
@@ -742,8 +808,14 @@ elif grep -qF "already a registered node's id" "$tmpdir/row21-red.err"; then
 elif grep -qF "adapter-malformed" "$tmpdir/row24-red.err"; then
   echo "FAIL control: row21's message leaked into row24's refusal"
   fail=1
+elif grep -qF "cannot consume" "$tmpdir/row25-red.err"; then
+  echo "FAIL control: row26's message leaked into row25's refusal"
+  fail=1
+elif grep -qF "definitions that collide at" "$tmpdir/row26-red.err"; then
+  echo "FAIL control: row25's message leaked into row26's refusal"
+  fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14 and row20/row21 refusals do not cross-match)"
+  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21 and row25/row26 refusals do not cross-match)"
 fi
 
 exit $fail
