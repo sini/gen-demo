@@ -1405,6 +1405,57 @@
         # the interim's own O-INJ-2 and lives in gen-bind, and a corpus cell restating it would be a
         # second copy of someone else's oracle rather than a consumer's reading.
         c24PlainAt = v: !(builtins.any builtins.isFunction (builtins.attrValues v));
+
+        # ── C25 — THE GRAPH INTERROGATED, THROUGH THE HUB'S PUBLISHED FRAMEWORK BUCKET
+        # (den-hoag-graph-viz-viy69, ADR-0015). gen-inspect is the roster's 22nd member and the
+        # newest at `framework`: it materializes an assembled graph into ONE named IR and answers
+        # questions about it — which nodes exist and of what kind, which edges are declared, which a
+        # policy program produced and why, what reaches what. This corpus is a consumer of that
+        # surface over ITS OWN graph, which is the only way the claim "every gen consumer needs
+        # this" stops being a sentence.
+        #
+        # ★ REACHED AT `inputs.gen.lib.framework.inspect`, NOT AS A MODULE ARG. `flakeModules.genLibs`
+        # injects eight roster names and `inspect` is not among them; the stratum BUCKET is the hub's
+        # published path for exactly this, and a consumer that needed the hub to grow a module-arg
+        # line before it could reach a new member would make every roster landing a two-repository
+        # change. Adding the line remains available and is not needed.
+        c25Inspect = inputs.gen.lib.framework.inspect;
+        c25Payload = config.gen.composed.values;
+        # `declaredEdges` is a LIST of `{ from; to; label; }` and the IR contract takes
+        # label -> src -> [ dst ]. The fold is the corpus's, not the library's: gen-inspect takes a
+        # subject already in the shape its consumer's graph has, and this is that shape for this
+        # consumer.
+        c25Relations = builtins.foldl' (
+          acc: e:
+          acc
+          // {
+            ${e.label} = (acc.${e.label} or { }) // {
+              ${e.from} = ((acc.${e.label} or { }).${e.from} or [ ]) ++ [ e.to ];
+            };
+          }
+        ) { } c25Payload.declaredEdges;
+        # THE DEGENERATE SUBJECT: this corpus's DECLARED half, with an empty policy half. C5's
+        # dynamic edge is admitted by a gen-scope program rather than a gen-program model, so the
+        # policy half stays empty here and the construct is about the declared graph — an honest
+        # scope, and the one whose figures this corpus already states elsewhere.
+        c25Ir = (
+          c25Inspect.mkInspector {
+            register = {
+              thimble = c25Payload.thimbles;
+              bobbin = c25Payload.bobbins;
+            };
+            relations = c25Relations;
+            program.rules = [ ];
+            model = {
+              trueAtoms = [ ];
+              verdict = _: "false";
+            };
+          }
+        );
+        # The door, driven. `tryEval` reports THAT it refused; WHICH refusal fired is a claim about a
+        # message and belongs on the plane that can read one, so this arm asserts the pair: a name
+        # this graph does not carry refuses, and a name it does carry answers.
+        c25Refuses = q: !(builtins.tryEval (builtins.deepSeq (c25Ir.query q) true)).success;
       in
       {
         imports = [
@@ -2639,6 +2690,90 @@
                     && c24PlainAt c24Payload.thimbles.pewter
                     && c24Crossed.declaredEdges == c24Payload.declaredEdges
                     && (c24Crossed.schema.thimble { }) ? imports
+                  );
+
+                  # (33) C25 — gen-inspect over this corpus's own graph, through the hub's published
+                  # `framework` bucket (den-hoag-graph-viz-viy69). The IR's figures are this corpus's
+                  # own: four nodes over two kinds, three declared edges, every one carrying a
+                  # declaration origin because this subject has no policy half. Asserted as a RECORD
+                  # rather than as a count so a materialization that lost a kind and gained a node
+                  # cannot pass the arithmetic.
+                  inspect-materializes-the-corpus-graph = asserts "inspect-materializes-the-corpus-graph" (
+                    {
+                      nodes = builtins.length c25Ir.facts.nodes;
+                      kinds = builtins.attrNames c25Ir.facts.kinds;
+                      edges = builtins.length c25Ir.facts.edges;
+                      labels = c25Ir.facts.labels;
+                      tables = builtins.attrNames c25Ir.facts.tables;
+                      declared = builtins.length (builtins.filter (e: e.origin.kind == "declaration") c25Ir.facts.edges);
+                    } == {
+                      nodes = 4;
+                      kinds = [
+                        "bobbin"
+                        "thimble"
+                      ];
+                      edges = 3;
+                      labels = [
+                        "gathers"
+                        "tacks"
+                      ];
+                      tables = [
+                        "bobbin"
+                        "edge"
+                        "thimble"
+                      ];
+                      declared = 3;
+                    }
+                  );
+
+                  # (34) C25 — the query surface answers over this graph, and the DOOR refuses a name
+                  # it does not carry. The pair is the assertion: against a raw row source an unknown
+                  # table yields `[ ]` at exit 0, which is indistinguishable from "no such edge", so a
+                  # refusal alone proves nothing without the answer beside it and the answer alone
+                  # proves nothing without the refusal.
+                  inspect-answers-and-refuses-by-name = asserts "inspect-answers-and-refuses-by-name" (
+                    c25Ir.query "SELECT src, dst FROM edge WHERE label = 'gathers'" == [
+                      {
+                        src = "pewter";
+                        dst = "damask";
+                      }
+                    ]
+                    &&
+                      c25Ir.query "SELECT name FROM thimble ORDER BY name" == [
+                        { name = "damask"; }
+                        { name = "pewter"; }
+                      ]
+                    # the unknown TABLE, and the unknown LABEL VALUE — the second is the sharp one,
+                    # a well-formed query over a known column whose value nothing publishes
+                    && c25Refuses "SELECT name FROM spindles"
+                    && c25Refuses "SELECT src FROM edge WHERE label = 'basting'"
+                    # …and the live control on the same door: a label this graph DOES carry answers
+                    &&
+                      c25Ir.query "SELECT src FROM edge WHERE label = 'tacks' ORDER BY src" == [
+                        { src = "grosgrain"; }
+                        { src = "pewter"; }
+                      ]
+                  );
+
+                  # (35) C25 — `faille` is the node NO declared edge reaches, which is this corpus's
+                  # own stated fact about itself (it is what makes C5's dynamic edge observable). The
+                  # walk is asked, not the edge list: an accessor-shaped `perLabel` fails only on
+                  # APPLICATION, so a materialization that built the wrong shape reds here and
+                  # nowhere earlier. `pewter` is the control — it reaches on both labels.
+                  inspect-walks-the-corpus-graph = asserts "inspect-walks-the-corpus-graph" (
+                    c25Ir.facts.graph.labeledEdges "faille" == [ ]
+                    &&
+                      c25Ir.facts.graph.labeledEdges "pewter" == [
+                        {
+                          label = "gathers";
+                          target = "damask";
+                        }
+                        {
+                          label = "tacks";
+                          target = "grosgrain";
+                        }
+                      ]
+                    && builtins.length c25Ir.facts.graph.nodes == 4
                   );
                 };
               in
