@@ -51,8 +51,10 @@ in
         # +1 paired. den-hoag-row12-message-cells-wrong-plane-x2stm's rows 25 and 26 are two more
         # ordinary paired rows — +4 arms, +2 paired — and row26's third arm is labelled "control"
         # (a distinct word, row24's reasoning below) so it stays outside this regex's population.
-        totalArms = 47;
-        paired = 23;
+        # den-hoag-viewrelation-definition-graph-alphabet-seam-og383's row27 — the definition⟂graph
+        # alphabet seam — is one more ordinary paired row: +2 arms, +1 paired.
+        totalArms = 49;
+        paired = 24;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
