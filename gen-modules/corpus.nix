@@ -43,6 +43,27 @@ let
             description = "An arbitrary attribute on the second kind, carrying content of its own.";
           };
         };
+
+        # ── C26 (den-hoag-0pk67, ADR-0016 ruling 7 / ADR-0033) — A REAL `inherits` PAIR ──
+        # `notch`/`dart` is the corpus's own exercise of the relocated capability, not a fixture
+        # built beside it: `dart` declares no `grade` option itself, `grade` travels from `notch` by
+        # NAME through this same staged pass, and `darts.chambray` below never sets it. The value
+        # every `dart` instance carries for `grade` is therefore genuinely inherited, not merely a
+        # name that happens to resolve.
+        config.schema.notch = {
+          options.grade = mkOption {
+            type = types.str;
+            default = "waxed";
+            description = "Parent-only. No `dart` instance sets this; a resolved value is the inheritance, not a coincidence.";
+          };
+        };
+        config.schema.dart = {
+          inherits = [ "notch" ];
+          options.bevel = mkOption {
+            type = types.str;
+            description = "The child's own attribute, declared alongside what it inherits from notch.";
+          };
+        };
       }
     ];
   };
@@ -94,6 +115,11 @@ in
   };
   options.bobbins = genSchema.mkInstanceRegistry schema.bobbin { };
 
+  # C26's own registries. Kept off `haberdashery`/`declaredEdges`/the aspects tree deliberately —
+  # this pair exercises the schema-inheritance capability alone, not delivery or the graph.
+  options.notches = genSchema.mkInstanceRegistry schema.notch { };
+  options.darts = genSchema.mkInstanceRegistry schema.dart { };
+
   # ── THE DELIVERY TARGET VIEW (`den-hoag-uedvp`) ──
   # `gen.nodeRegistryPath` names ONE attribute path, and that cardinality is the ruling, not a
   # limitation: a consumer has as many REGISTRIES as it declares kinds, while the delivery TARGET SET
@@ -144,6 +170,13 @@ in
     };
     bobbins.faille = {
       gauge = "coarse";
+    };
+
+    # C26 — `chambray` sets only `bevel`; `grade` is never mentioned here or anywhere else on
+    # `dart`'s own declaration. It resolves to `notch`'s default purely through `inherits` above.
+    notches.khaki = { };
+    darts.chambray = {
+      bevel = "shallow";
     };
 
     declaredEdges = [

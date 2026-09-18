@@ -61,11 +61,12 @@ incremental plane's decision crossing.
 | C23 -- `attrs` is a nullary container strategy            | 0014, 0027          | an `attrs` option undefined and defaultless resolves to `{ }` instead of throwing, and two modules contributing disjoint keys are unioned rather than collided; the type stated a checker and nothing else before den-hoag-241d7                                                                                                                     |
 | C24 -- the value-injection interim, priced                | 0023 (b)            | `injectAdapter`'s declared opt-out read from the CONSUMING side: a substrate closure (gen-schema's `__functor`) crosses into `_module.args` and is still applicable there, while a substrate-written DATA position crosses plain -- the matched control that stops the first arm passing for the wrong reason                                        |
 | C25 -- the graph interrogated                             | 0015, 0012          | gen-inspect reached at the hub's published `framework` bucket and materialized over THIS corpus's own graph: four nodes over two kinds and three declared edges become one IR, a SQL query answers over it, an unknown table and an unknown label value are both refused BY NAME, and the walk reports `faille` as the node no declared edge reaches |
+| C26 -- kind inheritance resolves a value                  | 0016 ruling 7, 0033 | the corpus's own `dart` kind inherits `notch`'s `grade` option through the relocated pass (`inherits = [ "notch" ]`); `darts.chambray` sets only `bevel`, so `grade` resolving to `notch`'s default is the inheritance and not two defaults agreeing; a mirrored fixture with `inherits` dropped shows the same option unreachable                   |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty-three
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty-seven
 `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
@@ -87,7 +88,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs thirty-three checks, and they are the acceptance criteria:
+`nix flake check` runs thirty-seven checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -266,7 +267,12 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     `perLabel` is an attrset of accessors and a wrong shape fails only on application, so a
     materialization that built the wrong one reds here and nowhere earlier. `pewter` is the control,
     reaching on both labels.
-36. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+36. **`kind-inheritance-resolves-a-value`** — C26, den-hoag-0pk67. The corpus's `dart` kind
+    declares `inherits = [ "notch" ]` and no `grade` option of its own; `darts.chambray` sets only
+    `bevel`, so a resolved `grade == "waxed"` on the real corpus is the relocated pass composing by
+    NAME (ADR-0016 ruling 7), not two defaults agreeing. A mirrored fixture with the same shape and
+    `inherits` dropped shows `grade` unreachable on that arm, the check's own discriminator.
+37. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -275,7 +281,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these thirty-three: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these thirty-seven: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
