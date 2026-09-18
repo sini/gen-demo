@@ -63,11 +63,12 @@ incremental plane's decision crossing.
 | C25 -- the graph interrogated                             | 0015, 0012          | gen-inspect reached at the hub's published `framework` bucket and materialized over THIS corpus's own graph: four nodes over two kinds and three declared edges become one IR, a SQL query answers over it, an unknown table and an unknown label value are both refused BY NAME, and the walk reports `faille` as the node no declared edge reaches |
 | C26 -- kind inheritance resolves a value                  | 0016 ruling 7, 0033 | the corpus's own `dart` kind inherits `notch`'s `grade` option through the relocated pass (`inherits = [ "notch" ]`); `darts.chambray` sets only `bevel`, so `grade` resolving to `notch`'s default is the inheritance and not two defaults agreeing; a mirrored fixture with `inherits` dropped shows the same option unreachable                   |
 | C27 -- rule identity refuses a name-only collision        | 0034                | two `gen-dispatch` intensional functions sharing the program-point name `notchGuard` mint no override handle from it; the no-override arm still fires both, overriding either now refuses by name                                                                                                                                                    |
+| C28 -- an order mark binds a declining declaration        | 0026                | `viewRelation`'s required `orderMark`, composed with the declaration's own order as a lexicographic product, mark outer, over the corpus's real `tacks`/`gathers` edges out of `pewter`; its order declines (`$` below both arrivals) and the mark overturns it, the identity mark being the arm showing the query alone chose otherwise             |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty-eight
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty-nine
 `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
@@ -89,7 +90,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs thirty-eight checks, and they are the acceptance criteria:
+`nix flake check` runs thirty-nine checks, and they are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -279,7 +280,23 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     the no-override arm still fires both, and overriding either one now throws
     `compose.nix`'s existing "cannot override anonymous rule" refusal by name instead of
     silently replacing whichever rule the substrate saw last.
-38. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+38. **`order-mark-binds`** — C28, ADR-0026 / M9. The effective visibility order is the LEXICOGRAPHIC
+    PRODUCT of a declared order mark with the declaration's own order, MARK OUTER, so a declaration
+    may refine only inside the mark's ties and can neither erase nor reverse a pair the mark states.
+    The fixture is the corpus's own graph — `pewter` reaches `grosgrain` on the real `tacks` edge and
+    `damask` on the real `gathers` edge, read through C2's own `byLabel` accessor, with each scope's
+    datum taken from the value that node really declares — and the declaration's order is written to
+    DECLINE: `gathers` outranks `tacks`, and `$ = -1` puts the root's own empty path below both
+    arrivals. Two arms, the same call, varying the mark alone: under the binding mark
+    (`tacks` ≻ `$` ≻ `gathers`) `grosgrain`'s real `gauge` wins and BOTH the root's own path and the
+    query-preferred arrival are shadowed; under the identity mark the product degenerates and
+    `pewter` keeps its real `spool`. The second arm is what makes the first a statement about the
+    mark rather than about a library that happened to prefer `tacks`. Resolved values on both arms,
+    never the presence of the field: `orderMark` is required and total, so a cell that only observed
+    it reaching the call would be green on a build that dropped it from the product entirely. The
+    optional step in `(tacks|gathers)?` is load-bearing — dropping the `?` un-admits the root's own
+    empty path and there is no decline left to overcome.
+39. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -288,7 +305,7 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these thirty-eight: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these thirty-nine: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
