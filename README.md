@@ -90,7 +90,15 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 
 ## The CI contract
 
-`nix flake check` runs thirty-nine checks, and they are the acceptance criteria:
+This repository has **two check planes**, and `nix flake check` covers the one its argument names
+and no other: the **root** flake's thirty-nine checks, listed below, and **`ci/`**'s six harness
+cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
+`mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
+`check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
+a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
+its green read as suite cover and was not.
+
+The thirty-nine root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -319,14 +327,23 @@ exit 0 on the arms it kept.
 
 ### Two arms, plus the by-name half
 
-These are devshell commands, declared in `ci/flake.nix` beside the `ci`, `fmt` and `repl` that
-gen-harness supplies. `direnv` loads them from `.envrc`; without it, `nix develop ./ci`.
+These are devshell commands, declared in `ci/flake.nix` beside the `ci`, `relock`, `fmt` and `repl`
+that gen-harness supplies. `direnv` loads them from `.envrc`; without it, `nix develop ./ci`.
 
 ```sh
-check-lock            # nix flake check
-check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen
+check-lock            # nix flake check  AND  nix flake check ./ci
+check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen  AND  nix flake check ./ci
 refusals              # T5's thirteen planted violations, each driven red by name, each with an unplanted control
 ```
+
+Each arm runs **both planes**, reports both exit codes on one summary line
+(`check-lock: root=0 ci=0`), and exits non-zero if either did. Neither is short-circuited, so a
+root failure still reports the `ci/` plane's colour rather than hiding it. Because these scripts
+run under `set -euo pipefail`, that is spelled `|| rc=$?` and not `cmd; rc=$?` — the latter exits
+on the first red and prints no summary line at all. `check-hub-main`'s second form carries no
+`--override-input`: the `ci/` plane declares `gen-harness` and `nixpkgs` and no `gen` at all, so it
+does not move with the hub, and nix answers an override for an absent input with a warning at exit
+0 — carrying it would be noise that reads like coverage.
 
 The committed `flake.lock` is the **last-green pin**. The second arm evaluates the same corpus against
 the hub's **current main**, so a hub landing that breaks the corpus reads red immediately instead of
@@ -435,7 +452,7 @@ Measured by poisoning each roster member's `lib` with a run-unique `throw` and f
 `.#checks.<system>` cell, exits read unpiped: a member is reached iff at least one cell reds under its
 own poison. Reproduce against a copy of this repo with one roster member's `lib` swapped for a
 throwing stub, then force every `.#checks.<system>.<cell>`'s **evaluation** with `nix flake check`
-(`check-lock` wraps it) — expect it to print `running 0 flake checks` and build nothing: the asserts
+(`check-lock`'s root arm) — expect it to print `running 0 flake checks` and build nothing: the asserts
 sit in each derivation's argument, so evaluating is what forces the poison, not building.
 `gen-settings` poisoned is the discriminating negative control: every cell stays green (rc 0), showing
 the instrument discriminates and this corpus simply has nothing that forces `gen-settings`.

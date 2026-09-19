@@ -40,18 +40,56 @@
         {
           perSystem = {
             devshells.default.commands = [
+              # ★ BOTH ARMS RUN BOTH PLANES, and that is the whole of den-hoag-dq6mw. This
+              # repository carries TWO check planes — the root flake's thirty-nine corpus cells and
+              # `./ci`'s six harness cells — and `nix flake check` names only the one its argument
+              # points at. Driven at `b1843a5`, one tree one run: with the nix-unit pairing cell
+              # seeded red, root `nix flake check` returned rc 0 and printed "all checks passed!"
+              # while `nix flake check ./ci` returned rc 1. So a command that ran the root form
+              # alone produced a green that ranged over a population it never touched, and
+              # "check-lock is green" read as suite cover when it was not.
+              #
+              # The remedy is the DOMAIN, not the name: a rename would only make the misreading
+              # harder, and would still leave a person able to run one command and quote it for
+              # both planes. Each arm runs both forms, reports both exit codes, and exits non-zero
+              # if either did — so its green is the thing anyone would take it for.
+              #
+              # ★ `|| rc=$?` AND NOT `cmd; rc=$?`, because numtide devshell emits `set -euo
+              # pipefail` at the head of every command script. Measured on the built wrapper at
+              # `/nix/store/54wppsanda76vcy4v1x7dz5sr6m2pvh6-check-lock/bin/check-lock`: the
+              # `cmd; rc=$?` spelling of this same body ran the root plane, then exited the instant
+              # the `./ci` plane reded and printed no summary line at all — so a root failure would
+              # have suppressed the second plane entirely, which is this row's own defect one level
+              # down. A command on the left of `||` is exempt from errexit; that is the whole
+              # reason for the spelling. (gen-harness's `ci` command carries a comment asserting
+              # these scripts are NOT under `set -e` — the code there is unaffected, but the stated
+              # ground is wrong, and believing it is what produced the first spelling.)
               {
                 name = "check-lock";
-                help = "ARM 1 - the corpus against the committed flake.lock, the last-green pin";
+                help = "ARM 1 - both planes against the committed flake.lock, the last-green pin";
                 command = ''
-                  cd "$FLAKE_ROOT" && nix flake check
+                  cd "$FLAKE_ROOT" || exit
+                  root=0; nix flake check || root=$?
+                  plane=0; nix flake check ./ci || plane=$?
+                  echo "check-lock: root=$root ci=$plane"
+                  [ "$root" -eq 0 ] && [ "$plane" -eq 0 ]
                 '';
               }
               {
                 name = "check-hub-main";
-                help = "ARM 2 - the corpus against the hub's current main, so a hub landing that breaks it reads red before the relock";
+                help = "ARM 2 - both planes, the corpus against the hub's current main, so a hub landing that breaks it reads red before the relock";
                 command = ''
-                  cd "$FLAKE_ROOT" && nix flake check --refresh --override-input gen github:sini/gen
+                  cd "$FLAKE_ROOT" || exit
+                  hub=0; nix flake check --refresh --override-input gen github:sini/gen || hub=$?
+                  # NO override on this line, deliberately: the harness plane declares `gen-harness`
+                  # and `nixpkgs` and no `gen` at all, so it does not move with the hub. Measured at
+                  # `b1843a5`: `nix flake check ./ci --override-input gen github:sini/gen` warns
+                  # "override for a non-existent input 'gen'" and exits 0 — inert, so carrying it
+                  # would be noise that reads like coverage. `--refresh` is omitted for the same
+                  # reason: there is no hub input here to refresh.
+                  plane=0; nix flake check ./ci || plane=$?
+                  echo "check-hub-main: hub=$hub ci=$plane"
+                  [ "$hub" -eq 0 ] && [ "$plane" -eq 0 ]
                 '';
               }
               {
