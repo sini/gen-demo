@@ -30,11 +30,13 @@
         # as a decision (owner, 2026-09-14).
         { gen.ci.agentsMd.sheet = "not-owed"; }
 
-        # The corpus-specific half of the command surface. gen-harness supplies `ci`, `fmt` and
-        # `repl`; a consuming module adds what only it needs, which is the pattern the hub's own
-        # `ci/flake.nix` follows. These four are `den-hoag-g87v` term 2's contract — the two check
-        # arms, the one built target, and the deliberate relock — written where a shared instrument
-        # can reach them instead of in a justfile nothing schedules.
+        # The corpus-specific half of the command surface. gen-harness supplies `ci`, `relock`,
+        # `fmt` and `repl`; a consuming module adds what only it needs, which is the pattern the
+        # hub's own `ci/flake.nix` follows. The first three below are `den-hoag-g87v` term 2's
+        # contract — the two lock arms and the one built target — written where a shared instrument
+        # can reach them instead of in a justfile nothing schedules. Term 2 names no relock: bumping
+        # the hub pin is `relock gen`, the shipped command, and a local declaration of a name mkCi
+        # already ships collides in buildEnv rather than overriding it.
         {
           perSystem = {
             devshells.default.commands = [
@@ -57,13 +59,6 @@
                 help = "NOT a check - the full build of the one nixos target, on demand";
                 command = ''
                   cd "$FLAKE_ROOT" && nix build .#nixosConfigurations.pewter.config.system.build.toplevel
-                '';
-              }
-              {
-                name = "relock";
-                help = "Advance the hub pin deliberately; both check arms must be green before it lands";
-                command = ''
-                  cd "$FLAKE_ROOT" && nix flake update gen
                 '';
               }
               {
