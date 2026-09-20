@@ -1754,62 +1754,81 @@
             # OWN attribution text, and reports how many entries it scanned against how many it
             # expected — a comparison that passes without saying so is not an oracle over the set
             # it claims to cover.
-            readmeIndexCheck =
+            #
+            # den-hoag-v4cpr — the comparing runs at EVAL time (`readFile` + string matching, the
+            # `seam-head-provenance` shape below) rather than in a `runCommand` shell script: a
+            # script's `exit 1` is invisible to `nix flake check --no-build`, which is exactly the
+            # blind spot every OTHER cell's `asserts` throw already closes. Only the SUCCESS path
+            # still builds a derivation, to keep the "how many scanned against how many expected"
+            # report the paragraph above requires.
+            readmeIndex =
               checkNames:
-              pkgs.runCommand "gen-demo-construct-index"
-                {
-                  readme = ./README.md;
-                  checkNamesFile = builtins.toFile "gen-demo-check-names.txt" (
-                    builtins.concatStringsSep "\n" checkNames
+              let
+                readmeLines = lib.splitString "\n" (builtins.readFile ./README.md);
+
+                # awk '/start/,/end/' — the inclusive line range from the first line matching
+                # `startRe` through the first LATER line matching `endRe`.
+                sectionBetween =
+                  startRe: endRe: ls:
+                  let
+                    idxs = lib.range 0 (builtins.length ls - 1);
+                    at = i: builtins.elemAt ls i;
+                    startIdx = lib.findFirst (i: builtins.match startRe (at i) != null) null idxs;
+                    endIdx = lib.findFirst (i: i >= startIdx && builtins.match endRe (at i) != null) null idxs;
+                  in
+                  lib.sublist startIdx (endIdx - startIdx + 1) ls;
+
+                sortUnique = l: lib.unique (builtins.sort (a: b: a < b) l);
+                firstMatch =
+                  re: line:
+                  let
+                    m = builtins.match re line;
+                  in
+                  if m == null then null else builtins.head m;
+
+                ciContract = sectionBetween ".*## The CI contract.*" ".*### Two arms.*" readmeLines;
+                declares = sectionBetween ".*## What v1 declares.*" ".*### The naming rule.*" readmeLines;
+
+                # surface 1: the numbered CI-contract list's own check names vs the evaluated
+                # `checks` attrset. This is the invariant the first two hand-repairs kept —
+                # deriving it means a THIRD unlisted check reds here instead of waiting on a
+                # fourth hand-repair.
+                numberedNames = sortUnique (
+                  builtins.filter (n: n != null) (
+                    map (firstMatch "[0-9]+\\.[[:space:]]+\\*\\*`([a-z0-9-]+)`\\*\\*.*") ciContract
+                  )
+                );
+                expectedNames = sortUnique checkNames;
+
+                # surface 2: the "## What v1 declares" table's rows vs the construct labels the
+                # numbered list attributes each check to (the text right after its em-dash, up to
+                # the first "." or ","), plus T5 — the one construct with no check cell.
+                constructTokens =
+                  desc:
+                  builtins.filter (t: builtins.match "C[0-9]+b?|T[0-9]+b?" t != null) (
+                    lib.filter (t: t != "") (lib.splitString " " (lib.replaceStrings [ "+" ] [ " " ] desc))
                   );
-                  nativeBuildInputs = [
-                    pkgs.gnugrep
-                    pkgs.gawk
-                    pkgs.diffutils
-                  ];
-                }
-                ''
-                  set -euo pipefail
-
-                  # surface 1: the numbered CI-contract list's own check names vs the evaluated
-                  # `checks` attrset. This is the invariant the first two hand-repairs kept —
-                  # deriving it means a THIRD unlisted check reds here instead of waiting on a
-                  # fourth hand-repair.
-                  awk '/^## The CI contract/,/^### Two arms/' "$readme" \
-                    | grep -oP '^\d+\.\s+\*\*`\K[a-z0-9-]+(?=`\*\*)' | sort -u > numbered-names.txt
-                  sort -u "$checkNamesFile" > expected-names.txt
-                  numberedCount=$(wc -l < numbered-names.txt)
-                  expectedNameCount=$(wc -l < expected-names.txt)
-                  echo "numbered CI-contract list: $numberedCount names scanned against $expectedNameCount evaluated checks"
-                  if ! diff -u expected-names.txt numbered-names.txt > names.diff; then
-                    echo "the numbered CI-contract list disagrees with the evaluated checks attrset:"
-                    cat names.diff
-                    exit 1
-                  fi
-
-                  # surface 2: the "## What v1 declares" table's rows vs the construct labels the
-                  # numbered list attributes each check to (the text right after its em-dash, up to
-                  # the first "." or ","), plus T5 — the one construct with no check cell.
-                  awk '/^## The CI contract/,/^### Two arms/' "$readme" \
-                    | grep -oP '^\d+\.\s+\*\*`[a-z0-9-]+`\*\*\s+—\s+\K[^.]*?(?=[.,]|$)' \
-                    | grep -oP '\bC[0-9]+b?\b|\bT[0-9]+b?\b' | sort -u > derived-constructs.txt
-                  { cat derived-constructs.txt; echo T5; } | sort -u > expected-constructs.txt
-                  awk '/^## What v1 declares/,/^### The naming rule/' "$readme" \
-                    | grep -oP '^\| \K[A-Za-z0-9]+(?= -- )' | sort -u > table-rows.txt
-                  scanned=$(wc -l < table-rows.txt)
-                  expectedConstructCount=$(wc -l < expected-constructs.txt)
-                  echo "'## What v1 declares' table: scanned $scanned rows against $expectedConstructCount expected constructs"
-                  if ! diff -u expected-constructs.txt table-rows.txt > table.diff; then
-                    echo "the table disagrees with the construct set the numbered list (by evaluation) attributes to each check:"
-                    cat table.diff
-                    exit 1
-                  fi
-
-                  {
-                    echo "numbered CI-contract list: $numberedCount names agree with $expectedNameCount evaluated checks"
-                    echo "'## What v1 declares' table: scanned $scanned rows agree with $expectedConstructCount expected constructs"
-                  } > $out
+                derivedConstructs = sortUnique (
+                  lib.concatMap (
+                    l:
+                    let
+                      desc = firstMatch "[0-9]+\\.[[:space:]]+\\*\\*`[a-z0-9-]+`\\*\\*[[:space:]]+—[[:space:]]+([^.,]*).*" l;
+                    in
+                    if desc == null then [ ] else constructTokens desc
+                  ) ciContract
+                );
+                expectedConstructs = sortUnique (derivedConstructs ++ [ "T5" ]);
+                tableRows = sortUnique (
+                  builtins.filter (n: n != null) (map (firstMatch "\\| ([A-Za-z0-9]+) -- .*") declares)
+                );
+              in
+              {
+                agrees = numberedNames == expectedNames && tableRows == expectedConstructs;
+                report = ''
+                  numbered CI-contract list: ${toString (builtins.length numberedNames)} names agree with ${toString (builtins.length expectedNames)} evaluated checks
+                  '## What v1 declares' table: scanned ${toString (builtins.length tableRows)} rows agree with ${toString (builtins.length expectedConstructs)} expected constructs
                 '';
+              };
           in
           {
             checks =
@@ -3089,7 +3108,14 @@
               in
               constructChecks
               // {
-                construct-index = readmeIndexCheck (builtins.attrNames constructChecks ++ [ "construct-index" ]);
+                construct-index =
+                  let
+                    index = readmeIndex (builtins.attrNames constructChecks ++ [ "construct-index" ]);
+                  in
+                  if index.agrees then
+                    pkgs.writeText "gen-demo-construct-index" index.report
+                  else
+                    throw "gen-demo: check 'construct-index' failed";
               };
           };
       }
