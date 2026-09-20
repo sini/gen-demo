@@ -66,11 +66,11 @@
               # ground is wrong, and believing it is what produced the first spelling.)
               {
                 name = "check-lock";
-                help = "ARM 1 - both planes against the committed flake.lock, the last-green pin";
+                help = "ARM 1 - both planes, FULL BUILD, against the committed flake.lock, the last-green pin. CI's own 'ARM 1' step (.github/workflows/ci.yml) runs eval-only over the root plane alone — a CI green does not cover everything this command does.";
                 command = ''
                   cd "$FLAKE_ROOT" || exit
-                  root=0; nix flake check || root=$?
-                  plane=0; nix flake check ./ci || plane=$?
+                  root=0; nix flake check --keep-going || root=$?
+                  plane=0; nix flake check ./ci --keep-going || plane=$?
                   echo "check-lock: root=$root ci=$plane"
                   [ "$root" -eq 0 ] && [ "$plane" -eq 0 ]
                 '';
@@ -80,14 +80,14 @@
                 help = "ARM 2 - both planes, the corpus against the hub's current main, so a hub landing that breaks it reads red before the relock";
                 command = ''
                   cd "$FLAKE_ROOT" || exit
-                  hub=0; nix flake check --refresh --override-input gen github:sini/gen || hub=$?
+                  hub=0; nix flake check --refresh --override-input gen github:sini/gen --keep-going || hub=$?
                   # NO override on this line, deliberately: the harness plane declares `gen-harness`
                   # and `nixpkgs` and no `gen` at all, so it does not move with the hub. Measured at
                   # `b1843a5`: `nix flake check ./ci --override-input gen github:sini/gen` warns
                   # "override for a non-existent input 'gen'" and exits 0 — inert, so carrying it
                   # would be noise that reads like coverage. `--refresh` is omitted for the same
                   # reason: there is no hub input here to refresh.
-                  plane=0; nix flake check ./ci || plane=$?
+                  plane=0; nix flake check ./ci --keep-going || plane=$?
                   echo "check-hub-main: hub=$hub ci=$plane"
                   [ "$hub" -eq 0 ] && [ "$plane" -eq 0 ]
                 '';

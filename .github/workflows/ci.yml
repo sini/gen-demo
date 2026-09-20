@@ -14,8 +14,12 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       # ARM 1 — the corpus against its committed lock, and the step this repository exists for:
-      # the twenty-two `checks` cells live on the ROOT flake, not in `ci/`, so the stock
+      # the thirty-nine `checks` cells live on the ROOT flake, not in `ci/`, so the stock
       # `working-directory: ci` form would run none of them.
+      #
+      # THIS STEP'S OWN SCOPE: eval-only (`--no-build`, see below), root plane only. `ci/flake.nix`'s
+      # `check-lock` devshell command also calls itself "ARM 1" and covers both planes in full-build
+      # form — the two are not interchangeable, and neither subsumes the other's coverage.
       #
       # ARM 2 (`nix flake check --refresh --override-input gen github:sini/gen`) is deliberately
       # NOT here. It is owner-ruled contract under den-hoag-g87v term 2, but it hits the network
@@ -27,9 +31,9 @@ jobs:
       # den-hoag-g87v term 2 contracts — while the system itself is never realised. The full
       # build is a LOCAL validation rule (owner-ruled 2026-09-14); a bare `nix flake check`
       # realises the NixOS system and exhausted the runner's disk (run 34907234688).
-      - run: nix flake check --no-build
+      - run: nix flake check --no-build --keep-going
       # The plane: the harness's five checks, plus the batch asserter over `ci/tests`.
-      - run: nix flake check ./ci
+      - run: nix flake check ./ci --keep-going
       # T5's by-name half (ADR-0025). `builtins.tryEval` cannot read a refusal's message, so these
       # seventeen rows cannot be `checks` cells and this is the step that schedules them — the gap
       # row16 escaped through was a missing scheduler, not a missing analyser.
