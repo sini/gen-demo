@@ -525,6 +525,94 @@
           graph = collisionGraph;
         };
 
+        # ── THE DEDUP DECIDES ON THE DECLARED RELATION, NEVER ON ITS ENCODING (den-hoag-behm0) ──
+        # `dedups.byDatum` declares "structural equality on the datum itself", so SAME is Nix `==`.
+        # Step 8 addresses its index by `builtins.toJSON`; deciding by that encoding instead records
+        # a drop asserting a duplicate that does not exist, because `toJSON` serialises an
+        # `outPath`/`__toString` attrset as its string coercion.
+        #
+        # Both declarations run on `collisionGraph`'s shape — three declarations under one `tacks`
+        # hop each, whose multi-survivor property the `movement-element-identity` cell already
+        # asserts live (`collisionMoved.contributions == 3` under `dedups.none`). Only the `dedup`
+        # field and the authored data move between them.
+        collisionDedupDefinition = genView.compositions.movement {
+          channel = "selvage";
+          relation = "gimp";
+          root = "pewter";
+          direction = "outbound";
+          admission = diamondCarrier.labelWellFormedness;
+          order = diamondCarrier.labelOrder;
+          wellFormed = _: true;
+          empty = [ ];
+          tieSet = genView.tieSets.union;
+          combine = genView.combines.listAppend;
+          dedup = genView.dedups.byDatum;
+        };
+        collisionDedupOn =
+          data:
+          genView.viewRelation {
+            definition = collisionDedupDefinition;
+            marks = _: [ ];
+            orderMark = identityMark diamondLabels;
+            graph = genView.scopeGraph {
+              carrier = diamondCarrier;
+              scopes = [
+                "pewter"
+                "grosgrain"
+                "faille"
+              ];
+              edges = {
+                tacks =
+                  id:
+                  if id == "pewter" then
+                    [
+                      "grosgrain"
+                      "faille"
+                    ]
+                  else
+                    [ ];
+              };
+              inherit data;
+            };
+          };
+
+        # THE REFERENCE — `collisionGraph`'s own three identical data under `byDatum`. A GENUINE
+        # 3 → 1 collapse the declaration licenses, and it must keep happening: a build that
+        # over-corrected into refusing all dedup would break this and leave the subject passing.
+        collisionDeduped = collisionDedupOn collisionGraph.data;
+
+        # THE SUBJECT — the same three declarations, differing in ONE TOKEN: `grosgrain`'s first
+        # datum is wrapped as `{ outPath = "cambric"; }`. It is Nix-UNEQUAL to `[ "cambric" ]` and
+        # encodes IDENTICALLY to it, so an encoding-decided dedup collapses all three and records
+        # two drops of which one asserts a duplicate that does not exist. The declared relation
+        # collapses only the two that really are equal: two survivors, ONE licensed drop.
+        collisionCoerced = collisionDedupOn [
+          {
+            scope = "grosgrain";
+            relation = "gimp";
+            datum = [ { outPath = "cambric"; } ];
+          }
+          {
+            scope = "grosgrain";
+            relation = "gimp";
+            datum = [ "cambric" ];
+          }
+          {
+            scope = "faille";
+            relation = "gimp";
+            datum = [ "cambric" ];
+          }
+        ];
+
+        # THE ORACLE: every recorded drop is one the arm's own declared relation licenses. Read off
+        # the RESULT alone — `definition` is carried inside `viewRelation`'s return — so it needs
+        # nothing the caller did not already hand the call.
+        noFalseDedup =
+          r:
+          builtins.all (
+            d: r.definition.dedup.arm == "byDatum" -> d.contribution.datum == d.collapsedInto.datum
+          ) r.dropped;
+
         # ★ THE ONLY DECLARATION IN THE CORPUS THAT REACHES THE SPANNING REFUSAL. `compositions.
         # registry`'s key is caller-supplied (`entityOf`); reading the DIAMOND's own residual
         # admission state makes the two arrivals of `diamondGraph`'s one authored element carry two
@@ -695,6 +783,85 @@
           }).config.darts.chambray;
         c26MirroredGrade = (c26Instance (c26NotchDart true)).grade;
         c26NoInheritHasGrade = (c26Instance (c26NotchDart false)) ? grade;
+
+        # ── C29 — A KIND'S MODULES RECEIVE A CALLER-SUPPLIED BASE MODULE ARG (den-hoag-jyiji) ──
+        # `denful/den#687`: a module that forces an argument WHILE DECLARING AN OPTION cannot be
+        # served from `_module.args`, because reading that forces the config fixpoint the module is
+        # part of. The abort is an INFINITE RECURSION naming neither the module nor the argument,
+        # and there is no `tryEval` door — so this cell asserts the CHANNEL, never the symptom: an
+        # oracle whose red state hangs the runner rather than failing it is not an oracle.
+        #
+        # Declared through `mkInstanceRegistry`, which is the idiom a consumer writes, and NOT
+        # through `mkInstanceType` directly: the registry builds its element as
+        # `attrsOf (mkInstanceType …)`, so the args cross `attrsOf`'s rebuild on the way in. That
+        # rebuild delegates to its element's, and a submodule whose rebuild re-entered the args-less
+        # constructor would drop them SILENTLY — a green corpus over a channel that reached nothing.
+        #
+        # THE DISCRIMINATOR IS IN THE SAME CELL, over the SAME kind: the identical declaration with
+        # `specialArgs` dropped is refused, catchably, by name. Without it the stock arm is
+        # consistent with `argand` arriving from somewhere other than the inlet under test.
+        c29Schema = inputs.gen.lib.substrate.schema;
+        c29Argand.selvage = "gimp";
+        c29BobbinWith =
+          args:
+          c29Schema.evalSchema (
+            {
+              modules = [
+                {
+                  config.schema.bobbin = {
+                    imports = [
+                      (
+                        { argand, ... }:
+                        {
+                          options.selvage = genMerge.mkOption {
+                            type = genMerge.types.str;
+                            default = argand.selvage;
+                          };
+                        }
+                      )
+                    ];
+                    options.spool = genMerge.mkOption { type = genMerge.types.str; };
+                  };
+                }
+              ];
+            }
+            // args
+          );
+        c29Bobbin = c29BobbinWith {
+          specialArgs = {
+            argand = c29Argand;
+          };
+        };
+
+        # ★★ THE SECOND ARM, AND IT IS A DIFFERENT CHANNEL. A kind's OWN OPTION TREE is built by
+        # `mkSchemaEntryType`'s `introspect` — a direct `evalModuleTree` — which a kind reaches with
+        # NO INSTANCE ANYWHERE, so the instance constructor is not on this path and cannot serve it.
+        # Read on the VALUE the caller handed in, not on "it evaluated": a channel that merely
+        # produced a better error message would pass the second reading and fail this one.
+        #
+        # ★ THE FORCING EXPRESSION IS ITSELF AN INSTRUMENT. `_kindNames` does not force a kind's
+        # modules, and `attrNames <kind>.options` applies the module but not its option DEFAULTS —
+        # both read green over a diverging kind. `…options.selvage.default` is the live one, and
+        # `c29Withheld` is the paired control that says so.
+        c29KindTree = (c29Bobbin.bobbin.options.selvage.default);
+        c29KindTreeWithheld =
+          (builtins.tryEval (builtins.deepSeq (c29BobbinWith { }).bobbin.options.selvage.default null))
+          .success;
+        c29Bobbins =
+          args:
+          (genMerge.evalModuleTree {
+            modules = [
+              { options.bobbins = c29Schema.mkInstanceRegistry c29Bobbin.bobbin args; }
+              { config.bobbins.pewter.spool = "linen"; }
+            ];
+          }).config.bobbins.pewter;
+        c29Supplied =
+          (c29Bobbins {
+            specialArgs = {
+              argand = c29Argand;
+            };
+          }).selvage;
+        c29Withheld = (builtins.tryEval (builtins.deepSeq (c29Bobbins { }).selvage null)).success;
 
         # ── C6 — a delivery to one target (ADR-0028) ──
         pewterClasses = builtins.attrNames config.gen.composed.hosts.pewter.classes;
@@ -1918,6 +2085,24 @@
                       ) == 3
                   );
 
+                  # C4b -- the dedup's decision is the relation the arm DECLARES, not an encoding
+                  # of it. Two arms on one shape, differing in one token. The REFERENCE's three
+                  # identical data collapse 3 -> 1 and record two drops, both licensed: that is what
+                  # keeps this from being a `dropped == 0` check, which would pass the subject the
+                  # moment the library over-corrected into refusing every dedup. The SUBJECT wraps
+                  # one datum as `{ outPath = "cambric"; }` -- Nix-unequal to `[ "cambric" ]`,
+                  # `toJSON`-identical to it -- so an encoding-decided dedup keeps ONE and records a
+                  # drop asserting a duplicate that does not exist. The declared relation keeps TWO
+                  # and records the one drop that is real.
+                  movement-dedup-equality = asserts "movement-dedup-equality" (
+                    builtins.length collisionDeduped.contributions == 1
+                    && builtins.length collisionDeduped.dropped == 2
+                    && noFalseDedup collisionDeduped
+                    && builtins.length collisionCoerced.contributions == 2
+                    && builtins.length collisionCoerced.dropped == 1
+                    && noFalseDedup collisionCoerced
+                  );
+
                   # registry-split-key-refuses -- named for `registry` and not for `movement`,
                   # because it declares `compositions.registry`: movement's key is a constant and
                   # cannot reach the spanning refusal at all, so a cell named `movement-...` would
@@ -3079,6 +3264,38 @@
                     && genValues.darts.chambray.bevel == "shallow"
                     && c26MirroredGrade == "waxed"
                     && c26NoInheritHasGrade == false
+                  );
+
+                  # (39) C29 — a kind's modules receive a base module arg the CALLER supplied
+                  # (`denful/den#687`). The stock arm's kind module forces `argand` while declaring
+                  # an option, which is the position that recurses when the value can only come
+                  # from `_module.args`; it resolves, and it resolves to the value handed to
+                  # `mkInstanceRegistry` rather than to any default. The discriminator is the SAME
+                  # kind with `specialArgs` withheld: refused, and catchably — `tryEval` returns
+                  # `false` instead of the runner diverging. That pair is what makes this a
+                  # statement about the channel; a single green arm would pass on a library that
+                  # bound `argand` from anywhere at all. The ordinary option is read beside it, so
+                  # a corpus that had broken instances wholesale could not pass this cell either.
+                  instance-base-module-arg-reaches-a-kind = asserts "instance-base-module-arg-reaches-a-kind" (
+                    c29Supplied == "gimp"
+                    && c29Withheld == false
+                    &&
+                      (c29Bobbins {
+                        specialArgs = {
+                          argand = c29Argand;
+                        };
+                      }).spool == "linen"
+                    # ★ THE SECOND ARM, on a DIFFERENT channel and in the same cell, because the two
+                    # together are what "a caller can supply a base module arg" means here. A kind's
+                    # OWN option tree is built by `mkSchemaEntryType`'s `introspect`, which a kind
+                    # reaches with NO INSTANCE ANYWHERE — so the instance constructor is
+                    # structurally not on this path, and a landing that threaded only it left this
+                    # arm diverging while the first arm read green. Read on the VALUE, with the
+                    # withheld-args control beside it, because the forcing expression is itself an
+                    # instrument: `_kindNames` and `attrNames <kind>.options` both read green over a
+                    # diverging kind and neither would have caught this.
+                    && c29KindTree == "gimp"
+                    && c29KindTreeWithheld == false
                   );
 
                   # (38) C28 — the order mark BINDS a declaration written to decline it. Both arms

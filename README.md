@@ -64,12 +64,13 @@ incremental plane's decision crossing.
 | C26 -- kind inheritance resolves a value                  | 0016 ruling 7, 0033 | the corpus's own `dart` kind inherits `notch`'s `grade` option through the relocated pass (`inherits = [ "notch" ]`); `darts.chambray` sets only `bevel`, so `grade` resolving to `notch`'s default is the inheritance and not two defaults agreeing; a mirrored fixture with `inherits` dropped shows the same option unreachable                   |
 | C27 -- rule identity refuses a name-only collision        | 0034                | two `gen-dispatch` intensional functions sharing the program-point name `notchGuard` mint no override handle from it; the no-override arm still fires both, overriding either now refuses by name                                                                                                                                                    |
 | C28 -- an order mark binds a declining declaration        | 0026                | `viewRelation`'s required `orderMark`, composed with the declaration's own order as a lexicographic product, mark outer, over the corpus's real `tacks`/`gathers` edges out of `pewter`; its order declines (`$` below both arrivals) and the mark overturns it, the identity mark being the arm showing the query alone chose otherwise             |
+| C29 -- a caller-supplied base module arg                  | 0033                | a kind whose module forces `argand` WHILE DECLARING an option, mounted through `mkInstanceRegistry`'s `specialArgs` and so through `attrsOf`'s rebuild of gen-merge's submodule; withholding the arg on the same kind is refused catchably, which is what makes the stock arm a statement about the channel and not about where `argand` came from   |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all thirty-nine
-`checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
+forty-one `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -91,14 +92,14 @@ C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's thirty-nine checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's forty-one checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The thirty-nine root checks are the acceptance criteria:
+The forty-one root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -304,7 +305,31 @@ The thirty-nine root checks are the acceptance criteria:
     it reaching the call would be green on a build that dropped it from the product entirely. The
     optional step in `(tacks|gathers)?` is load-bearing — dropping the `?` un-admits the root's own
     empty path and there is no decline left to overcome.
-39. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+39. **`movement-dedup-equality`** — C4b, den-hoag-behm0. A dedup decides on the relation its own
+    constructor DECLARES, never on an encoding of it: `dedups.byDatum` says "structural equality on
+    the datum itself", and structural equality in Nix is `==`. Two arms on `collisionGraph`'s shape,
+    differing in one token. The reference's three identical data collapse 3 → 1 and record two
+    drops, both licensed — that arm is what keeps the cell from being a `dropped == 0` check, which
+    would pass the subject the moment the library over-corrected into refusing every dedup. The
+    subject wraps one datum as `{ outPath = "cambric"; }`, which Nix `==` calls distinct from
+    `[ "cambric" ]` and `builtins.toJSON` encodes identically to it: a dedup keyed on the encoding
+    keeps ONE contribution and writes a `dropped` record asserting a duplicate that does not exist,
+    so the caller is told two values were the same about two values that are not. The declared
+    relation keeps TWO and records the one drop that is real. The oracle is read off the result
+    alone, since `viewRelation` carries its `definition` inside the answer.
+40. **`instance-base-module-arg-reaches-a-kind`** — C29, den-hoag-jyiji. A kind's modules receive a
+    base module argument the CALLER supplied (`denful/den#687`). A module that forces an argument
+    while DECLARING an option cannot be served from `_module.args`: reading that forces the config
+    fixpoint the module is part of, and the abort is an infinite recursion naming neither the module
+    nor the argument, with no `tryEval` door. So the cell asserts the CHANNEL and never the symptom —
+    an oracle whose red state hangs the runner instead of failing it is not an oracle. It declares
+    through `mkInstanceRegistry`, which is the idiom a consumer writes and which builds its element
+    as `attrsOf (mkInstanceType …)`, so the args cross `attrsOf`'s rebuild on the way in; a submodule
+    whose rebuild re-entered the args-less constructor would drop them silently and leave this green
+    over a channel that reached nothing. The discriminator is the same kind with `specialArgs`
+    withheld: refused, and catchably, so the stock arm is a statement about the inlet rather than
+    about where `argand` happened to come from.
+41. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -313,7 +338,7 @@ The thirty-nine root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these thirty-nine: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these forty-one: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
