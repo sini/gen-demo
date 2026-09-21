@@ -53,8 +53,10 @@ in
         # (a distinct word, row24's reasoning below) so it stays outside this regex's population.
         # den-hoag-viewrelation-definition-graph-alphabet-seam-og383's row27 — the definition⟂graph
         # alphabet seam — is one more ordinary paired row: +2 arms, +1 paired.
-        totalArms = 49;
-        paired = 24;
+        # den-hoag-nn4's row28 — a kind-declaration key no reader consumes — is one more ordinary
+        # paired row: +2 arms, +1 paired.
+        totalArms = 51;
+        paired = 25;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
