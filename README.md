@@ -110,8 +110,10 @@ The forty-one root checks are the acceptance criteria:
 05. **`delivery-projection`** — C6. The node set, the one collected class, both Rider limbs absent
     from the classes despite both being present in the aspect body, and the bobbin door under an
     invented name.
-06. **`warm-parity`** — T2b. The warm decision byte-identical to a cold one, with the guard
-    (`trace.mode == "warm"`) included.
+06. **`warm-parity`** — T2b. The warm decision byte-identical to a cold one, with both guards
+    (`trace.mode == "warm"` and `trace.reused == [ "ferrule" ]`) included. The second is what makes
+    the equality a statement about reuse: the base is a plain attrset and `ferrule` is outside the
+    edit, so the warm arm splices that leaf from the previous evaluation instead of remerging it.
 07. **`nixos-instantiate`** — the target instantiated, **not built**: the check writes
     `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
     NixOS evaluation and stops at the `.drv`.
