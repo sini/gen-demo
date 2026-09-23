@@ -3706,6 +3706,44 @@
                   refined-redeclaration-survives = asserts "refined-redeclaration-survives" (
                     map (r: r.message) genValues.schema.bobbin.refinements.picks == [ "must be positive" ]
                   );
+
+                  # (50) C39 — den-hoag-za4hp: each nesting seam reads a definition the way its
+                  # nixpkgs reference does. The tree type `(evalModuleTree …).type` reads every def
+                  # as a MODULE, as `(lib.evalModules …).type`: a FUNCTION def yields its value, where
+                  # it used to abort uncatchably. `types.submodule` reads an ATTRSET def as CONFIG, as
+                  # `lib.types.submodule`: an option the submodule declares as `key` takes the def's
+                  # value, where it used to be dropped as module identity and read the default.
+                  nesting-def-reading = asserts "nesting-def-reading" (
+                    let
+                      at =
+                        type: def:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            { options.seam = genMerge.mkOption { inherit type; }; }
+                            { config.seam = def; }
+                          ];
+                        }).config.seam;
+                      spoolTree =
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            {
+                              options.spool = genMerge.mkOption {
+                                type = genMerge.types.str;
+                                default = "none";
+                              };
+                            }
+                          ];
+                        }).type;
+                      keyed = genMerge.types.submodule {
+                        options.key = genMerge.mkOption {
+                          type = genMerge.types.str;
+                          default = "none";
+                        };
+                      };
+                    in
+                    (at spoolTree ({ ... }: { spool = "sateen"; })).spool == "sateen"
+                    && (at keyed { key = "sateen"; }).key == "sateen"
+                  );
                 };
               in
               constructChecks
