@@ -2266,6 +2266,18 @@
                         "piping"
                         "cording"
                       ]
+                    # `trim` DISCHARGED — the fragments above are only the carrier's bodies; this reads
+                    # the carrier through `applyGuard` at each thimble, so a guard that cannot address
+                    # its own kind (the pre-3jcs4 `pred.host` spelling read `host.name`, which a thimble
+                    # context does not carry) answers `null` here instead of the body.
+                    &&
+                      (genAspects.mkGuardVocab { }).applyGuard {
+                        thimble.name = "pewter";
+                      } config.gen.composed.aspects.stitch.trim == "piping"
+                    &&
+                      (genAspects.mkGuardVocab { }).applyGuard {
+                        thimble.name = "damask";
+                      } config.gen.composed.aspects.stitch.trim == "cording"
                     &&
                       bobbinProjectedNodes == [
                         "faille"

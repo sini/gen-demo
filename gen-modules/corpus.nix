@@ -233,12 +233,12 @@ in
     # through `merge.mergeDefaultOption` and concatenates like any other list-valued option.
     aspects.stitch.binding = [ "bias" ];
 
-    # witness 2 half. `trim` carries a guard record (`genAspects.guard`/`pred.host`, the base form
-    # `whenHost` is sugar for) at the SAME freeform key, again completed in
+    # witness 2 half. `trim` carries a guard record (`genAspects.guard`/`pred.eq` over the corpus's
+    # own `thimble` kind, the base form `whenEq` is sugar for) at the SAME freeform key, again completed in
     # `multidef-witness.nix`. Pre-fix this aborted `flatten` uncatchably; post-fix the two defs merge
     # into one fragment carrier, discharged per node downstream — at `pewter` this fragment survives
     # and the other (guarded on `damask`) does not.
-    aspects.stitch.trim = genAspects.guard (genAspects.pred.host "pewter") "piping";
+    aspects.stitch.trim = genAspects.guard (genAspects.pred.eq [ "thimble" "name" ] "pewter") "piping";
 
     # ── C16 — THE ASPECT GRAPH ITSELF, given depth so its published facts are a GRAPH ──
     aspects.hemline.placket.eyelet = { };

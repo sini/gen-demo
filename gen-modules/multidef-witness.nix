@@ -10,7 +10,8 @@
 # verbatim instead.
 #
 # `trim` — witness 2 (Arm B, den-hoag-sezf §2 O12): the same freeform key, this time carrying TWO
-# guard-record definitions (`genAspects.guard`/`pred.host` — the base export `whenHost` sugars over,
+# guard-record definitions (`genAspects.guard`/`pred.eq` over the `thimble` kind — the base export
+# `whenEq` sugars over,
 # see `gen-aspects/lib/guard.nix`). Pre-fix this aborted `flatten` uncatchably; post-fix the two defs
 # merge into one fragment carrier. Discharge is per-node, downstream of this declaration (at `damask`
 # this fragment survives and the `pewter`-guarded one in `corpus.nix` does not).
@@ -18,6 +19,6 @@
 {
   config.aspects.stitch = {
     binding = [ "hem" ];
-    trim = genAspects.guard (genAspects.pred.host "damask") "cording";
+    trim = genAspects.guard (genAspects.pred.eq [ "thimble" "name" ] "damask") "cording";
   };
 }
