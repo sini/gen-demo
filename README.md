@@ -67,12 +67,13 @@ incremental plane's decision crossing.
 | C29 -- a caller-supplied base module arg                  | 0033                | a kind whose module forces `argand` WHILE DECLARING an option, mounted through `mkInstanceRegistry`'s `specialArgs` and so through `attrsOf`'s rebuild of gen-merge's submodule; withholding the arg on the same kind is refused catchably, which is what makes the stock arm a statement about the channel and not about where `argand` came from   |
 | C30 -- an internal nested tree reports its own orphan     | 0025 item 1         | an option typed with gen-merge's own nesting seam (`evalModuleTree`'s `.type`, not `t.submodule`) receives an undeclared key under it at `check = false`; the outer `.undeclared` names it at its full path instead of the def vanishing with `.config` silently smaller, the same key at the tree's top level being the live control                |
 | C31 -- a custom guard form refuses at first use           | 0025 item 1         | gen-aspects' `mkGuardVocab` over a malformed (`reads` missing) and a core-colliding (`eq`) custom form: construction stays total, the first `applyGuard` through the vocabulary refuses though it names neither form, and a sound `fourchette` form is the control that dispatch is not refusing unconditionally                                     |
+| C32 -- the warm path reports a reused tree's orphan       | 0025 item 1, 0008   | a warm `evalModuleTree` re-compose that REUSES a nesting-seam leaf (`spoolTree` in `warmDecision.reused`) names the def the nested tree dropped, and its `.undeclared` equals the cold re-evaluation's; before, the warm arm answered `[ ]` for a reused leaf                                                                                        |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-forty-three `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+forty-four `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -94,14 +95,14 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's forty-three checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's forty-four checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The forty-three root checks are the acceptance criteria:
+The forty-four root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -344,7 +345,12 @@ The forty-three root checks are the acceptance criteria:
     `applyGuard` call, though that call dispatches `always` and never names the bad form. A sound
     invented form (`fourchette`) constructs and dispatches beside them, so the refusals are not
     `applyGuard` refusing everything.
-43. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+43. **`warm-reused-tree-reports-its-orphan`** — C32, den-hoag-warm-path-still-discards-mw5t6.
+    C30's seam on the WARM path: a re-compose that reuses a leaf typed with gen-merge's nesting seam
+    reports the def its nested tree dropped, equal to a cold re-evaluation of the same modules. The
+    leaf's presence in `warmDecision.reused` is asserted, so a warm run that remerged it through the
+    cold arm cannot pass the cell for the wrong reason.
+44. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -353,7 +359,7 @@ The forty-three root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these forty-three: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these forty-four: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
