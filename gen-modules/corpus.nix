@@ -19,6 +19,9 @@ let
   aspectSchema = genAspects.mkAspectSchema (import ../aspect-cnf.nix);
   inherit (genMerge) mkMerge mkOption types;
 
+  # C36/C37's refined type, let-bound ONCE so both `bobbin` declarations below carry the same value.
+  picksType = genSchema.refined types.int [ genSchema.refinements.positive ];
+
   # §2.6's staged pass — the kind bodies moved verbatim out of `config`, below, and evaluated by
   # gen-schema's OWN `evalModuleTree` (never this file's `config`). `schema.thimble`/`schema.bobbin`
   # is the frozen result these registries and `options.schema` both read.
@@ -41,6 +44,15 @@ let
           options.gauge = mkOption {
             type = types.str;
             description = "An arbitrary attribute on the second kind, carrying content of its own.";
+          };
+          # ── C36 (den-hoag-mx07b) — a refined option under gen-aspects' `mkType` arm ──
+          # `bobbin` is built through the aspect schema's `mkType`, so its `refinements` are derived
+          # from the option plane the kind publishes; the registry then refuses an inadmissible
+          # value by name (`refusals` row 32). The default keeps every existing instance unedited.
+          options.picks = mkOption {
+            type = picksType;
+            default = 1;
+            description = "Weft picks per unit; refined positive.";
           };
         };
 
@@ -65,6 +77,12 @@ let
           };
         };
       }
+
+      # ── C37 (den-hoag-refined-inherits-base-mint-oqrvg) — ONE refined option, TWO declarations ──
+      # A second module declares `bobbin.picks` again with the same let-bound refined type. The merge
+      # relation reconciles the pair and the refinement SURVIVES; `flake.nix` reads its message back.
+      # Two DIFFERENT refinements of one base refuse instead (`refusals` row 30).
+      { config.schema.bobbin.options.picks = mkOption { type = picksType; }; }
     ];
   };
 in

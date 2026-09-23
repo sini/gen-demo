@@ -70,12 +70,15 @@ incremental plane's decision crossing.
 | C32 -- the warm path reports a reused tree's orphan       | 0025 item 1, 0008   | a warm `evalModuleTree` re-compose that REUSES a nesting-seam leaf (`spoolTree` in `warmDecision.reused`) names the def the nested tree dropped, and its `.undeclared` equals the cold re-evaluation's; before, the warm arm answered `[ ]` for a reused leaf                                                                                        |
 | C33 -- a warm run that reuses nothing says so             | 0008                | a function-headed base re-composed warm is admitted and remerges every leaf; the hub's `trace.inert` reads `true` with `reused == [ ]`, where `mode == "warm"` alone hid it, and warm-parity's armed run reading `inert == false` is the control                                                                                                     |
 | C34 -- a wrapped module keeps its importer's file         | 0025 item 1         | a def reached through `{ _file = "/demo/spool.nix"; imports = [ … ]; }` carries that file in `provenance.spool.defs`, where it used to read the engine's `<gen-merge>` fallback; the value `sateen` is asserted beside it                                                                                                                            |
+| C35 -- the module reader classifies like nixpkgs          | 0025 item 1         | a shorthand key beside `imports` is config (`spool` reads `sateen`, where it read the default); a surplus key beside an explicit `config` is refused catchably, the same module without it being the control, and by name in `refusals` row 31                                                                                                       |
+| C36 -- a refined option under the `mkType` arm            | 0025                | `bobbin.picks`, refined positive, on a kind built through gen-aspects' `mkType`: the kind's `refinements` name `picks`, and the registry refuses `picks = 0` by name (`refusals` row 32)                                                                                                                                                             |
+| C37 -- one refined type declared twice survives           | 0034                | `bobbin.picks` declared in two modules of the staged pass with one let-bound refined type; the merge keeps exactly one refinement, read back as its message; two different refinements of one base refuse (`refusals` row 30)                                                                                                                        |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-forty-six `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+forty-nine `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -97,14 +100,14 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's forty-six checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's forty-nine checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The forty-six root checks are the acceptance criteria:
+The forty-nine root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -360,7 +363,20 @@ The forty-six root checks are the acceptance criteria:
 45. **`wrapped-module-provenance-file`** — C34, den-hoag-sdml-file-loss-2xeet. A definition passed
     through an unattributed `{ _file; imports }` wrapper is attributed to the wrapper's file in
     `provenance`, not to gen-merge's `<gen-merge>` fallback, and the merged value is read beside it.
-46. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+46. **`module-reader-syntax`** — C35, den-hoag-s7826. gen-merge reads a module's keys the way
+    nixpkgs' `unifyModuleSyntax` does. A shorthand key beside `imports` is config: `spool` reads
+    `sateen`, where the key used to be dropped unread and the option kept its default. A surplus key
+    beside an explicit `config` is refused, beside the same module without that key reading
+    `sateen`, so a reader refusing every module cannot pass; the message is `refusals` row 31's.
+47. **`mktype-refinements`** — C36, den-hoag-mx07b. `bobbin` is built through gen-aspects'
+    `mkType` arm, and its refined `picks` option is named in the kind's `refinements`, which the arm
+    used to publish as a literal `{ }` so that the registry enforced nothing. The instance value is
+    read beside it; the refusal of `picks = 0` is `refusals` row 32.
+48. **`refined-redeclaration-survives`** — C37, den-hoag-refined-inherits-base-mint-oqrvg.
+    `bobbin.picks` is declared in two modules of the staged pass with one let-bound refined type, and
+    the kind's `refinements.picks` carries exactly one message. The kind's `.options` is not a read
+    path (C17 pins it empty). Two different refinements of one base are `refusals` row 30.
+49. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -369,7 +385,7 @@ The forty-six root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these forty-six: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these forty-nine: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 

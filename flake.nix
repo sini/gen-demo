@@ -3619,6 +3619,59 @@
                     in
                     map (d: d.file) r.provenance.spool.defs == [ "/demo/spool.nix" ] && r.config.spool == "sateen"
                   );
+
+                  # (46) C35 — ADR-0025 item 1 on the module reader (den-hoag-s7826): gen-merge
+                  # classifies a module's keys the way nixpkgs' `unifyModuleSyntax` does. A shorthand
+                  # key beside `imports` is CONFIG, where it used to be dropped unread and the option
+                  # kept its default; a surplus key beside an explicit `config` is refused (by name in
+                  # `refusals` row 31). The refusal is read beside its control with the surplus key
+                  # removed, so a reader refusing every module cannot pass this cell.
+                  module-reader-syntax = asserts "module-reader-syntax" (
+                    let
+                      read =
+                        m:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            {
+                              options.spool = genMerge.mkOption {
+                                type = genMerge.types.str;
+                                default = "none";
+                              };
+                            }
+                            m
+                          ];
+                        }).config.spool;
+                      typo = {
+                        _file = "/demo/typo.nix";
+                        config.spool = "sateen";
+                        spol = 1;
+                      };
+                    in
+                    read {
+                      imports = [ ];
+                      spool = "sateen";
+                    } == "sateen"
+                    && !(builtins.tryEval (read typo)).success
+                    && read (removeAttrs typo [ "spol" ]) == "sateen"
+                  );
+
+                  # (47) C36 — den-hoag-mx07b: a kind built through gen-aspects' `mkType` arm derives
+                  # its `refinements` from the option plane it publishes. `bobbin.picks` is refined,
+                  # so the kind names it; before gen-schema `ecdb380` this arm published `{ }` and the
+                  # registry enforced nothing. The instance value is read beside it (the default).
+                  mktype-refinements = asserts "mktype-refinements" (
+                    builtins.attrNames genValues.schema.bobbin.refinements == [ "picks" ]
+                    && genValues.bobbins.grosgrain.picks == 1
+                  );
+
+                  # (48) C37 — den-hoag-refined-inherits-base-mint-oqrvg: `bobbin.picks` is declared
+                  # in TWO modules of the staged pass with one let-bound refined type, and the merge
+                  # relation keeps the refinement. The kind's `.options` is not a read path (C17 pins
+                  # it empty), so the survivor is read off the kind's `refinements`. Two DIFFERENT
+                  # refinements of one base are `refusals` row 30.
+                  refined-redeclaration-survives = asserts "refined-redeclaration-survives" (
+                    map (r: r.message) genValues.schema.bobbin.refinements.picks == [ "must be positive" ]
+                  );
                 };
               in
               constructChecks

@@ -941,6 +941,56 @@ check "T5 row30id planted   (an identity demanded of a refinement over a caller 
   "identity: a lambda in an identity position" \
   "$tmpdir/row30id-red.err"
 
+# ── row 31 -- a surplus key beside an explicit `config` (mirrors C35's `module-reader-syntax`,
+#    gen-merge s7826) ──
+# gen-merge reads a module's keys the way nixpkgs' `unifyModuleSyntax` does: once a module names
+# `config` (or `options`), every key outside the reserved set is surplus, and surplus is refused BY
+# NAME with the module's `_file`, where the reader used to drop it unread. The two arms differ by the
+# one surplus key; the unplanted arm prints the value, so a reader refusing every module cannot pass.
+row31='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genMerge = gen.lib.modules.merge;
+in (genMerge.evalModuleTree {
+  modules = [
+    { options.spool = genMerge.mkOption { type = genMerge.types.str; default = "none"; }; }
+    ({ _file = "/demo/typo.nix"; config.spool = "sateen"; } // { SURPLUS })
+  ];
+}).config.spool'
+check "T5 row31 unplanted (an explicit config and nothing beside it)" "${row31/SURPLUS/}" 0 "" \
+  "$tmpdir/row31-green.err" 'sateen'
+check "T5 row31 planted   (a surplus key beside an explicit config)" "${row31/SURPLUS/spol = 1;}" 1 \
+  "gen-merge: module \`/demo/typo.nix' has an unsupported attribute \`spol'" \
+  "$tmpdir/row31-red.err"
+
+# ── row 32 -- a refined option on a kind built through gen-aspects' `mkType` arm (mirrors C36's
+#    `bobbin.picks`, gen-schema mx07b) ──
+# The arm used to publish `refinements = { }` as a literal, so the registry enforced nothing a kind's
+# refined option declared and `picks = 0` was accepted. The arms differ by the one instance value; the
+# unplanted arm prints it, so a registry refusing every instance cannot pass.
+row32='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genAspects = gen.lib.aspects.aspects;
+  genSchema = gen.lib.substrate.schema;
+  genMerge = gen.lib.modules.merge;
+  aspectSchema = genAspects.mkAspectSchema (import ./aspect-cnf.nix);
+  schema = genSchema.evalSchema {
+    inherit (aspectSchema) schemaOption;
+    modules = [ { config.schema.bobbin.options.picks = genMerge.mkOption { type = genSchema.refined genMerge.types.int [ genSchema.refinements.positive ]; default = 1; }; } ];
+  };
+in toString (genMerge.evalModuleTree {
+  modules = [
+    { imports = [ (aspectSchema.mkAspectModule { }) ]; }
+    { options.schema = genMerge.mkOption { type = genMerge.types.raw; default = schema; }; }
+    { options.bobbins = genSchema.mkInstanceRegistry schema.bobbin { }; }
+    { config.bobbins.grosgrain.picks = PICKS; }
+  ];
+}).config.bobbins.grosgrain.picks'
+check "T5 row32 unplanted (an admissible value on the refined option)" "${row32/PICKS/3}" 0 "" \
+  "$tmpdir/row32-green.err" '3'
+check "T5 row32 planted   (a value the refinement forbids)" "${row32/PICKS/0}" 1 \
+  "gen-schema: refinement failed at bobbin:grosgrain.picks" \
+  "$tmpdir/row32-red.err"
+
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be
