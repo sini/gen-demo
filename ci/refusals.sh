@@ -1408,6 +1408,166 @@ check "T5 row46 catchable  (the refusal is caught by tryEval, not an abort)" \
   "if (builtins.tryEval ($row46planted)).success then \"ADMITTED\" else \"CAUGHT\"" 0 "" \
   "$tmpdir/row46-catch.err" 'CAUGHT'
 
+# ── row 47 -- a mark's `admits` verdict that is not a bool is refused by name (gen-view 0gpyq,
+#    ADR-0025 item 1) ──
+# gen-graph's `boundedBy` read a caller's `admits` verdict with `!`, so a non-bool verdict aborted
+# uncatchably (`expected a Boolean but found an integer`). gen-view now checks each caller-supplied
+# function's RESULT where it is consumed and refuses a malformed one by name. Row 38's pewter/grosgrain
+# declaration; the arms differ by one mark's `admits` alone. The unplanted arm asserts the answer, so
+# a library refusing every mark cannot pass it, and the catchable arm is the one that measures item 1
+# (row 33's form).
+row47='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" ]; };
+  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
+  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
+  relation = genView.viewRelation {
+    definition = genView.viewDefinition {
+      inherit channel admission order;
+      relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
+      distance = s: s.distance + 1;
+      tieSet = genView.tieSets.union; empty = [ ];
+      combine = genView.combines.listAppend; dedup = genView.dedups.none;
+    };
+    graph = genView.scopeGraph {
+      carrier = genView.carrier {
+        inherit labels;
+        relatumLabels = genView.relatumLabels { names = [ ]; };
+        labelWellFormedness = admission; labelOrder = order; dataOrder = channel;
+        relations = genView.relations { names = [ "gimp" ]; };
+      };
+      scopes = [ "grosgrain" "faille" "pewter" ];
+      edges.tacks = id: { pewter = [ "faille" "grosgrain" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
+      data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
+    };
+    marks = id: if id == "pewter" then [ { name = "hem"; admits = ADMITS; } ] else [ ];
+    orderMark = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = 0; };
+  };
+in BODY'
+row47unplanted="${row47/ADMITS/_: true}"
+row47planted="${row47/ADMITS/_: 42}"
+check "T5 row47 unplanted (an admitting mark; the answer is the assertion)" \
+  "${row47unplanted/BODY/builtins.toJSON relation.value}" 0 "" \
+  "$tmpdir/row47-green.err" '["cambric"]'
+check "T5 row47 planted   (a verdict that is not a bool, refused by name)" \
+  "${row47planted/BODY/builtins.toJSON relation.value}" 1 \
+  "gen-view.viewRelation: a mark's 'admits' at scope 'pewter' for the label 'tacks' returned 42" \
+  "$tmpdir/row47-red.err"
+check "T5 row47 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row47planted/BODY/if (builtins.tryEval (builtins.deepSeq relation.value true)).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row47-catch.err" 'CAUGHT'
+
+# ── row 48 -- a hand-built unit carrying the genuine tag is re-checked at intake and refused by
+#    name (gen-view uw098; p79do Q1: an element tag is a CLAIM, ADR-0025 item 1) ──
+# A one-unit schedule never reads a unit's fields, so a unit forged with `// { mode = … }` was
+# ADMITTED and answered `["hem"]`. gen-view's intake now re-checks the element's structural fields
+# and refuses the forged mode by name. Row 38's pewter/grosgrain declaration; the arms differ by the
+# unit's mode alone. The unplanted arm asserts the answer, so a library refusing every unit cannot
+# pass it, and the catchable arm is the one that measures item 1 (row 33's form).
+row48='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" ]; };
+  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
+  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
+  relation = genView.viewRelation {
+    definition = genView.viewDefinition {
+      inherit channel admission order;
+      relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
+      distance = s: s.distance + 1;
+      tieSet = genView.tieSets.union; empty = [ ];
+      combine = genView.combines.listAppend; dedup = genView.dedups.none;
+    };
+    graph = genView.scopeGraph {
+      carrier = genView.carrier {
+        inherit labels;
+        relatumLabels = genView.relatumLabels { names = [ ]; };
+        labelWellFormedness = admission; labelOrder = order; dataOrder = channel;
+        relations = genView.relations { names = [ "gimp" ]; };
+      };
+      scopes = [ "grosgrain" "faille" "pewter" ];
+      edges.tacks = id: { pewter = [ "faille" "grosgrain" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
+      data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
+    };
+    marks = _: [ ];
+    orderMark = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = 0; };
+  };
+  units.hem = genView.unit {
+    inherit relation;
+    target = genView.placement.targets.root { scope = "pewter"; channel = "selvage"; };
+    mode = "merge";
+  } // { mode = MODE; };
+in BODY'
+row48unplanted="${row48/MODE/\"merge\"}"
+row48planted="${row48/MODE/\"sideways\"}"
+check "T5 row48 unplanted (a genuine unit; the schedule is the assertion)" \
+  "${row48unplanted/BODY/builtins.toJSON (genView.accumulatorOrder { inherit units; \})}" 0 "" \
+  "$tmpdir/row48-green.err" '["hem"]'
+check "T5 row48 planted   (a forged unit mode, refused by name at intake)" \
+  "${row48planted/BODY/builtins.toJSON (genView.accumulatorOrder { inherit units; \})}" 1 \
+  "gen-view.accumulatorRelation: field 'units.mode' is \"sideways\", which is not one of the declared arms" \
+  "$tmpdir/row48-red.err"
+check "T5 row48 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row48planted/BODY/if (builtins.tryEval (builtins.deepSeq (genView.accumulatorOrder { inherit units; \}) true)).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row48-catch.err" 'CAUGHT'
+
+# ── row 49 -- a type refusal renders its value shallowly, so a cyclic definition is refused by
+#    name and not aborted (gen-types 14y3k) ──
+# gen-types' `toPretty` recursed through every member of the value it rendered, so an `int` option
+# defined as a cyclic set overflowed the stack inside the refusal (uncatchable) instead of refusing.
+# The renderer now reads the value and never a member: `{ self = …; }`. The arms differ by DEF only;
+# the unplanted arm asserts the value, so a type refusing every definition cannot pass it.
+row49='let
+  genMerge = (builtins.getFlake (toString ./.)).inputs.gen.lib.modules.merge;
+in builtins.toJSON (genMerge.evalModuleTree {
+  modules = [
+    { options.port = genMerge.mkOption { type = genMerge.types.int; }; }
+    { config.port = DEF; }
+  ];
+}).config.port'
+row49unplanted="${row49/DEF/7}"
+row49planted="${row49/DEF/let s = { self = s; \}; in s}"
+check "T5 row49 unplanted (an int definition answers the value)" \
+  "$row49unplanted" 0 "" "$tmpdir/row49-green.err" '7'
+check "T5 row49 planted   (a cyclic set, refused by name with a shallow rendering)" \
+  "$row49planted" 1 "is not of the expected type: expected type 'int' but value {" \
+  "$tmpdir/row49-red.err"
+check "T5 row49 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "if (builtins.tryEval (builtins.deepSeq ($row49planted) true)).success then \"ADMITTED\" else \"CAUGHT\"" 0 "" \
+  "$tmpdir/row49-catch.err" 'CAUGHT'
+
+# ── row 50 -- a refusal renders a float's VALUE through the one shared renderer (gen-prelude
+#    `renderValue`, den-hoag-shared-refusal-renderer-6wtos) ──
+# gen-view, gen-scope and gen-merge each carried their own copy of the refusal-value renderer, and
+# gen-view's named every float by its type: `direction = 1.5` was refused as `<a float>`, discarding
+# the value a reader acts on. The three now render through gen-prelude's `renderValue`, which prints
+# a finite float by its value. Row 33's declaration; the arms differ by DIRECTION alone. The
+# unplanted arm asserts the answer, the planted arm's substring is what separates the shared
+# renderer from the retired copy, and the catchable arm is row 33's form.
+row50='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" ]; };
+  definition = genView.compositions.movement {
+    channel = "settings"; relation = "declares"; root = "pewter"; direction = DIRECTION;
+    admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
+    order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+    wellFormed = _: true; tieSet = genView.tieSets.union; empty = [ ];
+    combine = genView.combines.listAppend; dedup = genView.dedups.none;
+  };
+in BODY'
+row50unplanted="${row50/DIRECTION/\"inbound\"}"
+row50planted="${row50/DIRECTION/1.5}"
+check "T5 row50 unplanted (a declared direction)" \
+  "${row50unplanted/BODY/definition.direction}" 0 "" "$tmpdir/row50-green.err" 'inbound'
+check "T5 row50 planted   (a float direction, refused by name with its value rendered)" \
+  "${row50planted/BODY/builtins.deepSeq definition \"ADMITTED\"}" 1 \
+  "gen-view.viewDefinition: field 'direction' is 1.5, which is not one of the declared arms" \
+  "$tmpdir/row50-red.err"
+check "T5 row50 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row50planted/BODY/if (builtins.tryEval (builtins.deepSeq definition \"ADMITTED\")).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row50-catch.err" 'CAUGHT'
+
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be

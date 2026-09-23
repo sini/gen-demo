@@ -83,9 +83,15 @@ in
         # rymxu's row45 (an undeclared unit mode refused at construction) and den-hoag-12ntx's
         # row46 (a non-string relation kind refused at the mint) are four more ordinary paired
         # rows: +8 arms, +4 paired; the third arms of rows 43, 45 and 46 are labelled "catchable",
-        # row24's form, so they stay outside this population.
-        totalArms = 87;
-        paired = 43;
+        # row24's form, so they stay outside this population. den-hoag-0gpyq's row47 (a mark's
+        # `admits` verdict that is not a bool, refused by name) is one more ordinary paired row: +2
+        # arms, +1 paired; its third arm is labelled "catchable", row24's form. den-hoag-uw098's row48
+        # (a forged unit mode refused at intake), den-hoag-14y3k's row49 (a cyclic int definition
+        # refused with a shallow rendering) and den-hoag-shared-refusal-renderer-6wtos's row50 (a
+        # float direction refused with its value rendered) are three more ordinary paired rows: +6
+        # arms, +3 paired; each third arm is labelled "catchable", row24's form.
+        totalArms = 95;
+        paired = 47;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
