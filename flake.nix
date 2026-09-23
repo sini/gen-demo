@@ -3599,6 +3599,26 @@
                       ]
                     && warm.undeclared == (lax (base ++ edited)).undeclared
                   );
+
+                  # (43) C34 — ADR-0025 item 1 on provenance (den-hoag-sdml-file-loss-2xeet):
+                  # content passed through an unattributed `{ _file; imports }` wrapper is
+                  # attributed to the WRAPPER's file, not to the engine's `<gen-merge>` fallback
+                  # (gen-merge `collectModulesFrom`). The value is read beside the file, so a
+                  # threading that moved the merge itself could not pass on the provenance alone.
+                  wrapped-module-provenance-file = asserts "wrapped-module-provenance-file" (
+                    let
+                      r = genMerge.evalModuleTree {
+                        modules = [
+                          { options.spool = genMerge.mkOption { type = genMerge.types.str; }; }
+                          {
+                            _file = "/demo/spool.nix";
+                            imports = [ { config.spool = "sateen"; } ];
+                          }
+                        ];
+                      };
+                    in
+                    map (d: d.file) r.provenance.spool.defs == [ "/demo/spool.nix" ] && r.config.spool == "sateen"
+                  );
                 };
               in
               constructChecks

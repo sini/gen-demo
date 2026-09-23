@@ -41,7 +41,7 @@
           perSystem = {
             devshells.default.commands = [
               # ★ BOTH ARMS RUN BOTH PLANES, and that is the whole of den-hoag-dq6mw. This
-              # repository carries TWO check planes — the root flake's forty-five corpus cells and
+              # repository carries TWO check planes — the root flake's forty-six corpus cells and
               # `./ci`'s six harness cells — and `nix flake check` names only the one its argument
               # points at. Driven at `b1843a5`, one tree one run: with the nix-unit pairing cell
               # seeded red, root `nix flake check` returned rc 0 and printed "all checks passed!"
