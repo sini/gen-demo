@@ -78,8 +78,14 @@ in
         # `targets.root`) are four more ordinary paired rows: +8 arms, +4 paired; each third arm is
         # labelled "catchable", row24's form, so it stays outside this population. Row26's control,
         # re-pointed by 5npwi, gains a "catchable" twin of the same form: +0 arms, +0 paired.
-        totalArms = 79;
-        paired = 39;
+        # den-hoag-cyiuz's row43 (a union member that is not a checker), den-hoag-typemerge-
+        # orientation-e07bf's row44 (the later declaration decides a redeclared type), den-hoag-
+        # rymxu's row45 (an undeclared unit mode refused at construction) and den-hoag-12ntx's
+        # row46 (a non-string relation kind refused at the mint) are four more ordinary paired
+        # rows: +8 arms, +4 paired; the third arms of rows 43, 45 and 46 are labelled "catchable",
+        # row24's form, so they stay outside this population.
+        totalArms = 87;
+        paired = 43;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it

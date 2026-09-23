@@ -1263,7 +1263,8 @@ check "T5 row41 catchable  (the refusal is caught by tryEval, not an abort)" \
 # it (`targetKey`, `writesOf`, `edgeSortKey`). The constructor now refuses a non-string or empty
 # name by name, and the consumers refuse a hand-built target the same way. The two arms differ by
 # the CHANNEL value only; the unplanted arm asserts the rendered key, so a library refusing every
-# target cannot pass it.
+# target cannot pass it. The key is the JSON of its names since gen-view qf55g (it was the
+# separator join `root:pewter/settings`), re-pointed as row 26 was.
 row42='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
   target = genView.placement.targets.root { scope = "pewter"; channel = CHANNEL; };
@@ -1271,7 +1272,7 @@ in BODY'
 row42unplanted="${row42/CHANNEL/\"settings\"}"
 row42planted="${row42/CHANNEL/(x: x)}"
 check "T5 row42 unplanted (a string channel keys the target)" \
-  "${row42unplanted/BODY/genView.placement.targetKey target}" 0 "" "$tmpdir/row42-green.err" 'root:pewter/settings'
+  "${row42unplanted/BODY/genView.placement.targetKey target}" 0 "" "$tmpdir/row42-green.err" '["root","pewter","settings"]'
 check "T5 row42 planted   (a lambda channel, refused by name at construction)" \
   "${row42planted/BODY/builtins.deepSeq target \"ADMITTED\"}" 1 \
   "gen-view.targets.root: field 'channel' is <a lambda>" \
@@ -1279,6 +1280,133 @@ check "T5 row42 planted   (a lambda channel, refused by name at construction)" \
 check "T5 row42 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row42planted/BODY/if (builtins.tryEval (builtins.deepSeq target \"ADMITTED\")).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
   "$tmpdir/row42-catch.err" 'CAUGHT'
+
+# ── row 43 -- a union over a member that is not a checker is refused by name (gen-types cyiuz,
+#    mirrors C48's `union-member-refuses-by-name`) ──
+# gen-types' combinators read each member's `verify` bare, and a gen-merge structural type carries
+# `admits` and no `verify`, so `union [ (submodule …) str ]` aborted uncatchably on its first use
+# (`attribute 'verify' missing`). The combinator now refuses a member that is not a checker by name.
+# The arms differ by the MEMBERS only; the unplanted arm prints the value, so a union refusing every
+# member cannot pass it.
+row43='let
+  genMerge = (builtins.getFlake (toString ./.)).inputs.gen.lib.modules.merge;
+  keyed = genMerge.types.submodule {
+    options.key = genMerge.mkOption { type = genMerge.types.str; default = "none"; };
+  };
+in builtins.toJSON (genMerge.evalModuleTree {
+  modules = [
+    { options.seam = genMerge.mkOption { type = genMerge.types.union MEMBERS; }; }
+    { config.seam = DEF; }
+  ];
+}).config.seam'
+row43a="${row43/MEMBERS/[ genMerge.types.str genMerge.types.int ]}"; row43unplanted="${row43a/DEF/\"sateen\"}"
+row43b="${row43/MEMBERS/[ keyed genMerge.types.str ]}"; row43planted="${row43b/DEF/{ key = \"sateen\"; \}}"
+check "T5 row43 unplanted (a union of checkers answers the value)" \
+  "$row43unplanted" 0 "" "$tmpdir/row43-green.err" '"sateen"'
+check "T5 row43 planted   (a submodule member, refused by name)" \
+  "$row43planted" 1 "gen-types: union: member 'submodule' is not a checker" \
+  "$tmpdir/row43-red.err"
+check "T5 row43 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "if (builtins.tryEval (builtins.deepSeq ($row43planted) true)).success then \"ADMITTED\" else \"CAUGHT\"" 0 "" \
+  "$tmpdir/row43-catch.err" 'CAUGHT'
+
+# ── row 44 -- a redeclared option's type is decided by the LATER declaration, as nixpkgs decides it
+#    (gen-merge e07bf) ──
+# `sealed` is `loom` whose own relation refuses every partner; declared SECOND it decides and
+# refuses, declared FIRST it is the partner `loom` decides against, and it merges. Before e07bf both
+# halves were inverted. The planted stderr is row 30's template, so this row stays out of the
+# cross-row control, as row34 does.
+row44='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  lib = (builtins.getFlake (toString ./.)).inputs.nixpkgs.lib;
+  genMerge = gen.lib.modules.merge;
+  loom = lib.types.attrsOf lib.types.str;
+  sealed = loom // { typeMerge = _: null; };
+in builtins.concatStringsSep "," (builtins.attrValues (genMerge.evalModuleTree {
+  modules = [
+    { options.shed = genMerge.mkOption { type = FIRST; }; }
+    { options.shed = genMerge.mkOption { type = SECOND; }; }
+    { config.shed.warp = "sateen"; }
+  ];
+}).config.shed)'
+row44a="${row44/FIRST/sealed}"; row44unplanted="${row44a/SECOND/loom}"
+row44b="${row44/FIRST/loom}"; row44planted="${row44b/SECOND/sealed}"
+check "T5 row44 unplanted (the refusing relation declared first; the later type decides and merges)" \
+  "$row44unplanted" 0 "" "$tmpdir/row44-green.err" 'sateen'
+check "T5 row44 planted   (the refusing relation declared second decides, refused by name)" \
+  "$row44planted" 1 "declared with types that do not merge" "$tmpdir/row44-red.err"
+
+# ── row 45 -- every field of a unit is decided where the unit is built (gen-view rymxu) ──
+# `unit` bound its `mode` check in a `let` and only inherited it, and `accumulatorOrder` over a
+# ONE-unit schedule never reads `mode`, so `mode = "sideways"` answered `["hem"]` silently. The
+# constructor now forces every field check at construction. The arms differ by MODE alone; the
+# unplanted arm asserts the answer, so a library refusing every unit cannot pass it.
+row45='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" ]; };
+  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
+  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
+  relation = genView.viewRelation {
+    definition = genView.viewDefinition {
+      inherit channel admission order;
+      relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
+      distance = s: s.distance + 1;
+      tieSet = genView.tieSets.union; empty = [ ];
+      combine = genView.combines.listAppend; dedup = genView.dedups.none;
+    };
+    graph = genView.scopeGraph {
+      carrier = genView.carrier {
+        inherit labels;
+        relatumLabels = genView.relatumLabels { names = [ ]; };
+        labelWellFormedness = admission; labelOrder = order; dataOrder = channel;
+        relations = genView.relations { names = [ "gimp" ]; };
+      };
+      scopes = [ "grosgrain" "faille" "pewter" ];
+      edges.tacks = id: { pewter = [ "faille" "grosgrain" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
+      data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
+    };
+    marks = _: [ ];
+    orderMark = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = 0; };
+  };
+  units.hem = genView.unit {
+    inherit relation;
+    target = genView.placement.targets.root { scope = "pewter"; channel = "selvage"; };
+    mode = MODE;
+  };
+  answer = genView.accumulatorOrder { inherit units; };
+in BODY'
+row45unplanted="${row45/MODE/\"merge\"}"
+row45planted="${row45/MODE/\"sideways\"}"
+check "T5 row45 unplanted (a declared mode; the schedule is the assertion)" \
+  "${row45unplanted/BODY/builtins.toJSON answer}" 0 "" "$tmpdir/row45-green.err" '["hem"]'
+check "T5 row45 planted   (an undeclared mode, refused by name at construction)" \
+  "${row45planted/BODY/builtins.toJSON answer}" 1 \
+  "gen-view.unit: field 'mode' is \"sideways\"" \
+  "$tmpdir/row45-red.err"
+check "T5 row45 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row45planted/BODY/if (builtins.tryEval (builtins.deepSeq answer true)).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row45-catch.err" 'CAUGHT'
+
+# ── row 46 -- a non-string relation kind is refused at the mint (gen-identity 12ntx) ──
+# `hashIdentity` handed a non-string kind to `builtins.match`, whose type failure escapes tryEval, so
+# a lambda kind aborted the evaluation. The mint now refuses a non-string kind (and label) by name.
+# The two arms differ by the KIND only; the unplanted arm asserts the identity, so a mint refusing
+# every kind cannot pass it.
+row46='let
+  inherit ((builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.identity) hashIdentity;
+in hashIdentity KIND [ "spool" ] (_: "linen")'
+row46unplanted="${row46/KIND/\"thimble\"}"
+row46planted="${row46/KIND/(x: x)}"
+check "T5 row46 unplanted (a string kind mints, and the identity is the assertion)" \
+  "$row46unplanted" 0 "" "$tmpdir/row46-green.err" 'thimble:13ccbea8f37b673e832c95463487e7cfb76ccf16a6117271258e3f53dd425cb4'
+check "T5 row46 planted   (a lambda kind, refused by name at the mint)" \
+  "builtins.deepSeq ($row46planted) \"ADMITTED\"" 1 \
+  "identity: a lambda as the relation kind; a kind is a string" \
+  "$tmpdir/row46-red.err"
+check "T5 row46 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "if (builtins.tryEval ($row46planted)).success then \"ADMITTED\" else \"CAUGHT\"" 0 "" \
+  "$tmpdir/row46-catch.err" 'CAUGHT'
 
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check

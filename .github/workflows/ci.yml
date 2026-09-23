@@ -14,7 +14,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       # ARM 1 — the corpus against its committed lock, and the step this repository exists for:
-      # the fifty-seven `checks` cells live on the ROOT flake, not in `ci/`, so the stock
+      # the sixty-one `checks` cells live on the ROOT flake, not in `ci/`, so the stock
       # `working-directory: ci` form would run none of them.
       #
       # THIS STEP'S OWN SCOPE: eval-only (`--no-build`, see below), root plane only. `ci/flake.nix`'s
@@ -35,7 +35,7 @@ jobs:
       # The plane: the harness's five checks, plus the batch asserter over `ci/tests`.
       - run: nix flake check ./ci --keep-going
       # T5's by-name half (ADR-0025). `builtins.tryEval` cannot read a refusal's message, so these
-      # forty-two rows cannot be `checks` cells and this is the step that schedules them — the gap
+      # forty-six rows cannot be `checks` cells and this is the step that schedules them — the gap
       # row16 escaped through was a missing scheduler, not a missing analyser.
       - run: nix develop ./ci --command refusals
       - run: nix fmt -- --ci

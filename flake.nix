@@ -2028,6 +2028,44 @@
               wellFormed = _: true;
             };
 
+            # C46 -- a walk over scopes named after packages. gen-graph keys a caller's node names by
+            # their text (den-hoag-u9k7j), so a labeled graph whose scopes are `baseNameOf` of two
+            # packages is walked, and every node it answers keeps its context. C2's idiom (`lg`,
+            # `tacked`) over store-named scopes; declared here because it needs this system's `pkgs`.
+            helloScope = baseNameOf pkgs.hello;
+            jqScope = baseNameOf pkgs.jq;
+            storeNamedContains = [
+              {
+                from = "pewter";
+                to = helloScope;
+              }
+              {
+                from = helloScope;
+                to = jqScope;
+              }
+            ];
+            storeNamedWalk = genGraph.labeledFrom {
+              nodes = [
+                "pewter"
+                helloScope
+                jqScope
+              ];
+              perLabel.contains = id: map (e: e.to) (builtins.filter (e: e.from == id) storeNamedContains);
+            };
+            storeNamedFollow = genGraph.regex.star (genGraph.regex.lit "contains");
+            storeNamedReached = genGraph.query {
+              graph = storeNamedWalk;
+              from = "pewter";
+              follow = storeNamedFollow;
+              mode = "all";
+            };
+            storeNamedPaths = genGraph.query {
+              graph = storeNamedWalk;
+              from = "pewter";
+              follow = storeNamedFollow;
+              mode = "paths";
+            };
+
             # den-hoag-bl06m — this file carries TWO hand-maintained indices over its own
             # construct set (the numbered CI-contract list below, and the "## What v1 declares"
             # table), and they drifted twice in three landings because a repair fixed the one it
@@ -2223,6 +2261,131 @@
                     builtins.length storeNamedEntries == 1
                     && builtins.hasContext (builtins.head storeNamedEntries).scope
                     && builtins.hasContext (builtins.toJSON (builtins.head storeNamedEntries).datum)
+                  );
+
+                  # C46 -- den-hoag-u9k7j. Live control: movement-dedup-equality.
+                  walk-store-named-scope = asserts "walk-store-named-scope" (
+                    let
+                      deepest = (builtins.elemAt storeNamedPaths 2).node;
+                    in
+                    builtins.length storeNamedReached == 3
+                    && builtins.elem helloScope storeNamedReached
+                    && builtins.any builtins.hasContext storeNamedReached
+                    && deepest == jqScope
+                    && builtins.hasContext deepest
+                    && (genGraph.topoOrder (genGraph.forgetLabels storeNamedWalk)).ok
+                  );
+
+                  # C49 -- den-hoag-qf55g. gen-view keys a cell by the JSON of its names, so two
+                  # units whose scope and channel names carry the separator no longer collide. Under
+                  # the old `/` join, `consumer`'s write `<grosgrain/hem, selvage>` and `producer`'s
+                  # read `<grosgrain, hem/selvage>` rendered one key, and the schedule was refused as
+                  # a cycle; the `-` arm is the control, ordered on both sides of the landing.
+                  movement-schedule-separator-names = asserts "movement-schedule-separator-names" (
+                    let
+                      scheduleWith =
+                        sep:
+                        let
+                          labels = genView.edgeLabels { letters = [ "tacks" ]; };
+                          admission = genView.labelWellFormedness {
+                            alphabet = labels;
+                            expression = "tacks*";
+                          };
+                          order = genView.labelOrder {
+                            alphabet = labels;
+                            layers = [ [ "tacks" ] ];
+                            endOfPath = -1;
+                          };
+                          hem = "pewter${sep}hem";
+                          hemSelvage = "hem${sep}selvage";
+                          graph = genView.scopeGraph {
+                            carrier = genView.carrier {
+                              inherit labels;
+                              relations = genView.relations { names = [ "gimp" ]; };
+                              relatumLabels = genView.relatumLabels { names = [ ]; };
+                              labelWellFormedness = admission;
+                              labelOrder = order;
+                              dataOrder = genView.dataOrder {
+                                channel = "selvage";
+                                keyOf = c: c.scope;
+                              };
+                            };
+                            scopes = [
+                              hem
+                              "grosgrain"
+                            ];
+                            edges.tacks = _: [ ];
+                            data = [
+                              {
+                                scope = hem;
+                                relation = "gimp";
+                                datum = [ "cambric" ];
+                              }
+                              {
+                                scope = "grosgrain";
+                                relation = "gimp";
+                                datum = [ "voile" ];
+                              }
+                            ];
+                          };
+                          gathered =
+                            root: channel:
+                            genView.viewRelation {
+                              definition = genView.compositions.movement {
+                                inherit
+                                  channel
+                                  root
+                                  admission
+                                  order
+                                  ;
+                                relation = "gimp";
+                                direction = "outbound";
+                                wellFormed = _: true;
+                                empty = [ ];
+                                tieSet = genView.tieSets.union;
+                                combine = genView.combines.listAppend;
+                                dedup = genView.dedups.byDatum;
+                              };
+                              inherit graph;
+                              marks = _: [ ];
+                              orderMark = genView.labelOrder {
+                                alphabet = labels;
+                                layers = [ [ "tacks" ] ];
+                                endOfPath = 0;
+                              };
+                            };
+                          units = {
+                            consumer = genView.unit {
+                              relation = gathered hem "selvage";
+                              target = genView.placement.targets.root {
+                                scope = "grosgrain${sep}hem";
+                                channel = "selvage";
+                              };
+                              mode = "nest";
+                            };
+                            producer = genView.unit {
+                              relation = gathered "grosgrain" hemSelvage;
+                              target = genView.placement.targets.root {
+                                scope = "pewter";
+                                channel = hemSelvage;
+                              };
+                              mode = "nest";
+                            };
+                          };
+                          answer = genView.accumulatorOrder { inherit units; };
+                          r = builtins.tryEval (builtins.deepSeq answer answer);
+                        in
+                        if r.success then r.value else "REFUSED";
+                    in
+                    scheduleWith "/" == [
+                      "consumer"
+                      "producer"
+                    ]
+                    &&
+                      scheduleWith "-" == [
+                        "consumer"
+                        "producer"
+                      ]
                   );
 
                   # C38 -- a function-bearing datum under `byDatum` is deduped by the declared
@@ -4021,6 +4184,159 @@
                         selvedge = "pinked";
                         lining.weave = "plain";
                       }
+                  );
+
+                  # (58) C47 — den-hoag-tgj54: a nested tree typed BARE reads its own config lazily. A
+                  # `check = true` tree's `sub` leaf is another tree defined `mkIf config.bolt.flag …`,
+                  # which aborted uncatchably with infinite recursion because the orphan gate was
+                  # seq'd onto the config the `mkIf` reads. The gate now decides its own level only:
+                  # an undeclared key one level down is refused when read deep and is a value at a
+                  # sibling read, and `.undeclared` names it, so a reader refusing everything and one
+                  # refusing nothing both fail. A warm evaluation keys on the effective strictness:
+                  # strict over a lax prior refuses deep and says why it went cold; lax over a strict
+                  # prior is the cold value.
+                  bare-tree-reads-its-own-config = asserts "bare-tree-reads-its-own-config" (
+                    let
+                      inherit (genMerge) evalModuleTree mkOption mkIf;
+                      t = genMerge.types;
+                      forces = e: (builtins.tryEval (builtins.deepSeq e null)).success;
+                      liningOf =
+                        check:
+                        (evalModuleTree {
+                          inherit check;
+                          modules = [
+                            {
+                              options.k = mkOption {
+                                type = t.str;
+                                default = "d";
+                              };
+                            }
+                          ];
+                        }).type;
+                      boltOf =
+                        check:
+                        (evalModuleTree {
+                          inherit check;
+                          modules = [
+                            {
+                              options.known = mkOption {
+                                type = t.str;
+                                default = "k";
+                              };
+                              options.flag = mkOption {
+                                type = t.bool;
+                                default = false;
+                              };
+                              options.sub = mkOption { type = liningOf check; };
+                            }
+                          ];
+                        }).type;
+                      run =
+                        check: ty: m:
+                        evalModuleTree {
+                          inherit check;
+                          modules = [
+                            { options.bolt = mkOption { type = ty; }; }
+                            m
+                          ];
+                        };
+                      selfRef =
+                        { config, ... }:
+                        {
+                          config.bolt = {
+                            known = "v";
+                            flag = true;
+                            sub = mkIf config.bolt.flag { k = "s"; };
+                          };
+                        };
+                      subBad = {
+                        _file = "/corpus/bolt.nix";
+                        config.bolt = {
+                          known = "v";
+                          sub = {
+                            k = "s";
+                            bogus = 1;
+                          };
+                        };
+                      };
+                      edited = [
+                        {
+                          options.other = mkOption { type = t.str; };
+                          config.other = "o";
+                        }
+                      ];
+                      base = [
+                        { options.bolt = mkOption { type = boltOf false; }; }
+                        subBad
+                      ];
+                      warmAt =
+                        prev: next:
+                        evalModuleTree {
+                          check = next;
+                          modules = base ++ edited;
+                          warmFrom = evalModuleTree {
+                            check = prev;
+                            modules = base;
+                          };
+                          editedModules = edited;
+                        };
+                      coldLax = evalModuleTree {
+                        check = false;
+                        modules = base ++ edited;
+                      };
+                      strictOverLax = warmAt false true;
+                    in
+                    (run true (boltOf true) selfRef).config.bolt.sub.k == "s"
+                    && !(forces (run true (boltOf false) subBad).config)
+                    && (run true (boltOf false) subBad).config.bolt.known == "v"
+                    &&
+                      map (u: u.path) (run true (boltOf false) subBad).undeclared == [
+                        [
+                          "bolt"
+                          "sub"
+                          "bogus"
+                        ]
+                      ]
+                    && !(forces strictOverLax.config)
+                    && strictOverLax.warmDecision.mode == "cold"
+                    && strictOverLax.warmDecision.reason == "check differs from warmFrom's (warm refused)"
+                    && (warmAt true false).config.bolt == coldLax.config.bolt
+                  );
+
+                  # (59) C48 — den-hoag-cyiuz: a gen-types combinator over a member that is not a
+                  # checker refuses by name. A gen-merge `submodule` carries `admits` and no `verify`,
+                  # so `union [ keyed str ]` aborted uncatchably (`attribute 'verify' missing`) on its
+                  # first read; it is now refused catchably, and the checker-only `union [ str int ]`
+                  # beside it still answers, so a union refusing everything cannot pass. The message
+                  # is `refusals` row 43's.
+                  union-member-refuses-by-name = asserts "union-member-refuses-by-name" (
+                    let
+                      at =
+                        type: def:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            { options.seam = genMerge.mkOption { inherit type; }; }
+                            { config.seam = def; }
+                          ];
+                        }).config.seam;
+                      keyed = genMerge.types.submodule {
+                        options.key = genMerge.mkOption {
+                          type = genMerge.types.str;
+                          default = "none";
+                        };
+                      };
+                    in
+                    !(builtins.tryEval (
+                      builtins.deepSeq (at (genMerge.types.union [
+                        keyed
+                        genMerge.types.str
+                      ]) { key = "sateen"; }) true
+                    )).success
+                    &&
+                      at (genMerge.types.union [
+                        genMerge.types.str
+                        genMerge.types.int
+                      ]) "sateen" == "sateen"
                   );
                 };
               in
