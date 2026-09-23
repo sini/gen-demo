@@ -61,9 +61,11 @@ in
         # both arms too, but the label is not `row<digits> ` so it stays outside this population.
         # den-hoag-s7826's row31 (a surplus module key refused by name) and den-hoag-mx07b's row32
         # (a refined option under the `mkType` arm) are two more ordinary paired rows: +4 arms,
-        # +2 paired.
-        totalArms = 59;
-        paired = 29;
+        # +2 paired. den-hoag-gen-view-refusal-render-tojson-p79do's row33 (a lambda `direction`
+        # refused by name) is one more ordinary paired row: +2 arms, +1 paired; its third arm is
+        # labelled "catchable", row24's form, so it stays outside this population.
+        totalArms = 61;
+        paired = 30;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
