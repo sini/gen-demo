@@ -83,11 +83,11 @@ a nonsense word: `thimble`, `bobbin`, `pewter`, `damask`, `grosgrain`, `faille`,
 `gusset`, `basting`. No den vocabulary appears anywhere.
 
 **The one exception is gone.** The node registry used to be spelled `hosts`, because the hub called
-gen-delivery's `project` without a `selectHosts` and a registry under any other name projected
+gen-delivery's `project` without a `selectNodes` and a registry under any other name projected
 **empty** — no error, no output, just an empty `nixosConfigurations`. The hub now takes the attribute
 path from the consumer (`gen.nodeRegistryPath`, ADR-0035), so both registries here are invented and
 each is the plural of its own kind: `thimbles`, reached THROUGH the hub, and `bobbins`, reached by
-C6's extra `project` call with an explicit `selectHosts`. See *Findings* below.
+C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 
 ## The CI contract
 
@@ -395,7 +395,7 @@ arms are measured green at that pin. No workaround was needed here — the repai
 relock, as v0 predicted.
 
 **2. The hub hardcoded the node-registry name — REPAIRED.** `flakeModules/default.nix` called
-`genDelivery.project` with no `selectHosts` and exposed no option for one, so a consumer's node
+`genDelivery.project` with no `selectNodes` and exposed no option for one, so a consumer's node
 registry had to be named literally `hosts`, and a wrong name failed **silently** — an empty
 projection, not an error. It was the same family as the two defects that module's own header records
 as carried unfixed (`den-hoag-es9g`): the class-name hardcode and the witness-2 gap. Fixed under

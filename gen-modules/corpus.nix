@@ -86,7 +86,7 @@ in
 
   # ── THE NODE REGISTRIES, BOTH UNDER INVENTED NAMES ──
   # The hub's `flakeModules/default.nix` used to call `gen-delivery`'s `project` without a
-  # `selectHosts`, so the projection took that function's default — `v: v.hosts or { }` — and a
+  # `selectNodes`, so the projection took that function's default — `v: v.hosts or { }` — and a
   # registry under any other name projected EMPTY: no error, no output, an empty
   # `nixosConfigurations`. The hub now takes the attribute path from the consumer through
   # `gen.nodeRegistryPath` (ADR-0035, `den-hoag-hub-hardcodes-hosts-mxpd5`), so no word here is

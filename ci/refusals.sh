@@ -142,7 +142,7 @@ row5='let
   mkProj = withCnf: genDelivery.project {
     values = vals;
     cnf = if withCnf then (import ./aspect-cnf.nix) else null;
-    selectHosts = v: v.thimbles or { };
+    selectNodes = v: v.thimbles or { };
   };
 in builtins.toJSON (builtins.attrNames (mkProj WITHCNF).nodes)'
 check "T5 row5 unplanted (cnf present)" "${row5/WITHCNF/true}" 0 "" \

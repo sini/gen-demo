@@ -873,16 +873,16 @@
         # VIEW and a view is singular (`den-hoag-uedvp`); the corpus declares the union of both
         # registries as `options.haberdashery` and names THAT path, so the hub now reaches every node
         # of both. What keeps this call is the reason the comment already gave second: it is the
-        # corpus's only DIRECT exercise of `gen-delivery.project`'s `selectHosts` formal, which
+        # corpus's only DIRECT exercise of `gen-delivery.project`'s `selectNodes` formal, which
         # survives the ruling and would be lost with the call. Calling `realize` directly is
         # rejected — it takes `terminals`, so the corpus would have to rebuild the hub's unexported
         # `terminalOf` bridge, and a corpus that reimplements the surface it tests has stopped
-        # testing it. Taken instead: one extra check calling `project` directly with `selectHosts`,
+        # testing it. Taken instead: one extra check calling `project` directly with `selectNodes`,
         # so gen-delivery's own selector stays exercised beside the hub's option.
         bobbinProjection = genDelivery.project {
           values = genValues;
           cnf = import ./aspect-cnf.nix;
-          selectHosts = v: v.bobbins or { };
+          selectNodes = v: v.bobbins or { };
         };
         bobbinProjectedNodes = builtins.attrNames bobbinProjection.nodes;
 
