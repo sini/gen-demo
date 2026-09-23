@@ -66,8 +66,14 @@ in
         # labelled "catchable", row24's form, so it stays outside this population.
         # den-hoag-foreign-parametric-base-by-name-u92up's row34 (a refined foreign `listOf` pair
         # discriminated at its element) is one more ordinary paired row: +2 arms, +1 paired.
-        totalArms = 63;
-        paired = 31;
+        # den-hoag-4kw63's row35 (a declaration-only read of a surplus key) and den-hoag-foreign-leaf-
+        # check-unenforced-v4h7k's row36 (a foreign type's `check` before the fold) are two more
+        # ordinary paired rows: +4 arms, +2 paired. den-hoag-moduletree-container-element-0s6zi's
+        # row37 (a nested tree as a container element refuses its undeclared key) and den-hoag-gen-
+        # view-value-comparator-abort-hvucx's row38 (a non-int distance rule refused by name) are two
+        # more ordinary paired rows: +4 arms, +2 paired.
+        totalArms = 71;
+        paired = 35;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it

@@ -1054,6 +1054,116 @@ check "T5 row34 planted   (the same foreign container over a DIFFERENT element o
   "which the first type's own \`functor' does not reconcile" \
   "$tmpdir/row34-red.err"
 
+# ── row 35 -- a declaration-only read of a module with a surplus key (mirrors C40's
+#    `declaration-read-syntax`, gen-merge 4kw63) ──
+# The refusals used to sit in the config reader, so a read of declarations alone answered without
+# the typo'd key. The arms differ by the one key's spelling; the unplanted arm prints the names.
+row35='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genMerge = gen.lib.modules.merge;
+  o = genMerge.mkOption { type = genMerge.types.str; default = "none"; };
+in builtins.concatStringsSep "," (builtins.attrNames (genMerge.declaredOptions {
+  modules = [ { _file = "/demo/typo.nix"; options.spool = o; KEY.weft = o; } ];
+}))'
+check "T5 row35 unplanted (both options spelled right)" "${row35/KEY/options}" 0 "" \
+  "$tmpdir/row35-green.err" 'spool,weft'
+check "T5 row35 planted   (a declaration-only read of a typo key)" "${row35/KEY/option}" 1 \
+  "gen-merge: module \`/demo/typo.nix' has an unsupported attribute \`option'" \
+  "$tmpdir/row35-red.err"
+
+# ── row 36 -- a foreign type's `check` before gen-merge's fold (mirrors C41's `foreign-type-check`,
+#    gen-merge v4h7k) ──
+# nixpkgs checks every definition against the option type's `check` before its merge; gen-merge's own
+# folds used to skip a foreign type's `check`, so `lib.types.str` accepted `1`. The arms differ by the
+# one value; the unplanted arm prints it, so a fold refusing every definition cannot pass.
+row36='let
+  flake = builtins.getFlake (toString ./.);
+  genMerge = flake.inputs.gen.lib.modules.merge;
+  lib = flake.inputs.nixpkgs.lib;
+in toString (genMerge.evalModuleTree {
+  modules = [
+    { options.spool = genMerge.mkOption { type = lib.types.str; }; }
+    { _file = "/demo/spool.nix"; spool = VALUE; }
+  ];
+}).config.spool'
+check "T5 row36 unplanted (a string for a foreign str)" "${row36/VALUE/\"sateen\"}" 0 "" \
+  "$tmpdir/row36-green.err" 'sateen'
+check "T5 row36 planted   (an int for a foreign str)" "${row36/VALUE/1}" 1 \
+  "gen-merge: a definition for option \`spool' is not of type \`string', in \`/demo/spool.nix'" \
+  "$tmpdir/row36-red.err"
+
+# ── row 37 -- a nested tree used as a container element refuses the key it cannot report
+#    (mirrors C44's `element-tree-refuses-per-level`, gen-merge 0s6zi) ──
+# A `check = false` tree typed as an `attrsOf` element has no undeclared report, and a key its own
+# level does not declare used to vanish at exit 0 with `.config` smaller. It is now refused by name,
+# naming the key, its file and the element. The arms differ by ONE key in the element; the unplanted
+# arm asserts the value, so a library refusing every element cannot pass it.
+row37='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genMerge = gen.lib.modules.merge;
+  pocketTree = (genMerge.evalModuleTree {
+    check = false;
+    modules = [ { options.selvedge = genMerge.mkOption { type = genMerge.types.str; }; } ];
+  }).type;
+in builtins.toJSON (genMerge.evalModuleTree {
+  check = false;
+  modules = [
+    { options.pockets = genMerge.mkOption { type = genMerge.types.attrsOf pocketTree; }; }
+    { _file = "row37"; config.pockets.welt = { selvedge = "pinked"; } // PLANT; }
+  ];
+}).config.pockets'
+check "T5 row37 unplanted (a clean element of a lax nested tree)" \
+  "${row37/PLANT/{ \}}" 0 "" \
+  "$tmpdir/row37-green.err" '{"welt":{"selvedge":"pinked"}}'
+check "T5 row37 planted   (the same element with one key its tree does not declare)" \
+  "${row37/PLANT/{ fray = \"loose\"; \}}" 1 \
+  "is not declared by the nested tree that owns it (defined in row37); the tree at \`pockets.welt' is merged where no undeclared report is carried" \
+  "$tmpdir/row37-red.err"
+
+# ── row 38 -- a distance rule returning a non-int is refused by name (gen-view hvucx, ADR-0025
+#    item 1; C4b's diamond shape) ──
+# `pewter` reaches `grosgrain` in one `tacks` hop and in two, in ONE derivative state, so the
+# projection compares the two arrivals' distances. A caller's `distance` rule returning a string
+# used to be compared as one: "x" against 1 aborted uncatchably, and two strings ordered
+# lexicographically. The arms differ by the rule alone; the unplanted arm is the hop count and
+# asserts the one-hop arrival survives, so a library refusing every rule cannot pass it.
+row38='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" ]; };
+  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
+  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
+  relation = genView.viewRelation {
+    definition = genView.viewDefinition {
+      inherit channel admission order;
+      relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
+      distance = DISTANCE;
+      tieSet = genView.tieSets.union; empty = [ ];
+      combine = genView.combines.listAppend; dedup = genView.dedups.none;
+    };
+    graph = genView.scopeGraph {
+      carrier = genView.carrier {
+        inherit labels;
+        relatumLabels = genView.relatumLabels { names = [ ]; };
+        labelWellFormedness = admission; labelOrder = order; dataOrder = channel;
+        relations = genView.relations { names = [ "gimp" ]; };
+      };
+      scopes = [ "grosgrain" "faille" "pewter" ];
+      edges.tacks = id: { pewter = [ "faille" "grosgrain" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
+      data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
+    };
+    marks = _: [ ];
+    orderMark = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = 0; };
+  };
+in builtins.toJSON (builtins.deepSeq relation.value (map (c: c.distance) relation.contributions))'
+check "T5 row38 unplanted (the hop count; the one-hop arrival survives)" \
+  "${row38/DISTANCE/s: s.distance + 1}" 0 "" \
+  "$tmpdir/row38-green.err" '[1]'
+check "T5 row38 planted   (a rule returning a string, refused by name)" \
+  "${row38/DISTANCE/s: if builtins.isInt s.distance then \"x\" else 1}" 1 \
+  "gen-view.viewRelation: channel 'selvage' declares a distance rule that returned \"x\"" \
+  "$tmpdir/row38-red.err"
+
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be
@@ -1074,6 +1184,8 @@ check "T5 row34 planted   (the same foreign container over a DIFFERENT element o
 # `gen-schema:`, and both are about a NAME the library does not admit -- row 28 a declaration key no
 # reader consumes, row 29 a collection key colliding with the library's own vocabulary. They are the
 # pair most able to cross-match by accident, and neither message may appear in the other's stderr.
+# Extended to rows 35/36: both are gen-merge refusals of one `spool` module behind the same `gen-merge:`
+# prefix, row 35 a key the reader does not admit and row 36 a value the foreign type does not admit.
 if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
   echo "FAIL control: row1's message leaked into row2's refusal"
   fail=1
@@ -1122,8 +1234,14 @@ elif grep -qF "is reserved — cannot be used as a collection key" "$tmpdir/row2
 elif grep -qF "unrecognised declaration key" "$tmpdir/row29-red.err"; then
   echo "FAIL control: row28's message leaked into row29's refusal"
   fail=1
+elif grep -qF "is not of type" "$tmpdir/row35-red.err"; then
+  echo "FAIL control: row36's message leaked into row35's refusal"
+  fail=1
+elif grep -qF "has an unsupported attribute" "$tmpdir/row36-red.err"; then
+  echo "FAIL control: row35's message leaked into row36's refusal"
+  fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26 and row28/row29 refusals do not cross-match)"
+  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29 and row35/row36 refusals do not cross-match)"
 fi
 
 exit $fail

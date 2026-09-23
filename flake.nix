@@ -3744,6 +3744,244 @@
                     (at spoolTree ({ ... }: { spool = "sateen"; })).spool == "sateen"
                     && (at keyed { key = "sateen"; }).key == "sateen"
                   );
+
+                  # (51) C40 — den-hoag-4kw63: gen-merge refuses a module's syntax on its first read, so
+                  # a DECLARATION-only read of C35's typo module refuses by name, as a config read does,
+                  # where `declaredOptions` used to answer `[ "spool" ]` and drop `weft` unread. The
+                  # spelled-right twin is read beside it, so a reader refusing every module cannot pass.
+                  declaration-read-syntax = asserts "declaration-read-syntax" (
+                    let
+                      spoolOpt = genMerge.mkOption {
+                        type = genMerge.types.str;
+                        default = "none";
+                      };
+                      declared = m: builtins.attrNames (genMerge.declaredOptions { modules = [ m ]; });
+                      typo = {
+                        _file = "/demo/typo.nix";
+                        options.spool = spoolOpt;
+                        option.weft = spoolOpt;
+                      };
+                    in
+                    !(builtins.tryEval (declared typo)).success
+                    &&
+                      declared (
+                        removeAttrs typo [ "option" ]
+                        // {
+                          options = {
+                            spool = spoolOpt;
+                            weft = spoolOpt;
+                          };
+                        }
+                      ) == [
+                        "spool"
+                        "weft"
+                      ]
+                  );
+
+                  # (52) C41 — den-hoag-foreign-leaf-check-unenforced-v4h7k: a foreign type's `check`
+                  # is applied before gen-merge's own fold, as nixpkgs' `checkedAndMerged` does.
+                  # `lib.types.str` used to accept `1` at every position gen-merge folds; it now
+                  # refuses it (by name in `refusals` row 36). The refusal is read beside its control,
+                  # the same option given a string, so a fold refusing everything cannot pass.
+                  foreign-type-check = asserts "foreign-type-check" (
+                    let
+                      read =
+                        m:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            { options.spool = genMerge.mkOption { type = lib.types.str; }; }
+                            m
+                          ];
+                        }).config.spool;
+                    in
+                    !(builtins.tryEval (read {
+                      _file = "/demo/spool.nix";
+                      spool = 1;
+                    })).success
+                    && read { spool = "sateen"; } == "sateen"
+                  );
+
+                  # (53) C42 — den-hoag-9f4bn: a nesting option whose every definition was discharged
+                  # reads what its nixpkgs reference reads. A `submodule` option defined only under
+                  # `mkIf false` yields the module set evaluated over no definitions (nixpkgs
+                  # `submoduleWith`'s `base.config`), so `weft` reads its default, where it used to
+                  # abort uncatchably; a strict `attrsOf` DROPS an element whose every definition was
+                  # discharged, where it used to keep the key. With the condition true both read the
+                  # definition.
+                  empty-nesting-reads-its-reference = asserts "empty-nesting-reads-its-reference" (
+                    let
+                      selvage = genMerge.types.submodule {
+                        options.weft = genMerge.mkOption {
+                          type = genMerge.types.str;
+                          default = "plain";
+                        };
+                      };
+                      read =
+                        on:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            {
+                              options.selvage = genMerge.mkOption { type = selvage; };
+                              options.bolts = genMerge.mkOption { type = genMerge.types.attrsOf selvage; };
+                            }
+                            {
+                              selvage = genMerge.mkIf on { weft = "twill"; };
+                              bolts.linen = genMerge.mkIf on { weft = "twill"; };
+                            }
+                          ];
+                        }).config;
+                    in
+                    (read false).selvage.weft == "plain"
+                    && builtins.attrNames (read false).bolts == [ ]
+                    && (read true).selvage.weft == "twill"
+                    && (read true).bolts.linen.weft == "twill"
+                  );
+
+                  # (54) C43 — den-hoag-submodule-admits-path-string-uetyh: a nesting type admits
+                  # what nixpkgs admits as a module. A STRING naming a module file is the MODULE under
+                  # `either (submodule M) str`, as `lib.types.submodule`'s `path.check` reads it, where
+                  # the union used to answer the string; and `lint` collects that string as the
+                  # engine imports it, where it used to drop it with no finding.
+                  module-path-string = asserts "module-path-string" (
+                    let
+                      at =
+                        type: def:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            { options.seam = genMerge.mkOption { inherit type; }; }
+                            { config.seam = def; }
+                          ];
+                        }).config.seam;
+                      keyed = genMerge.types.submodule {
+                        options.key = genMerge.mkOption {
+                          type = genMerge.types.str;
+                          default = "none";
+                        };
+                      };
+                      spool = builtins.toFile "spool.nix" ''{ config.key = "sateen"; }'';
+                      lintee = builtins.toFile "lintee.nix" "{ options, ... }: { }";
+                    in
+                    at (genMerge.types.either keyed genMerge.types.str) spool == {
+                      key = "sateen";
+                    }
+                    && builtins.length (genMerge.lint { modules = [ lintee ]; }) == 1
+                  );
+
+                  # (55) C44 — a nested tree used as a container element refuses, level by level, the
+                  # key it cannot report (ADR-0025 item 1, den-hoag-0s6zi). C30's tree typed BARE
+                  # reports its orphan; the same seam as an `attrsOf` ELEMENT has no report channel,
+                  # and the key used to vanish at exit 0. It is refused by name when the level that
+                  # holds it is read, and a level not read decides nothing, as nixpkgs refuses per
+                  # level. The bare arm (5) is the control that the report channel is untouched; the
+                  # message is `refusals` row 37's.
+                  element-tree-refuses-per-level = asserts "element-tree-refuses-per-level" (
+                    let
+                      liningTree =
+                        (genMerge.evalModuleTree {
+                          check = false;
+                          modules = [
+                            {
+                              options.weave = genMerge.mkOption {
+                                type = genMerge.types.str;
+                                default = "plain";
+                              };
+                            }
+                          ];
+                        }).type;
+                      pocketTree =
+                        (genMerge.evalModuleTree {
+                          check = false;
+                          modules = [
+                            {
+                              options.selvedge = genMerge.mkOption {
+                                type = genMerge.types.str;
+                                default = "raw";
+                              };
+                              options.lining = genMerge.mkOption { type = liningTree; };
+                            }
+                          ];
+                        }).type;
+                      pockets =
+                        def:
+                        genMerge.evalModuleTree {
+                          check = false;
+                          modules = [
+                            { options.pockets = genMerge.mkOption { type = genMerge.types.attrsOf pocketTree; }; }
+                            {
+                              _file = "c44";
+                              config.pockets = def;
+                            }
+                          ];
+                        };
+                      bare = genMerge.evalModuleTree {
+                        check = false;
+                        modules = [
+                          { options.pocket = genMerge.mkOption { type = pocketTree; }; }
+                          {
+                            _file = "c44";
+                            config.pocket = {
+                              selvedge = "pinked";
+                              fray = "loose";
+                            };
+                          }
+                        ];
+                      };
+                      refuses = e: !(builtins.tryEval (builtins.deepSeq e null)).success;
+                    in
+                    # (1) clean elements are values
+                    (pockets { welt.selvedge = "pinked"; }).config.pockets == {
+                      welt = {
+                        selvedge = "pinked";
+                        lining.weave = "plain";
+                      };
+                    }
+                    # (2) a throwing leaf nested inside an element, not read, stays unforced
+                    &&
+                      (pockets {
+                        welt = {
+                          selvedge = "pinked";
+                          lining = throw "unread";
+                        };
+                      }).config.pockets.welt.selvedge == "pinked"
+                    # (3) an undeclared key inside an element is refused, not dropped ...
+                    &&
+                      refuses
+                        (pockets {
+                          welt = {
+                            selvedge = "pinked";
+                            fray = "loose";
+                          };
+                        }).config.pockets
+                    # (4) ... one level down, when ITS level is read, while the element's own level is a value
+                    &&
+                      refuses
+                        (pockets {
+                          welt.lining = {
+                            weave = "twill";
+                            fray = "loose";
+                          };
+                        }).config.pockets.welt.lining
+                    &&
+                      (pockets {
+                        welt.lining = {
+                          weave = "twill";
+                          fray = "loose";
+                        };
+                      }).config.pockets.welt.selvedge == "raw"
+                    # (5) CONTROL: the same tree typed bare still REPORTS rather than refuses
+                    &&
+                      map (u: u.path) bare.undeclared == [
+                        [
+                          "pocket"
+                          "fray"
+                        ]
+                      ]
+                    &&
+                      bare.config.pocket == {
+                        selvedge = "pinked";
+                        lining.weave = "plain";
+                      }
+                  );
                 };
               in
               constructChecks

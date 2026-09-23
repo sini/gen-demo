@@ -75,12 +75,17 @@ incremental plane's decision crossing.
 | C37 -- one refined type declared twice survives           | 0034                | `bobbin.picks` declared in two modules of the staged pass with one let-bound refined type; the merge keeps exactly one refinement, read back as its message; two different refinements of one base refuse (`refusals` row 30)                                                                                                                        |
 | C38 -- a function-bearing datum dedups by `==`            | 0025 item 1, 0034   | `movement-dedup-function-datum`: under `byDatum`, one module binding authored at two scopes collapses (Nix `==` is true of one binding) and a fresh literal survives; 2 kept, 1 licensed drop, where the datum used to abort uncatchably in `toJSON`                                                                                                 |
 | C39 -- a nesting seam reads a definition as its reference | 0025 item 1         | `nesting-def-reading`: a function def at an `(evalModuleTree …).type` option yields `spool = "sateen"`, where it aborted uncatchably; a `submodule` declaring `key` takes the def's `key = "sateen"`, where it read the default                                                                                                                      |
+| C40 -- a declaration read refuses module syntax           | 0025 item 1         | `declaredOptions` of C35's typo module (`option.weft` beside `options.spool`) is refused by name, where it answered `[ "spool" ]`; the spelled-right twin reads `[ "spool" "weft" ]`; the message is `refusals` row 35's                                                                                                                             |
+| C41 -- a foreign type's check is enforced                 | 0025 item 1         | `spool` typed nixpkgs `lib.types.str` refuses `1` catchably, where gen-merge's own fold used to accept it; the same option given `sateen` is the control, and the refusal is by name in `refusals` row 36                                                                                                                                            |
+| C42 -- a discharged nesting option reads its reference    | 0025 item 1         | `empty-nesting-reads-its-reference`: a `submodule` option defined only under `mkIf false` reads `weft = "plain"`, where it aborted uncatchably; a strict `attrsOf` drops the discharged `linen`, where it kept the key; with the condition true both read `"twill"`                                                                                  |
+| C43 -- a module named by a path string is a module        | 0025 item 1         | `module-path-string`: a store-path string under `either (submodule M) str` is the module (`{ key = "sateen"; }`), where the union answered the string; `lint` collects that string as the engine imports it, one finding where it dropped it                                                                                                         |
+| C44 -- a nested tree as a container element refuses       | 0025 item 1         | `element-tree-refuses-per-level`: a key a `check = false` tree does not declare, inside an `attrsOf` element, is refused when its level is read, where it vanished at exit 0; the same tree typed bare still reports it; the message is `refusals` row 37's                                                                                          |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-fifty-one `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+fifty-six `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -102,14 +107,14 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's fifty-one checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's fifty-six checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The fifty-one root checks are the acceptance criteria:
+The fifty-six root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -389,7 +394,31 @@ The fifty-one root checks are the acceptance criteria:
     every def as a module, so a function def yields `spool = "sateen"`, where it used to abort
     uncatchably; `types.submodule` reads an attrset def as config, so an option it declares as `key`
     takes `sateen`, where the key was dropped as module identity and read the default.
-51. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+51. **`declaration-read-syntax`** — C40, den-hoag-4kw63. gen-merge refuses a module's syntax on
+    each door's first read, which for `declaredOptions` is the declaration stratum. C35's typo
+    module, read for its declarations only, is refused by name, where the read used to answer
+    `[ "spool" ]` and drop `weft` without a word. The spelled-right twin reads `[ "spool" "weft" ]`
+    beside it; the message is `refusals` row 35.
+52. **`foreign-type-check`** — C41, den-hoag-foreign-leaf-check-unenforced-v4h7k. A type stated in
+    the foreign protocol has its `check` applied to every definition before gen-merge's own fold, as
+    nixpkgs' `mergeDefinitions` does. `spool` typed `lib.types.str` used to accept `1`; it is now
+    refused, beside the same option reading `sateen`; the message is `refusals` row 36's.
+53. **`empty-nesting-reads-its-reference`** — C42, den-hoag-9f4bn. A nesting option whose every
+    definition was discharged reads what nixpkgs reads. A `submodule` defined only under `mkIf false`
+    is its module set over no definitions, so `weft` reads its default `plain`, where it used to abort
+    uncatchably. A strict `attrsOf` drops the discharged element, so `bolts` has no `linen`. The
+    control, with the condition true, reads `twill` at both.
+54. **`module-path-string`** — C43, den-hoag-submodule-admits-path-string-uetyh. A nesting type
+    admits what nixpkgs admits as a module: a string naming a module file is the module under
+    `either (submodule M) str`, so the union reads `{ key = "sateen"; }` where it used to answer the
+    string, and `lint` collects that string as the engine imports it, where it used to drop it with
+    no finding.
+55. **`element-tree-refuses-per-level`** — C44, den-hoag-0s6zi. A `check = false` nested tree used
+    as an `attrsOf` element has no undeclared report, and a key its level does not declare used to
+    vanish at exit 0. It is now refused by name when the level holding it is read, one level down as
+    well, while an unread level decides nothing; the same tree typed bare still reports the key
+    rather than refusing it. The message is `refusals` row 37's.
+56. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -398,7 +427,7 @@ The fifty-one root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these fifty-one: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these fifty-six: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
