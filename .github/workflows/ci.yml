@@ -14,7 +14,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       # ARM 1 — the corpus against its committed lock, and the step this repository exists for:
-      # the forty-two `checks` cells live on the ROOT flake, not in `ci/`, so the stock
+      # the forty-three `checks` cells live on the ROOT flake, not in `ci/`, so the stock
       # `working-directory: ci` form would run none of them.
       #
       # THIS STEP'S OWN SCOPE: eval-only (`--no-build`, see below), root plane only. `ci/flake.nix`'s

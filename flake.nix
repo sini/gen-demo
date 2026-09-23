@@ -888,6 +888,27 @@
 
         # ── T2b — the incremental plane's byte-parity cell (ADR-0008) ──
         roster = inputs.gen.lib.mkGenLibs { inherit lib; };
+
+        # ── den-hoag-cr72 — gen-aspects' custom guard-form vocabulary refuses EAGERLY. A malformed
+        # or core-colliding `cnf.guardForms` entry used to construct fine and refuse only when that
+        # exact form was dispatched BY NAME, so the library's own "MUST be { eval; reads; }" held for
+        # exactly the forms a run happened to look up. `fourchette` is an invented (unused) fabric
+        # term, per the corpus's naming rule; `eq` below is not corpus vocabulary but the NAME OF A
+        # CORE PREDICATE FORM in gen-aspects, which is the collision under test.
+        cr72Vocab = forms: roster.aspects.mkGuardVocab { guardForms = forms; };
+        cr72Sound = {
+          eval = _ctx: _a: true;
+          reads = [ ];
+        };
+        cr72NoReads = {
+          eval = _ctx: _a: true;
+        };
+        # Dispatch through an unrelated CORE predicate: nothing in this call names any declared
+        # custom form, which is the defect at full strength.
+        cr72Dispatch = gv: gv.applyGuard { yardage = 3; } (gv.vocab.always { fired = true; });
+        # deepSeq, not WHNF: a refusal living in a lazy attribute value is invisible to a bare tryEval.
+        cr72Refuses = e: !(builtins.tryEval (builtins.deepSeq e true)).success;
+        cr72Constructs = v: (builtins.tryEval (builtins.deepSeq v true)).success;
         t2bCtors = {
           genMerge = roster.merge;
           genSchema = roster.schema;
@@ -3439,6 +3460,42 @@
                         selvedge = "pinked";
                       }
                     && map (u: u.path) topLevel.undeclared == [ [ "fray" ] ]
+                  );
+
+                  # (41) C31 — ADR-0025 item 1 in gen-aspects' guard vocabulary (den-hoag-cr72): a
+                  # malformed or core-colliding custom form is a NAMED refusal at the vocabulary's
+                  # first use, not a value that travels until something happens to dispatch it by name.
+                  guard-vocab-eager = asserts "guard-vocab-eager" (
+                    # (1) CONTROL — a well-formed, non-colliding form constructs AND dispatches.
+                    # Without it the refusals below read as `applyGuard` refusing unconditionally.
+                    cr72Dispatch (cr72Vocab {
+                      fourchette = cr72Sound;
+                    }) == {
+                      fired = true;
+                    }
+                    # (2) a `fourchette` form missing `reads`. Construction stays TOTAL — the fix
+                    # deliberately does NOT move the throw onto `mkGuardVocab`'s return, because that
+                    # makes the return's WHNF depend on `guardForms`' key set and cycles for a caller
+                    # whose key comes from its own config fixpoint (den-hoag-fvxh's shape) ...
+                    && cr72Constructs (cr72Vocab {
+                      fourchette = cr72NoReads;
+                    })
+                    # ... and the FIRST `applyGuard` call through that vocab refuses, though it
+                    # dispatches `always` and never names `fourchette`.
+                    && cr72Refuses (
+                      cr72Dispatch (cr72Vocab {
+                        fourchette = cr72NoReads;
+                      })
+                    )
+                    # (3) a custom form shadowing the core `eq` form — same corrected shape.
+                    && cr72Constructs (cr72Vocab {
+                      eq = cr72Sound;
+                    })
+                    && cr72Refuses (
+                      cr72Dispatch (cr72Vocab {
+                        eq = cr72Sound;
+                      })
+                    )
                   );
                 };
               in
