@@ -3858,8 +3858,11 @@
                           default = "none";
                         };
                       };
-                      spool = builtins.toFile "spool.nix" ''{ config.key = "sateen"; }'';
-                      lintee = builtins.toFile "lintee.nix" "{ options, ... }: { }";
+                      # Files in the flake source, named by STRING: `toString` of a path is the
+                      # store-path string `lib.types.submodule`'s `path.check` admits. Never
+                      # `builtins.toFile`, which CI's read-only `--no-build` eval cannot import.
+                      spool = toString ./fixtures/module-path-string/spool.nix;
+                      lintee = toString ./fixtures/module-path-string/lintee.nix;
                     in
                     at (genMerge.types.either keyed genMerge.types.str) spool == {
                       key = "sateen";
