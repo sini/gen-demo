@@ -430,7 +430,8 @@ projection, not an error. It was the same family as the two defects that module'
 as carried unfixed (`den-hoag-es9g`): the class-name hardcode and the witness-2 gap. Fixed under
 ADR-0035 (`den-hoag-hub-hardcodes-hosts-mxpd5`): the hub takes the attribute path from the consumer,
 and this corpus declares `gen.nodeRegistryPath = [ "thimbles" ]`. The sibling output key
-`gen.composed.hosts` is the same finding at another site and is **not** fixed here.
+`gen.composed.hosts` was the same finding at another site, repaired the same way: the handle
+publishes `gen.composed.nodes` (`den-hoag-erp1m`).
 
 **3. Two stale docs, met while building, still stale at the v1 pin.** gen-scope's README documents
 `eval { roots = …; }`; the formal argument is `scope`, and `buildNodes` is a tombstone that refuses

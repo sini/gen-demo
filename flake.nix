@@ -864,8 +864,8 @@
         c29Withheld = (builtins.tryEval (builtins.deepSeq (c29Bobbins { }).selvage null)).success;
 
         # ── C6 — a delivery to one target (ADR-0028) ──
-        pewterClasses = builtins.attrNames config.gen.composed.hosts.pewter.classes;
-        damaskClasses = builtins.attrNames config.gen.composed.hosts.damask.classes;
+        pewterClasses = builtins.attrNames config.gen.composed.nodes.pewter.classes;
+        damaskClasses = builtins.attrNames config.gen.composed.nodes.damask.classes;
         stitchKeySet = builtins.attrNames config.gen.composed.aspects.stitch;
 
         # A SECOND ROUTE TO A PROJECTION, kept deliberately — and the cardinality is NO LONGER the
@@ -2267,7 +2267,7 @@
                   # limbs absent from it despite both being present in the aspect body, and the bobbin
                   # door under an invented name.
                   delivery-projection = asserts "delivery-projection" (
-                    builtins.attrNames config.gen.composed.hosts == [
+                    builtins.attrNames config.gen.composed.nodes == [
                       "damask"
                       "faille"
                       "grosgrain"
