@@ -73,12 +73,13 @@ incremental plane's decision crossing.
 | C35 -- the module reader classifies like nixpkgs          | 0025 item 1         | a shorthand key beside `imports` is config (`spool` reads `sateen`, where it read the default); a surplus key beside an explicit `config` is refused catchably, the same module without it being the control, and by name in `refusals` row 31                                                                                                       |
 | C36 -- a refined option under the `mkType` arm            | 0025                | `bobbin.picks`, refined positive, on a kind built through gen-aspects' `mkType`: the kind's `refinements` name `picks`, and the registry refuses `picks = 0` by name (`refusals` row 32)                                                                                                                                                             |
 | C37 -- one refined type declared twice survives           | 0034                | `bobbin.picks` declared in two modules of the staged pass with one let-bound refined type; the merge keeps exactly one refinement, read back as its message; two different refinements of one base refuse (`refusals` row 30)                                                                                                                        |
+| C38 -- a function-bearing datum dedups by `==`            | 0025 item 1, 0034   | `movement-dedup-function-datum`: under `byDatum`, one module binding authored at two scopes collapses (Nix `==` is true of one binding) and a fresh literal survives; 2 kept, 1 licensed drop, where the datum used to abort uncatchably in `toJSON`                                                                                                 |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-forty-nine `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+fifty `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -100,14 +101,14 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's forty-nine checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's fifty checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The forty-nine root checks are the acceptance criteria:
+The fifty root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -376,7 +377,13 @@ The forty-nine root checks are the acceptance criteria:
     `bobbin.picks` is declared in two modules of the staged pass with one let-bound refined type, and
     the kind's `refinements.picks` carries exactly one message. The kind's `.options` is not a read
     path (C17 pins it empty). Two different refinements of one base are `refusals` row 30.
-49. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+49. **`movement-dedup-function-datum`** — C38, den-hoag-eunp3. A NixOS module is a function,
+    and `dedups.byDatum` used to address a datum with `toJSON`, which aborts on a lambda where
+    `tryEval` cannot hold it. Step 8 now gives every lambda one tag in the bucket address and leaves
+    the decision to `==`: `cambricModule`, one binding at `grosgrain` and `faille`, collapses, while a
+    fresh `{ config, ... }: { }` literal at `faille` survives. Two kept, one drop, and `noFalseDedup`
+    holds.
+50. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -385,7 +392,7 @@ The forty-nine root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these forty-nine: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these fifty: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 

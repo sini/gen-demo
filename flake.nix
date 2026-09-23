@@ -604,6 +604,30 @@
           }
         ];
 
+        # ── A FUNCTION-BEARING DATUM IS DEDUPED BY `==`, NEVER ABORTED ON (den-hoag-eunp3) ──
+        # A NixOS module is a function. `cambricModule` is ONE binding authored at two scopes, so
+        # Nix `==` calls the two `[ cambricModule ]` data equal; a second literal of the same text is
+        # a second closure, which `==` calls distinct. Three declarations on `collisionGraph`'s
+        # shape: two survivors, ONE licensed drop.
+        cambricModule = { config, ... }: { };
+        collisionModules = collisionDedupOn [
+          {
+            scope = "grosgrain";
+            relation = "gimp";
+            datum = [ cambricModule ];
+          }
+          {
+            scope = "faille";
+            relation = "gimp";
+            datum = [ cambricModule ];
+          }
+          {
+            scope = "faille";
+            relation = "gimp";
+            datum = [ ({ config, ... }: { }) ];
+          }
+        ];
+
         # THE ORACLE: every recorded drop is one the arm's own declared relation licenses. Read off
         # the RESULT alone — `definition` is carried inside `viewRelation`'s return — so it needs
         # nothing the caller did not already hand the call.
@@ -2162,6 +2186,16 @@
                     && builtins.length collisionCoerced.contributions == 2
                     && builtins.length collisionCoerced.dropped == 1
                     && noFalseDedup collisionCoerced
+                  );
+
+                  # C38 -- a function-bearing datum under `byDatum` is deduped by the declared
+                  # relation instead of aborting where `tryEval` cannot hold it. The shared module
+                  # collapses (Nix `==` is true of one binding), the fresh literal survives, and the
+                  # one drop recorded is licensed.
+                  movement-dedup-function-datum = asserts "movement-dedup-function-datum" (
+                    builtins.length collisionModules.contributions == 2
+                    && builtins.length collisionModules.dropped == 1
+                    && noFalseDedup collisionModules
                   );
 
                   # registry-split-key-refuses -- named for `registry` and not for `movement`,
