@@ -1,7 +1,7 @@
 # The PLANE-COVERAGE discipline of the check commands, held to a cell (`den-hoag-dq6mw`).
 #
 # `nix flake check` covers the flake its argument names and no other. This repository has two —
-# the root flake's thirty-nine corpus cells and `ci/`'s six harness cells — so a command running
+# the root flake's corpus cells and `ci/`'s six harness cells — so a command running
 # one form produces a green over a population it never touched. Driven at `b1843a5`: with the
 # `refusals` pairing cell seeded red, root `nix flake check` returned rc 0 and "all checks
 # passed!" while `nix flake check ./ci` returned rc 1, on one tree in one run. `check-lock` ran

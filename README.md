@@ -85,14 +85,14 @@ incremental plane's decision crossing.
 | C47 -- a nested tree typed bare reads its own config      | 0025 item 1, 0008 item 2 | `bare-tree-reads-its-own-config`: a `check = true` tree whose leaf `sub` is another tree defined `mkIf config.bolt.flag …` reads `sub.k = "s"`, where it aborted with infinite recursion; `sub.bogus` is refused read deep and a value at a sibling read, and `.undeclared` names it; a strict warm evaluation over a lax prior goes cold and says why |
 | C48 -- a union member that is not a checker               | 0025 item 1              | `union-member-refuses-by-name`: `union [ (submodule …) str ]` over `{ key = "sateen"; }` is refused catchably, where it aborted (`attribute 'verify' missing`); `union [ str int ]` over `"sateen"` is the control; the message is `refusals` row 43's                                                                                                 |
 | C49 -- a schedule over separator-bearing names            | 0025 item 1              | `movement-schedule-separator-names`: two units whose scope and channel names carry `/` order `["consumer","producer"]`, where the `/`-joined cell keys collided and the schedule was refused; the `-` arm is the control                                                                                                                               |
-| T5 -- planted refusals                                    | 0025                     | forty-eight enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                          |
+| T5 -- planted refusals                                    | 0025                     | every enforcer in `ci/refusals/`, each driven red by name via `refusals`                                                                                                                                                                                                                                                                               |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
-holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
-queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-sixty-one `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
-holds T5's by-name half, which runs out of band because
-`builtins.tryEval` cannot read a refusal's message.
+holds the key-category declaration that both the tree and the hub read; `constructs/` holds the
+queries and every construct's standalone fixtures, one file per construct; `cells/` holds the
+`checks`, one file per cell; `flake.nix` holds only the wiring that discovers both, plus the
+`construct-index` cell over this table; `ci/refusals/` holds T5's by-name half, one file per row,
+which runs out of band because `builtins.tryEval` cannot read a refusal's message.
 
 ### The naming rule — invented kinds only
 
@@ -112,354 +112,63 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's sixty-one checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's checks, one per file in `cells/`, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The sixty-one root checks are the acceptance criteria:
+The root checks are the acceptance criteria. **`cells/` is their index**: each file is one check,
+named after the file, and its header comment says what the cell asserts and why. The one check with
+no file is `construct-index`, declared in `flake.nix`: it reads the constructs every cell attributes
+itself to (the `construct` field) and requires them to equal this README's `## What v1 declares`
+table, plus T5 — the one construct with no check cell (`den-hoag-bl06m`). It reports how many rows
+it scanned against how many it expected, never a bare pass.
 
-01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
-    gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
-    explicit per-id `kindFor` over the heterogeneous node union.
-02. **`binding-node`** — C3. The binding minted, identified by its own labelled relata.
-03. **`movement`** — C4. The movement's value, and Λ read off C3's own relata names by construction.
-04. **`policy-edge`** — C5. The policy program's stable model, total, and the derived edge admitted.
-05. **`delivery-projection`** — C6. The node set, the one collected class, both Rider limbs absent
-    from the classes despite both being present in the aspect body, and the bobbin door under an
-    invented name. gen-aspects' exported `hasClassContent` is also called directly, on both of its
-    clauses: the declared-but-unset class and a fabricated empty module each read as no content.
-06. **`warm-parity`** — T2b. The warm decision byte-identical to a cold one, with both guards
-    (`trace.mode == "warm"` and `trace.reused == [ "ferrule" ]`) included. The second is what makes
-    the equality a statement about reuse: the base is a plain attrset and `ferrule` is outside the
-    edit, so the warm arm splices that leaf from the previous evaluation instead of remerging it.
-    `trace.inert == false` is read too: an armed warm run is not inert, which is C33's control.
-07. **`nixos-instantiate`** — the target instantiated, **not built**: the check writes
-    `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
-    NixOS evaluation and stops at the `.drv`.
-08. **`contribution-protocol`** — C8. Three contributions unioned; the node set is fixed under
-    permutation, the positionally-folded `spool` is not.
-09. **`share-class`** — C9. The partition on `weave`, the core's shared keys and values, the gate on
-    a real member, and the invariance check all in one cell.
-10. **`stratified-dispatch`** — C10. Each rule's stratum stamped by `deriveGroup`; the `sateen` rule
-    not firing against a `linen` context is the discriminator.
-11. **`federated-link`** — C11. The locally-declared capability equals what the requirer resolves to
-    after the exchange (ADR-0027's equivalence survival).
-12. **`product-promotion`** — C12. The product's own `dims` order, its cells, the promoted edge set,
-    a projection, and the policy program's admission of the promoted head, all read off one
-    `seamCoords` rather than restated.
-13. **`layered-fold`** — C13. All three `foldLayers` strategies plus the default channel in one call.
-14. **`body-term-algebra`** — C14. The resolved term, `knownFormers`, the crossing's primitives and
-    inert budget, and all three refusal arms as data — the one construct whose refusals live in this
-    cell rather than in `refusals`.
-15. **`cyclic-stratum`** — C15. `runScc`'s iterate-from-bottom ascent over a two-member SCC with an
-    external `higherStrata` dependency, which the acyclic rebuilder cannot express at all.
-16. **`well-defined-schedule`** — C7. `genView.boundedWellDefinedSchedule` over `config.declaredEdges`,
-    read off fields of the returned `gated` record, never of its argument: the cyclic-SCC filter
-    (`[ ]`, over a real five-way partition) and the contracted accessor's own edge lookup
-    (`gated.edges "pewter"`). A hand-written record of the same fields satisfies this cell byte-for-
-    byte -- see Oracle 1b and `refusals` row 11 below.
-17. **`aspect-contribution`** — C16. The corpus's own aspect facts (`genAspects.graphFacts`)
-    contributed through `genAssemble`'s protocol alongside the node registry's declared membership;
-    the labelled graph `genGraph.labeledFrom`/`forgetLabels` produces and the selector context
-    `genSelect.adapters.registry.mkContext` builds over the PUBLISHED parent, both walked; oracle 5's
-    structural-helper substitution armed at C16's own non-flat assembly (`children`/`subtreeOf`
-    diverge) and at C1's flat one (the node set does not).
-18. **`aspect-foreign-reference`** — C16b. The corpus declares a FOREIGN reference —
-    `genAspects.keyRef "mill/stitch"`, a third position on `aspects.bartack.includes` — and the cell
-    asserts it is published as a REFERENCE and never as an edge: present in
-    `c16Facts.foreignIncludesOf` in the declaration's own `{ origin; path; key; }` shape, absent from
-    `c16Facts.includesOf`, and every `declares` edge in the assembled contribution naming a member of
-    its `vertices`. `aspect-cnf.nix` sets no `providerPrefix`, so this corpus's origin is `[ ]` and
-    the sugar's first segment `mill` makes the reference foreign by construction. The population is
-    stated because it IS one: three declared positions accounted for exactly once each across the
-    three relations — one checked edge, one inline body, one foreign reference — over six vertices
-    and one `declares` edge, with the totality control that a node declaring no foreign reference is
-    PRESENT with an empty list rather than absent. The declaration was UNDECLARABLE before
-    gen-aspects `3b6d41d`: the reference entered `includesOf`, became a `declares` edge to a
-    non-member, and `genAssemble`'s `requireDeclaredMembership` refused the whole contribution by
-    name.
-19. **`option-set-closure`** — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `thimbles`
-    registry carries an `extraModules` option (`shirring`); the cell asserts the option really landed
-    AND that `thimbles.pewter.id_hash` is byte-identical to
-    `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a`, the stamp minted
-    before it existed. Equality alone would pass for a registry that dropped the caller's modules, so
-    both halves are load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
-    `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, whose
-    `options` attribute is EMPTY because it is declared through gen-aspects' `schemaOption`. Live
-    control in the same cell: `bobbin` recomputes to its own stamp over a different option set, and
-    the two stamps differ. And the WRONG-kind arm, which Finding 5 recorded as absent until the
-    accessor was guarded: recomputing `bobbin` against a thimble instance answers `null`, so a
-    `findFirst` over candidate kinds passes over it rather than aborting.
-20. **`kinded-contribution`** — C18. The same facts assembled by BOTH paths: C1's direct
-    `genScope.buildRoots` call, and `genAssemble.assemble` with that same three-kind registry routed
-    as `kinds`. The cell asserts the two records are IDENTICAL — `nodes`, `nodeOrder` and the
-    registry all have to agree — with a negative control on the same comparator that changes one
-    node's kind and reads false, and it reads the kinds back through the same `nodesOfType` door C1's
-    own queries use, so the equality is not two sides equally empty. It also asserts `kinds` is still
-    NOT an eighth contribution key: offered on a contribution it is refused by name. C1 could not be
-    written through the protocol before `gen-assemble` `d08cebf`, which is what Finding 4 recorded.
-21. **`seam-head-provenance`** — C12c, den-hoag-eh6x8. Owner-overridden standing guard: the other
-    Oracle 3 rows guard a VALUE a cell already reads, and a value assertion cannot tell "`seamHead`
-    computed from `seamCoords`" apart from "`seamHead` restated as the same literal" — both evaluate
-    to `"seam:pewter:grosgrain"`. This cell reads no value; it reads the corpus's own `flake.nix`
-    source for the one line binding `seamHead` and requires it to interpolate BOTH
-    `seamCoords.thimble` and `seamCoords.bobbin`. A literal has no such line and reds this cell by
-    name while leaving every value cell — including `product-promotion` — unmoved, because the
-    literal and the derivation produce the identical string.
-22. **`frayed-dangling-includes-refused`** — den-hoag-lk06. A local includes entry naming a key
-    absent from the registry is refused by gen-link's `rewrite.originStamp`, catchably, rather than
-    aborting past `tryEval` as an interpreter "attribute missing". gen-aspects synthesizes a key for
-    any bare attrset placed in `includes` regardless of what the author wrote there, so an anonymous
-    entry and a named-but-wrong-key one are one class; `frayed` links alone, never joining the
-    mill/loom federation's sources, for the isolation reason given at its declaration.
-23. **`monotone-separation`** — C19, den-hoag-0hwn. `discreteCtx` clears a context's declared
-    `ctx.inFlight` accessors at gen-select's seven non-monotone positions (Datafun's discrete/monotone
-    split, applied at evaluation time since gen has no type-level ∆/Γ to clear instead). A two-node
-    fixture over `adapters.registry.mkContext` exercises the writable cycle at both seeds: `not`,
-    `attrs` and `when` refuse catchably when the accessor they would read is declared in flight, while
-    a frozen ctx, the monotone `has`, and `parentMatches` over the untouched `parent` accessor all
-    still answer — the class is the read an accessor is put to, not the tag carrying it. A9 (the
-    refusal is actionable) is not asserted here; it is a pairing on `ci/refusals.sh` instead, since
-    `tryEval` exposes only `success`, never the thrown text.
-24. **`movement-element-identity`** — C4b, den-hoag-2vzn. `diamondMoved`'s two-route arrival to
-    `grosgrain` mints exactly ONE element (`value == [ "cambric" ]`, no refusal under
-    `tieSet = refuse`); `collisionMoved`'s three declarations of identical content — two authored at
-    `grosgrain`, one at `faille` — mint three, because element identity is the declaration coordinate
-    `(producer, ordinal)` and never the content or the path that reached it. Both arms defeat the
-    same two maskers: an asymmetric admission and a `labelOrder` with every letter in one layer.
-25. **`registry-split-key-refuses`** — C4b, den-hoag-2vzn. Named for `registry` and not for
-    `movement`, because `compositions.movement`'s key is a constant and cannot reach the spanning
-    refusal at all. `splitKeyed` reads the diamond's own residual admission state as its competition
-    key, so the one authored element at `grosgrain` survives under two keys and refuses catchably, by
-    name — live control in the same cell: the identical declaration keyed on `c.scope` instead
-    evaluates and carries exactly one contribution.
-26. **`product-adapter-totality`** — C20, den-hoag-4kh.53.52. Two arms, one real `gen-product`
-    coordinate graph (C12's own `seamSpace`/`seamCell`, not a mock): the working arm's real
-    `coordsOf` flows through `adapters.product.mkContext`'s `coordsFor` unchanged; the armed arm
-    swaps in the SAME `coordsOf`, deliberately under-applied by one argument, and now refuses
-    (named throw, `tryEval`-caught) instead of writing a residual function into `__coords` that
-    every downstream coord-selector match would have read as a silent, wrong `false`.
-27. **`corpus-stamp-relocation-invariant`** — C21, den-hoag-ppv0z. The EQUALITY half. A `thimble`
-    composed the RETIRED way (`imports = [ config.schema.hank ]`, read live off the tree being
-    declared) and the RELOCATED way (`inherits = [ "hank" ]`, resolved by gen-schema's staged
-    `evalSchema` pass) mint the SAME `id_hash`, over the corpus's real instrument — gen-aspects'
-    own `schemaOption`, `mkInstanceRegistry`, and C17's `extraModules` inlet. Relational, never a
-    literal digest: the digests this pair was designed against were measured at another lock, and
-    asserting one here would relay a figure across a rev boundary. The retired arm is APPARATUS,
-    not a survival of the migrated class — the reference value has to be built the old way or
-    there is nothing for the new way to be compared against.
-28. **`corpus-stamp-no-inherit-discriminator`** — C21, den-hoag-ppv0z. The PERTURBATION half, and
-    what stops the cell above being two agreeing arms. The same staged tree with the parent
-    dropped mints a DIFFERENT stamp, so the equality is non-vacuous: the instrument is shown to
-    discriminate on the exact axis the equality asserts. The perturbed arm lands on
-    `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a` — the corpus's own
-    published stamp, the one `ci/refusals.sh` row 13 pins — which is what shows the instrument is
-    the corpus's and not a lookalike. Each cell was driven RED independently while the other
-    stayed green: dropping the `inherits` built-in from `evalSchema` reds the equality alone, and
-    making the parent's option non-identifying reds this one alone.
-29. **`extent-peer-bounded`** — C22, den-hoag-gcr8x. `grommet` carries the `batting` mark, which
-    admits no label, so its handed `specialArgs.nodes` is bounded to empty; `bodkin` and `awl` carry
-    no mark and are handed the whole class, including themselves (the relation carries self-loops).
-    The withheld half is read straight off the adapter — bypassing `realize` — because ADR-0026's one
-    stated requirement on a consuming implementation is that a boundary refusal NAME the mark that
-    caused it, and `realize`'s own carriage never surfaces a withheld set at all.
-30. **`attrs-undefined-yields-empty`** — C23, den-hoag-241d7. An `attrs` option with no definition
-    anywhere and no `default` resolves to `{ }`. Reads the VALUE and never a `tryEval` bit: a repair
-    that yields `null`, or a nested shape, still "succeeds", and only an equality catches it.
-31. **`attrs-unions-disjoint-contributions`** — C23, den-hoag-241d7. Two modules contributing
-    disjoint keys to one `attrs` option both survive. The empty value alone does not buy this — a
-    type can state an empty and still state no fold — so this is the container strategy's second
-    half and not a restatement of the cell above.
-32. **`injection-payload-price`** — C24, den-hoag-9ivu. ADR-0023 (b)'s declared interim, read from
-    the side that pays for it. gen-bind's `injectAdapter` states that substrate-built values carrying
-    genuine functions cross into the target's `_module.args`, inert only because the consuming module
-    system never type-walks that position; this cell is the consumer confirming it on its OWN composed
-    values — gen-schema's `__functor` crosses and is still applicable here, plain data crosses
-    verbatim, and a substrate-written data position is plain, which is the control that stops the
-    first arm passing for the wrong reason. Sites 1 and 4 of the same interim are not declarable in
-    any corpus: their own text records that no shipped Adapter reaches them.
-33. **`inspect-materializes-the-corpus-graph`** — C25, den-hoag-graph-viz-viy69. gen-inspect, the
-    roster's newest `framework` member, materializes this corpus's own declared graph into the one
-    named IR its contract defines: four nodes over two kinds, three edges, every one carrying a
-    declaration origin because this subject has no policy half. Asserted as a record rather than as
-    a count, so a materialization that lost a kind and gained a node cannot pass the arithmetic. The
-    library is reached at `inputs.gen.lib.framework.inspect` — the stratum bucket the hub publishes —
-    and not as a module arg, because `flakeModules.genLibs` injects eight roster names and this is
-    not one of them.
-34. **`inspect-answers-and-refuses-by-name`** — C25, den-hoag-graph-viz-viy69. The query surface
-    answers over this graph AND the door refuses a name it does not carry, and the pair is the
-    assertion rather than either half. Against a raw row source an unknown table yields `[ ]` at exit
-    0, indistinguishable from "no such edge", so a refusal alone proves nothing without an answer
-    beside it. Two refusals are driven: an unknown table, and an unknown LABEL VALUE — the sharp one,
-    a well-formed query over a known column whose value nothing publishes. A label this graph does
-    carry is the live control on the same door.
-35. **`inspect-walks-the-corpus-graph`** — C25, den-hoag-graph-viz-viy69. `faille` is the node no
-    declared edge reaches, which is this corpus's own stated fact about itself and what makes C5's
-    dynamic edge observable elsewhere. The WALK is asked rather than the edge list: the IR's
-    `perLabel` is an attrset of accessors and a wrong shape fails only on application, so a
-    materialization that built the wrong one reds here and nowhere earlier. `pewter` is the control,
-    reaching on both labels.
-36. **`kind-inheritance-resolves-a-value`** — C26, den-hoag-0pk67. The corpus's `dart` kind
-    declares `inherits = [ "notch" ]` and no `grade` option of its own; `darts.chambray` sets only
-    `bevel`, so a resolved `grade == "waxed"` on the real corpus is the relocated pass composing by
-    NAME (ADR-0016 ruling 7), not two defaults agreeing. A mirrored fixture with the same shape and
-    `inherits` dropped shows `grade` unreachable on that arm, the check's own discriminator.
-37. **`seam-identity-collision-refused`** — C27. Two intensional functions sharing the
-    program-point name `notchGuard` (ADR-0034, den-hoag-t6iy2): the substrate mints no
-    handle from that name, so neither rule collapses onto the other's `overridden` entry;
-    the no-override arm still fires both, and overriding either one now throws
-    `compose.nix`'s existing "cannot override anonymous rule" refusal by name instead of
-    silently replacing whichever rule the substrate saw last.
-38. **`order-mark-binds`** — C28, ADR-0026 / M9. The effective visibility order is the LEXICOGRAPHIC
-    PRODUCT of a declared order mark with the declaration's own order, MARK OUTER, so a declaration
-    may refine only inside the mark's ties and can neither erase nor reverse a pair the mark states.
-    The fixture is the corpus's own graph — `pewter` reaches `grosgrain` on the real `tacks` edge and
-    `damask` on the real `gathers` edge, read through C2's own `byLabel` accessor, with each scope's
-    datum taken from the value that node really declares — and the declaration's order is written to
-    DECLINE: `gathers` outranks `tacks`, and `$ = -1` puts the root's own empty path below both
-    arrivals. Two arms, the same call, varying the mark alone: under the binding mark
-    (`tacks` ≻ `$` ≻ `gathers`) `grosgrain`'s real `gauge` wins and BOTH the root's own path and the
-    query-preferred arrival are shadowed; under the identity mark the product degenerates and
-    `pewter` keeps its real `spool`. The second arm is what makes the first a statement about the
-    mark rather than about a library that happened to prefer `tacks`. Resolved values on both arms,
-    never the presence of the field: `orderMark` is required and total, so a cell that only observed
-    it reaching the call would be green on a build that dropped it from the product entirely. The
-    optional step in `(tacks|gathers)?` is load-bearing — dropping the `?` un-admits the root's own
-    empty path and there is no decline left to overcome.
-39. **`movement-dedup-equality`** — C4b, den-hoag-behm0. A dedup decides on the relation its own
-    constructor DECLARES, never on an encoding of it: `dedups.byDatum` says "structural equality on
-    the datum itself", and structural equality in Nix is `==`. Two arms on `collisionGraph`'s shape,
-    differing in one token. The reference's three identical data collapse 3 → 1 and record two
-    drops, both licensed — that arm is what keeps the cell from being a `dropped == 0` check, which
-    would pass the subject the moment the library over-corrected into refusing every dedup. The
-    subject wraps one datum as `{ outPath = "cambric"; }`, which Nix `==` calls distinct from
-    `[ "cambric" ]` and `builtins.toJSON` encodes identically to it: a dedup keyed on the encoding
-    keeps ONE contribution and writes a `dropped` record asserting a duplicate that does not exist,
-    so the caller is told two values were the same about two values that are not. The declared
-    relation keeps TWO and records the one drop that is real. The oracle is read off the result
-    alone, since `viewRelation` carries its `definition` inside the answer.
-40. **`instance-base-module-arg-reaches-a-kind`** — C29, den-hoag-jyiji. A kind's modules receive a
-    base module argument the CALLER supplied (`denful/den#687`). A module that forces an argument
-    while DECLARING an option cannot be served from `_module.args`: reading that forces the config
-    fixpoint the module is part of, and the abort is an infinite recursion naming neither the module
-    nor the argument, with no `tryEval` door. So the cell asserts the CHANNEL and never the symptom —
-    an oracle whose red state hangs the runner instead of failing it is not an oracle. It declares
-    through `mkInstanceRegistry`, which is the idiom a consumer writes and which builds its element
-    as `attrsOf (mkInstanceType …)`, so the args cross `attrsOf`'s rebuild on the way in; a submodule
-    whose rebuild re-entered the args-less constructor would drop them silently and leave this green
-    over a channel that reached nothing. The discriminator is the same kind with `specialArgs`
-    withheld: refused, and catchably, so the stock arm is a statement about the inlet rather than
-    about where `argand` happened to come from.
-41. **`internal-tree-reports-its-orphan`** — C30, den-hoag-1ksl. An option typed with gen-merge's
-    own nesting seam (another `evalModuleTree` call's `.type`, not `t.submodule`), both levels at
-    `check = false`, receives a key its inner tree does not declare. The outer `.undeclared` names it
-    at its full path and `.config` is exactly the declared part; before, the def vanished at exit 0.
-    The same key at the tree's own top level is the control that the report was already live there.
-42. **`guard-vocab-eager`** — C31, den-hoag-cr72. A custom guard form missing `reads`, and one
-    shadowing the core `eq` form, each still CONSTRUCT a vocabulary and each refuse on its first
-    `applyGuard` call, though that call dispatches `always` and never names the bad form. A sound
-    invented form (`fourchette`) constructs and dispatches beside them, so the refusals are not
-    `applyGuard` refusing everything.
-43. **`warm-reused-tree-reports-its-orphan`** — C32, den-hoag-warm-path-still-discards-mw5t6.
-    C30's seam on the WARM path: a re-compose that reuses a leaf typed with gen-merge's nesting seam
-    reports the def its nested tree dropped, equal to a cold re-evaluation of the same modules. The
-    leaf's presence in `warmDecision.reused` is asserted, so a warm run that remerged it through the
-    cold arm cannot pass the cell for the wrong reason.
-44. **`warm-inert-says-so`** — C33, den-hoag-0t9oh. The function-headed T2b base this corpus
-    shipped before `c544488`: its warm run is admitted (`trace.mode == "warm"`) and reuses nothing,
-    because gen-merge rules every function module dirty. `trace.inert == true` beside
-    `trace.reused == [ ]` is what now says so; `mode` alone read "warm" and hid it.
-45. **`wrapped-module-provenance-file`** — C34, den-hoag-sdml-file-loss-2xeet. A definition passed
-    through an unattributed `{ _file; imports }` wrapper is attributed to the wrapper's file in
-    `provenance`, not to gen-merge's `<gen-merge>` fallback, and the merged value is read beside it.
-46. **`module-reader-syntax`** — C35, den-hoag-s7826. gen-merge reads a module's keys the way
-    nixpkgs' `unifyModuleSyntax` does. A shorthand key beside `imports` is config: `spool` reads
-    `sateen`, where the key used to be dropped unread and the option kept its default. A surplus key
-    beside an explicit `config` is refused, beside the same module without that key reading
-    `sateen`, so a reader refusing every module cannot pass; the message is `refusals` row 31's.
-47. **`mktype-refinements`** — C36, den-hoag-mx07b. `bobbin` is built through gen-aspects'
-    `mkType` arm, and its refined `picks` option is named in the kind's `refinements`, which the arm
-    used to publish as a literal `{ }` so that the registry enforced nothing. The instance value is
-    read beside it; the refusal of `picks = 0` is `refusals` row 32.
-48. **`refined-redeclaration-survives`** — C37, den-hoag-refined-inherits-base-mint-oqrvg.
-    `bobbin.picks` is declared in two modules of the staged pass with one let-bound refined type, and
-    the kind's `refinements.picks` carries exactly one message. The kind's `.options` is not a read
-    path (C17 pins it empty). Two different refinements of one base are `refusals` row 30.
-49. **`movement-dedup-function-datum`** — C38, den-hoag-eunp3. A NixOS module is a function,
-    and `dedups.byDatum` used to address a datum with `toJSON`, which aborts on a lambda where
-    `tryEval` cannot hold it. Step 8 now gives every lambda one tag in the bucket address and leaves
-    the decision to `==`: `cambricModule`, one binding at `grosgrain` and `faille`, collapses, while a
-    fresh `{ config, ... }: { }` literal at `faille` survives. Two kept, one drop, and `noFalseDedup`
-    holds.
-50. **`nesting-def-reading`** — C39, den-hoag-za4hp. gen-merge's two nesting types read a
-    definition the way their nixpkgs references do. The tree type `(evalModuleTree …).type` reads
-    every def as a module, so a function def yields `spool = "sateen"`, where it used to abort
-    uncatchably; `types.submodule` reads an attrset def as config, so an option it declares as `key`
-    takes `sateen`, where the key was dropped as module identity and read the default.
-51. **`declaration-read-syntax`** — C40, den-hoag-4kw63. gen-merge refuses a module's syntax on
-    each door's first read, which for `declaredOptions` is the declaration stratum. C35's typo
-    module, read for its declarations only, is refused by name, where the read used to answer
-    `[ "spool" ]` and drop `weft` without a word. The spelled-right twin reads `[ "spool" "weft" ]`
-    beside it; the message is `refusals` row 35.
-52. **`foreign-type-check`** — C41, den-hoag-foreign-leaf-check-unenforced-v4h7k. A type stated in
-    the foreign protocol has its `check` applied to every definition before gen-merge's own fold, as
-    nixpkgs' `mergeDefinitions` does. `spool` typed `lib.types.str` used to accept `1`; it is now
-    refused, beside the same option reading `sateen`; the message is `refusals` row 36's.
-53. **`empty-nesting-reads-its-reference`** — C42, den-hoag-9f4bn. A nesting option whose every
-    definition was discharged reads what nixpkgs reads. A `submodule` defined only under `mkIf false`
-    is its module set over no definitions, so `weft` reads its default `plain`, where it used to abort
-    uncatchably. A strict `attrsOf` drops the discharged element, so `bolts` has no `linen`. The
-    control, with the condition true, reads `twill` at both.
-54. **`module-path-string`** — C43, den-hoag-submodule-admits-path-string-uetyh. A nesting type
-    admits what nixpkgs admits as a module: a string naming a module file is the module under
-    `either (submodule M) str`, so the union reads `{ key = "sateen"; }` where it used to answer the
-    string, and `lint` collects that string as the engine imports it, where it used to drop it with
-    no finding.
-55. **`element-tree-refuses-per-level`** — C44, den-hoag-0s6zi. A `check = false` nested tree used
-    as an `attrsOf` element has no undeclared report, and a key its level does not declare used to
-    vanish at exit 0. It is now refused by name when the level holding it is read, one level down as
-    well, while an unread level decides nothing; the same tree typed bare still reports the key
-    rather than refusing it. The message is `refusals` row 37's.
-56. **`relation-entries-store-named-scope`** — C45, den-hoag-3tsd3. gen-view keys a caller's
-    identifiers by their text, so a scope named `baseNameOf pkgs.hello`, which carries string
-    context, files its datum and reads it back: `relationEntries` answers one entry whose scope and
-    datum both keep their context, where the read used to abort with `… is not allowed to refer to a store path`. It is a non-walking read; a view over store-named scopes still aborts in gen-graph
-    (den-hoag-u9k7j).
-57. **`walk-store-named-scope`** — C46, den-hoag-u9k7j. gen-graph keys a caller's node names by
-    their text, so a labeled graph over `pewter` and two scopes named `baseNameOf` of `hello` and
-    `jq` is walked `contains*` from `pewter`: it answers all three nodes, the deepest path ends at
-    the `jq` scope, the answered names keep their context, and the graph orders. The walk used to
-    abort with `… is not allowed to refer to a store path`.
-58. **`bare-tree-reads-its-own-config`** — C47, den-hoag-tgj54. A `check = true` tree typed
-    bare whose leaf `sub` is another tree, defined `sub = mkIf config.bolt.flag { k = "s"; }`, reads
-    `sub.k = "s"`, where the orphan gate forced the config the `mkIf` reads and the evaluation aborted
-    with infinite recursion. An undeclared `sub.bogus` is refused when read deep and is a value at a
-    sibling read (`known = "v"`), and `.undeclared` names it. A strict warm evaluation over a lax prior
-    refuses it deep and reads `warmDecision.mode == "cold"` with its reason; a lax warm evaluation over
-    a strict prior is the cold value.
-59. **`union-member-refuses-by-name`** — C48, den-hoag-cyiuz. gen-types' combinators refuse a member
-    that is not a checker by name: a union over C39's `keyed` submodule and `str`, given
-    `{ key = "sateen"; }`, is refused catchably, where it aborted with `attribute 'verify' missing`.
-    The checker-only `union [ str int ]` given `"sateen"` answers it, so a union refusing everything
-    cannot pass. The message is `refusals` row 43's.
-60. **`movement-schedule-separator-names`** — C49, den-hoag-qf55g. gen-view keys a cell by the JSON
-    of its names, so a `consumer` writing `<grosgrain/hem, selvage>` and a `producer` reading
-    `<grosgrain, hem/selvage>` are different cells and the schedule orders
-    `["consumer","producer"]`, where the `/` join rendered one key and refused the schedule. The same
-    schedule with `-` is the control, ordered on both sides.
-61. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
-    rather than against each other. Two hand-maintained surfaces recorded the same construct set —
-    this numbered list, and the `## What v1 declares` table above — and drifted twice in three
-    landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
-    the numbered list's own names equal `builtins.attrNames` of the evaluated `checks` attrset, and
-    that the table's rows equal the construct labels this list attributes each check to, plus T5 (the
-    one construct with no check cell); both comparisons report how many entries they scanned against
-    how many they expected, never a bare pass.
+### Adding a construct, a cell or a refusal row
 
-T5's forty-four refusals are not among these sixty-one: `builtins.tryEval` yields `success` and nothing
+Every addition is **one new file**; no list, index or count anywhere is edited by hand.
+
+- **A construct's declarations** go in `constructs/<name>.nix`: a function whose formals are the
+  names it reads, returning the names it declares.
+
+  ```nix
+  { genGraph, nodes }:
+  let
+    hemGraph = genGraph.labeledFrom { … };
+  in
+  {
+    inherit hemGraph;
+  }
+  ```
+
+  Every construct file and every module arg (`lib`, `pkgs`, `config`, `inputs`, the `gen*` libraries)
+  is one namespace, so any file may read a name another declares. A name declared twice is refused,
+  naming both files; a name nothing declares is refused, naming the file that reads it.
+
+- **A check cell** goes in `cells/<check-name>.nix`: a function of the names it reads, returning
+  `{ construct; check; }`. `asserts` is already bound to the cell's own name, so a red names the cell.
+
+  ```nix
+  # `hem-walk` — C50, den-hoag-xxxxx. What the cell asserts, and what would turn it red.
+  { asserts, hemGraph }:
+  {
+    construct = [ "C50" ];
+    check = asserts (hemGraph.nodes != [ ]);
+  }
+  ```
+
+  A cell attributed to a construct this README's table does not carry reds `construct-index`, so a
+  NEW construct is the one addition that also adds a table row. Drive a cell under `nix flake check --no-build` before landing it: that is what CI runs, and a store write (`builtins.toFile`) greens
+  locally and reds there.
+
+- **A refusal row** goes in `ci/refusals/<id>.sh`, sourced by `ci/refusals.sh` in version order.
+  Label every arm `T5 <id> planted …` / `T5 <id> unplanted …` (a third arm is `catchable`): the
+  pairing cell (`ci/tests/refusals-pairing.nix`) reads the labels and reds a row left one-sided, or a
+  row file whose arms it cannot see. A new row takes any id no existing file uses.
+
+T5's refusals are not among these cells: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
@@ -479,7 +188,7 @@ that gen-harness supplies. `direnv` loads them from `.envrc`; without it, `nix d
 ```sh
 check-lock            # nix flake check  AND  nix flake check ./ci
 check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen  AND  nix flake check ./ci
-refusals              # T5's forty-four planted violations, each driven red by name, each with an unplanted control
+refusals              # T5's planted violations (ci/refusals/), each driven red by name, each with an unplanted control
 ```
 
 Each arm runs **both planes**, reports both exit codes on one summary line

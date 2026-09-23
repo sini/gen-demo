@@ -14,12 +14,14 @@
       inherit inputs;
       name = "gen-demo";
       testModules = ./tests;
-      # `ci/refusals.sh` is read by `tests/refusals-pairing.nix`, so it is declared: the guard's
-      # subject is the bytes the evaluator sees, and an untracked script would give the cell a
-      # different file from the one the commit carries. `worktree-precommit-check.sh` is declared for
+      # `ci/refusals/` (the row files) is read by `tests/refusals-pairing.nix`, so it is declared: the
+      # guard's subject is the bytes the evaluator sees, and an untracked row would give the cell a
+      # different set of files from the one the commit carries. `refusals.sh` is the driver that
+      # sources them, declared beside them. `worktree-precommit-check.sh` is declared for
       # the same reason: it is the artefact the `worktree-check` command executes, so the evaluator
       # must reach the committed bytes rather than whatever the working tree happens to hold.
       readRoots = [
+        ./refusals
         ./refusals.sh
         ./worktree-precommit-check.sh
       ];
@@ -41,7 +43,7 @@
           perSystem = {
             devshells.default.commands = [
               # ★ BOTH ARMS RUN BOTH PLANES, and that is the whole of den-hoag-dq6mw. This
-              # repository carries TWO check planes — the root flake's forty-six corpus cells and
+              # repository carries TWO check planes — the root flake's corpus cells (`cells/`) and
               # `./ci`'s six harness cells — and `nix flake check` names only the one its argument
               # points at. Driven at `b1843a5`, one tree one run: with the nix-unit pairing cell
               # seeded red, root `nix flake check` returned rc 0 and printed "all checks passed!"

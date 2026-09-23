@@ -8,104 +8,73 @@
 # and a row that quietly loses an arm is exactly the regression nothing else in this repository
 # would see: the script's own exit is 0 when every arm it still has passes.
 #
-# This is the one nix-unit cell gen-demo declares. `mkCi` takes `testModules` as a required formal
-# and an empty collection reports `0/0 successful` at exit 0 — a green gate asserting nothing, run
-# by `nix flake check ./ci` and by the pre-commit hook on every `.nix` commit. One cell that can
-# fail is what makes that plane non-vacuous, and this is the invariant worth spending it on.
+# This is the one nix-unit cell gen-demo declares against the refusals plane. `mkCi` takes
+# `testModules` as a required formal and an empty collection reports `0/0 successful` at exit 0 — a
+# green gate asserting nothing. One cell that can fail is what makes that plane non-vacuous, and
+# this is the invariant worth spending it on.
 #
-# The four figures are read from the arm labels rather than declared twice, so the cell fails on
-# each distinct way the discipline can erode: an arm deleted (`totalArms`), a row left one-sided
-# (`plantedOnly` / `unplantedOnly`), a whole row deleted (`paired`).
+# The rows are files (`ci/refusals/*.sh`, discovered, never listed), so every figure here is read
+# off the arm labels in those files and none is a count someone must bump when a row lands. The
+# cell fails on each distinct way the discipline can erode: a row left one-sided (`plantedOnly` /
+# `unplantedOnly`), and a row file whose arms this regex cannot see at all (`filesWithoutAPair`) —
+# a label that drops the `T5 <id> planted|unplanted` form would otherwise leave its row outside
+# the population, which reads exactly like a row that needs no pairing.
 { lib, ... }:
 let
-  armLabels = builtins.filter (m: m != null) (
-    map (line: builtins.match "check \"T5 row([0-9]+) +(planted|unplanted).*" line) (
-      lib.splitString "\n" (builtins.readFile ../refusals.sh)
+  rowDir = ../refusals;
+  rowFiles = builtins.attrNames (
+    lib.filterAttrs (file: type: type == "regular" && lib.hasSuffix ".sh" file) (
+      builtins.readDir rowDir
     )
   );
 
-  rowsCarrying =
-    arm:
-    lib.unique (
-      map (m: builtins.elemAt m 0) (builtins.filter (m: builtins.elemAt m 1 == arm) armLabels)
+  armsIn =
+    file:
+    builtins.filter (m: m != null) (
+      map (line: builtins.match "check \"T5 ([a-z0-9-]+) +(planted|unplanted).*" line) (
+        lib.splitString "\n" (builtins.readFile (rowDir + "/${file}"))
+      )
     );
 
-  planted = rowsCarrying "planted";
-  unplanted = rowsCarrying "unplanted";
+  armLabels = lib.concatMap armsIn rowFiles;
+
+  rowsCarrying =
+    arms: arm:
+    lib.unique (map (m: builtins.elemAt m 0) (builtins.filter (m: builtins.elemAt m 1 == arm) arms));
+
+  planted = rowsCarrying armLabels "planted";
+  unplanted = rowsCarrying armLabels "unplanted";
+
+  pairedIn =
+    file:
+    let
+      arms = armsIn file;
+    in
+    lib.intersectLists (rowsCarrying arms "planted") (rowsCarrying arms "unplanted");
 in
 {
   flake.tests.refusals = {
     test-every-row-runs-both-planted-and-unplanted = {
       expr = {
-        totalArms = builtins.length armLabels;
-        paired = builtins.length (lib.intersectLists planted unplanted);
+        # A floor on the population, so the cell cannot pass over a directory it failed to read.
+        readsRows = builtins.length rowFiles > 0 && builtins.length armLabels > 0;
         plantedOnly = lib.subtractLists unplanted planted;
         unplantedOnly = lib.subtractLists planted unplanted;
+        filesWithoutAPair = builtins.filter (file: pairedIn file == [ ]) rowFiles;
       };
       expected = {
-        # Stated as a DELTA against what `refusals.sh` carried before, never as an absolute target
-        # lifted from a document: 41 arms / 20 paired was read off the script at gen-demo `3c53cbd`
-        # (den-hoag-4kh.53.13's row22/row23 land in this same file but carry no `T5`/planted/
-        # unplanted label — 0 of this regex's arms, by design and stated in their own comment — so
-        # they move neither figure). den-hoag-n03z's row24 is an ordinary paired row — +2 arms,
-        # +1 paired. den-hoag-row12-message-cells-wrong-plane-x2stm's rows 25 and 26 are two more
-        # ordinary paired rows — +4 arms, +2 paired — and row26's third arm is labelled "control"
-        # (a distinct word, row24's reasoning below) so it stays outside this regex's population.
-        # den-hoag-viewrelation-definition-graph-alphabet-seam-og383's row27 — the definition⟂graph
-        # alphabet seam — is one more ordinary paired row: +2 arms, +1 paired.
-        # den-hoag-nn4's row28 — a kind-declaration key no reader consumes — is one more ordinary
-        # paired row: +2 arms, +1 paired. den-hoag-6vgwm's row29 — a collection key colliding with
-        # gen-schema's own vocabulary, row28's mirror image on the other side of one `elem` — is one
-        # more ordinary paired row: +2 arms, +1 paired. den-hoag-refined-inherits-base-mint-oqrvg's
-        # row30 is one more ordinary paired row: +2 arms, +1 paired. Its `row30id` probe carries
-        # both arms too, but the label is not `row<digits> ` so it stays outside this population.
-        # den-hoag-s7826's row31 (a surplus module key refused by name) and den-hoag-mx07b's row32
-        # (a refined option under the `mkType` arm) are two more ordinary paired rows: +4 arms,
-        # +2 paired. den-hoag-gen-view-refusal-render-tojson-p79do's row33 (a lambda `direction`
-        # refused by name) is one more ordinary paired row: +2 arms, +1 paired; its third arm is
-        # labelled "catchable", row24's form, so it stays outside this population.
-        # den-hoag-foreign-parametric-base-by-name-u92up's row34 (a refined foreign `listOf` pair
-        # discriminated at its element) is one more ordinary paired row: +2 arms, +1 paired.
-        # den-hoag-4kw63's row35 (a declaration-only read of a surplus key) and den-hoag-foreign-leaf-
-        # check-unenforced-v4h7k's row36 (a foreign type's `check` before the fold) are two more
-        # ordinary paired rows: +4 arms, +2 paired. den-hoag-moduletree-container-element-0s6zi's
-        # row37 (a nested tree as a container element refuses its undeclared key) and den-hoag-gen-
-        # view-value-comparator-abort-hvucx's row38 (a non-int distance rule refused by name) are two
-        # more ordinary paired rows: +4 arms, +2 paired. den-hoag-par76's row39 (a non-string scope
-        # at `relationEntries`) and row40 (a label outside L-hat at `labelOrder.precedes`), den-hoag-
-        # listof-nonlist-def-abort-5npwi's row41 (a non-list definition refused by name) and den-hoag-
-        # gen-view-channel-refused-late-h0e7t's row42 (a lambda `channel` refused by name at
-        # `targets.root`) are four more ordinary paired rows: +8 arms, +4 paired; each third arm is
-        # labelled "catchable", row24's form, so it stays outside this population. Row26's control,
-        # re-pointed by 5npwi, gains a "catchable" twin of the same form: +0 arms, +0 paired.
-        # den-hoag-cyiuz's row43 (a union member that is not a checker), den-hoag-typemerge-
-        # orientation-e07bf's row44 (the later declaration decides a redeclared type), den-hoag-
-        # rymxu's row45 (an undeclared unit mode refused at construction) and den-hoag-12ntx's
-        # row46 (a non-string relation kind refused at the mint) are four more ordinary paired
-        # rows: +8 arms, +4 paired; the third arms of rows 43, 45 and 46 are labelled "catchable",
-        # row24's form, so they stay outside this population. den-hoag-0gpyq's row47 (a mark's
-        # `admits` verdict that is not a bool, refused by name) is one more ordinary paired row: +2
-        # arms, +1 paired; its third arm is labelled "catchable", row24's form. den-hoag-uw098's row48
-        # (a forged unit mode refused at intake), den-hoag-14y3k's row49 (a cyclic int definition
-        # refused with a shallow rendering) and den-hoag-shared-refusal-renderer-6wtos's row50 (a
-        # float direction refused with its value rendered) are three more ordinary paired rows: +6
-        # arms, +3 paired; each third arm is labelled "catchable", row24's form. den-hoag-ns1z9's
-        # row51 (a self-referential type refused by name with a bounded type name) is one more
-        # ordinary paired row: +2 arms, +1 paired; its third arm is labelled "catchable".
-        totalArms = 97;
-        paired = 48;
-        # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
-        # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
-        # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
-        # "planted" is the only way it registers at all — a deliberate decision, not a fixture
-        # update. row24's catchable check is a THIRD arm alongside an already-complete planted+
-        # unplanted pair; that pair alone fully discharges the pairing discipline for row24, so its
-        # catchable arm is additional and orthogonal, not itself planted-only. Labelling it "T5
-        # row24 catchable" (a distinct word, not "planted") keeps it correctly outside this regex's
-        # population instead of manufacturing a spurious `plantedOnly` entry for a row that is not
-        # one-sided.
-        plantedOnly = [ "17" ];
+        readsRows = true;
+        # Row 17 is the only THIRD-ARM row counted here as `plantedOnly`: its catchable check is
+        # its SOLE arm (no unplanted counterpart of its own to carry), so labelling it "planted" is
+        # the only way it registers at all — a deliberate decision, not a fixture update. Every
+        # other third arm (row24's and later) is labelled "catchable" or "control", a distinct word,
+        # alongside an already-complete planted+unplanted pair, so it stays outside this population
+        # instead of manufacturing a spurious one-sided row.
+        plantedOnly = [ "row17" ];
         unplantedOnly = [ ];
+        # row22/row23 (den-hoag-4kh.53.13) carry no `T5`/planted/unplanted label by design — they
+        # assert an id's stability, not a refusal — so their file carries no pair.
+        filesWithoutAPair = [ "row22-23.sh" ];
       };
     };
   };
