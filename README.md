@@ -80,12 +80,13 @@ incremental plane's decision crossing.
 | C42 -- a discharged nesting option reads its reference    | 0025 item 1         | `empty-nesting-reads-its-reference`: a `submodule` option defined only under `mkIf false` reads `weft = "plain"`, where it aborted uncatchably; a strict `attrsOf` drops the discharged `linen`, where it kept the key; with the condition true both read `"twill"`                                                                                  |
 | C43 -- a module named by a path string is a module        | 0025 item 1         | `module-path-string`: a store-path string under `either (submodule M) str` is the module (`{ key = "sateen"; }`), where the union answered the string; `lint` collects that string as the engine imports it, one finding where it dropped it                                                                                                         |
 | C44 -- a nested tree as a container element refuses       | 0025 item 1         | `element-tree-refuses-per-level`: a key a `check = false` tree does not declare, inside an `attrsOf` element, is refused when its level is read, where it vanished at exit 0; the same tree typed bare still reports it; the message is `refusals` row 37's                                                                                          |
-| T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
+| C45 -- a scope named after a package                      | 0025 item 1         | `relation-entries-store-named-scope`: a scope named `baseNameOf pkgs.hello` carries string context; gen-view keys it by its text, so the datum filed there is read back as one entry whose scope and datum keep their context, where the read used to abort (`… is not allowed to refer to a store path`)                                            |
+| T5 -- planted refusals                                    | 0025                | forty enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                              |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-fifty-six `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+fifty-seven `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -107,14 +108,14 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's fifty-six checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's fifty-seven checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The fifty-six root checks are the acceptance criteria:
+The fifty-seven root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -418,7 +419,12 @@ The fifty-six root checks are the acceptance criteria:
     vanish at exit 0. It is now refused by name when the level holding it is read, one level down as
     well, while an unread level decides nothing; the same tree typed bare still reports the key
     rather than refusing it. The message is `refusals` row 37's.
-56. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+56. **`relation-entries-store-named-scope`** — C45, den-hoag-3tsd3. gen-view keys a caller's
+    identifiers by their text, so a scope named `baseNameOf pkgs.hello`, which carries string
+    context, files its datum and reads it back: `relationEntries` answers one entry whose scope and
+    datum both keep their context, where the read used to abort with `… is not allowed to refer to a store path`. It is a non-walking read; a view over store-named scopes still aborts in gen-graph
+    (den-hoag-u9k7j).
+57. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -427,7 +433,7 @@ The fifty-six root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these fifty-six: `builtins.tryEval` yields `success` and nothing
+T5's forty refusals are not among these fifty-seven: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 
@@ -447,7 +453,7 @@ that gen-harness supplies. `direnv` loads them from `.envrc`; without it, `nix d
 ```sh
 check-lock            # nix flake check  AND  nix flake check ./ci
 check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen  AND  nix flake check ./ci
-refusals              # T5's thirteen planted violations, each driven red by name, each with an unplanted control
+refusals              # T5's forty planted violations, each driven red by name, each with an unplanted control
 ```
 
 Each arm runs **both planes**, reports both exit codes on one summary line

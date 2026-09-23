@@ -1998,6 +1998,36 @@
               else
                 throw "gen-demo: check '${name}' failed";
 
+            # C45 -- a scope named after a package. `baseNameOf pkgs.hello` carries string context;
+            # gen-view keys it by its text, so the datum filed there is read back, and the entry's
+            # scope and datum keep their context. A non-walking read: a view over store-named scopes
+            # still aborts in gen-graph (den-hoag-u9k7j). Declared here rather than beside
+            # `collisionGraph` because it needs this system's `pkgs`.
+            storeNamedScope = baseNameOf pkgs.hello;
+            storeNamedGraph = genView.scopeGraph {
+              carrier = diamondCarrier;
+              scopes = [
+                "pewter"
+                storeNamedScope
+              ];
+              edges = {
+                tacks = _: [ ];
+              };
+              data = [
+                {
+                  scope = storeNamedScope;
+                  relation = "gimp";
+                  datum = [ pkgs.hello ];
+                }
+              ];
+            };
+            storeNamedEntries = genView.relationEntries {
+              graph = storeNamedGraph;
+              scope = storeNamedScope;
+              relation = "gimp";
+              wellFormed = _: true;
+            };
+
             # den-hoag-bl06m — this file carries TWO hand-maintained indices over its own
             # construct set (the numbered CI-contract list below, and the "## What v1 declares"
             # table), and they drifted twice in three landings because a repair fixed the one it
@@ -2186,6 +2216,13 @@
                     && builtins.length collisionCoerced.contributions == 2
                     && builtins.length collisionCoerced.dropped == 1
                     && noFalseDedup collisionCoerced
+                  );
+
+                  # C45 -- den-hoag-3tsd3. Live control: movement-dedup-equality.
+                  relation-entries-store-named-scope = asserts "relation-entries-store-named-scope" (
+                    builtins.length storeNamedEntries == 1
+                    && builtins.hasContext (builtins.head storeNamedEntries).scope
+                    && builtins.hasContext (builtins.toJSON (builtins.head storeNamedEntries).datum)
                   );
 
                   # C38 -- a function-bearing datum under `byDatum` is deduped by the declared

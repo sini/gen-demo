@@ -724,11 +724,13 @@ check "T5 row25 planted   (two files, the SAME key -- refused naming the key and
   "has \`attrs' definitions that collide at \`warp' (/corpus/b.nix, /corpus/a.nix)" \
   "$tmpdir/row25-red.err"
 
-# Row 26's third arm is a CONTROL, not an unplanted counterpart, so it is labelled with a distinct
-# word and stays outside the pairing population the way row24's `catchable` does: `attrsOf int` over
-# the SAME rejected definition is the partition this row exists to keep `attrs` out of, and it aborts
-# UNCATCHABLY. That is also why it cannot be a conjunct of any `checks` cell -- it would take the
-# corpus evaluation down rather than red one cell.
+# Row 26's third and fourth arms are a CONTROL and its `catchable` twin, not unplanted counterparts,
+# so they are labelled with distinct words and stay outside the pairing population the way row24's
+# `catchable` does. `attrsOf int` over the SAME rejected definition used to abort uncatchably, which
+# is what this control once pinned as the partition keeping `attrs` apart. gen-merge 5npwi fixed that
+# abort: `attrs` and `attrsOf` now both check their domain through one `refusingOutside` binding, so
+# the control pins that they AGREE -- `attrsOf` refuses the same definition by name, naming the file,
+# and `tryEval` catches it (row 26, re-pointed by 5npwi).
 row26Base='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
@@ -752,10 +754,13 @@ check "T5 row26 planted   (a string definition attrs cannot consume -- refused n
   "$row26planted" 1 \
   "has definitions \`attrs' cannot consume (/corpus/bad.nix)" \
   "$tmpdir/row26-red.err"
-check "T5 row26 control   (attrsOf int over the SAME definition aborts UNCATCHABLY -- the partition)" \
+check "T5 row26 control   (attrsOf int over the SAME definition refuses by name, naming the file)" \
   "$row26control" 1 \
-  'expected a set but found a string' \
+  "has definitions \`attrsOf' cannot consume (/corpus/bad.nix)" \
   "$tmpdir/row26-control.err"
+check "T5 row26 catchable  (attrsOf's refusal is caught by tryEval, not an abort)" \
+  "let v = ($row26control); in if (builtins.tryEval v).success then \"ADMITTED\" else \"CAUGHT\"" 0 "" \
+  "$tmpdir/row26-catch.err" 'CAUGHT'
 
 # ── row 27 -- a definition composed with a graph over ANOTHER ALPHABET (gen-view og383) ──
 # The seam M9 left open: `viewRelation` checked the orderMark against the definition's alphabet but
@@ -1163,6 +1168,117 @@ check "T5 row38 planted   (a rule returning a string, refused by name)" \
   "${row38/DISTANCE/s: if builtins.isInt s.distance then \"x\" else 1}" 1 \
   "gen-view.viewRelation: channel 'selvage' declares a distance rule that returned \"x\"" \
   "$tmpdir/row38-red.err"
+
+# ── row 39 -- a non-string scope at `relationEntries` is refused by name (gen-view par76,
+#    ADR-0025 item 1) ──
+# `relationEntries` read `datumsAt.${scope}` with whatever it was handed, so an int scope aborted
+# uncatchably (`expected a string but found an integer`). The arms differ by the scope alone; the
+# unplanted arm asserts the datum filed there, so a library refusing every scope cannot pass it, and
+# the catchable arm is the one that measures item 1 (row 33's form).
+row39='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" ]; };
+  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
+  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  graph = genView.scopeGraph {
+    carrier = genView.carrier {
+      inherit labels;
+      relatumLabels = genView.relatumLabels { names = [ ]; };
+      labelWellFormedness = admission; labelOrder = order;
+      dataOrder = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
+      relations = genView.relations { names = [ "gimp" ]; };
+    };
+    scopes = [ "grosgrain" "pewter" ];
+    edges.tacks = id: { pewter = [ "grosgrain" ]; }.${id} or [ ];
+    data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
+  };
+  entries = genView.relationEntries { inherit graph; scope = SCOPE; relation = "gimp"; wellFormed = _: true; };
+in BODY'
+row39unplanted="${row39/SCOPE/\"grosgrain\"}"
+row39planted="${row39/SCOPE/42}"
+check "T5 row39 unplanted (a scope named by a string; its datum is the assertion)" \
+  "${row39unplanted/BODY/builtins.toJSON (map (e: e.datum) entries)}" 0 "" \
+  "$tmpdir/row39-green.err" '[["cambric"]]'
+check "T5 row39 planted   (an int scope, refused by name)" \
+  "${row39planted/BODY/builtins.deepSeq entries \"ADMITTED\"}" 1 \
+  "gen-view.relationEntries: scope is 42; a scope is named by a string" \
+  "$tmpdir/row39-red.err"
+check "T5 row39 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row39planted/BODY/if (builtins.tryEval (builtins.deepSeq entries \"ADMITTED\")).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row39-catch.err" 'CAUGHT'
+
+# ── row 40 -- a label outside L-hat at `labelOrder.precedes` is refused by name (gen-view par76,
+#    ADR-0025 item 1) ──
+# `precedes` read `ranks.${l}` for any label, so a name that is not a letter aborted uncatchably
+# (`attribute 'selvage' missing`). The arms differ by the second label alone; the unplanted arm
+# asserts the order's answer, so a library refusing every comparison cannot pass it.
+row40='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  labels = genView.edgeLabels { letters = [ "tacks" "gathers" ]; };
+  order = genView.labelOrder { alphabet = labels; layers = [ [ "gathers" ] [ "tacks" ] ]; endOfPath = -1; };
+  answer = if order.precedes "gathers" LABEL then "gathers-first" else "not-ordered";
+in BODY'
+row40unplanted="${row40/LABEL/\"tacks\"}"
+row40planted="${row40/LABEL/\"selvage\"}"
+check "T5 row40 unplanted (two letters; the order's answer is the assertion)" \
+  "${row40unplanted/BODY/answer}" 0 "" "$tmpdir/row40-green.err" 'gathers-first'
+check "T5 row40 planted   (a name that is not a letter, refused by name)" \
+  "${row40planted/BODY/answer}" 1 \
+  "gen-view.labelOrder: 'selvage' is not a label of L̂ (gathers, tacks, or \`\$\`)" \
+  "$tmpdir/row40-red.err"
+check "T5 row40 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row40planted/BODY/if (builtins.tryEval answer).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row40-catch.err" 'CAUGHT'
+
+# ── row 41 -- a structural container refuses a wrong-kind definition by name (gen-merge 5npwi) ──
+# `listOf` walked a non-list definition with `imap0`, so the interpreter aborted UNCATCHABLY with
+# `expected a list but found a string`, naming neither option nor file. The fold now checks its
+# domain first, through the binding it states as `admits`. The arms differ by the one definition;
+# the unplanted arm prints the value, so a fold refusing every definition cannot pass, and the
+# catchable arm measures ADR-0025 item 1 (row 24's form).
+row41='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genMerge = gen.lib.modules.merge;
+in BODY (genMerge.evalModuleTree {
+  modules = [
+    { options.bobbins = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; }; }
+    { _file = "/demo/bobbins.nix"; config.bobbins = DEF; }
+  ];
+}).config.bobbins'
+row41unplanted="${row41/DEF/[ \"linen\" ]}"
+row41planted="${row41/DEF/\"linen\"}"
+check "T5 row41 unplanted (a list definition)" "${row41unplanted/BODY/builtins.toJSON}" 0 "" \
+  "$tmpdir/row41-green.err" '["linen"]'
+check "T5 row41 planted   (a string where a list is declared, refused by name)" \
+  "${row41planted/BODY/builtins.toJSON}" 1 \
+  "gen-merge: option \`bobbins' has definitions \`listOf' cannot consume (/demo/bobbins.nix)" \
+  "$tmpdir/row41-red.err"
+check "T5 row41 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row41planted/BODY/(v: if (builtins.tryEval (builtins.deepSeq v true)).success then \"ADMITTED\" else \"CAUGHT\")}" 0 "" \
+  "$tmpdir/row41-catch.err" 'CAUGHT'
+
+# ── row 42 -- a root target's names are refused where the target is built (gen-view h0e7t) ──
+# `placement.targets.root` checked only that `scope` and `channel` were present, so a lambda
+# channel built a target and the abort came later, uncatchably, at whichever consumer interpolated
+# it (`targetKey`, `writesOf`, `edgeSortKey`). The constructor now refuses a non-string or empty
+# name by name, and the consumers refuse a hand-built target the same way. The two arms differ by
+# the CHANNEL value only; the unplanted arm asserts the rendered key, so a library refusing every
+# target cannot pass it.
+row42='let
+  genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  target = genView.placement.targets.root { scope = "pewter"; channel = CHANNEL; };
+in BODY'
+row42unplanted="${row42/CHANNEL/\"settings\"}"
+row42planted="${row42/CHANNEL/(x: x)}"
+check "T5 row42 unplanted (a string channel keys the target)" \
+  "${row42unplanted/BODY/genView.placement.targetKey target}" 0 "" "$tmpdir/row42-green.err" 'root:pewter/settings'
+check "T5 row42 planted   (a lambda channel, refused by name at construction)" \
+  "${row42planted/BODY/builtins.deepSeq target \"ADMITTED\"}" 1 \
+  "gen-view.targets.root: field 'channel' is <a lambda>" \
+  "$tmpdir/row42-red.err"
+check "T5 row42 catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row42planted/BODY/if (builtins.tryEval (builtins.deepSeq target \"ADMITTED\")).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "$tmpdir/row42-catch.err" 'CAUGHT'
 
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check

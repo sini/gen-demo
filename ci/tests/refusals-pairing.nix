@@ -71,9 +71,15 @@ in
         # ordinary paired rows: +4 arms, +2 paired. den-hoag-moduletree-container-element-0s6zi's
         # row37 (a nested tree as a container element refuses its undeclared key) and den-hoag-gen-
         # view-value-comparator-abort-hvucx's row38 (a non-int distance rule refused by name) are two
-        # more ordinary paired rows: +4 arms, +2 paired.
-        totalArms = 71;
-        paired = 35;
+        # more ordinary paired rows: +4 arms, +2 paired. den-hoag-par76's row39 (a non-string scope
+        # at `relationEntries`) and row40 (a label outside L-hat at `labelOrder.precedes`), den-hoag-
+        # listof-nonlist-def-abort-5npwi's row41 (a non-list definition refused by name) and den-hoag-
+        # gen-view-channel-refused-late-h0e7t's row42 (a lambda `channel` refused by name at
+        # `targets.root`) are four more ordinary paired rows: +8 arms, +4 paired; each third arm is
+        # labelled "catchable", row24's form, so it stays outside this population. Row26's control,
+        # re-pointed by 5npwi, gains a "catchable" twin of the same form: +0 arms, +0 paired.
+        totalArms = 79;
+        paired = 39;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
