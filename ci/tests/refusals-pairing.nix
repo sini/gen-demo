@@ -89,9 +89,11 @@ in
         # (a forged unit mode refused at intake), den-hoag-14y3k's row49 (a cyclic int definition
         # refused with a shallow rendering) and den-hoag-shared-refusal-renderer-6wtos's row50 (a
         # float direction refused with its value rendered) are three more ordinary paired rows: +6
-        # arms, +3 paired; each third arm is labelled "catchable", row24's form.
-        totalArms = 95;
-        paired = 47;
+        # arms, +3 paired; each third arm is labelled "catchable", row24's form. den-hoag-ns1z9's
+        # row51 (a self-referential type refused by name with a bounded type name) is one more
+        # ordinary paired row: +2 arms, +1 paired; its third arm is labelled "catchable".
+        totalArms = 97;
+        paired = 48;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
