@@ -68,12 +68,13 @@ incremental plane's decision crossing.
 | C30 -- an internal nested tree reports its own orphan     | 0025 item 1         | an option typed with gen-merge's own nesting seam (`evalModuleTree`'s `.type`, not `t.submodule`) receives an undeclared key under it at `check = false`; the outer `.undeclared` names it at its full path instead of the def vanishing with `.config` silently smaller, the same key at the tree's top level being the live control                |
 | C31 -- a custom guard form refuses at first use           | 0025 item 1         | gen-aspects' `mkGuardVocab` over a malformed (`reads` missing) and a core-colliding (`eq`) custom form: construction stays total, the first `applyGuard` through the vocabulary refuses though it names neither form, and a sound `fourchette` form is the control that dispatch is not refusing unconditionally                                     |
 | C32 -- the warm path reports a reused tree's orphan       | 0025 item 1, 0008   | a warm `evalModuleTree` re-compose that REUSES a nesting-seam leaf (`spoolTree` in `warmDecision.reused`) names the def the nested tree dropped, and its `.undeclared` equals the cold re-evaluation's; before, the warm arm answered `[ ]` for a reused leaf                                                                                        |
+| C33 -- a warm run that reuses nothing says so             | 0008                | a function-headed base re-composed warm is admitted and remerges every leaf; the hub's `trace.inert` reads `true` with `reused == [ ]`, where `mode == "warm"` alone hid it, and warm-parity's armed run reading `inert == false` is the control                                                                                                     |
 | T5 -- planted refusals                                    | 0025                | thirteen enforcers, each driven red by name via `refusals`                                                                                                                                                                                                                                                                                           |
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
 holds the key-category declaration that both the tree and the hub read; `flake.nix` holds the
 queries, C7's gate over `config.declaredEdges`, C8-C18's own standalone fixtures, and all
-forty-four `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
+forty-five `checks`, including its own `construct-index` cell over this file's two indices; `ci/refusals.sh`
 holds T5's by-name half, which runs out of band because
 `builtins.tryEval` cannot read a refusal's message.
 
@@ -95,14 +96,14 @@ C6's extra `project` call with an explicit `selectNodes`. See *Findings* below.
 ## The CI contract
 
 This repository has **two check planes**, and `nix flake check` covers the one its argument names
-and no other: the **root** flake's forty-four checks, listed below, and **`ci/`**'s six harness
+and no other: the **root** flake's forty-five checks, listed below, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
 `check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
-The forty-four root checks are the acceptance criteria:
+The forty-five root checks are the acceptance criteria:
 
 01. **`graph-query`** — C1 + C2, both doors. gen-scope registers the two kinds and four nodes;
     gen-graph's named query walks `tacks*` then `piping*`; gen-select's second door is read with an
@@ -118,6 +119,7 @@ The forty-four root checks are the acceptance criteria:
     (`trace.mode == "warm"` and `trace.reused == [ "ferrule" ]`) included. The second is what makes
     the equality a statement about reuse: the base is a plain attrset and `ferrule` is outside the
     edit, so the warm arm splices that leaf from the previous evaluation instead of remerging it.
+    `trace.inert == false` is read too: an armed warm run is not inert, which is C33's control.
 07. **`nixos-instantiate`** — the target instantiated, **not built**: the check writes
     `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
     NixOS evaluation and stops at the `.drv`.
@@ -350,7 +352,11 @@ The forty-four root checks are the acceptance criteria:
     reports the def its nested tree dropped, equal to a cold re-evaluation of the same modules. The
     leaf's presence in `warmDecision.reused` is asserted, so a warm run that remerged it through the
     cold arm cannot pass the cell for the wrong reason.
-44. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
+44. **`warm-inert-says-so`** — C33, den-hoag-0t9oh. The function-headed T2b base this corpus
+    shipped before `c544488`: its warm run is admitted (`trace.mode == "warm"`) and reuses nothing,
+    because gen-merge rules every function module dirty. `trace.inert == true` beside
+    `trace.reused == [ ]` is what now says so; `mode` alone read "warm" and hid it.
+45. **`construct-index`** — this file's own two indices, checked against the live `checks` attrset
     rather than against each other. Two hand-maintained surfaces recorded the same construct set —
     this numbered list, and the `## What v1 declares` table above — and drifted twice in three
     landings because each repair fixed the one it was looking at (`den-hoag-bl06m`). The cell asserts
@@ -359,7 +365,7 @@ The forty-four root checks are the acceptance criteria:
     one construct with no check cell); both comparisons report how many entries they scanned against
     how many they expected, never a bare pass.
 
-T5's thirteen refusals are not among these forty-four: `builtins.tryEval` yields `success` and nothing
+T5's thirteen refusals are not among these forty-five: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
 name through `refusals` instead (below).
 

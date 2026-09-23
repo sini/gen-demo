@@ -950,6 +950,30 @@
         # `warmAdmits reuseKey edits` = `attrNames edits == [ reuseKey ]` (`gen-memo/lib/warmTrace.nix`)
         # fires on `modules` alone.
         warm = warmBase.override { modules = [ t2bEdit ]; };
+        # ── C33 — the FUNCTION-headed T2b base this corpus shipped before `c544488`. gen-merge's
+        # `classifyModule` rules every function module dirty, so this warm run is admitted and
+        # reuses nothing; `trace.inert` is the field that now says so (den-hoag-0t9oh), where
+        # `trace.mode` alone read "warm" and hid it.
+        fnWarm =
+          (inputs.gen.lib.compose {
+            modules = [
+              (
+                { genMerge, ... }:
+                {
+                  options.spool = genMerge.mkOption {
+                    type = genMerge.types.str;
+                    default = "linen";
+                  };
+                  options.ferrule = genMerge.mkOption {
+                    type = genMerge.types.str;
+                    default = "chased";
+                  };
+                }
+              )
+            ];
+            specialArgs = t2bCtors;
+          }).override
+            { modules = [ t2bEdit ]; };
         cold = inputs.gen.lib.compose {
           modules = [
             t2bBase
@@ -2334,7 +2358,21 @@
                     && builtins.toJSON cold.provenance == builtins.toJSON warm.provenance
                     && (warm.trace.mode or null) == "warm"
                     && (warm.trace.reused or [ ]) == [ "ferrule" ]
+                    # An armed warm run is, by construction, not inert. `or null` so a trace that
+                    # lost the field reads red rather than defaulting to `false`.
+                    && (warm.trace.inert or null) == false
                     && !(cold ? trace)
+                  );
+
+                  # (7b) C33 — a warm run that reuses nothing SAYS SO (den-hoag-0t9oh). The
+                  # function-headed base is admitted (`mode == "warm"`) and remerges every leaf;
+                  # `inert` is the field separating that from warm-parity's armed run above, which
+                  # is this cell's control. `reused == [ ]` is read beside it, so a library that
+                  # set `inert` without the reuse set agreeing could not pass.
+                  warm-inert-says-so = asserts "warm-inert-says-so" (
+                    (fnWarm.trace.mode or null) == "warm"
+                    && (fnWarm.trace.inert or null) == true
+                    && (fnWarm.trace.reused or null) == [ ]
                   );
 
                   # (7) the target instantiated, not built. Forcing the drvPath into a file runs the
