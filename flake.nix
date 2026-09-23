@@ -2283,6 +2283,22 @@
                         "faille"
                         "grosgrain"
                       ]
+                    # den-hoag-sgut's declaration (ADR-0018 / den-hoag-g87v term 2) — the SUBSTRATE
+                    # predicate called DIRECTLY, not only through gen-delivery's projection. The
+                    # `pewterClasses`/`damaskClasses` arms above read gen-delivery's own output, which
+                    # is satisfied whether the fact came from the substrate or from a consumer's
+                    # private re-derivation of it; these name `aspects.hasClassContent` at its own
+                    # call site, on the two corpus values it discriminates — `nixos` carries a real
+                    # class body, `gusset` is the declared-but-unset class (C6 LIMB 2, the `null`).
+                    && roster.aspects.hasClassContent config.gen.composed.aspects.stitch.nixos
+                    && !(roster.aspects.hasClassContent config.gen.composed.aspects.stitch.gusset)
+                    # BOTH CLAUSES of the exported predicate, at a consumer. The corpus cannot supply
+                    # the FABRICATED EMPTY deferredModule — gen-aspects never renders one, which is
+                    # the whole point of the `null` above — so this arm hands the published predicate
+                    # that shape directly. It is the clause gen-delivery's own realization-predicate
+                    # cells turn on, and so the clause that has to be present in the EXPORT before
+                    # gen-delivery's private duplicate can be retired onto it.
+                    && !(roster.aspects.hasClassContent { imports = [ ]; })
                   );
 
                   # (6) T2b — the warm decision, byte-identical to the cold one, with BOTH guards

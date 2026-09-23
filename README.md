@@ -109,7 +109,8 @@ The forty-one root checks are the acceptance criteria:
 04. **`policy-edge`** — C5. The policy program's stable model, total, and the derived edge admitted.
 05. **`delivery-projection`** — C6. The node set, the one collected class, both Rider limbs absent
     from the classes despite both being present in the aspect body, and the bobbin door under an
-    invented name.
+    invented name. gen-aspects' exported `hasClassContent` is also called directly, on both of its
+    clauses: the declared-but-unset class and a fabricated empty module each read as no content.
 06. **`warm-parity`** — T2b. The warm decision byte-identical to a cold one, with both guards
     (`trace.mode == "warm"` and `trace.reused == [ "ferrule" ]`) included. The second is what makes
     the equality a statement about reuse: the base is a plain attrset and `ferrule` is outside the
