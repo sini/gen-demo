@@ -56,9 +56,11 @@ in
         # den-hoag-nn4's row28 — a kind-declaration key no reader consumes — is one more ordinary
         # paired row: +2 arms, +1 paired. den-hoag-6vgwm's row29 — a collection key colliding with
         # gen-schema's own vocabulary, row28's mirror image on the other side of one `elem` — is one
-        # more ordinary paired row: +2 arms, +1 paired.
-        totalArms = 53;
-        paired = 26;
+        # more ordinary paired row: +2 arms, +1 paired. den-hoag-refined-inherits-base-mint-oqrvg's
+        # row30 is one more ordinary paired row: +2 arms, +1 paired. Its `row30id` probe carries
+        # both arms too, but the label is not `row<digits> ` so it stays outside this population.
+        totalArms = 55;
+        paired = 27;
         # Row 17 is still the only THIRD-ARM row counted here as `plantedOnly`, and row24 (den-hoag-
         # n03z) does NOT join it despite also carrying a third `catchable` arm: row17's catchable
         # check is its SOLE arm (no unplanted counterpart of its own to carry), so labelling it
