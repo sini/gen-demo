@@ -82,7 +82,7 @@ echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/"
 
 # The control below reads rows' stderr by file; `grep` on a file that was never written exits 2,
 # which `if grep -q` reads as "no leak". Refuse that instead of passing it.
-for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36; do
+for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36 row75 row76; do
   if [ ! -f "$tmpdir/$errfile-red.err" ]; then
     echo "FAIL control: $errfile's planted stderr was never written -- the row it names did not run"
     fail=1
@@ -111,6 +111,9 @@ done
 # pair most able to cross-match by accident, and neither message may appear in the other's stderr.
 # Extended to rows 35/36: both are gen-merge refusals of one `spool` module behind the same `gen-merge:`
 # prefix, row 35 a key the reader does not admit and row 36 a value the foreign type does not admit.
+# Extended to rows 75/76, the rows 10/11 case at gen-select's two kind-admission doors: the two
+# refusals share every token but the site naming itself, so a leak either way would mean the by-name
+# half is matching the library rather than the door.
 if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
   echo "FAIL control: row1's message leaked into row2's refusal"
   fail=1
@@ -165,8 +168,14 @@ elif grep -qF "is not of type" "$tmpdir/row35-red.err"; then
 elif grep -qF "has an unsupported attribute" "$tmpdir/row36-red.err"; then
   echo "FAIL control: row35's message leaked into row36's refusal"
   fail=1
+elif grep -qF "adapters.registry.mkContext" "$tmpdir/row75-red.err"; then
+  echo "FAIL control: row76's message leaked into row75's refusal"
+  fail=1
+elif grep -qF "sel.kind expects" "$tmpdir/row76-red.err"; then
+  echo "FAIL control: row75's message leaked into row76's refusal"
+  fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29 and row35/row36 refusals do not cross-match)"
+  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29, row35/row36 and row75/row76 refusals do not cross-match)"
 fi
 
 exit $fail
