@@ -14,5 +14,5 @@ in tree.options.grommet.type.functor.name'
 check "T5 row18 unplanted (grommet redeclared refined, functor identity holds)" "${row18/SECOND/refinedInt}" 0 "" \
   "$tmpdir/row18-green.err" 'refined<int>'
 check "T5 row18 planted   (grommet redeclared bare int, functor identity dropped)" "${row18/SECOND/genMerge.types.int}" 1 \
-  "which the first type's own \`functor' does not reconcile" \
+  "own \`functor' (named \`refined<int>') does not reconcile with the second's (named \`int')" \
   "$tmpdir/row18-red.err"
