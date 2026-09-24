@@ -30,6 +30,18 @@
         { name = "damask"; }
         { name = "pewter"; }
       ]
+    # a JOIN qualified by TABLE NAME answers the rows its aliased form does (den-hoag-2xriv:
+    # the copied executor once answered `[ ]` at exit 0 here); the aliased form is the control
+    &&
+      c25Ir.query "SELECT edge.dst FROM thimble JOIN edge ON edge.src = thimble.name WHERE edge.label = 'gathers'"
+      == [
+        { dst = "damask"; }
+      ]
+    &&
+      c25Ir.query "SELECT e.dst FROM thimble t JOIN edge e ON e.src = t.name WHERE e.label = 'gathers'"
+      == [
+        { dst = "damask"; }
+      ]
     # the unknown TABLE, and the unknown LABEL VALUE — the second is the sharp one,
     # a well-formed query over a known column whose value nothing publishes
     && c25Refuses "SELECT name FROM spindles"
