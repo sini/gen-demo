@@ -2,12 +2,11 @@
 # `nixosConfigurations.pewter.config.system.build.toplevel.drvPath` to a file, which runs the whole
 # NixOS evaluation and stops at the `.drv`.
 #
-# the target instantiated, not built. Forcing the drvPath into a file runs the
-# whole NixOS evaluation and writes the .drv, and stops there.
+# Context discarded: upstream and Lix refuse `--no-build` on an absent input `.drv` (den-hoag-lbtnv).
 { config, pkgs }:
 {
   construct = [ ];
   check = pkgs.writeText "gen-demo-pewter-drvpath" (
-    config.flake.nixosConfigurations.pewter.config.system.build.toplevel.drvPath
+    builtins.unsafeDiscardStringContext config.flake.nixosConfigurations.pewter.config.system.build.toplevel.drvPath
   );
 }
