@@ -40,7 +40,7 @@ incremental plane's decision crossing.
 | C4b -- element identity                                   | 0024 arm F               | a diamond mints exactly one element (`diamondMoved`); a collision of identical content across three declarations mints three (`collisionMoved`); a competition key that reads the diamond's own residual admission state SPLITS the one element and refuses by name (`splitKeyed`), live control on `entityOf` keyed by scope instead                                                                           |
 | C5 -- a policy program                                    | 0020, 0022, 0033         | a stable model admitting `piping:grosgrain:faille`, which becomes C2's dynamic edge                                                                                                                                                                                                                                                                                                                             |
 | C6 -- a delivery                                          | 0028                     | one `nixos` class realized on `pewter`; two Rider limbs (`welt`, `gusset`) that must NOT realize                                                                                                                                                                                                                                                                                                                |
-| C7 -- the well-definedness gate                           | 0008 §3, 0030, 0019      | `genView.boundedWellDefinedSchedule` over `config.declaredEdges` (NOT C2's `edges`), contracted through `genGraph.mkNodeRef`/`mkDeclaredEdges`; the Check reads fields of the returned `gated`, never of its argument                                                                                                                                                                                           |
+| C7 -- the well-definedness gate                           | 0008 §3, 0030, 0019      | `genView.boundedWellDefinedSchedule` over `config.declaredEdges` plus C5's candidates, on or off (NOT C2's `edges`), contracted through `genGraph.mkNodeRef`/`mkDeclaredEdges`; the Check reads the returned `gated`, never its argument                                                                                                                                                                        |
 | T2b -- byte parity                                        | 0008                     | `compose`/`override` warm arm byte-identical to a cold `compose`, guarded by `trace.mode`                                                                                                                                                                                                                                                                                                                       |
 | C8 -- the contribution protocol                           | 0012, 0014               | `genAssemble.assemble`/`union` over three contributions; shape unions commutatively, content folds by positional authority                                                                                                                                                                                                                                                                                      |
 | C9 -- a SHARE class                                       | 0028                     | `genClass` partitions declared content on `weave`, never on the kind boundary; core, gate and invariance all checked                                                                                                                                                                                                                                                                                            |
@@ -299,15 +299,18 @@ drives exactly that promotion path red.
 
 **C7 landed in this pass.** It rides gen-view's own W1 work (`boundedWellDefinedSchedule`,
 ADR-0008 §3), unreachable until the hub relocked to carry it; the relock is the commit ahead of
-this one. C7 gates `config.declaredEdges` directly -- not C2's `edges`, which additionally carries
-C5's policy-produced dynamic edge and C12's promoted coordinate edges -- so the corpus makes one
-graph claim and two doors read different sets from it. Its Check reads fields of the returned
+this one. C7 gates `config.declaredEdges` plus every CANDIDATE C5's program declares, on or off
+(`policyCandidates`, over C1's `registered` set) -- not C2's `edges`, which carries only the
+candidates that resolved on -- so the corpus makes one graph claim and two doors read different
+sets from it (`den-hoag-6s1t` (iii)). The gate returns its equations and no order: its relation
+carries edges that may resolve off. Its Check reads fields of the returned
 `gated` record, never of its argument: a cell over the argument would force gen-graph alone (already
 reached) and add nothing for gen-view (gate v0's CONSTRUCTION-1, `den-hoag-xgu75`). `refusals`
 row 10 plants the cycle `pewter -> grosgrain -> damask -> pewter`; row 11 hands the gate a
 hand-assembled attrset carrying the same `index`/`dependencies` fields `mkDeclaredEdges` builds, no
 `_type` tag -- `genGraph.isDeclaredEdges` is purely nominal, so this door is the only
-construct-granular witness a hand-written stand-in cannot forge (Oracle 1b).
+construct-granular witness a hand-written stand-in cannot forge (Oracle 1b); row 81 plants
+`faille -> grosgrain`, a cycle only through C5's piping candidate, with the policy off.
 
 ### The roster census
 
@@ -391,8 +394,8 @@ empty moved set or throws naming the coordinate, the kind, both identities and t
 declarations.
 
 **`den-hoag-9l26n` closes on C17's cell.** On a kind declared through gen-aspects' `schemaOption` —
-the shape this corpus uses — the kind value's `options` attribute is EMPTY, so the sole recompute path
-used to answer over `[ "name" ]` alone and disagree with the stamp on every instance of it. Measured
+the shape this corpus uses — the kind value's declarations live in the module its `__functor` imports,
+and the sole recompute path used to answer over `[ "name" ]` alone and disagree with the stamp on every instance of it. Measured
 at this landing's two pins, same probe, same corpus shape:
 
 |                                      | recompute                                                                  | carried stamp       | agree     |

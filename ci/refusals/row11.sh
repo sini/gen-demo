@@ -24,9 +24,9 @@ row11='let
     equations = { };
     admitsCycle = _: false;
   };
-in builtins.toJSON (gated.edges "pewter")'
+in builtins.toJSON gated'
 check "T5 row11 unplanted (the value mkDeclaredEdges minted is accepted)" "${row11/DOOR/false}" 0 "" \
-  "$tmpdir/row11-green.err" '["grosgrain","damask"]'
+  "$tmpdir/row11-green.err" '{"equations":{}}'
 check "T5 row11 planted   (a hand-assembled lookalike, no _type tag, is refused by name)" \
   "${row11/DOOR/true}" 1 \
   "gen-view.boundedWellDefinedSchedule: field 'declaredDependencies' must be the relation \`gen-graph.mkDeclaredEdges\` returns; received an attrset that \`mkDeclaredEdges\` did not build" \

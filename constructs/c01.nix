@@ -9,7 +9,10 @@
   seamPromotion,
 }:
 let
-  nodes = genValues.thimbles // genValues.bobbins // seamPromotion.nodes;
+  # The REGISTRATION set — the nodes both registries declare, before any policy resolves. C7's
+  # gate reads this (plus C5's candidates); `nodes` below is the plane's structure.
+  registered = genValues.thimbles // genValues.bobbins;
+  nodes = registered // seamPromotion.nodes;
 
   scope = genScope.buildRoots {
     kinds = genScope.mkKinds (
@@ -44,6 +47,7 @@ let
 in
 {
   inherit
+    registered
     nodes
     scope
     ev

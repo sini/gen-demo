@@ -4,8 +4,9 @@
 # `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a`, the stamp minted
 # before it existed. Equality alone would pass for a registry that dropped the caller's modules, so
 # both halves are load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
-# `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, whose
-# `options` attribute is EMPTY because it is declared through gen-aspects' `schemaOption`. Live
+# `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, declared
+# through gen-aspects' `schemaOption`, whose `options` publishes the plane an instance imports
+# (`aspects`, `spool`) and whose `refs` is empty. Live
 # control in the same cell: `bobbin` recomputes to its own stamp over a different option set, and
 # the two stamps differ. And the WRONG-kind arm, which Finding 5 recorded as absent until the
 # accessor was guarded: recomputing `bobbin` against a thimble instance answers `null`, so a
@@ -20,7 +21,7 @@
 #
 # It also closes den-hoag-9l26n. `identityHashForKind` is the SOLE recompute path, and on
 # a kind declared through gen-aspects' `schemaOption` — the shape this corpus uses, whose
-# `options` attribute is EMPTY — it used to answer over `[ "name" ]` alone and disagree
+# declarations live in the module its `__functor` imports — it used to answer over `[ "name" ]` alone and disagree
 # with the stamp on every instance. Since the derivation reads the kind's own evaluation
 # it cannot disagree, and the pinned literal is what separates agreement from two
 # derivations degenerating together.
@@ -63,7 +64,12 @@
         "name"
         "spool"
       ]
-    && (c17Thimble.options or { }) == { }
+    &&
+      builtins.attrNames c17Thimble.options == [
+        "aspects"
+        "spool"
+      ]
+    && c17Thimble.refs == { }
     && c17Schema.identityHashForKind c17Thimble c17Pewter == c17Pewter.id_hash
     &&
       c17Schema.identityHashForKind c17Bobbin genValues.bobbins.grosgrain

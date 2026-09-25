@@ -21,9 +21,9 @@ row10='let
     equations = { };
     admitsCycle = _: false;
   };
-in builtins.toJSON (builtins.filter (scc: builtins.length scc > 1) (gated.condensation).sccs)'
+in builtins.toJSON gated'
 check "T5 row10 unplanted (declared edges stay acyclic)" "${row10/PLANT/false}" 0 "" \
-  "$tmpdir/row10-green.err" '[]'
+  "$tmpdir/row10-green.err" '{"equations":{}}'
 check "T5 row10 planted   (damask -> pewter closes pewter -> grosgrain -> damask -> pewter)" \
   "${row10/PLANT/true}" 1 \
   "gen-view.boundedWellDefinedSchedule: the declared relation has a cyclic component \`admitsCycle\` does not admit: [[\"damask\",\"grosgrain\",\"pewter\"]]" \

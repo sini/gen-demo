@@ -44,38 +44,51 @@ let
     interpretation = [ ];
     complete = true;
   };
-  # THE DYNAMIC EDGE, materialised: the atom's predicate is the label, its relata are the
-  # endpoints. It keeps its own label (`piping`) rather than borrowing a declared one (`tacks`),
-  # so it is never mistakable for a declaration.
-  pipingEdge =
-    if (mdl.resolve pipingHead).included then
-      [
-        {
-          from = "grosgrain";
-          to = "faille";
-          label = "piping";
-        }
-      ]
-    else
-      [ ];
+  # THE CANDIDATES — what each conditional head's declaration names, read before solving and
+  # whether or not the head resolves on. C7's gate relation carries these (ADR-0008 §3's "complete
+  # at registration" over every declared production; den-hoag-6s1t (iii)). The materialised values
+  # below are the SAME records gated on `.included`, so the reached structure is a subset of the
+  # candidates by construction.
+  #
+  # THE DYNAMIC EDGE: the atom's predicate is the label, its relata are the endpoints. It keeps its
+  # own label (`piping`) rather than borrowing a declared one (`tacks`), so it is never mistakable
+  # for a declaration.
+  pipingCandidate = {
+    nodes = { };
+    edges = [
+      {
+        from = "grosgrain";
+        to = "faille";
+        label = "piping";
+      }
+    ];
+  };
   # THE PROMOTION — a coordinate promoted into a node of the one graph by giving it edges
   # (ADR-0016 ruling 2). Both the node and its edges are read off `seamCoords`/`seamSpace`,
   # never restated as literals.
-  seamPromotion =
-    if (mdl.resolve seamHead).included then
-      {
-        nodes.${seamHead} = { };
-        edges = map (d: {
-          from = seamHead;
-          to = seamCoords.${d};
-          label = d;
-        }) seamSpace.product.dims;
-      }
+  seamCandidate = {
+    nodes.${seamHead} = { };
+    edges = map (d: {
+      from = seamHead;
+      to = seamCoords.${d};
+      label = d;
+    }) seamSpace.product.dims;
+  };
+  policyCandidates = {
+    nodes = pipingCandidate.nodes // seamCandidate.nodes;
+    edges = pipingCandidate.edges ++ seamCandidate.edges;
+  };
+  reachedOf =
+    head: candidate:
+    if (mdl.resolve head).included then
+      candidate
     else
       {
         nodes = { };
         edges = [ ];
       };
+  pipingEdge = (reachedOf pipingHead pipingCandidate).edges;
+  seamPromotion = reachedOf seamHead seamCandidate;
 in
 {
   inherit
@@ -84,5 +97,6 @@ in
     mdl
     pipingEdge
     seamPromotion
+    policyCandidates
     ;
 }

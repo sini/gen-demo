@@ -1,14 +1,19 @@
 # ── C7 — the well-definedness gate over the declared edge set (ADR-0008 §3, ADR-0030,
-# ADR-0019; gen-view). C2's OWN declarations, contracted. `mkDeclaredEdges` admits and
-# ignores the `label` field, so the corpus's edge records ride through unchanged.
+# ADR-0019; gen-view). C2's OWN declarations plus every CANDIDATE C5's program declares, ON OR
+# OFF (den-hoag-6s1t (iii)): a static gate over-approximates, so a cycle through a policy edge
+# that resolved off is still refused. `mkDeclaredEdges` admits and ignores the `label` field, so
+# the corpus's edge records ride through unchanged. The gate publishes its verdict and the
+# equations, never an order: its relation carries edges that resolve off (ADR-0019).
 {
   genGraph,
   genValues,
   genView,
-  nodes,
+  registered,
+  policyCandidates,
 }:
 let
-  ref = genGraph.mkNodeRef { isRegistered = id: nodes ? ${id}; };
+  gateNodes = registered // policyCandidates.nodes; # the registration set plus every candidate node
+  ref = genGraph.mkNodeRef { isRegistered = id: gateNodes ? ${id}; };
   contracted =
     es:
     genGraph.mkDeclaredEdges (
@@ -22,22 +27,17 @@ let
       ) es
     );
   gated = genView.boundedWellDefinedSchedule {
-    nodes = builtins.attrNames nodes; # the registration set
-    declaredDependencies = contracted genValues.declaredEdges; # NOT C2's `edges`
+    nodes = builtins.attrNames gateNodes;
+    declaredDependencies = contracted (genValues.declaredEdges ++ policyCandidates.edges); # NOT C2's `edges`
     equations = { }; # see OPEN 1
     admitsCycle = _: false; # nothing here is declared circular
   };
-  # THE CELL READS `gated`, NOT `contracted` — see the Check. A cell over the argument
-  # forces gen-graph only (already reached) and adds nothing for gen-view.
-  gatedSccs = (gated.condensation).sccs;
-  gatedEdges = gated.edges "pewter";
 in
 {
   inherit
+    gateNodes
     ref
     contracted
     gated
-    gatedSccs
-    gatedEdges
     ;
 }

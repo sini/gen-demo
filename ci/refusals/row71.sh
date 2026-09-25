@@ -10,7 +10,7 @@ row71='let
   x0 = gen.lib.substrate.bind.crossing;
   _testHashIdentity = kind: labels: relatumOf:
     builtins.hashString "sha256" (kind + "@" + builtins.concatStringsSep "|" (
-      builtins.map (l: l + "=" + relatumOf l) (builtins.sort (a: b: a < b) labels)
+      builtins.map (l: l + "=" + builtins.toJSON (relatumOf l)) (builtins.sort (a: b: a < b) labels)
     ));
   x = x0 // (x0.mkOperations { hashIdentity = _testHashIdentity; }).value;
   c = x.contractTerm;
