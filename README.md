@@ -136,6 +136,14 @@ cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-r
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
+Both `nix flake check` forms, and so both arms below, are **unguarded**: they read a git-filtered
+copy of the tree, so an untracked file is absent from either plane and a failing untracked cell
+reads green. The guarded command is `nix develop ./ci --command ci`, which refuses on any untracked
+file under the `ci/` plane's read roots (`ci/tests`, `ci/refusals`, `ci/refusals.sh`,
+`ci/worktree-precommit-check.sh`) before it runs `ci/tests`; the remedy is `git add` or move. Its
+reach is that plane alone: it does not run the root plane, and nothing guards `cells/` or
+`constructs/`, so `git add` a new cell before any command here can see it.
+
 The root checks are the acceptance criteria. **`cells/` is their index**: each file is one check,
 named after the file, and its header comment says what the cell asserts and why. The one check with
 no file is `construct-index`, declared in `flake.nix`: it reads the constructs every cell attributes
@@ -199,12 +207,13 @@ exit 0 on the arms it kept.
 
 ### Two arms, plus the by-name half
 
-These are devshell commands, declared in `ci/flake.nix` beside the `ci`, `relock`, `fmt` and `repl`
-that gen-harness supplies. `direnv` loads them from `.envrc`; without it, `nix develop ./ci`.
+These are devshell commands. `ci` is gen-harness's; the other three are declared in `ci/flake.nix`
+beside the `relock`, `fmt` and `repl` that gen-harness also supplies. `direnv` loads them from `.envrc`; without it, `nix develop ./ci`.
 
 ```sh
-check-lock            # nix flake check  AND  nix flake check ./ci
-check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen  AND  nix flake check ./ci
+ci                    # guarded: refuses on an untracked file under ci/'s read roots, then runs ci/tests
+check-lock            # nix flake check  AND  nix flake check ./ci -- unguarded
+check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen  AND  nix flake check ./ci -- unguarded
 refusals              # T5's planted violations (ci/refusals/), each driven red by name, each with an unplanted control
 ```
 
