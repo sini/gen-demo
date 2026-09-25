@@ -21,10 +21,10 @@
 #            need it to: an arm left to throw UNCAUGHT comes back in the job's own `error` field
 #            with its full message, which is what the by-name grep reads.
 #   process  one `nix eval --impure --raw` per arm, `REFUSALS_JOBS` at a time.
-# nix-eval-jobs links its OWN evaluator (upstream Nix), so it reads a message the way upstream Nix
-# words it and no other. `auto` (the default) takes `nej` only when the `nix` on PATH is upstream
-# Nix and `process` otherwise, so a Lix or Determinate column still reads every refusal under its
-# own evaluator. `REFUSALS_ENGINE=nej|process` forces one.
+# `nej` is the default. nix-eval-jobs links its OWN evaluator, pinned by nixpkgs rather than by the
+# CI matrix, so it reads a message in that evaluator's words and no other: every CI column sets
+# `REFUSALS_ENGINE=process` (.github/workflows/ci.yml) and so reads each refusal under the
+# evaluator the column installed. The header line names the engine and the evaluator it ran under.
 #
 # Reached as the devshell command `refusals` (`ci/flake.nix`), which is what makes the plane
 # schedulable: the workflow runs it, and `ci/tests/refusals-pairing.nix` holds the pairing above
@@ -111,13 +111,15 @@ for rowfile in "${rowfiles[@]}"; do
 done
 
 # ── the engines ──
-engine="${REFUSALS_ENGINE:-auto}"
-if [ "$engine" = auto ]; then
-  case "$(nix --version)" in
-  "nix (Nix) "*) engine=nej ;;
-  *) engine=process ;;
-  esac
-fi
+engine="${REFUSALS_ENGINE:-nej}"
+case "$engine" in
+nej) echo "engine: nej (evaluator: nix-eval-jobs' own; $workers workers)" ;;
+process) echo "engine: process (evaluator: $(nix --version); $workers at a time)" ;;
+*)
+  echo "FAIL engine: REFUSALS_ENGINE is '$engine', not nej or process"
+  exit 1
+  ;;
+esac
 
 nej=() proc=()
 if [ "$engine" = nej ]; then

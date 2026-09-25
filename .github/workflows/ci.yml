@@ -44,5 +44,7 @@ jobs:
       # T5's by-name half (ADR-0025). `builtins.tryEval` cannot read a refusal's message, so these
       # rows (`ci/refusals/`) cannot be `checks` cells and this is the step that schedules them — the gap
       # row16 escaped through was a missing scheduler, not a missing analyser. A refusal's message
-      # is the evaluator's, so it is read in every column.
-      extra-run: nix develop ./ci --command refusals
+      # is the evaluator's, so it is read in every column, and by the PROCESS engine: the default
+      # engine, nix-eval-jobs, carries its own evaluator and would read every column's refusals in
+      # one evaluator's words.
+      extra-run: REFUSALS_ENGINE=process nix develop ./ci --command refusals

@@ -206,13 +206,15 @@ someone running it by hand. `ci/tests/refusals-pairing.nix` gates the other half
 its planted or unplanted arm reds `nix flake check ./ci` even though the script itself would still
 exit 0 on the arms it kept.
 
-`refusals` evaluates every arm in ONE `nix-eval-jobs` run when the `nix` on `PATH` is upstream Nix:
-each worker evaluates the corpus once, and an arm that refuses comes back with its message in the
-job's `error` field, which is what the by-name check reads. nix-eval-jobs carries its own upstream
-evaluator, so under Lix or Determinate Nix the script runs one `nix eval` per arm instead, several at
-a time, and the refusal is read in that evaluator's words. `REFUSALS_ENGINE=nej|process` forces one
-engine, `REFUSALS_JOBS` sets the parallelism (default: the core count, at most 8). A dead
-nix-eval-jobs run reports `EVALUATOR FAILED` and tallies nothing.
+By default `refusals` evaluates every arm in ONE `nix-eval-jobs` run: each worker evaluates the
+corpus once, and an arm that refuses comes back with its message in the job's `error` field, which is
+what the by-name check reads. nix-eval-jobs carries its own evaluator, so CI runs
+`REFUSALS_ENGINE=process` in every column instead: one `nix eval` per arm, several at a time, each
+refusal read in the words of the evaluator that column installed. Both engines feed one verdict
+function, and the run's first line names the engine. `REFUSALS_JOBS` sets the parallelism (default:
+the core count, at most 8). A dead nix-eval-jobs run reports `EVALUATOR FAILED` and tallies nothing;
+a row whose planted arm aborts past `catch` (a stack overflow) kills that run, and runs under
+`REFUSALS_ENGINE=process`.
 
 ### Two arms, plus the by-name half
 
