@@ -1,59 +1,59 @@
 # shellcheck shell=bash
-# ── row 13 -- a KIND option contributed after an evaluation already minted, refused on the WARM
-# re-compose (mirrors C17's closure from the other side) ──
+# ── row 13 -- a minted identity that MOVES on a warm re-compose, refused by name (mirrors C17's
+# closure from the other side) ──
 #
-# ★ IT IS A WARM RE-COMPOSE, NOT A COLD PLANT, AND THAT IS THE WHOLE ROW. Region 1 closes the
-# INSTANCE side by construction, so an instance-side option is unexpressible in an identity rather
-# than refused -- there is nothing for a by-name row to catch there, and C17 asserts it as a value
-# instead. The KIND side has no such construction: within ONE evaluation a kind's option set simply
-# is what it is. The move is only nameable where TWO evaluations are in hand, and the substrate
-# holds two in exactly one place -- `warmFrom`. So this row builds the prior evaluation AND the
-# warm re-compose in one expression, which is what makes a by-name refusal reachable from a single
-# `nix eval` at all. A cold plant would exit 0 on BOTH arms and measure nothing.
+# ★ IT IS A WARM RE-COMPOSE, NOT A COLD PLANT, AND THAT IS THE WHOLE ROW. Within ONE evaluation an
+# identity simply is what it is; a move is only nameable where TWO evaluations are in hand, and the
+# substrate holds two in exactly one place -- `warmFrom`. So this row builds the prior evaluation
+# AND the warm re-compose in one expression, which is what makes a by-name refusal reachable from a
+# single `nix eval` at all. A cold plant would exit 0 on BOTH arms and measure nothing.
 #
-# The two arms are ONE token apart: `internal = true` makes the planted option a declaration the
-# identity reflection excludes, so it is still a dirty decl-side contribution -- the id_hash is
-# re-merged either way -- and moves nothing. A refusal keyed on decl-side dirtiness alone would
-# fire on BOTH arms and destroy reuse; the unplanted arm is what catches that, and its exact
-# stdout is the corpus's own unmoved thimble stamp.
+# The edit is at a DECLARED identity position: `thimbles.pewter.spool`, an option of the `thimble`
+# kind read through gen-schema's real registry (`evalSchema` + `mkInstanceRegistry`, the corpus's
+# own crossing). The two arms are ONE token apart: `mkForce "linen"` re-defines the value the prior
+# minted, so it is a dirty contribution at the identity position that moves nothing, and
+# `mkForce "wool"` moves `pewter`. A refusal keyed on dirtiness alone would fire on BOTH arms and
+# destroy reuse; the unplanted arm is what catches that, and its exact stdout is the corpus's own
+# unmoved thimble stamp. The control arm is the laziness witness: an edit that only declares an
+# option nothing defines (`never`) is admitted warm without forcing it, the stamp unmoved.
 #
-# ★ THE CROSSING SPELLING MIGRATED (2026-09-15 relocation, §2.6): the kind is read through the
-# staged `evalSchema` pass now, same as the corpus's own `gen-modules/corpus.nix`, not off a bare
-# `config.schema.thimble`. `evalSchema` has no `warmFrom` of its own to thread -- it runs its OWN
-# internal `evalModuleTree`, sealed before the outer tree below ever starts -- so "prior" and
-# "warm" each get their OWN `evalSchema` call over the kind's own module list (unplanted / with
-# `grommet` planted), and it is the OUTER tree's `mkInstanceRegistry <schema>.thimble` declaration
-# that differs between the two, which is what the outer `warmFrom` compares. Driven both arms:
-# green still exits 0 with the unmoved stamp; red still carries gen-memo's own by-name refusal.
+# The row used to plant a KIND option (`grommet`) and rest its unplanted arm on `internal = true`
+# excluding the option from identity. gen-schema no longer reads `internal` for identity -- it is
+# presentation only, so an internal primitive is an identity key like any other -- and that arm
+# stopped being a non-move. The refusal it pinned is unchanged.
 row13='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genAspects = gen.lib.aspects.aspects;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   aspectSchema = genAspects.mkAspectSchema (import ./aspect-cnf.nix);
-  kindModules = extra: [
-    {
-      config.schema.thimble.options.aspects = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; };
-      config.schema.thimble.options.spool = genMerge.mkOption { type = genMerge.types.str; };
-    }
-  ] ++ extra;
-  mkOuter = schema: [
+  schema = genSchema.evalSchema {
+    inherit (aspectSchema) schemaOption;
+    modules = [
+      {
+        config.schema.thimble.options.aspects = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; };
+        config.schema.thimble.options.spool = genMerge.mkOption { type = genMerge.types.str; };
+      }
+    ];
+  };
+  outer = [
     { imports = [ (aspectSchema.mkAspectModule { }) ]; }
     { options.schema = genMerge.mkOption { type = genMerge.types.raw; default = schema; }; }
-    ({ config, ... }: { options.thimbles = genSchema.mkInstanceRegistry schema.thimble { }; })
+    { options.thimbles = genSchema.mkInstanceRegistry schema.thimble { }; }
     { config.thimbles.pewter = { aspects = [ "stitch" ]; spool = "linen"; }; }
   ];
-  priorSchema = genSchema.evalSchema { inherit (aspectSchema) schemaOption; modules = kindModules [ ]; };
-  warmSchema = genSchema.evalSchema {
-    inherit (aspectSchema) schemaOption;
-    modules = kindModules [ { config.schema.thimble.options.grommet = genMerge.mkOption { type = genMerge.types.str; default = "plain"; internal = INTERNAL; }; } ];
-  };
-  prior = genMerge.evalModuleTree { modules = mkOuter priorSchema; };
-  warmBase = mkOuter warmSchema;
-  warm = genMerge.evalModuleTree { modules = warmBase; warmFrom = prior; editedModules = warmBase; };
+  edit = [ EDIT ];
+  prior = genMerge.evalModuleTree { modules = outer; };
+  warm = genMerge.evalModuleTree { modules = outer ++ edit; warmFrom = prior; editedModules = edit; };
 in warm.config.thimbles.pewter.id_hash'
-check "T5 row13 unplanted (planted option internal, no identity moves)" "${row13/INTERNAL/true}" 0 "" \
-  "$tmpdir/row13-green.err" 'thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a'
-check "T5 row13 planted   (planted option is an identity key, pewter moves)" "${row13/INTERNAL/false}" 1 \
+row13stamp='thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a'
+check "T5 row13 unplanted (the declared spool re-defined to its minted value, no identity moves)" \
+  "${row13/EDIT/{ config.thimbles.pewter.spool = genMerge.mkForce \"linen\"; \}}" 0 "" \
+  "$tmpdir/row13-green.err" "$row13stamp"
+check "T5 row13 planted   (the declared spool moved, pewter's identity moves)" \
+  "${row13/EDIT/{ config.thimbles.pewter.spool = genMerge.mkForce \"wool\"; \}}" 1 \
   "gen-memo.identitiesHeld: minted identity moved on a warm re-compose at 'thimbles.pewter'" \
   "$tmpdir/row13-red.err"
+check "T5 row13 control   (an option nothing defines enters by edit, admitted without forcing it)" \
+  "${row13/EDIT/{ options.never = genMerge.mkOption { type = genMerge.types.str; \}; \}}" 0 "" \
+  "$tmpdir/row13-lazy.err" "$row13stamp"

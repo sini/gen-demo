@@ -31,8 +31,9 @@ jobs:
       # owner 2026-09-25): it stays the human act `check-hub-main`, and this workflow runs the
       # committed-lock arm only.
       # CI EVALUATES; IT DOES NOT BUILD. `--no-build` still forces the checks' derivations —
-      # so the `nixos` target is INSTANTIATED to its `toplevel.drvPath`, which is what
-      # den-hoag-g87v term 2 contracts — while the system itself is never realised. The full
+      # so the `nixos` target gets the full NixOS evaluation down to its `toplevel.drvPath`,
+      # which is what den-hoag-g87v term 2 contracts — while no evaluator writes the `.drv`
+      # under `--no-build` and the system itself is never realised. The full
       # build is a LOCAL validation rule (owner-ruled 2026-09-14); a bare `nix flake check`
       # realises the NixOS system and exhausted the runner's disk (run 34907234688).
       #

@@ -367,14 +367,17 @@ before `shirring` existed, and the cell pins that literal rather than comparing 
 edit would move.
 
 **T5 row 13 is the half that has no construction, so it is a refusal — and it is a WARM RE-COMPOSE.**
-Within one evaluation a kind's option set simply is what it is; the move is only nameable where TWO
+Within one evaluation a minted identity simply is what it is; a move is only nameable where TWO
 evaluations are in hand, and the substrate holds two in exactly one place, `warmFrom`. So the row
 builds the prior evaluation and the warm re-compose in a single expression, which is what makes a
 by-name refusal reachable from one `nix eval` at all. A COLD plant would exit 0 on both arms and
-measure nothing. The two arms are one token apart: `internal = true` leaves the planted `grommet` a
-decl-side contribution that re-merges `id_hash` and moves no identity, and the unplanted arm's exact
-stdout is the corpus's own unmoved stamp — so a refusal keyed on decl-side dirtiness alone, which
-would destroy reuse for every consumer, fails that arm.
+measure nothing. The edit is at a declared identity position, `thimbles.pewter.spool`, and the two
+arms are one token apart: `mkForce "linen"` re-defines the value the prior minted, a dirty
+contribution that moves no identity, and `mkForce "wool"` moves `pewter`. The unplanted arm's exact
+stdout is the corpus's own unmoved stamp, so a refusal keyed on dirtiness alone, which would destroy
+reuse for every consumer, fails that arm. A third arm declares an option nothing defines and is
+admitted warm without forcing it. `internal` plays no part: it is presentation only, and an
+internal primitive is an identity key like any other.
 
 The refusal is `gen-memo`'s, over a fact `gen-merge` computes: the evaluator holds both evaluations
 and hands two maps of coordinate to minted identity to the incremental plane, which admits with an
