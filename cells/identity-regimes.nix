@@ -1,7 +1,6 @@
 # `identity-regimes` — C56, den-hoag-3f39. gen-algebra's intensional identity under ADR-0034,
 # composed with the hub's ONE mint (`substrate.identity.hashIdentity`) rather than a stub: the
-# encoder `mkIntensional` over a `basting` registry, `conservativeEq`, and the key site reached the
-# only way a consumer can reach it, through `search.converge`.
+# encoder `mkIntensional` over a `basting` registry and `conservativeEq`.
 #
 # The five `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
 # `ci/refusals/row77-78.sh`):
@@ -15,9 +14,8 @@
 #      there: a refusal under an ordinary key surfaces, catchably, beside inert controls that decide
 #      both ways, so the cell separates "`__id` is excluded" from "every key is". A
 #      self-referential payload aborts the evaluator uncatchably and no cell can hold it;
-#   4. the KEY site keys on the identity, not the name — two continuations at one program point
-#      with differing `args` BOTH fire. Items 1–3 stay green on a build whose dedup key reads the
-#      name; this one drops a continuation there;
+#   4. the search runner is RETIRED (den-hoag-b7u1v): gen-algebra publishes no `search`, so no key
+#      site reads the regime outside the regime's own readers;
 #   5. the UNMIGRATED regime decides on content, not the name — one program point, one shared `fn`,
 #      differing inert `closure` ⇒ unequal, while an equal closure still identifies. It is the
 #      witness of ADR-0034's deleted name arm: a gen-algebra that still decides an unmigrated pair on
@@ -33,14 +31,13 @@ let
     conservativeEq
     identityOf
     regimeTagOf
-    search
     ;
   mint = inputs.gen.lib.substrate.identity.hashIdentity;
 
   basting = {
     revision = "r1";
     members = {
-      whipstitch = args: (v: s: search.emit [ "${args.thread}:${v}" ] s);
+      whipstitch = args: (v: s: s);
       backstitch = args: (v: s: s);
     };
   };
@@ -74,11 +71,6 @@ let
   };
   sealedEq = a: b: conservativeEq (sealed // a) (sealed // b);
   decides = e: (builtins.tryEval e).success;
-
-  converged =
-    f1: f2:
-    (search.converge (search.on "k" f2 (search.on "k" f1 (search.insert "k" "v" search.empty))))
-    .results;
 in
 {
   construct = [ "C56" ];
@@ -100,13 +92,8 @@ in
     && !(decides (sealedEq { zz = throw "plain"; } { zz = throw "plain"; }))
     && sealedEq { zz = "v"; } { zz = "v"; }
     && !(sealedEq { zz = "v"; } { zz = "w"; })
-    # 4 — the key site: both continuations fire; the same value twice dedups to one
-    &&
-      converged madder woad == [
-        "madder:v"
-        "woad:v"
-      ]
-    && converged madder madder == [ "madder:v" ]
+    # 4 — the search runner is retired (den-hoag-b7u1v): no key site outside the regime readers
+    && !(genAlgebra ? search)
     # 5 — the unmigrated regime: same name, differing closure, unequal
     && regimeTagOf (identityOf unmigrated) == "u"
     && !(conservativeEq unmigrated (unmigrated // { closure.thread = "woad"; }))
