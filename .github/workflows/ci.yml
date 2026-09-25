@@ -27,8 +27,9 @@ jobs:
       # ARM 2 (`nix flake check --refresh --override-input gen github:sini/gen`) is deliberately
       # NOT here. It is owner-ruled contract under den-hoag-g87v term 2, but it hits the network
       # on every run and reds whenever the hub moves ahead of gen-demo's deliberate relock — a
-      # permanently red main for a repository whose pin advances by decision. It stays the human
-      # act `check-hub-main` until that is ruled on; scheduling it is not this workflow's to take.
+      # permanently red main for a repository whose pin advances by decision. RULED (den-hoag-vffs5,
+      # owner 2026-09-25): it stays the human act `check-hub-main`, and this workflow runs the
+      # committed-lock arm only.
       # CI EVALUATES; IT DOES NOT BUILD. `--no-build` still forces the checks' derivations —
       # so the `nixos` target is INSTANTIATED to its `toplevel.drvPath`, which is what
       # den-hoag-g87v term 2 contracts — while the system itself is never realised. The full
