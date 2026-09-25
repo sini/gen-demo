@@ -25,7 +25,14 @@ let
     };
     layers = weaveLayers;
   };
+  # `foldNestedLayers` over a literal dotted key and the nested path it spells: two leaves.
+  dottedFold = genAlgebra.record.foldNestedLayers {
+    layers = [
+      { "a.b" = "literal"; }
+      { a.b = "nested"; }
+    ];
+  };
 in
 {
-  inherit weaveLayers folded;
+  inherit weaveLayers folded dottedFold;
 }
