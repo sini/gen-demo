@@ -139,10 +139,11 @@ its green read as suite cover and was not.
 Both `nix flake check` forms, and so both arms below, are **unguarded**: they read a git-filtered
 copy of the tree, so an untracked file is absent from either plane and a failing untracked cell
 reads green. The guarded command is `nix develop ./ci --command ci`, which refuses on any untracked
-file under the `ci/` plane's read roots (`ci/tests`, `ci/refusals`, `ci/refusals.sh`,
-`ci/worktree-precommit-check.sh`) before it runs `ci/tests`; the remedy is `git add` or move. Its
-reach is that plane alone: it does not run the root plane, and nothing guards `cells/` or
-`constructs/`, so `git add` a new cell before any command here can see it.
+file under a declared read root before it runs `ci/tests`: the `ci/` plane's own (`ci/tests`,
+`ci/refusals`, `ci/refusals.sh`, `ci/worktree-precommit-check.sh`) and everything the root flake
+reads (`cells/`, `constructs/`, `fixtures/`, `gen-modules/`, `aspect-cnf.nix`, `README.md`,
+`flake.nix`, `flake.lock`). The remedy is `git add` or move. It does not run the root plane itself,
+so run it before either arm below to know the arm saw every file you meant it to.
 
 The root checks are the acceptance criteria. **`cells/` is their index**: each file is one check,
 named after the file, and its header comment says what the cell asserts and why. The one check with
@@ -205,13 +206,21 @@ someone running it by hand. `ci/tests/refusals-pairing.nix` gates the other half
 its planted or unplanted arm reds `nix flake check ./ci` even though the script itself would still
 exit 0 on the arms it kept.
 
+`refusals` evaluates every arm in ONE `nix-eval-jobs` run when the `nix` on `PATH` is upstream Nix:
+each worker evaluates the corpus once, and an arm that refuses comes back with its message in the
+job's `error` field, which is what the by-name check reads. nix-eval-jobs carries its own upstream
+evaluator, so under Lix or Determinate Nix the script runs one `nix eval` per arm instead, several at
+a time, and the refusal is read in that evaluator's words. `REFUSALS_ENGINE=nej|process` forces one
+engine, `REFUSALS_JOBS` sets the parallelism (default: the core count, at most 8). A dead
+nix-eval-jobs run reports `EVALUATOR FAILED` and tallies nothing.
+
 ### Two arms, plus the by-name half
 
 These are devshell commands. `ci` is gen-harness's; the other three are declared in `ci/flake.nix`
 beside the `relock`, `fmt` and `repl` that gen-harness also supplies. `direnv` loads them from `.envrc`; without it, `nix develop ./ci`.
 
 ```sh
-ci                    # guarded: refuses on an untracked file under ci/'s read roots, then runs ci/tests
+ci                    # guarded: refuses on an untracked file under a declared read root, then runs ci/tests
 check-lock            # nix flake check  AND  nix flake check ./ci -- unguarded
 check-hub-main        # nix flake check --refresh --override-input gen github:sini/gen  AND  nix flake check ./ci -- unguarded
 refusals              # T5's planted violations (ci/refusals/), each driven red by name, each with an unplanted control

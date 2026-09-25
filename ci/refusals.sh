@@ -10,8 +10,21 @@
 #
 # THE ROWS ARE FILES. Every `ci/refusals/*.sh` is one row (or one group of rows sharing a prelude),
 # sourced below in version order (`row9` before `row10`); this script holds only the `check`
-# function, the cross-row control and the exit. A new row lands by adding one file -- see README.md,
-# "Adding a construct, a cell or a refusal row".
+# function, the engines, the cross-row control and the exit. A new row lands by adding one file --
+# see README.md, "Adding a construct, a cell or a refusal row".
+#
+# TWO ENGINES, ONE VERDICT. Sourcing a row only RECORDS its arms; every arm is then evaluated by
+# one of two engines and judged by the one `verdict` function below, in the rows' order.
+#   nej      ONE `nix-eval-jobs` run over every arm (den v1's `ci.bash`): each worker evaluates the
+#            corpus flake ONCE, where a `nix eval` per arm re-evaluated the hub library per arm
+#            (~3 s each, ~11 min a run). tryEval cannot read a message, but nix-eval-jobs does not
+#            need it to: an arm left to throw UNCAUGHT comes back in the job's own `error` field
+#            with its full message, which is what the by-name grep reads.
+#   process  one `nix eval --impure --raw` per arm, `REFUSALS_JOBS` at a time.
+# nix-eval-jobs links its OWN evaluator (upstream Nix), so it reads a message the way upstream Nix
+# words it and no other. `auto` (the default) takes `nej` only when the `nix` on PATH is upstream
+# Nix and `process` otherwise, so a Lix or Determinate column still reads every refusal under its
+# own evaluator. `REFUSALS_ENGINE=nej|process` forces one.
 #
 # Reached as the devshell command `refusals` (`ci/flake.nix`), which is what makes the plane
 # schedulable: the workflow runs it, and `ci/tests/refusals-pairing.nix` holds the pairing above
@@ -22,22 +35,40 @@ set -u
 # which resolves against the CWD; `just` supplied that by running recipes from the justfile's
 # directory, and as a devshell command the script supplies it itself.
 cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
+root="$PWD"
 fail=0
 
 # A fresh dir per run -- two concurrent `refusals` runs no longer collide on a fixed /tmp name.
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
+# den v1's caps: workers bounded so an arm that runs away cannot take the host's memory with it.
+workers="${REFUSALS_JOBS:-$(($(nproc) < 8 ? $(nproc) : 8))}"
+
 # $1 label, $2 nix expr, $3 wanted exit code, $4 required stderr substring (empty = none checked),
 # $5 file to capture this row's stderr into (for the cross-row control at the end),
 # $6 wanted stdout, exact match (empty = none checked -- the planted arms, which refuse before
 # producing a value; every unplanted arm passes one, so a construction that refused everything
 # cannot pass this arm by exiting 0 with the wrong (or no) value).
+labels=() exprs=() want_exits=() want_greps=() errfiles=() want_stdouts=()
 check() {
-  local label="$1" expr="$2" want_exit="$3" want_grep="$4" errfile="$5" want_stdout="${6:-}"
-  local out
-  out="$(nix eval --impure --raw --expr "$expr" 2>"$errfile")"
-  local ec=$?
+  labels+=("$1")
+  exprs+=("$2")
+  want_exits+=("$3")
+  want_greps+=("$4")
+  errfiles+=("$5")
+  want_stdouts+=("${6:-}")
+}
+
+# Arm $1's verdict, from the exit code, stdout and stderr its engine left in `$tmpdir/arm$1.*` and
+# its errfile. An arm with no exit code left behind was never evaluated, and reds as such.
+verdict() {
+  local i="$1"
+  local label="${labels[$i]}" want_exit="${want_exits[$i]}" want_grep="${want_greps[$i]}"
+  local errfile="${errfiles[$i]}" want_stdout="${want_stdouts[$i]}"
+  local ec out
+  ec="$(cat "$tmpdir/arm$i.ec" 2>/dev/null)" || ec="none (the arm was never evaluated)"
+  out="$(cat "$tmpdir/arm$i.out" 2>/dev/null)"
   if [ "$ec" != "$want_exit" ]; then
     echo "FAIL $label: exit $ec, wanted $want_exit"
     sed -n '1,5p' "$errfile"
@@ -78,7 +109,101 @@ for rowfile in "${rowfiles[@]}"; do
     fail=1
   }
 done
-echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/"
+
+# ── the engines ──
+engine="${REFUSALS_ENGINE:-auto}"
+if [ "$engine" = auto ]; then
+  case "$(nix --version)" in
+  "nix (Nix) "*) engine=nej ;;
+  *) engine=process ;;
+  esac
+fi
+
+nej=() proc=()
+if [ "$engine" = nej ]; then
+  # An arm reaches the one run by two rewrites of its text: the flake it reads becomes one binding
+  # shared by every arm, and its one other relative path literal, `./aspect-cnf.nix`, becomes
+  # absolute (the jobs file lives in `$tmpdir`, so a relative literal would resolve there). Any arm
+  # still carrying a relative path after that runs as a process instead of reading a wrong file.
+  case "$root" in
+  *[!A-Za-z0-9._/+-]*)
+    echo "FAIL engine: the repository path '$root' cannot be a Nix path literal; set REFUSALS_ENGINE=process"
+    exit 1
+    ;;
+  esac
+  {
+    echo "let"
+    echo "  __refusalsFlake = builtins.getFlake \"$root\";"
+    # nix-eval-jobs reports derivations only, and drops any other value from its stream without a
+    # word, so each arm is carried on a derivation it never instantiates. \"\${v}\" is the coercion
+    # `nix eval --raw` applies.
+    echo '  __refusalsArm = v: derivation { name = "refusal-arm"; system = builtins.currentSystem; builder = "/bin/sh"; } // { refusalValue = "${v}"; };'
+    echo "in {"
+    for i in "${!exprs[@]}"; do
+      e="${exprs[$i]//builtins.getFlake (toString .\/.)/__refusalsFlake}"
+      e="${e//.\/aspect-cnf.nix/$root/aspect-cnf.nix}"
+      if printf '%s' "$e" | grep -qE '(^|[^A-Za-z0-9._/~+-])\.\.?/'; then
+        proc+=("$i")
+        continue
+      fi
+      nej+=("$i")
+      printf '  arm%s = __refusalsArm (\n%s\n);\n' "$i" "$e"
+    done
+    echo "}"
+  } >"$tmpdir/jobs.nix"
+else
+  proc=("${!exprs[@]}")
+fi
+
+if [ "${#nej[@]}" -gt 0 ]; then
+  # den v1's evaluator-death rule: a non-zero nix-eval-jobs exit is a dead evaluator, not a set of
+  # verdicts, and whatever it did reach is never tallied.
+  nejrc=0
+  nix-eval-jobs --impure --no-instantiate --workers "$workers" --max-memory-size 2048 \
+    --apply 'd: { v = d.refusalValue; }' "$tmpdir/jobs.nix" \
+    >"$tmpdir/jobs.json" 2>"$tmpdir/jobs.err" || nejrc=$?
+  if [ "$nejrc" -ne 0 ]; then
+    echo "FAIL engine: EVALUATOR FAILED (nix-eval-jobs exit $nejrc) -- no arm is tallied"
+    # An arm that aborts past `catch` (a stack overflow) is `fatal` and takes the run's exit with
+    # it. No row does today; one that must is run with REFUSALS_ENGINE=process.
+    jq -r 'select(.fatal == true) | .attr' "$tmpdir/jobs.json" | while read -r attr; do
+      echo "  fatal arm: ${labels[${attr#arm}]:-$attr}"
+    done
+    cat "$tmpdir/jobs.err"
+    exit "$nejrc"
+  fi
+  # One record per arm: attr, exit, stdout, error. An error is `nix eval`'s exit 1; a record with
+  # neither an error nor a value is exit 2, which no arm wants.
+  jqrc=0
+  jq --raw-output0 '.attr,
+      (if .error != null then "1" elif (.extraValue.v | type) == "string" then "0" else "2" end),
+      (.extraValue.v // ""),
+      (.error // "nix-eval-jobs returned neither an error nor a value")' \
+    "$tmpdir/jobs.json" >"$tmpdir/jobs.split" || jqrc=$?
+  if [ "$jqrc" -ne 0 ]; then
+    echo "FAIL engine: could not read nix-eval-jobs' output (jq exit $jqrc)"
+    exit 1
+  fi
+  while IFS= read -r -d '' attr && IFS= read -r -d '' ec && IFS= read -r -d '' out && IFS= read -r -d '' err; do
+    i="${attr#arm}"
+    printf '%s' "$ec" >"$tmpdir/arm$i.ec"
+    printf '%s' "$out" >"$tmpdir/arm$i.out"
+    if [ "$ec" = 0 ]; then : >"${errfiles[$i]}"; else printf '%s\n' "$err" >"${errfiles[$i]}"; fi
+  done <"$tmpdir/jobs.split"
+fi
+
+for i in "${proc[@]}"; do
+  while [ "$(jobs -rp | wc -l)" -ge "$workers" ]; do wait -n; done
+  (
+    ec=0
+    nix eval --impure --raw --expr "${exprs[$i]}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
+    echo "$ec" >"$tmpdir/arm$i.ec"
+  ) &
+done
+wait
+
+for i in "${!labels[@]}"; do verdict "$i"; done
+echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/ (${#labels[@]} arms: ${#nej[@]} through nix-eval-jobs, ${#proc[@]} as processes, $workers at a time)"
 
 # The control below reads rows' stderr by file; `grep` on a file that was never written exits 2,
 # which `if grep -q` reads as "no leak". Refuse that instead of passing it.
