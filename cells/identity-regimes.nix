@@ -3,7 +3,7 @@
 # encoder `mkIntensional` over a `basting` registry, `conservativeEq`, and the key site reached the
 # only way a consumer can reach it, through `search.converge`.
 #
-# The four `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
+# The five `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
 # `ci/refusals/row77-78.sh`):
 #   1. the MINT carries the relation, not the name — one coordinate mints one identity, differing
 #      `args` mint two, and the two carry EQUAL names;
@@ -17,7 +17,11 @@
 #      self-referential payload aborts the evaluator uncatchably and no cell can hold it;
 #   4. the KEY site keys on the identity, not the name — two continuations at one program point
 #      with differing `args` BOTH fire. Items 1–3 stay green on a build whose dedup key reads the
-#      name; this one drops a continuation there.
+#      name; this one drops a continuation there;
+#   5. the UNMIGRATED regime decides on content, not the name — one program point, one shared `fn`,
+#      differing inert `closure` ⇒ unequal, while an equal closure still identifies. It is the
+#      witness of ADR-0034's deleted name arm: a gen-algebra that still decides an unmigrated pair on
+#      `name` alone calls this pair equal.
 {
   asserts,
   genAlgebra,
@@ -61,6 +65,13 @@ let
       ctor = "whipstitch";
     };
   };
+  # Unmigrated values: no `__mint`, no `__id`; overridden the same way, and for the same reason.
+  unmigrated = {
+    name = "whipstitch";
+    closure.thread = "madder";
+    fn = v: s: s;
+    __functor = self: self.fn;
+  };
   sealedEq = a: b: conservativeEq (sealed // a) (sealed // b);
   decides = e: (builtins.tryEval e).success;
 
@@ -96,5 +107,9 @@ in
         "woad:v"
       ]
     && converged madder madder == [ "madder:v" ]
+    # 5 — the unmigrated regime: same name, differing closure, unequal
+    && regimeTagOf (identityOf unmigrated) == "u"
+    && !(conservativeEq unmigrated (unmigrated // { closure.thread = "woad"; }))
+    && conservativeEq unmigrated (unmigrated // { closure.thread = "madder"; })
   );
 }
