@@ -5,19 +5,22 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # A negative test runs on a scratch branch with no pull request: `gh workflow run ci.yml --ref <branch>`.
+  workflow_dispatch:
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      # ARM 1 — the corpus against its committed lock, and the step this repository exists for:
-      # the `checks` cells (`cells/`) live on the ROOT flake, not in `ci/`, so the stock
-      # `working-directory: ci` form would run none of them.
+  # The three-evaluator matrix (upstream Nix, Determinate, Lix) from gen-harness. The ref is the
+  # gen-harness rev locked in ci/flake.lock, so one harness identity governs the run; `relock`
+  # rewrites it when that lock moves. Each column runs every line below under its own evaluator,
+  # and the matrix's `fmt` job is the former `nix fmt -- --ci` step in ci/.
+  evaluators:
+    uses: sini/gen-harness/.github/workflows/evaluators.yml@7a1e718c4652bfedd707c9a261fa03ee7e002195
+    with:
+      # `.` is ARM 1 — the corpus against its committed lock, and the line this repository exists
+      # for: the `checks` cells (`cells/`) live on the ROOT flake, not in `ci/`, so the stock
+      # `./ci` line alone would run none of them.
       #
-      # THIS STEP'S OWN SCOPE: eval-only (`--no-build`, see below), root plane only. `ci/flake.nix`'s
+      # THIS LINE'S OWN SCOPE: eval-only (`--no-build`, see below), root plane only. `ci/flake.nix`'s
       # `check-lock` devshell command also calls itself "ARM 1" and covers both planes in full-build
       # form — the two are not interchangeable, and neither subsumes the other's coverage.
       #
@@ -31,12 +34,13 @@ jobs:
       # den-hoag-g87v term 2 contracts — while the system itself is never realised. The full
       # build is a LOCAL validation rule (owner-ruled 2026-09-14); a bare `nix flake check`
       # realises the NixOS system and exhausted the runner's disk (run 34907234688).
-      - run: nix flake check --no-build --keep-going
-      # The plane: the harness's five checks, plus the batch asserter over `ci/tests`.
-      - run: nix flake check ./ci --keep-going
+      #
+      # `./ci` is the plane: the harness's five checks, plus the batch asserter over `ci/tests`.
+      flake-checks: |
+        . --no-build --keep-going
+        ./ci --keep-going
       # T5's by-name half (ADR-0025). `builtins.tryEval` cannot read a refusal's message, so these
       # rows (`ci/refusals/`) cannot be `checks` cells and this is the step that schedules them — the gap
-      # row16 escaped through was a missing scheduler, not a missing analyser.
-      - run: nix develop ./ci --command refusals
-      - run: nix fmt -- --ci
-        working-directory: ci
+      # row16 escaped through was a missing scheduler, not a missing analyser. A refusal's message
+      # is the evaluator's, so it is read in every column.
+      extra-run: nix develop ./ci --command refusals
