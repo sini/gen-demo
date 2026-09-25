@@ -13,8 +13,9 @@
 # own crossing). The two arms are ONE token apart: `mkForce "linen"` re-defines the value the prior
 # minted, so it is a dirty contribution at the identity position that moves nothing, and
 # `mkForce "wool"` moves `pewter`. A refusal keyed on dirtiness alone would fire on BOTH arms and
-# destroy reuse; the unplanted arm is what catches that, and its exact stdout is the corpus's own
-# unmoved thimble stamp. The control arm is the laziness witness: an edit that only declares an
+# destroy reuse; the unplanted arm is what catches that, and its exact stdout is this row's thimble's
+# unmoved stamp. It is not C17's node: the stamp carries the kind's minted identity, and this row's
+# `thimble` is its own declaration of the corpus's option set. The control arm is the laziness witness: an edit that only declares an
 # option nothing defines (`never`) is admitted warm without forcing it, the stamp unmoved.
 #
 # The row used to plant a KIND option (`grommet`) and rest its unplanted arm on `internal = true`
@@ -46,7 +47,7 @@ row13='let
   prior = genMerge.evalModuleTree { modules = outer; };
   warm = genMerge.evalModuleTree { modules = outer ++ edit; warmFrom = prior; editedModules = edit; };
 in warm.config.thimbles.pewter.id_hash'
-row13stamp='thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a'
+row13stamp='thimble:705a5d2021c09cda5fed94157bda6b5446735fffe1f619375f90f930d10e7fd0'
 check "T5 row13 unplanted (the declared spool re-defined to its minted value, no identity moves)" \
   "${row13/EDIT/{ config.thimbles.pewter.spool = genMerge.mkForce \"linen\"; \}}" 0 "" \
   "$tmpdir/row13-green.err" "$row13stamp"

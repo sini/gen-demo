@@ -1,9 +1,15 @@
-# ── C21 — THE CORPUS'S IDENTITY STAMP SURVIVES THE SCHEMA-INHERITANCE RELOCATION ──
+# ── C21 — THE SCHEMA-INHERITANCE RELOCATION PRESERVES THE CORPUS KIND'S IDENTITY CONTENT ──
 # (ADR-0016 ruling 7, ADR-0033). §2.6 of the relocation moved every kind declaration off the
 # live `config.schema.<k>` crossing and onto gen-schema's staged `evalSchema` pass, where a
-# parent travels as a NAME instead of being read out of the tree being declared. The corpus's
-# own stamp must not move across that rewrite — and the oracle must be able to SEE it move,
-# or the equality is two agreeing arms measuring nothing.
+# parent travels as a NAME instead of being read out of the tree being declared.
+#
+# WHAT IS PRESERVED IS THE CONTENT, NOT THE STAMP. The retired and the relocated spelling are two
+# DECLARATIONS — `kindEq` has called them distinct since before the stamp carried the kind — and an
+# instance stamp carries its kind's minted identity (ADR-0034: nothing mints or keys by a name). So
+# the stamps FOLLOW `kindEq`, and the relocation's invariant is that the relocated instance,
+# recomputed under the retired kind, is the retired instance, over one closed key set. The
+# proposition "the two spellings mint ONE `id_hash`" held only while the stamp's kind input was the
+# name, and it is retired.
 #
 # THREE ARMS, ONE COMPOSITION ATTRIBUTE APART, over the corpus's real instrument: gen-aspects'
 # own `schemaOption`, `mkInstanceRegistry`, and C17's `extraModules` inlet.
@@ -14,15 +20,13 @@
 #   no-inherit — the same staged tree with the parent dropped: the PERTURBATION.
 #
 # `hank` carries ONE primitive option, so it enters the identity key set (`name`/`selvage`/
-# `spool` against `name`/`spool`) and the stamp genuinely moves when the inheritance goes. The
-# no-inherit arm lands on
-# `thimble:d3dc9389c41b780239d34cc9e1046d74ed8ead1af294db092f7bd3e79c9cba6a` — the corpus's own
-# published stamp, the one `ci/refusals.sh` row 13 pins — which is what shows this instrument
-# is the corpus's and not a lookalike built beside it.
+# `spool` against `name`/`spool`): dropping the inheritance moves the KEY SET, which is where the
+# perturbation is judged, since two declarations' stamps differ whatever their keys are. The
+# no-inherit arm's content and key set are the corpus's own thimble's (`c17Thimble`/`c17Pewter`),
+# which is what shows this instrument is the corpus's and not a lookalike built beside it.
 #
-# Asserted RELATIONALLY and never as a literal digest: the digests this pair was designed
-# against were measured at a different lock, and pinning one here would relay a figure across
-# a rev boundary.
+# Exported as INSTANCES and KINDS, not only stamps, because every conjunct above is a relation over
+# the kind, the key set and the recompute. Asserted RELATIONALLY and never as a literal digest.
 {
   genAspects,
   genMerge,
@@ -71,7 +75,7 @@ let
         }
       ];
     };
-  c21Stamp =
+  c21Instance =
     kind:
     (genMerge.evalModuleTree {
       modules = [
@@ -95,10 +99,13 @@ let
           };
         }
       ];
-    }).config.thimbles.pewter.id_hash;
-  c21HeadIdhash = c21Stamp c21HeadSchema.thimble;
-  c21RelocatedIdhash = c21Stamp (c21RelocatedSchema { inherits = [ "hank" ]; }).thimble;
-  c21NoInheritIdhash = c21Stamp (c21RelocatedSchema { }).thimble;
+    }).config.thimbles.pewter;
+  c21HeadKind = c21HeadSchema.thimble;
+  c21RelocatedKind = (c21RelocatedSchema { inherits = [ "hank" ]; }).thimble;
+  c21NoInheritKind = (c21RelocatedSchema { }).thimble;
+  c21HeadInstance = c21Instance c21HeadKind;
+  c21RelocatedInstance = c21Instance c21RelocatedKind;
+  c21NoInheritInstance = c21Instance c21NoInheritKind;
 in
 {
   inherit
@@ -108,9 +115,12 @@ in
     c21ThimbleWith
     c21HeadSchema
     c21RelocatedSchema
-    c21Stamp
-    c21HeadIdhash
-    c21RelocatedIdhash
-    c21NoInheritIdhash
+    c21Instance
+    c21HeadKind
+    c21RelocatedKind
+    c21NoInheritKind
+    c21HeadInstance
+    c21RelocatedInstance
+    c21NoInheritInstance
     ;
 }
