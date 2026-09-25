@@ -209,7 +209,7 @@ echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/ (${#labels[@]} a
 
 # The control below reads rows' stderr by file; `grep` on a file that was never written exits 2,
 # which `if grep -q` reads as "no leak". Refuse that instead of passing it.
-for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36 row75 row76; do
+for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36 row75 row76 row86 row87; do
   if [ ! -f "$tmpdir/$errfile-red.err" ]; then
     echo "FAIL control: $errfile's planted stderr was never written -- the row it names did not run"
     fail=1
@@ -241,6 +241,10 @@ done
 # Extended to rows 75/76, the rows 10/11 case at gen-select's two kind-admission doors: the two
 # refusals share every token but the site naming itself, so a leak either way would mean the by-name
 # half is matching the library rather than the door.
+# Extended to row87 against row76: both refuse at `adapters.registry.mkContext`, row76 a `kind`
+# argument with no mark and row87 a `kindFor` returning a kind NAME, so they are the pair most able to
+# cross-match by accident at that door; and row86 against row87, the two kind-NAME refusals, one at
+# the matcher and one at the adapter.
 if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
   echo "FAIL control: row1's message leaked into row2's refusal"
   fail=1
@@ -301,8 +305,20 @@ elif grep -qF "adapters.registry.mkContext" "$tmpdir/row75-red.err"; then
 elif grep -qF "sel.kind expects" "$tmpdir/row76-red.err"; then
   echo "FAIL control: row75's message leaked into row76's refusal"
   fail=1
+elif grep -qF 'returned the kind name' "$tmpdir/row76-red.err"; then
+  echo "FAIL control: row87's message leaked into row76's refusal"
+  fail=1
+elif grep -qF '`kind` expects a gen-schema kind value' "$tmpdir/row87-red.err"; then
+  echo "FAIL control: row76's message leaked into row87's refusal"
+  fail=1
+elif grep -qF 'returned the kind name' "$tmpdir/row86-red.err"; then
+  echo "FAIL control: row87's message leaked into row86's refusal"
+  fail=1
+elif grep -qF 'sel.kind matched against a projection' "$tmpdir/row87-red.err"; then
+  echo "FAIL control: row86's message leaked into row87's refusal"
+  fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29, row35/row36 and row75/row76 refusals do not cross-match)"
+  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29, row35/row36, row75/row76, row76/row87 and row86/row87 refusals do not cross-match)"
 fi
 
 exit $fail
