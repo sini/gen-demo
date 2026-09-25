@@ -16,7 +16,7 @@ row8='let
   kindValue = tree.config.schema.thimble;
 in builtins.toJSON (builtins.attrNames (genSelect.kind ARG))'
 check "T5 row8 unplanted (a real kind value, minted through the schema)" "${row8/ARG/kindValue}" 0 "" \
-  "$tmpdir/row8-green.err" '["__sel","kind"]'
+  "$tmpdir/row8-green.err" '["__sel","identity","name","sealed"]'
 check "T5 row8 planted   (a bare kind-name string, never a kind value)" "${row8/ARG/\"thimble\"}" 1 \
   "gen-select: sel.kind expects a kind value" \
   "$tmpdir/row8-red.err"

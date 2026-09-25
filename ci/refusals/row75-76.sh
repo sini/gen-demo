@@ -26,7 +26,7 @@ rowKindHeader='let
   minted = tree.config.schema.thimble;
   handWritten = { kind = "thimble"; options = { }; };
 '
-row75="${rowKindHeader}"'in builtins.toJSON (genSelect.kind ARG).kind'
+row75="${rowKindHeader}"'in builtins.toJSON (genSelect.kind ARG).name'
 check "T5 row75 unplanted (a schema-minted kind value carries the mark)" "${row75/ARG/minted}" 0 "" \
   "$tmpdir/row75-green.err" '"thimble"'
 check "T5 row75 planted   (a hand-written attrset of the same shape, no mark)" "${row75/ARG/handWritten}" 1 \
