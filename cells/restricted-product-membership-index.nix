@@ -7,6 +7,7 @@
   asserts,
   genProduct,
   threading,
+  threadingSpace,
 }:
 {
   construct = [ "C59" ];
@@ -40,6 +41,22 @@
             "silk"
           ])
         ]
+      ]
+    # den-hoag-4kh.53.53: a fiber of the restricted product keeps its members and its refusal, and
+    # no published record carries an undeclared `__` key (`__cells` is gen-product's one stated one).
+    && map (c: c.thread) (genProduct.cells (genProduct.fiber threading "needle" "sharp")) == [ "silk" ]
+    && !(builtins.tryEval (
+      genProduct.cell (genProduct.fiber threading "needle" "sharp") { thread = "linen"; }
+    )).success
+    &&
+      map (pg: builtins.filter (k: builtins.substring 0 2 k == "__") (builtins.attrNames pg)) [
+        threadingSpace
+        threading
+        (genProduct.fiber threading "needle" "sharp")
+      ] == [
+        [ "__cells" ]
+        [ "__cells" ]
+        [ "__cells" ]
       ]
   );
 }
