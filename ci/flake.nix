@@ -44,6 +44,8 @@
         # sheet is owed. Recorded as a declaration rather than left silent, so the absence reads
         # as a decision (owner, 2026-09-14).
         { gen.ci.agentsMd.sheet = "not-owed"; }
+        # Nor a root library surface: there is no root `default.nix` for `checks.root-surface` to apply.
+        { gen.ci.rootSurface.entry = "not-owed"; }
 
         # The corpus-specific half of the command surface. gen-harness supplies `ci`, `relock`,
         # `fmt` and `repl`; a consuming module adds what only it needs, which is the pattern the
