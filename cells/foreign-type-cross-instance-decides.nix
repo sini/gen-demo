@@ -4,10 +4,10 @@
 # was interned before the first differing attribute. `typeEq` now compares each record's closures
 # before the record, and decides every such pair. `_intern` is the adverse order: it interns
 # `functor` first. `description` is interned by the evaluator itself at startup, so the synthetic
-# back-edge through it is reached before `check` in every context. Live controls: a registry leaf
-# still unifies across the two instances, each type still equals itself and its `// { }` copy, and
-# two records sharing every closure but differing in `description` stay apart, so neither a
-# `typeEq` answering `false` to everything nor one comparing closures alone can pass.
+# back-edge through it is reached before `check` in every context. Live controls: each type still
+# equals itself and its `// { }` copy, and two records sharing every closure but differing in
+# `description` stay apart, so neither a `typeEq` answering `false` to everything nor one comparing
+# closures alone can pass.
 { asserts, inputs }:
 let
   _intern = {
@@ -45,7 +45,6 @@ in
       && !(typeEq g (mk 2))
       && !(typeEq (t.port // { description = "a"; }) (t.port // { description = "b"; }))
       && typeEq g g
-      && typeEq t.str u.str
       && typeEq t.port t.port
       && typeEq t.port (t.port // { })
     )

@@ -25,6 +25,6 @@
     && builtins.any builtins.hasContext storeNamedReached
     && deepest == jqScope
     && builtins.hasContext deepest
-    && (genGraph.topoOrder (genGraph.forgetLabels storeNamedWalk)).ok
+    && (genGraph.topoOrder { } (genGraph.forgetLabels storeNamedWalk)).ok
   );
 }

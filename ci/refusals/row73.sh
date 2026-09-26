@@ -25,7 +25,7 @@ row73='let
   };
   picked = genGraph.select graph PRED;
   parents = genGraph.materializeParents graph;
-  ordered = genGraph.topoOrder { inherit (graph) nodes edges; lessThan = LESS; };
+  ordered = genGraph.topoOrder { lessThan = LESS; } { inherit (graph) nodes edges; };
 in BODY'
 row73ok="${row73/PARENT/lawfulParent}"
 row73ok="${row73ok/PRED/lawfulPred}"

@@ -49,7 +49,7 @@ in
         [ "tag" ]
       ]
     &&
-      genGraph.topoOrderKahn g == {
+      genGraph.topoOrderKahn { } g == {
         ok = false;
         cycles = [
           [

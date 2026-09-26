@@ -12,7 +12,7 @@ row70='let
   lawful = id: { selvage = [ "warp" ]; warp = [ "weft" ]; }.${id} or [ ];
   graph = { nodes = [ "selvage" "warp" "weft" ]; edges = EDGES; };
   reached = genGraph.reachableFrom graph "selvage";
-  ordered = genGraph.topoOrder graph;
+  ordered = genGraph.topoOrder { } graph;
   leaves = genGraph.leaves graph;
 in BODY'
 row70ok="${row70/EDGES/lawful}"
