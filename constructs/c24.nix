@@ -8,7 +8,7 @@
 #
 # Sites 1 (`applyContracts`) and 4 (`configGate`) are NOT declarable here and this is not an
 # omission: each declaration's own (iii) clause states there is no crossing route through any
-# shipped Adapter to reach them by — `injectAdapter`, `mkSystemTerminal` and `mkFlakeTerminal`
+# shipped Adapter to reach them by — `injectAdapter`, `mkHostedTerminal` and `mkFlakeTerminal`
 # all set `bindArgEnv = null`. Site 3 (`resolveThunks`) is already declared, by the thunk-
 # authorization rows 20/21 on the T5 plane, and site 6 (`bindFormals`) by C22's terminal.
 { config, genBind }:

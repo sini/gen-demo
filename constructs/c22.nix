@@ -4,7 +4,7 @@
 # Deliberately OUTSIDE `config.gen.composed`, the same way C15's cyclic stratum
 # is: its own invented nodes, its own accessor. Three nodes over one invented
 # kind, a complete peer relation, one node carrying an invented mark that
-# admits no label. The REAL `mkSystemTerminal` adapter and the REAL
+# admits no label. The REAL `mkHostedTerminal` adapter and the REAL
 # `genDelivery.realize` (never a hand-written fold) bound the marked node's
 # handed peer set to empty and name the mark on every withheld member, while
 # the unmarked node's handed set stays the whole class.
@@ -62,7 +62,7 @@ let
   # it is what its text specified — see the ★ note on the inputs above.
   flounceAdapterOf =
     readerId:
-    (genBind.crossing.mkSystemTerminal {
+    (genBind.crossing.mkHostedTerminal {
       evaluator = a: builtins.attrNames a.specialArgs.nodes;
       locateConfig = x: x;
       class = "notion";
