@@ -2,8 +2,11 @@
 # of `aspectsRoot`'s own type-merge relation.
 #
 # `gen-modules/corpus.nix` already declares `options.aspects`, via `mkAspectModule`. This file
-# declares it AGAIN, through `mkAspectOption`, the public sibling that answers with the same
-# `aspectsRoot` container type. Two modules declaring one option is the ordinary shape of a
+# declares it AGAIN, through a second `mkAspectModule` over the same cnf, which answers with the same
+# `aspectsRoot` container type. Not through `mkAspectOption`: that sibling does not thread the
+# schema-declared instance options, so once `aspectsRoot` states its relation over its construction
+# (den-hoag-bfc0k) the two are two constructions and are refused in either order. Two modules
+# declaring one option is the ordinary shape of a
 # federated tree — a framework declares the container, a consumer declares it too — and it is the
 # shape that makes the module system reconcile the two DECLARED TYPES rather than merely their
 # values.
@@ -24,7 +27,5 @@
 #
 # NAMING: nothing here names an entity. The option is the one gen-aspects already publishes, and no
 # kind, node or aspect word is introduced (ADR-0035).
-{ genAspects, ... }:
-{
-  options.aspects = (genAspects.mkAspectSchema (import ../aspect-cnf.nix)).mkAspectOption { };
-}
+args@{ genAspects, ... }:
+(genAspects.mkAspectSchema (import ../aspect-cnf.nix)).mkAspectModule { } args
