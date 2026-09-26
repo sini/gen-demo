@@ -6,7 +6,10 @@
 # them, as do two differing only in a default. A predicate built from a REGISTERED constructor (`between`, over the hub's mint) is a term,
 # not a lambda: its field mints, so two `selvage` kinds differing only in its bounds mint apart and
 # `kindEq` decides them with no refusal. Before (c+) every pair minted one mark and nothing
-# refused. The refusal's wording is `refusals` row 82.
+# refused. The refusal's wording is `refusals` row 82. A field typed by two constructions of one
+# check-only `mkOptionType` whose `description` carries a back-edge is refused by name (den-hoag-6b5ia:
+# the sealed type is compared closures-first; before, `==` walked the cyclic records until the
+# evaluator overflowed), and one construction shared by both kinds is one kind.
 {
   asserts,
   genAlgebra,
@@ -46,6 +49,20 @@ let
   };
   endsWide = selvage { options.ends = field (schema.refined T.int (between 1 65535)); };
   endsLow = selvage { options.ends = field (schema.refined T.int (between 1 1023)); };
+  # one construction of a check-only `mkOptionType` per call, its back-edge under `description`
+  tension =
+    _:
+    let
+      back = {
+        self = back;
+      };
+    in
+    T.mkOptionType {
+      name = "tension";
+      description = back;
+      check = v: builtins.isInt v && v < 10;
+    };
+  tensionShared = tension null;
 in
 {
   construct = [ "C64" ];
@@ -68,6 +85,16 @@ in
     && schema.kindEq ends ends
     && schema.kindEq endsInt (selvage {
       options.ends = field T.int;
+    })
+    # a field typed by two constructions of one check-only type is refused by name, and one
+    # construction shared by both kinds is one kind
+    && !(decides (
+      schema.kindEq (selvage { options.ends = field (tension 1); }) (selvage {
+        options.ends = field (tension 2);
+      })
+    ))
+    && schema.kindEq (selvage { options.ends = field tensionShared; }) (selvage {
+      options.ends = field tensionShared;
     })
   );
 }
