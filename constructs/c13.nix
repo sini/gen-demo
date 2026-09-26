@@ -32,7 +32,29 @@ let
       { a.b = "nested"; }
     ];
   };
+  # `foldNestedLayers` over layers that disagree on shape at one path: the later scalar
+  # replaces the earlier subtree (the last layer providing `a.b` wins), and a later subtree
+  # merges onto what that reset left, never onto the subtree before it.
+  shapeConflictFold = genAlgebra.record.foldNestedLayers {
+    layers = [
+      { a.b.x = 1; }
+      { a.b = 5; }
+    ];
+  };
+  shapeResetFold = genAlgebra.record.foldNestedLayers {
+    layers = [
+      { a.b.x = 1; }
+      { a.b = 5; }
+      { a.b.y = 9; }
+    ];
+  };
 in
 {
-  inherit weaveLayers folded dottedFold;
+  inherit
+    weaveLayers
+    folded
+    dottedFold
+    shapeConflictFold
+    shapeResetFold
+    ;
 }
