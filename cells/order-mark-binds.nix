@@ -41,6 +41,18 @@
         "pewter"
         "damask"
       ]
+    # WHICH component of the effective order shadowed each loss: the mark on the binding arm,
+    # the declaration's own order on the identity arm — the same losses, told apart by name.
+    &&
+      map (c: c.orders) mandateBound.shadowed == [
+        [ "orderMark" ]
+        [ "orderMark" ]
+      ]
+    &&
+      map (c: c.orders) mandateDeclined.shadowed == [
+        [ "order" ]
+        [ "order" ]
+      ]
     # The two literals above ARE the corpus's own declared content, named here so
     # the cell cannot quietly decouple from the registries it claims to read.
     && genValues.bobbins.grosgrain.gauge == "fine"
