@@ -7,8 +7,8 @@ row24Base='let
   genScope = gen.lib.substrate.scope;
   spawnOf = _self: id: { "KEYNAME" = { id = "KEYNAME"; parent = id; decls = { }; }; };
   kinds = genScope.mkKinds [
-    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
     (genScope.mkKind { name = "thread"; })
+    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
   ];
 in builtins.toJSON (genScope.eval {
   scope = genScope.buildRoots {
@@ -30,8 +30,8 @@ row24catch='let
   genScope = gen.lib.substrate.scope;
   spawnOf = _self: id: { "bobbin" = { id = "bobbin"; parent = id; decls = { }; }; };
   kinds = genScope.mkKinds [
-    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
     (genScope.mkKind { name = "thread"; })
+    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
   ];
 in if (builtins.tryEval (builtins.deepSeq (genScope.eval {
   scope = genScope.buildRoots {
