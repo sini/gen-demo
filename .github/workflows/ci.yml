@@ -14,7 +14,7 @@ jobs:
   # rewrites it when that lock moves. Each column runs every line below under its own evaluator,
   # and the matrix's `fmt` job is the former `nix fmt -- --ci` step in ci/.
   evaluators:
-    uses: sini/gen-harness/.github/workflows/evaluators.yml@f1483f5b27a788f92556e268e8d37dda2177680e
+    uses: sini/gen-harness/.github/workflows/evaluators.yml@9af27e315ccd5171a00c480fa6c5b9c01de23755
     with:
       # `.` is ARM 1 — the corpus against its committed lock, and the line this repository exists
       # for: the `checks` cells (`cells/`) live on the ROOT flake, not in `ci/`, so the stock
