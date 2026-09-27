@@ -21,7 +21,7 @@ check "T5 row61 planted   (a node value where dependentsOf takes an id, refused 
   "$tmpdir/row61-red.err"
 check "T5 row61 planted   (a node value where reachableFrom takes an id, refused by name)" \
   "${row61/BODY/builtins.toJSON (genGraph.reachableFrom g pewter)}" 1 \
-  "gen-graph.reachableFrom: got set, expected a node identifier (a string or another scalar)" \
+  "gen-graph.reachableFrom: got set, expected a node identifier (a string)" \
   "$tmpdir/row61-red2.err"
 check "T5 row61 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row61/BODY/if (builtins.tryEval (builtins.deepSeq (genGraph.reachableFrom g pewter) true)).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
