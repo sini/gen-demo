@@ -120,7 +120,16 @@
         declares = [ ];
         members = [ "stitch" ];
       }
-    && c16Assembled.nodes."bartack".decls.__edges.declares == [ "hemline/placket" ]
+    # den-hoag-zxgan: `bartack.includes`' fourth position is a bare string naming the same target as
+    # the first (by-value) position, so `declares` carries the edge TWICE — `edgeIndex`'s own `map`
+    # (gen-scope's `build-nodes.nix`) has no dedup step, matching the algebraic graph layer's
+    # documented duplicate tolerance (`gen-scope/lib/graph.nix`). `aspect-bartack-barestring-edge.nix`
+    # is the cell for the claim that the two positions produce the identical edge.
+    &&
+      c16Assembled.nodes."bartack".decls.__edges.declares == [
+        "hemline/placket"
+        "hemline/placket"
+      ]
     # O6 — the query walks the labelled graph the union produced.
     &&
       genGraph.query {

@@ -274,10 +274,17 @@ in
     # Declared here because it used to be UNDECLARABLE: with the reference in `includesOf` it became
     # a `declares` edge whose `to` is no node of this graph, and gen-assemble's
     # `requireDeclaredMembership` refused the whole contribution by name.
+    #
+    # ★ THE FOURTH ELEMENT IS A BARE STRING (den-hoag-zxgan), and it names the SAME target as the
+    # first — a bare string is always a REFERENCE (den-hoag-2zjg1), the identical by-key edge shape
+    # as a by-value one, so this is deliberately a DUPLICATE `declares` edge rather than a distinct
+    # one: `cells/aspect-bartack-barestring-edge.nix` asserts the two forms produce the SAME edge,
+    # which a distinct target could not show.
     aspects.bartack.includes = [
       config.aspects.hemline.placket # a REFERENCE — resolves to the node "hemline/placket"
       ({ node, ... }: { }) # INLINE CONTENT — its POSITION is published, not an edge
       (genAspects.keyRef "mill/stitch") # a FOREIGN REFERENCE — published as a ref, never an edge
+      "hemline/placket" # a BARE STRING — the same by-key edge as the first, den-hoag-zxgan
     ];
   };
 }

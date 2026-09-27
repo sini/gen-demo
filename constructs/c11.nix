@@ -82,6 +82,19 @@ let
       config.aspects.snag.includes = [ { } ];
     }
   ];
+
+  # den-hoag-zxgan — the BARE-STRING counterpart to `frayed` above: a local includes entry naming a
+  # key absent from the registry, spelled as a bare identifier rather than an anonymous `{ }`. A bare
+  # string is unconditionally a REFERENCE (den-hoag-2zjg1), never inline content, so it is refused by
+  # the SAME `rewrite.originStamp` lookup, catchably — no new refusal code, one shape substituted for
+  # the other. Isolated for the identical reason `frayed` is: the dangling entry refuses the WHOLE
+  # `originStamp` call, so folding it into `federated`'s shared sources would collaterally break
+  # every other C11 assertion that forces `federated`.
+  frayedBareString = mkSelvageRegistry [
+    {
+      config.aspects.orphanstr.includes = [ "no-such-sibling" ];
+    }
+  ];
 in
 {
   inherit
@@ -93,5 +106,6 @@ in
     federated
     selvageProvides
     frayed
+    frayedBareString
     ;
 }
