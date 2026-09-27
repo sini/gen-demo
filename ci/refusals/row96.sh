@@ -32,6 +32,6 @@ check "T5 row96 unplanted (inline content over two definitions is published, the
   "${row96unplanted/BODY/shown}" 0 "" "$tmpdir/row96-green.err" '[0,2]'
 check "T5 row96 planted   (another tree's aspect value is refused by name)" \
   "${row96planted/BODY/shown}" 1 \
-  "names no node of this tree" "$tmpdir/row96-red.err"
+  "declaration 'elsewhere/thing' is not a member of the registry (available: 'app', 'hemline', 'hemline/placket') (in prelude.resolve)" "$tmpdir/row96-red.err"
 check "T5 row96 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row96planted/BODY/caught}" 0 "" "$tmpdir/row96-catch.err" 'CAUGHT'
