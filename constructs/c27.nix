@@ -31,19 +31,23 @@ let
   };
   notchRuleA = genDispatch.fromFunction notchGuardA;
   notchRuleB = genDispatch.fromFunction notchGuardB;
-  notchReplacement = genDispatch.mkRule {
-    condition = { };
-    produce = _id: _ctx: [
+  notchReplacement =
+    genDispatch.mkRule
       {
-        __action = "notch";
-        side = "usurped";
+        identity = "notch-replacement";
       }
-    ];
-    identity = "notch-replacement";
-  };
+      { }
+      (
+        _id: _ctx: [
+          {
+            __action = "notch";
+            side = "usurped";
+          }
+        ]
+      );
   notchDispatch =
     rules:
-    genDispatch.dispatch {
+    genDispatch.dispatch { } {
       inherit rules;
       id = null;
       context = { };
@@ -59,7 +63,12 @@ let
       notchRuleB
     ]).actions.notch;
   notchOverrideRefuses =
-    !(builtins.tryEval (genDispatch.override notchRuleA notchReplacement)).success;
+    !(builtins.tryEval (
+      genDispatch.override {
+        original = notchRuleA;
+        replacement = notchReplacement;
+      }
+    )).success;
 in
 {
   inherit

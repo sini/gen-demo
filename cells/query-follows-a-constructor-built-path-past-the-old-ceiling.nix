@@ -26,12 +26,11 @@
         spool = [ ];
       };
       lg = genGraph.labeledFrom {
-        nodes = builtins.attrNames next;
-        perLabel.tacks = id: next.${id};
-      };
+        tacks = id: next.${id};
+      } (builtins.attrNames next);
       walk =
         follow:
-        genGraph.query {
+        genGraph.query { } {
           graph = lg;
           from = "thimble";
           inherit follow;

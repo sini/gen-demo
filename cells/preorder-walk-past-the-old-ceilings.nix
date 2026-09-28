@@ -17,14 +17,18 @@ let
   len = xs: builtins.length (builtins.deepSeq xs xs);
   expand =
     edges: seen0:
-    genGraph.expandPreorder {
-      roots = [ "n0" ];
-      key = f: f;
-      inherit edges seen0;
-    };
+    genGraph.expandPreorder
+      {
+        inherit seen0;
+      }
+      {
+        roots = [ "n0" ];
+        key = f: f;
+        inherit edges;
+      };
   reach =
     edges:
-    (genGraph.foldReach {
+    (genGraph.foldReach { } {
       roots = [ { to = "n0"; } ];
       edges = id: map (t: { to = t; }) (edges id);
       target = e: e.to;
@@ -33,7 +37,7 @@ let
     }).nodes;
   count =
     edges:
-    (genGraph.foldPreorder {
+    (genGraph.foldPreorder { } {
       roots = [ "n0" ];
       key = f: f;
       acc = 0;
@@ -62,12 +66,16 @@ let
   woven = id: loom.${id} or [ ];
   order =
     seen0:
-    (genGraph.expandPreorder {
-      roots = [ "awl" ];
-      key = f: f;
-      edges = woven;
-      inherit seen0;
-    }).nodes;
+    (genGraph.expandPreorder
+      {
+        inherit seen0;
+      }
+      {
+        roots = [ "awl" ];
+        key = f: f;
+        edges = woven;
+      }
+    ).nodes;
 in
 {
   construct = [ "C51" ];
@@ -79,7 +87,9 @@ in
     && count (chain 20000) == 20000
     &&
       len (
-        genGraph.ancestorsOf { parent = id: if idx id == 0 then null else nm (idx id - 1); } (nm 19999)
+        genGraph.ancestorsOf { } {
+          parent = id: if idx id == 0 then null else nm (idx id - 1);
+        } (nm 19999)
       ) == 19999
     &&
       order { } == [

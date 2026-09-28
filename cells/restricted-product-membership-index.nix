@@ -17,16 +17,16 @@
       "betweens*linen"
     ]
     && (builtins.tryEval (
-      genProduct.cell threading {
+      genProduct.cell {
         needle = "sharp";
         thread = "silk";
-      }
+      } threading
     )).success
     && !(builtins.tryEval (
-      genProduct.cell threading {
+      genProduct.cell {
         needle = "sharp";
         thread = "linen";
-      }
+      } threading
     )).success
     && threading.product.restriction.cellIndex == null
     &&
@@ -44,15 +44,15 @@
       ]
     # den-hoag-4kh.53.53: a fiber of the restricted product keeps its members and its refusal, and
     # no published record carries an undeclared `__` key (`__cells` is gen-product's one stated one).
-    && map (c: c.thread) (genProduct.cells (genProduct.fiber threading "needle" "sharp")) == [ "silk" ]
+    && map (c: c.thread) (genProduct.cells (genProduct.fiber "needle" "sharp" threading)) == [ "silk" ]
     && !(builtins.tryEval (
-      genProduct.cell (genProduct.fiber threading "needle" "sharp") { thread = "linen"; }
+      genProduct.cell { thread = "linen"; } (genProduct.fiber "needle" "sharp" threading)
     )).success
     &&
       map (pg: builtins.filter (k: builtins.substring 0 2 k == "__") (builtins.attrNames pg)) [
         threadingSpace
         threading
-        (genProduct.fiber threading "needle" "sharp")
+        (genProduct.fiber "needle" "sharp" threading)
       ] == [
         [ "__cells" ]
         [ "__cells" ]

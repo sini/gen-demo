@@ -35,14 +35,14 @@
       map (
         cid:
         let
-          c = genProduct.coordsOf seamSpace cid;
+          c = genProduct.coordsOf cid seamSpace;
         in
         "${c.thimble}*${c.bobbin}"
       ) (seamSpace.edges seamCell) == [
         "damask*grosgrain"
         "pewter*faille"
       ]
-    && (genProduct.projectTo seamSpace "bobbin").projection.ofCell seamCell == "grosgrain"
+    && (genProduct.projectTo "bobbin" seamSpace).projection.ofCell seamCell == "grosgrain"
     && (mdl.resolve seamHead).included == true
     && seamNodes == [ "seam:pewter:grosgrain" ]
     &&

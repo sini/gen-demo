@@ -34,7 +34,7 @@ let
       entryOf = i: i;
     }
   ];
-  threading = genProduct.restrict threadingSpace {
+  threading = genProduct.restrict {
     relations = [
       {
         dims = [
@@ -53,7 +53,7 @@ let
         ];
       }
     ];
-  };
+  } threadingSpace;
 in
 {
   inherit threadingSpace threading;

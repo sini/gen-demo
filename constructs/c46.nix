@@ -16,27 +16,37 @@ let
       to = jqScope;
     }
   ];
-  storeNamedWalk = genGraph.labeledFrom {
-    nodes = [
-      "pewter"
-      helloScope
-      jqScope
-    ];
-    perLabel.contains = id: map (e: e.to) (builtins.filter (e: e.from == id) storeNamedContains);
-  };
+  storeNamedWalk =
+    genGraph.labeledFrom
+      {
+        contains = id: map (e: e.to) (builtins.filter (e: e.from == id) storeNamedContains);
+      }
+      [
+        "pewter"
+        helloScope
+        jqScope
+      ];
   storeNamedFollow = genGraph.regex.star (genGraph.regex.lit "contains");
-  storeNamedReached = genGraph.query {
-    graph = storeNamedWalk;
-    from = "pewter";
-    follow = storeNamedFollow;
-    mode = "all";
-  };
-  storeNamedPaths = genGraph.query {
-    graph = storeNamedWalk;
-    from = "pewter";
-    follow = storeNamedFollow;
-    mode = "paths";
-  };
+  storeNamedReached =
+    genGraph.query
+      {
+        mode = "all";
+      }
+      {
+        graph = storeNamedWalk;
+        from = "pewter";
+        follow = storeNamedFollow;
+      };
+  storeNamedPaths =
+    genGraph.query
+      {
+        mode = "paths";
+      }
+      {
+        graph = storeNamedWalk;
+        from = "pewter";
+        follow = storeNamedFollow;
+      };
 in
 {
   inherit

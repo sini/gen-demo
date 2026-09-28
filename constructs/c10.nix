@@ -10,32 +10,38 @@ let
     finishing = [ "hem" ];
   };
   seamRules = map (genDispatch.deriveGroup seamActions.groupOfKind) [
-    (genDispatch.mkRule {
-      identity = "tack-the-thimbles";
-      produces = [ "tack" ];
-      condition = {
+    (genDispatch.mkRule
+      {
+        identity = "tack-the-thimbles";
+        produces = [ "tack" ];
+      }
+      {
         spool = "linen";
-      };
-      produce = id: _: [ (seamActions.tack { node = id; }) ];
-    })
-    (genDispatch.mkRule {
-      identity = "hem-the-linen";
-      produces = [ "hem" ];
-      condition = {
+      }
+      (id: _: [ (seamActions.tack { node = id; }) ])
+    )
+    (genDispatch.mkRule
+      {
+        identity = "hem-the-linen";
+        produces = [ "hem" ];
+      }
+      {
         spool = "linen";
-      };
-      produce = id: _: [ (seamActions.hem { node = id; }) ];
-    })
-    (genDispatch.mkRule {
-      identity = "gather-the-sateen";
-      produces = [ "gather" ];
-      condition = {
+      }
+      (id: _: [ (seamActions.hem { node = id; }) ])
+    )
+    (genDispatch.mkRule
+      {
+        identity = "gather-the-sateen";
+        produces = [ "gather" ];
+      }
+      {
         spool = "sateen";
-      };
-      produce = id: _: [ (seamActions.gather { node = id; }) ];
-    })
+      }
+      (id: _: [ (seamActions.gather { node = id; }) ])
+    )
   ];
-  seamDispatched = genDispatch.dispatch {
+  seamDispatched = genDispatch.dispatch { } {
     rules = seamRules;
     id = "pewter";
     context = {

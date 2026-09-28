@@ -13,10 +13,10 @@ row90='let
   genProduct = gen.lib.substrate.product;
   genGraph = gen.lib.substrate.graph;
   reg = { sharp = { id_hash = "sharp"; name = "sharp"; }; };
-  needle = { dim = "needle"; graph = genGraph.fromRegistry { registry = reg; edges = _: _: [ ]; }; };
+  needle = { dim = "needle"; graph = genGraph.fromRegistry { } (_: _: [ ]) reg; };
   space = genProduct.productN "cartesian" [ needle ];
-  sharp = genProduct.cell space { needle = reg.sharp; };
-  blunt = genProduct.cell space { needle = { id_hash = "blunt"; name = "blunt"; }; };
+  sharp = genProduct.cell { needle = reg.sharp; } space;
+  blunt = genProduct.cell { needle = { id_hash = "blunt"; name = "blunt"; }; } space;
 in BODY'
 check "T5 row90 unplanted (a registry entry addresses under the default codec)" \
   "${row90/BODY/sharp}" 0 "" "$tmpdir/row90-green.err" '["sharp"]'

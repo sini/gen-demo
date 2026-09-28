@@ -132,7 +132,7 @@
       ]
     # O6 — the query walks the labelled graph the union produced.
     &&
-      genGraph.query {
+      genGraph.query { } {
         graph = c16Lg;
         from = "hemline";
         follow = genGraph.regex.star (genGraph.regex.lit "contains");
@@ -148,7 +148,7 @@
       # as `stitch` itself. `pewter`'s own `members` edge is still the single one
       # (asserted at O5 below); the second answer is the `contains` step, which is the
       # point of running the star rather than a `members` literal.
-      genGraph.query {
+      genGraph.query { } {
         graph = c16Lg;
         from = "pewter";
         follow = genGraph.regex.seq [
@@ -160,7 +160,7 @@
         "stitch/trim"
       ]
     &&
-      genGraph.query {
+      genGraph.query { } {
         graph = c16Lg;
         from = "bartack";
         follow = genGraph.regex.seq [
@@ -193,15 +193,18 @@
       ]
     && genGraph.cycles (genGraph.forgetLabels c16Lg) == [ ]
     # O7 — the selector reads the PUBLISHED parent, not a key split.
-    && genSelect.matches (genSelect.descendant (genSelect.attrs {
-      key = "hemline";
-    }) genSelect.star) "hemline/placket/eyelet" c16Ctx
-    && genSelect.matches (genSelect.child (genSelect.attrs {
-      key = "hemline";
-    }) genSelect.star) "hemline/placket" c16Ctx
-    && !(genSelect.matches (genSelect.child (genSelect.attrs {
-      key = "hemline";
-    }) genSelect.star) "hemline/placket/eyelet" c16Ctx)
+    && genSelect.matches (genSelect.descendant {
+      ancestor = genSelect.attrs { key = "hemline"; };
+      descendant = genSelect.star;
+    }) "hemline/placket/eyelet" c16Ctx
+    && genSelect.matches (genSelect.child {
+      parent = genSelect.attrs { key = "hemline"; };
+      child = genSelect.star;
+    }) "hemline/placket" c16Ctx
+    && !(genSelect.matches (genSelect.child {
+      parent = genSelect.attrs { key = "hemline"; };
+      child = genSelect.star;
+    }) "hemline/placket/eyelet" c16Ctx)
     && genSelect.matches (genSelect.has (genSelect.attrs { key = "hemline/facing"; })) "hemline" c16Ctx
     &&
       c16Ctx.ancestors "hemline/placket/eyelet" == [

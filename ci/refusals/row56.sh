@@ -10,18 +10,21 @@
 row56='let
   genGraph = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.graph;
   genuine = genGraph.labeledFrom {
-    nodes = [ "pewter" "faille" "grosgrain" ];
-    perLabel.tacks = id: { pewter = [ "faille" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
-  };
+    tacks = id: { pewter = [ "faille" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
+  } [ "pewter" "faille" "grosgrain" ];
   lg = LG;
-  reached = genGraph.query { graph = GRAPH; from = "pewter"; follow = genGraph.regex.star (genGraph.regex.lit "tacks"); };
+  reached = genGraph.query { } {
+    graph = GRAPH;
+    from = "pewter";
+    follow = genGraph.regex.star (genGraph.regex.lit "tacks");
+  };
 in BODY'
 row56plant='genuine // { labeledEdges = id: if id == "faille" then [ "grosgrain" ] else genuine.labeledEdges id; }'
 row56unplanted="${row56/LG/genuine}"
 row56unplanted="${row56unplanted/GRAPH/lg}"
 row56planted="${row56/LG/$row56plant}"
 row56direct="${row56planted/GRAPH/lg}"
-row56bounded="${row56planted/GRAPH/genGraph.boundedBy lg (_: [ ])}"
+row56bounded="${row56planted/GRAPH/genGraph.boundedBy (_: [ ]) lg}"
 check "T5 row56 unplanted (a genuine labeled graph; the answer is the assertion)" \
   "${row56unplanted/BODY/builtins.toJSON reached}" 0 "" \
   "$tmpdir/row56-green.err" '["faille","grosgrain","pewter"]'

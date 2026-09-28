@@ -34,10 +34,10 @@ let
       entryOf = i: i;
     }
   ];
-  seamCell = genProduct.cell seamSpace {
+  seamCell = genProduct.cell {
     thimble = "pewter";
     bobbin = "grosgrain";
-  };
+  } seamSpace;
   # ★ THE HEAD, THE RELATA AND THE EDGE LABELS ARE ALL READ OFF THE COORDINATE — never
   # restated as literals. Oracle 3 row C12c is the guard that catches a literal in this spot.
   seamCoords = seamSpace.product.coordsOf seamCell;

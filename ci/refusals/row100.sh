@@ -11,7 +11,11 @@ row100='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   graph = gen.lib.substrate.graph;
   mk = from: graph.mkGraph { edges = [ { inherit from; to = "b"; } ]; };
-  scanned = items: graph.fromScan { inherit items; scan = v: v; project = r: r; };
+  scanned = items: graph.fromScan { } {
+    inherit items;
+    scan = v: v;
+    project = r: r;
+  };
   goodMk = mk "a";
   goodScan = scanned [ { id = "a"; value = [ "b" ]; } ];
   mkGreen = builtins.toJSON { nodes = goodMk.nodes; a = goodMk.edges "a"; };

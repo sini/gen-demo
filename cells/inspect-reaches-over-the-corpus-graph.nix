@@ -31,7 +31,7 @@ in
     &&
       map (d: { inherit d; }) (
         builtins.sort builtins.lessThan (
-          graph.query {
+          graph.query { } {
             graph = c25Ir.facts.graph;
             from = "pewter";
             follow = graph.regex.star (graph.regex.lit "tacks");

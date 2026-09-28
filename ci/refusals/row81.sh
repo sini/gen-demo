@@ -21,7 +21,7 @@ row81='let
     { from = seam; to = "grosgrain"; label = "bobbin"; }
   ];
   plantedEdges = baseEdges ++ candidateEdges ++ (if PLANT then [ { from = "faille"; to = "grosgrain"; label = "tacks"; } ] else [ ]);
-  ref = genGraph.mkNodeRef { isRegistered = id: nodes ? ${id}; };
+  ref = genGraph.mkNodeRef (id: nodes ? ${id});
   contracted = es: genGraph.mkDeclaredEdges (map (e: e // { from = ref e.from; to = ref e.to; }) es);
   gated = genView.boundedWellDefinedSchedule {
     nodes = builtins.attrNames nodes;

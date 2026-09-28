@@ -30,9 +30,7 @@ let
   contracted =
     rel:
     genGraph.mkDeclaredEdges (
-      builtins.mapAttrs (
-        _: ids: map (genGraph.mkNodeRef { isRegistered = id: scope.nodes ? ${id}; }) ids
-      ) rel
+      builtins.mapAttrs (_: ids: map (genGraph.mkNodeRef (id: scope.nodes ? ${id})) ids) rel
     );
   # a shared round ranges over every eligible instance, so `loom`'s own step acquires too
   declared = contracted {

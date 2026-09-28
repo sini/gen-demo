@@ -20,9 +20,8 @@ let
     "awl"
   ];
   flouncePeerGraph = genGraph.labeledFrom {
-    nodes = flounceNodes;
-    perLabel.kin = _id: flounceNodes;
-  };
+    kin = _id: flounceNodes;
+  } flounceNodes;
   flounceMarksOf =
     id:
     if id == "grommet" then

@@ -13,16 +13,13 @@ let
   edges = genValues.declaredEdges ++ pipingEdge ++ seamPromotion.edges;
   byLabel = lbl: id: map (e: e.to) (builtins.filter (e: e.label == lbl && e.from == id) edges);
   lg = genGraph.labeledFrom {
-    nodes = builtins.attrNames nodes;
-    perLabel = {
-      tacks = byLabel "tacks";
-      gathers = byLabel "gathers";
-      piping = byLabel "piping";
-    };
-  };
+    tacks = byLabel "tacks";
+    gathers = byLabel "gathers";
+    piping = byLabel "piping";
+  } (builtins.attrNames nodes);
   # The named query: tacks*, then piping* — walks the derived label, so C5's edge changes what
   # this answers without the query ever mentioning `piping` as a declared thing.
-  tacked = genGraph.query {
+  tacked = genGraph.query { } {
     graph = lg;
     from = "pewter";
     follow = genGraph.regex.seq [
@@ -31,7 +28,7 @@ let
     ];
   };
   # The discriminator: `gathers` alone, so a label filter that stopped filtering is visible.
-  gathered = genGraph.query {
+  gathered = genGraph.query { } {
     graph = lg;
     from = "pewter";
     follow = genGraph.regex.star (genGraph.regex.lit "gathers");

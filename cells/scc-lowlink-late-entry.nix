@@ -50,7 +50,7 @@ in
     }
     && genGraph.lowlink g == genGraph.fbNode g
     &&
-      genGraph.cyclicEdgesWhere lg (l: l == "neg") == [
+      genGraph.cyclicEdgesWhere (l: l == "neg") lg == [
         {
           from = "twill";
           label = "neg";

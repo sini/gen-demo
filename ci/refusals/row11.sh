@@ -14,7 +14,7 @@ row11='let
     { from = "grosgrain"; to = "damask"; label = "tacks"; }
     { from = "pewter"; to = "damask"; label = "gathers"; }
   ];
-  ref = genGraph.mkNodeRef { isRegistered = id: nodes ? ${id}; };
+  ref = genGraph.mkNodeRef (id: nodes ? ${id});
   minted = genGraph.mkDeclaredEdges (map (e: e // { from = ref e.from; to = ref e.to; }) baseEdges);
   lookalikeIndex = { pewter = [ "grosgrain" "damask" ]; grosgrain = [ "damask" ]; };
   handAssembled = { index = lookalikeIndex; dependencies = id: lookalikeIndex.${id} or [ ]; };

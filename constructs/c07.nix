@@ -13,7 +13,7 @@
 }:
 let
   gateNodes = registered // policyCandidates.nodes; # the registration set plus every candidate node
-  ref = genGraph.mkNodeRef { isRegistered = id: gateNodes ? ${id}; };
+  ref = genGraph.mkNodeRef (id: gateNodes ? ${id});
   contracted =
     es:
     genGraph.mkDeclaredEdges (

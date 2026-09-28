@@ -102,15 +102,12 @@ let
   c16Out = g: id: map (e: e.to) (builtins.filter (e: e.from == id) g.edges);
 
   c16Lg = genGraph.labeledFrom {
-    nodes = c16Assembled.nodeOrder;
-    perLabel = {
-      # THE INVERSION IS THE TOOLKIT'S, NOT HAND-ROLLED: `c16Structural.children` is
-      # `genAssemble.structuralDecls`'s own `_self: id: filterAttrs (_: n: n.parent == id) nodes`.
-      contains = id: builtins.attrNames (c16Structural.children null id);
-      declares = c16Out (c16LabelGraph "declares");
-      members = c16Out (c16LabelGraph "members");
-    };
-  };
+    # THE INVERSION IS THE TOOLKIT'S, NOT HAND-ROLLED: `c16Structural.children` is
+    # `genAssemble.structuralDecls`'s own `_self: id: filterAttrs (_: n: n.parent == id) nodes`.
+    contains = id: builtins.attrNames (c16Structural.children null id);
+    declares = c16Out (c16LabelGraph "declares");
+    members = c16Out (c16LabelGraph "members");
+  } c16Assembled.nodeOrder;
 
   # The context is built with `parent` = the PUBLISHED `parentOf`, NOT a key split and NOT
   # `_: null` — the fix §3.4 names. `entryFor` is stated explicitly so the identity the

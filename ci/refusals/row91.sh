@@ -11,14 +11,14 @@ row91='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genProduct = gen.lib.substrate.product;
   genGraph = gen.lib.substrate.graph;
-  factor = dim: registry: { inherit dim; graph = genGraph.fromRegistry { inherit registry; edges = _: _: [ ]; }; };
+  factor = dim: registry: { inherit dim; graph = genGraph.fromRegistry { } (_: _: [ ]) registry; };
   needles = { sharp = { id_hash = "sharp"; name = "sharp"; }; };
   threads = { eye = { id_hash = "eye"; name = "eye"; }; };
   blunt = { id_hash = "blunt"; name = "blunt"; };
   space = genProduct.productN "cartesian" [ (factor "needle" needles) (factor "thread" threads) ];
-  sharpFiber = builtins.concatStringsSep "," (genProduct.fiber space "needle" needles.sharp).nodes;
-  bluntFiber = builtins.concatStringsSep "," (genProduct.fiber space "needle" blunt).nodes;
-  bluntSlice = builtins.concatStringsSep "," (genProduct.slice space { needle = needles.sharp; thread = blunt; }).nodes;
+  sharpFiber = builtins.concatStringsSep "," (genProduct.fiber "needle" needles.sharp space).nodes;
+  bluntFiber = builtins.concatStringsSep "," (genProduct.fiber "needle" blunt space).nodes;
+  bluntSlice = builtins.concatStringsSep "," (genProduct.slice { needle = needles.sharp; thread = blunt; } space).nodes;
   caught = if (builtins.tryEval (builtins.deepSeq bluntFiber null)).success then "ADMITTED" else "CAUGHT";
 in BODY'
 check "T5 row91 unplanted (a registry entry fibers to its cells)" \

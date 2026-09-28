@@ -9,12 +9,22 @@
 row68='let
   genGraph = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.graph;
   graph = genGraph.labeledFrom {
-    nodes = [ "pewter" "faille" "grosgrain" ];
-    perLabel.tacks = id: { pewter = [ "faille" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
-  };
+    tacks = id: { pewter = [ "faille" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
+  } [ "pewter" "faille" "grosgrain" ];
   follow = genGraph.regex.star (genGraph.regex.lit "tacks");
-  distances = map (a: a.distance) (genGraph.queryArrivals { inherit graph follow; from = "pewter"; advance = ADVANCE; });
-  reached = genGraph.query { inherit graph follow; from = "pewter"; where = WHERE; };
+  distances = map (a: a.distance) (genGraph.queryArrivals { } {
+    inherit graph;
+    inherit follow;
+    from = "pewter";
+    advance = ADVANCE;
+  });
+  reached = genGraph.query {
+    where = WHERE;
+  } {
+    inherit graph;
+    inherit follow;
+    from = "pewter";
+  };
 in BODY'
 row68ok="${row68/ADVANCE/s: s.distance + 1}"
 row68ok="${row68ok/WHERE/_: true}"
