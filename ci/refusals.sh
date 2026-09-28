@@ -209,7 +209,7 @@ echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/ (${#labels[@]} a
 
 # The control below reads rows' stderr by file; `grep` on a file that was never written exits 2,
 # which `if grep -q` reads as "no leak". Refuse that instead of passing it.
-for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36 row75 row76 row82 row86 row87 row89; do
+for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36 row75 row76 row82 row86 row87 row89 row117; do
   if [ ! -f "$tmpdir/$errfile-red.err" ]; then
     echo "FAIL control: $errfile's planted stderr was never written -- the row it names did not run"
     fail=1
@@ -247,7 +247,10 @@ done
 # the matcher and one at the adapter. Extended to row89 against row82: the same `selvage` pair and
 # the same sealed-collision sentence, refused at gen-select's `selectorEq` (row89) and at gen-schema's
 # `kindEq` (row82), so only the door prefix tells them apart and a leak either way would mean the
-# by-name half is matching the sentence rather than the site.
+# by-name half is matching the sentence rather than the site. Extended to row117 against row89: the same
+# `selvage` pair and the same sentence again, refused at `selectorEq` on two `entity` selectors
+# (row89) and on two `adapters.product.coord` selectors (row117), so only the parenthesised site tells
+# them apart.
 if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
   echo "FAIL control: row1's message leaked into row2's refusal"
   fail=1
@@ -326,8 +329,14 @@ elif grep -qF 'gen-select: selectorEq:' "$tmpdir/row82-red.err"; then
 elif grep -qF 'gen-schema: kindEq:' "$tmpdir/row89-red.err"; then
   echo "FAIL control: row82's message leaked into row89's refusal"
   fail=1
+elif grep -qF 'gen-select: selectorEq (adapters.product.coord):' "$tmpdir/row89-red.err"; then
+  echo "FAIL control: row117's message leaked into row89's refusal"
+  fail=1
+elif grep -qF 'gen-select: selectorEq:' "$tmpdir/row117-red.err"; then
+  echo "FAIL control: row89's message leaked into row117's refusal"
+  fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29, row35/row36, row75/row76, row76/row87, row86/row87 and row82/row89 refusals do not cross-match)"
+  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29, row35/row36, row75/row76, row76/row87, row86/row87, row82/row89 and row89/row117 refusals do not cross-match)"
 fi
 
 exit $fail
