@@ -72,12 +72,12 @@ let
 
   warm =
     mk:
-    genMemo.propagateEager engine (genMemo.build engine {
+    genMemo.propagateEager engine (genMemo.build { } engine {
       inherit accessor hashOf;
       recompute = recompute mk;
     }) { reel.weight = 200; };
   cold =
-    (genMemo.build engine {
+    (genMemo.build { } engine {
       accessor = accessor // {
         nodeData = id: if id == "reel" then { weight = 200; } else accessor.nodeData id;
       };
