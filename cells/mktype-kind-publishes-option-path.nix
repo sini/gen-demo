@@ -4,6 +4,11 @@
 # `mkInstanceType` admits it; a `selvage` whose result echoes `"bobbin"` still reads `"selvage"`.
 # Before gen-schema ba34a93 the `mkType` arm never wrote `kind`: the omitting kind's `.kind` aborted
 # uncatchably (`attribute 'kind' missing`), and the echoing kind published the echo.
+#
+# Admission is read through a USE of the type: an instance of it in an evaluation reads its field.
+# A `deepSeq` of the type record is not an admission test, and since den-hoag-n6dh7 Unit 2.4 it
+# reaches a submodule's called `whenEmpty.value`, which refuses by name (item 1; OQ2 α). gen-schema's
+# `mktype-kind-value` admission cell took the same re-pin (Unit 2 landing gate, C2).
 {
   asserts,
   genMerge,
@@ -33,7 +38,18 @@ in
   check = asserts (
     # the omitting arm publishes the option path, and the instance type admits it
     omits.kind == "selvage"
-    && (builtins.tryEval (builtins.deepSeq (schema.mkInstanceType omits { }) true)).success
+    && (builtins.tryEval (
+      builtins.deepSeq
+        (genMerge.evalModuleTree {
+          modules = [
+            {
+              options.h = genMerge.mkOption { type = schema.mkInstanceType omits { }; };
+              config.h = { };
+            }
+          ];
+        }).config.h.spool
+        true
+    )).success
     # a wrong echo does not win over the option path
     && echoesWrong.kind == "selvage"
     # control: a correct echo reads the same
