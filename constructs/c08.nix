@@ -28,7 +28,10 @@ let
     edgeGraphs = [
       {
         label = "tacks";
-        graph = genScope.edge "pewter" "grosgrain";
+        graph = genScope.edge {
+          from = "pewter";
+          to = "grosgrain";
+        };
       }
     ];
     decls = {

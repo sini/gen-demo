@@ -8,12 +8,14 @@
 # unplanted arm is the live control: member ids answer.
 row62='let
   S = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
-  roots = S.buildRoots { parentGraph = S.edge "grosgrain" "pewter"; };
-  self = S.eval {
-    scope = roots;
-    attributes.children = self: id:
+  roots = S.buildRoots { parentGraph = S.edge {
+    from = "grosgrain";
+    to = "pewter";
+  }; };
+  self = S.eval { } {
+    children = self: id:
       if id == "pewter" then builtins.intersectAttrs { grosgrain = 0; } roots.nodes else { };
-  };
+  } roots;
   pewter = { name = "pewter"; };
 in BODY'
 check "T5 row62 unplanted (member ids answer at both doors; the answer is the assertion)" \

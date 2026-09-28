@@ -16,7 +16,7 @@ let
 
   scope = genScope.buildRoots {
     kinds = genScope.mkKinds (
-      map (n: genScope.mkKind { name = n; }) [
+      map (n: genScope.mkKind { } n) [
         "thimble"
         "bobbin"
         "seam"
@@ -35,11 +35,10 @@ let
     ) nodes;
   };
 
-  ev = genScope.eval {
-    inherit scope;
+  ev = genScope.eval { } {
     # A flat scope: nothing is contained in anything, so `children` selects nothing.
-    attributes.children = _: _: { };
-  };
+    children = _: _: { };
+  } scope;
 
   thimbles = builtins.attrNames (ev.nodesOfType "thimble");
   bobbinNodes = builtins.attrNames (ev.nodesOfType "bobbin");

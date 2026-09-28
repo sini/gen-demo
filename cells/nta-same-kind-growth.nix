@@ -19,7 +19,6 @@
         }
       ];
       skein = genScope.mkKind {
-        name = "skein";
         nta.ply =
           self: id:
           let
@@ -38,15 +37,36 @@
             );
             twist =
               if d ? twist && builtins.elem "warp" picked then
-                { ${self.get (genScope.mintNtaId id "ply" "strand" "warp") "dye"} = at [ "twist" ]; }
+                {
+                  ${
+                    self.get (genScope.mintNtaId {
+                      host = id;
+                      name = "ply";
+                      group = "strand";
+                      key = "warp";
+                    }) "dye"
+                  } =
+                    at [ "twist" ];
+                }
               else
                 { };
           };
-      };
+      } "skein";
       run =
         picked:
-        genScope.eval {
-          scope = {
+        genScope.eval { }
+          {
+            children = _: _: { };
+            defs =
+              self: id:
+              let
+                n = (self.node id).decls;
+              in
+              if n ? seed then map (e: e.value) n.seed else n.defs;
+            picked = self: id: (self.node id).decls.picked or [ ];
+            dye = self: id: (builtins.head (self.get id "defs")).dye or "none";
+          }
+          {
             nodes.hank = {
               id = "hank";
               type = "skein";
@@ -67,18 +87,6 @@
             nodeOrder = [ "hank" ];
             kinds = genScope.mkKinds [ skein ];
           };
-          attributes = {
-            children = _: _: { };
-            defs =
-              self: id:
-              let
-                n = (self.node id).decls;
-              in
-              if n ? seed then map (e: e.value) n.seed else n.defs;
-            picked = self: id: (self.node id).decls.picked or [ ];
-            dye = self: id: (builtins.head (self.get id "defs")).dye or "none";
-          };
-        };
       grown =
         ev:
         builtins.sort builtins.lessThan (

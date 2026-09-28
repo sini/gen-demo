@@ -16,8 +16,14 @@
 let
   scope = genScope.buildRoots {
     parentGraph = genScope.overlays [
-      (genScope.edge "damask" "loom")
-      (genScope.edge "faille" "loom")
+      (genScope.edge {
+        from = "damask";
+        to = "loom";
+      })
+      (genScope.edge {
+        from = "faille";
+        to = "loom";
+      })
     ];
     decls = {
       loom.ply = 0;
@@ -68,7 +74,7 @@ let
 
   foldWith =
     declaredDependencies:
-    (genScope.foldEquations {
+    (genScope.foldEquations { } {
       inherit scope declaredDependencies;
       parseParent = id: scope.nodes.${id}.parent or null;
       schedule.equations = builtins.mapAttrs (name: compute: {

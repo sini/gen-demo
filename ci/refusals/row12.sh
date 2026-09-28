@@ -19,9 +19,15 @@ row12='let
   facts = genAspects.graphFacts cnf tree.config.aspects;
   parentGraph = genScope.overlays (map (id:
     let p = facts.parentOf.${id}; in
-    if p == null then genScope.vertex id else genScope.edge id p) facts.nodes);
+    if p == null then genScope.vertex id else genScope.edge {
+      from = id;
+      to = p;
+    }) facts.nodes);
   aspectGraph = { name = "aspect-graph"; vertices = facts.nodes; inherit parentGraph;
-    edgeGraphs = [ { label = LABEL; graph = genScope.edge "hemline/facing" "hemline/placket"; } ]; };
+    edgeGraphs = [ { label = LABEL; graph = genScope.edge {
+      from = "hemline/facing";
+      to = "hemline/placket";
+    }; } ]; };
 in builtins.toJSON (builtins.attrNames (genAssemble.assemble { contributions = [ aspectGraph ]; }).nodes)'
 check "T5 row12 unplanted (label declares)" "${row12/LABEL/\"declares\"}" 0 "" \
   "$tmpdir/row12-green.err" '["hemline","hemline/facing","hemline/placket"]'

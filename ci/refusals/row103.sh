@@ -9,14 +9,11 @@
 row103='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   S = gen.lib.substrate.scope;
-  r = S.eval {
-    scope = S.buildRoots { parentGraph = S.vertex "loom"; importGraph = S.empty; decls.loom = { }; types = { }; };
-    attributes = {
+  r = S.eval { } {
       children = _: _: { };
       imports = _: _: [ ];
       weave = S.circular { carrier = { bottom = { }; leq = a: b: builtins.all (k: b ? ${k}) (builtins.attrNames a); height = 1; quotient = true; }; } (_: _: _: { warp0 = 0; });
-    };
-  };
+    } (S.buildRoots { parentGraph = S.vertex "loom"; importGraph = S.empty; decls.loom = { }; types = { }; });
   green = builtins.toJSON (r.getRepresentative "loom" "weave");
   red = builtins.toJSON (r.get "loom" "weave");
   caught = if (builtins.tryEval (builtins.deepSeq (r.get "loom" "weave") true)).success then "ADMITTED" else "CAUGHT";

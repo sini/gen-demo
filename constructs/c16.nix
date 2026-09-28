@@ -23,14 +23,29 @@ let
       let
         p = c16Facts.parentOf.${id};
       in
-      if p == null then genScope.vertex id else genScope.edge id p
+      if p == null then
+        genScope.vertex id
+      else
+        genScope.edge {
+          from = id;
+          to = p;
+        }
     ) c16Facts.nodes
   );
 
   # INCLUDES travels under a label of the caller's own. NOT `I` — that is gen-scope's own
   # import relation between scopes, reserved by gen-assemble at the entry.
   c16IncludesGraph = genScope.overlays (
-    builtins.concatMap (id: map (t: genScope.edge id t) c16Facts.includesOf.${id}) c16Facts.nodes
+    builtins.concatMap (
+      id:
+      map (
+        t:
+        genScope.edge {
+          from = id;
+          to = t;
+        }
+      ) c16Facts.includesOf.${id}
+    ) c16Facts.nodes
   );
 
   c16AspectGraph = {
@@ -75,9 +90,16 @@ let
       {
         label = "members";
         graph = genScope.overlays (
-          builtins.concatMap (id: map (a: genScope.edge id a) (genValues.thimbles.${id}.aspects or [ ])) (
-            builtins.attrNames genValues.thimbles
-          )
+          builtins.concatMap (
+            id:
+            map (
+              a:
+              genScope.edge {
+                from = id;
+                to = a;
+              }
+            ) (genValues.thimbles.${id}.aspects or [ ])
+          ) (builtins.attrNames genValues.thimbles)
         );
       }
     ];
@@ -126,24 +148,17 @@ let
   # C16's OWN non-flat assembly: the hand-written `children` (C1's own shape, nothing
   # contained) against the toolkit's `structuralDecls`. The node set cannot move (identity is
   # free by construction); `get`/`subtreeOf` DO move, which is the arming.
-  c16ArmHand = genScope.eval {
-    scope = c16Assembled;
-    attributes.children = _: _: { };
-  };
-  c16ArmToolkit = genScope.eval {
-    scope = c16Assembled;
-    attributes = c16Structural;
-  };
+  c16ArmHand = genScope.eval { } {
+    children = _: _: { };
+  } c16Assembled;
+  c16ArmToolkit = genScope.eval { } c16Structural c16Assembled;
 
   # C1's OWN flat assembly, read as `ev`/`scope` are already bound above — never rebuilt here.
   # `structuralDecls` over C1's flat `scope.nodes` gives every node `parent == null` already,
   # so `filterAttrs (_: n: n.parent == id) nodes` is `{ }` for every id — the same answer
   # `ev`'s own hand-written `_: _: { }` gives. The node-set identity is the claim; the arming
   # pair above is what makes it non-vacuous.
-  c16O5Toolkit = genScope.eval {
-    inherit scope;
-    attributes = genAssemble.structuralDecls scope.nodes;
-  };
+  c16O5Toolkit = genScope.eval { } (genAssemble.structuralDecls scope.nodes) scope;
 in
 {
   inherit

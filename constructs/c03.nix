@@ -7,41 +7,38 @@ let
     warp = "pewter";
     weft = "grosgrain";
   };
-  minted = genScope.mintStrata {
-    kinds = { };
-    emitters = [
-      {
-        pass = 0;
-        identifier = "pewter";
-        kind = "thimble";
-        relata = { };
-        content = {
-          spool = "linen";
-        };
-        site = "c:pewter";
-      }
-      {
-        pass = 0;
-        identifier = "grosgrain";
-        kind = "bobbin";
-        relata = { };
-        content = {
-          gauge = "fine";
-        };
-        site = "c:gros";
-      }
-      {
-        pass = 1;
-        identifier = "basting:pewter:grosgrain";
-        kind = "basting";
-        content = {
-          tension = "slack";
-        };
-        relata = bastingRelata;
-        site = "c:basting";
-      }
-    ];
-  };
+  minted = genScope.mintStrata { } [
+    {
+      pass = 0;
+      identifier = "pewter";
+      kind = "thimble";
+      relata = { };
+      content = {
+        spool = "linen";
+      };
+      site = "c:pewter";
+    }
+    {
+      pass = 0;
+      identifier = "grosgrain";
+      kind = "bobbin";
+      relata = { };
+      content = {
+        gauge = "fine";
+      };
+      site = "c:gros";
+    }
+    {
+      pass = 1;
+      identifier = "basting:pewter:grosgrain";
+      kind = "basting";
+      content = {
+        tension = "slack";
+      };
+      relata = bastingRelata;
+      site = "c:basting";
+    }
+  ];
 
   # THE IDENTITY ORDER MARK — one layer holding every letter of the alphabet, with `$` tied to
   # them. `viewRelation`'s `orderMark` is REQUIRED and total (M9), so "this query carries no

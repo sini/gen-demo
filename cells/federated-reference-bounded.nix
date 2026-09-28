@@ -21,20 +21,32 @@ let
   importIndex = builtins.foldl' (
     acc: e: acc // { ${e.from} = (acc.${e.from} or [ ]) ++ [ e.to ]; }
   ) { } edges;
-  self = genScope.eval {
-    scope = genScope.buildRoots {
-      importGraph = genScope.overlays (map (e: genScope.edge e.from e.to) edges);
-      decls = {
-        ${requirer}.provided = [ ];
-        ${provider}.provided = selvageProvides;
-      };
-    };
-    attributes = {
-      children = _self: _id: { };
-      imports = _self: id: importIndex.${id} or [ ];
-    };
-    parseParent = _id: null;
-  };
+  self =
+    genScope.eval
+      {
+        parseParent = _id: null;
+      }
+      {
+        children = _self: _id: { };
+        imports = _self: id: importIndex.${id} or [ ];
+      }
+      (
+        genScope.buildRoots {
+          importGraph = genScope.overlays (
+            map (
+              e:
+              genScope.edge {
+                from = e.from;
+                to = e.to;
+              }
+            ) edges
+          );
+          decls = {
+            ${requirer}.provided = [ ];
+            ${provider}.provided = selvageProvides;
+          };
+        }
+      );
 
   selvageBoundary = {
     name = "selvageBoundary";

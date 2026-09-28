@@ -8,7 +8,7 @@ row1='let
     { pass = 0; identifier = "grosgrain"; kind = "bobbin"; relata = { }; content = { gauge = "fine"; }; site = "c:gros"; }
     { pass = pass1; identifier = "basting:pewter:grosgrain"; kind = "basting"; content = { tension = "slack"; }; relata = { warp = "pewter"; weft = "grosgrain"; }; site = "c:basting"; }
   ];
-in builtins.toJSON (builtins.attrNames (genScope.mintStrata { kinds = { }; emitters = emitters PASS; }).nodes)'
+in builtins.toJSON (builtins.attrNames (genScope.mintStrata { } (emitters PASS)).nodes)'
 check "T5 row1 unplanted (basting minted strictly later)" "${row1/PASS/1}" 0 "" \
   "$tmpdir/row1-green.err" '["basting:pewter:grosgrain","grosgrain","pewter"]'
 check "T5 row1 planted   (basting minted in the same pass)" "${row1/PASS/0}" 1 \

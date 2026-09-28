@@ -11,13 +11,19 @@ heddleBase='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genScope = gen.lib.substrate.scope;
   kinds = genScope.mkKinds [
-    (genScope.mkKind { name = "shaft"; })
-    (genScope.mkKind { name = "heddle"; })
+    (genScope.mkKind { } "shaft")
+    (genScope.mkKind { } "heddle")
   ];
   built = genScope.buildRoots {
     parentGraph = genScope.overlay
-      (genScope.edge (genScope.mintAttachmentId "heddle" [ "shaft1" "shaft2" ] "shaft1") "shaft1")
-      (genScope.edge (genScope.mintAttachmentId "heddle" [ "shaft1" "shaft2" ] "shaft2") "shaft2");
+      (genScope.edge {
+        from = (genScope.mintAttachmentId "heddle" [ "shaft1" "shaft2" ] "shaft1");
+        to = "shaft1";
+      })
+      (genScope.edge {
+        from = (genScope.mintAttachmentId "heddle" [ "shaft1" "shaft2" ] "shaft2");
+        to = "shaft2";
+      });
     types.shaft1 = "shaft"; types.shaft2 = "shaft";
     types."heddle@shaft1" = "heddle"; types."heddle@shaft2" = "heddle";
     decls.shaft1 = { }; decls.shaft2 = { };

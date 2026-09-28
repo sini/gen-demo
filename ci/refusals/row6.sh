@@ -7,7 +7,10 @@ row6='let
   thimbles = { name = "thimbles"; vertices = [ "pewter" "damask" ];
     decls = { pewter = { spool = "linen"; aspects = [ "stitch" ]; }; damask = { spool = "sateen"; aspects = [ ]; }; }; };
   mkBobbins = bobbinVertices: { name = "bobbins"; vertices = bobbinVertices;
-    edgeGraphs = [ { label = "tacks"; graph = genScope.edge "pewter" "grosgrain"; } ];
+    edgeGraphs = [ { label = "tacks"; graph = genScope.edge {
+      from = "pewter";
+      to = "grosgrain";
+    }; } ];
     decls = { grosgrain = { gauge = "fine"; }; faille = { gauge = "coarse"; }; }; };
 in builtins.toJSON (builtins.attrNames (genAssemble.assemble { contributions = [ thimbles (mkBobbins BOBBINVERTICES) ]; }).nodes)'
 check "T5 row6 unplanted (grosgrain declared a member)" "${row6/BOBBINVERTICES/[ \"grosgrain\" \"faille\" ]}" 0 "" \

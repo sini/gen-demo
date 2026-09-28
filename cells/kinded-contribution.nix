@@ -40,10 +40,9 @@
     # door C1's own queries use, so the equality above is not two sides equally empty.
     &&
       builtins.attrNames (
-        (genScope.eval {
-          scope = c18ThroughTheProtocol c18Types;
-          attributes.children = _: _: { };
-        }).nodesOfType
+        (genScope.eval { } {
+          children = _: _: { };
+        } (c18ThroughTheProtocol c18Types)).nodesOfType
           "thimble"
       ) == thimbles
     # CARDINALITY, read off this corpus rather than assumed: three kinds are declared,
@@ -65,7 +64,7 @@
           {
             name = "corpus";
             vertices = builtins.attrNames nodes;
-            kinds = genScope.mkKinds [ (genScope.mkKind { name = "thimble"; }) ];
+            kinds = genScope.mkKinds [ (genScope.mkKind { } "thimble") ];
           }
         ];
       }) 1

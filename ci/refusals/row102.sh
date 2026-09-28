@@ -16,24 +16,35 @@ row102Registry='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genScope = gen.lib.substrate.scope;
   spawnOf = _self: id: { "${id}-thread" = { id = "${id}-thread"; parent = id; decls = { }; }; };
-  thread = genScope.mkKind { name = "thread"; };
+  thread = genScope.mkKind { } "thread";
   minted = genScope.mkKinds [
     thread
-    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
+    (genScope.mkKind {
+      below = [ "thread" ];
+      spawns.thread = spawnOf;
+    } "bolt")
   ];
   upside = genScope.mkKinds [
-    (genScope.mkKind { name = "bolt"; })
-    (genScope.mkKind { name = "thread"; below = [ "bolt" ]; spawns.bolt = spawnOf; })
+    (genScope.mkKind { } "bolt")
+    (genScope.mkKind {
+      below = [ "bolt" ];
+      spawns.bolt = spawnOf;
+    } "thread")
   ];
   spool = genScope.mkKinds [
     thread
-    (genScope.mkKind { name = "spool"; below = [ "thread" ]; spawns.thread = spawnOf; })
+    (genScope.mkKind {
+      below = [ "thread" ];
+      spawns.thread = spawnOf;
+    } "spool")
   ];
   merged = minted // { kinds = minted.kinds // { inherit (upside.kinds) thread; }; };
   coherent = minted // { kinds = minted.kinds // spool.kinds; };
   scopeWith = kinds: genScope.buildRoots { parentGraph = genScope.vertex "selvage"; types.selvage = "bolt"; decls.selvage = { }; inherit kinds; };
 in '
-row102="$row102Registry"'builtins.toJSON (genScope.eval { scope = scopeWith REGISTRY; attributes.children = _self: _id: { }; }).allNodeIds'
+row102="$row102Registry"'builtins.toJSON (genScope.eval { } {
+  children = _self: _id: { };
+} (scopeWith REGISTRY)).allNodeIds'
 row102Catch="$row102Registry"'if (builtins.tryEval (builtins.deepSeq (scopeWith merged) "ADMITTED")).success then "ADMITTED" else "CAUGHT"'
 
 check "T5 row102 unplanted (two registries sharing one thread, merged)" "${row102/REGISTRY/coherent}" 0 "" \

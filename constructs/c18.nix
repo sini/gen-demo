@@ -35,7 +35,7 @@ let
         }
       ];
       kinds = genScope.mkKinds (
-        map (n: genScope.mkKind { name = n; }) [
+        map (n: genScope.mkKind { } n) [
           "thimble"
           "bobbin"
           "seam"

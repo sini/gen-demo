@@ -46,20 +46,32 @@ let
     )
   );
 
-  self = genScope.eval {
-    scope = genScope.buildRoots {
-      importGraph = genScope.overlays (map (e: genScope.edge e.from e.to) edges);
-      decls = {
-        ${requirer}.provided = [ ];
-        ${provider}.provided = selvageProvides;
-      };
-    };
-    attributes = {
-      children = _self: _id: { };
-      imports = _self: id: importIndex.${id} or [ ];
-    };
-    parseParent = _id: null;
-  };
+  self =
+    genScope.eval
+      {
+        parseParent = _id: null;
+      }
+      {
+        children = _self: _id: { };
+        imports = _self: id: importIndex.${id} or [ ];
+      }
+      (
+        genScope.buildRoots {
+          importGraph = genScope.overlays (
+            map (
+              e:
+              genScope.edge {
+                from = e.from;
+                to = e.to;
+              }
+            ) edges
+          );
+          decls = {
+            ${requirer}.provided = [ ];
+            ${provider}.provided = selvageProvides;
+          };
+        }
+      );
 
   # The carrier that puts `imports` in L over the federated shape.
   labels = genView.edgeLabels { letters = [ "imports" ]; };

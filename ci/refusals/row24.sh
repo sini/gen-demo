@@ -7,18 +7,20 @@ row24Base='let
   genScope = gen.lib.substrate.scope;
   spawnOf = _self: id: { "KEYNAME" = { id = "KEYNAME"; parent = id; decls = { }; }; };
   kinds = genScope.mkKinds [
-    (genScope.mkKind { name = "thread"; })
-    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
+    (genScope.mkKind { } "thread")
+    (genScope.mkKind {
+      below = [ "thread" ];
+      spawns.thread = spawnOf;
+    } "bolt")
   ];
-in builtins.toJSON (genScope.eval {
-  scope = genScope.buildRoots {
+in builtins.toJSON (genScope.eval { } {
+  children = _self: _id: { };
+} (genScope.buildRoots {
     parentGraph = genScope.overlay (genScope.vertex "selvage") (genScope.vertex "bobbin");
     types.selvage = "bolt"; types.bobbin = "thread";
     decls.selvage = { }; decls.bobbin = { };
     kinds = kinds;
-  };
-  attributes.children = _self: _id: { };
-}).allNodeIds'
+  })).allNodeIds'
 row24="${row24Base//KEYNAME/warp}"
 row24planted="${row24Base//KEYNAME/bobbin}"
 
@@ -30,18 +32,20 @@ row24catch='let
   genScope = gen.lib.substrate.scope;
   spawnOf = _self: id: { "bobbin" = { id = "bobbin"; parent = id; decls = { }; }; };
   kinds = genScope.mkKinds [
-    (genScope.mkKind { name = "thread"; })
-    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
+    (genScope.mkKind { } "thread")
+    (genScope.mkKind {
+      below = [ "thread" ];
+      spawns.thread = spawnOf;
+    } "bolt")
   ];
-in if (builtins.tryEval (builtins.deepSeq (genScope.eval {
-  scope = genScope.buildRoots {
+in if (builtins.tryEval (builtins.deepSeq (genScope.eval { } {
+  children = _self: _id: { };
+} (genScope.buildRoots {
     parentGraph = genScope.overlay (genScope.vertex "selvage") (genScope.vertex "bobbin");
     types.selvage = "bolt"; types.bobbin = "thread";
     decls.selvage = { }; decls.bobbin = { };
     kinds = kinds;
-  };
-  attributes.children = _self: _id: { };
-}).allNodeIds "ADMITTED")).success then "ADMITTED" else "CAUGHT"'
+  })).allNodeIds "ADMITTED")).success then "ADMITTED" else "CAUGHT"'
 
 check "T5 row24 unplanted (a fresh spawn key, colliding with nothing)" "$row24" 0 "" \
   "$tmpdir/row24-green.err" '["selvage","warp","bobbin"]'

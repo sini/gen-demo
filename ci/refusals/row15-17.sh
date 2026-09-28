@@ -18,18 +18,23 @@ registry='let
   genScope = gen.lib.substrate.scope;
   spawnOf = _self: id: { "${id}-thread" = { id = "${id}-thread"; parent = id; decls = { }; }; };
   minted = genScope.mkKinds [
-    (genScope.mkKind { name = "thread"; })
-    (genScope.mkKind { name = "bolt"; below = [ "thread" ]; spawns.thread = spawnOf; })
+    (genScope.mkKind { } "thread")
+    (genScope.mkKind {
+      below = [ "thread" ];
+      spawns.thread = spawnOf;
+    } "bolt")
   ];
-  selfNaming = genScope.mkKind { name = "bolt"; below = [ "bolt" ]; spawns.bolt = spawnOf; };
+  selfNaming = genScope.mkKind {
+    below = [ "bolt" ];
+    spawns.bolt = spawnOf;
+  } "bolt";
   forged = { kinds = { bolt = selfNaming; }; };
 in '
 
 # ── row 15 -- the DIRECT path: the substrate constructor and then its evaluator ──
-row15="$registry"'builtins.toJSON (genScope.eval {
-  scope = genScope.buildRoots { parentGraph = genScope.vertex "selvage"; types.selvage = "bolt"; decls.selvage = { }; kinds = REGISTRY; };
-  attributes.children = _self: _id: { };
-}).allNodeIds'
+row15="$registry"'builtins.toJSON (genScope.eval { } {
+  children = _self: _id: { };
+} (genScope.buildRoots { parentGraph = genScope.vertex "selvage"; types.selvage = "bolt"; decls.selvage = { }; kinds = REGISTRY; })).allNodeIds'
 check "T5 row15 unplanted (a registry mkKinds minted, bolt above thread)" "${row15/REGISTRY/minted}" 0 "" \
   "$tmpdir/row15-green.err" '["selvage","selvage-thread"]'
 check "T5 row15 planted   (mkKinds cannot mint bolt below itself)" "$registry"'builtins.toJSON (builtins.attrNames (genScope.mkKinds [ selfNaming ]).kinds)' 1 \

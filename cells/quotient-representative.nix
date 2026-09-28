@@ -7,49 +7,51 @@
 # answers raw through `get`, so an evaluator refusing every circular demand cannot pass.
 { asserts, genScope }:
 let
-  r = genScope.eval {
-    scope = genScope.buildRoots {
-      parentGraph = genScope.vertex "loom";
-      importGraph = genScope.empty;
-      decls.loom.ply = 3;
-      types = { };
-    };
-    attributes = {
-      children = _self: _id: { };
-      imports = _self: _id: [ ];
-      weave =
-        genScope.circular
-          {
-            carrier = {
-              bottom = { };
-              leq = a: b: builtins.all (k: b ? ${k}) (builtins.attrNames a);
-              height = 3;
-              quotient = true;
-            };
-          }
-          (
-            _self: _id: prev:
-            let
-              n = builtins.length (builtins.attrNames prev);
-            in
-            builtins.mapAttrs (_: v: v + 1) prev // (if n >= 3 then { } else { "warp${toString n}" = 0; })
-          );
-      shuttle =
-        genScope.circular
-          {
-            carrier = {
-              bottom = 0;
-              leq = a: b: a <= b;
-              height = 3;
-              quotient = false;
-            };
-          }
-          (
-            self: id: prev:
-            if prev >= (self.node id).decls.ply then prev else prev + 1
-          );
-    };
-  };
+  r =
+    genScope.eval { }
+      {
+        children = _self: _id: { };
+        imports = _self: _id: [ ];
+        weave =
+          genScope.circular
+            {
+              carrier = {
+                bottom = { };
+                leq = a: b: builtins.all (k: b ? ${k}) (builtins.attrNames a);
+                height = 3;
+                quotient = true;
+              };
+            }
+            (
+              _self: _id: prev:
+              let
+                n = builtins.length (builtins.attrNames prev);
+              in
+              builtins.mapAttrs (_: v: v + 1) prev // (if n >= 3 then { } else { "warp${toString n}" = 0; })
+            );
+        shuttle =
+          genScope.circular
+            {
+              carrier = {
+                bottom = 0;
+                leq = a: b: a <= b;
+                height = 3;
+                quotient = false;
+              };
+            }
+            (
+              self: id: prev:
+              if prev >= (self.node id).decls.ply then prev else prev + 1
+            );
+      }
+      (
+        genScope.buildRoots {
+          parentGraph = genScope.vertex "loom";
+          importGraph = genScope.empty;
+          decls.loom.ply = 3;
+          types = { };
+        }
+      );
 in
 {
   construct = [ "C89" ];
