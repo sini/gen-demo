@@ -3,7 +3,10 @@
 # sealed marker. Two `selvage` kinds differing only in a refinement PREDICATE (a caller lambda,
 # sealed) mint one mark, and `kindEq` refuses the pair BY NAME rather than calling them one kind;
 # two differing only in a MINTED field type (`int` against `str`) mint apart and `kindEq` decides
-# them, as do two differing only in a default. A predicate built from a REGISTERED constructor (`between`, over the hub's mint) is a term,
+# them. Two differing only in a default are ONE kind (den-hoag-pa887 arm A: an option enters the
+# mark by its `type` alone, a collision pinned until arm C), while two whose default, written in a
+# function module pulled in through `require`, reads an instance's `name` are refused BY NAME at
+# `modules`. A predicate built from a REGISTERED constructor (`between`, over the hub's mint) is a term,
 # not a lambda: its field mints, so two `selvage` kinds differing only in its bounds mint apart and
 # `kindEq` decides them with no refusal. Before (c+) every pair minted one mark and nothing
 # refused. The refusal's wording is `refusals` row 82. A field typed by two constructions of one
@@ -49,6 +52,22 @@ let
   };
   endsWide = selvage { options.ends = field (schema.refined T.int (between 1 65535)); };
   endsLow = selvage { options.ends = field (schema.refined T.int (between 1 1023)); };
+  # a default reading an instance's `name`, in a function module pulled in through `require`
+  warp =
+    word:
+    selvage {
+      require = [
+        (
+          { config, ... }:
+          {
+            options.ends = genMerge.mkOption {
+              type = T.str;
+              default = "${word}-${config.name}";
+            };
+          }
+        )
+      ];
+    };
   # one construction of a check-only `mkOptionType` per call, its back-edge under `description`
   tension =
     _:
@@ -77,10 +96,12 @@ in
     && endsWide.__mint.minted != endsLow.__mint.minted
     && decides (schema.kindEq endsWide endsLow)
     && !(schema.kindEq endsWide endsLow)
-    # inert content enters too: a default of 80 against 443 separates and is decided
-    && !(schema.kindEq (selvage { options.ends = field' 80; }) (selvage {
+    # an option enters by its `type` alone: a default of 80 against 443 is one kind (pa887 arm A)
+    && (schema.kindEq (selvage { options.ends = field' 80; }) (selvage {
       options.ends = field' 443;
     }))
+    # a function module under `require` is the sealed `modules` component: refused, never one kind
+    && !(decides (schema.kindEq (warp "x") (warp "y")))
     # controls: a kind is one kind with itself, and a minted twin across evaluations is one kind
     && schema.kindEq ends ends
     && schema.kindEq endsInt (selvage {
