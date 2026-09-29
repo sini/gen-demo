@@ -58,7 +58,7 @@
   construct = [ "C17" ];
   check = asserts (
     c17Pewter.shirring == "gathered"
-    && c17Pewter.id_hash == "thimble:6ee629244f5a010792e11f7a61b0a359f621b58a51477586f5a3b7488c530cb7"
+    && c17Pewter.id_hash == "thimble:b3e012bf11f07722ae08497f67b480cfe6a8a3a4015c801d2600dd5e177f0ed8"
     &&
       c17Pewter._identityKeys == [
         "name"
