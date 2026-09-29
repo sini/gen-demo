@@ -4,8 +4,9 @@
 # into ONE carrying the union of both contexts. Neither input alone carries it, so a union that
 # keeps the walk-first element as it stood (prelude `unique`) reds here.
 #
-# C100 -- a set union keeps every dependency edge: its one element carries the
-# union of its collapsed twins' string contexts.
+# C100 -- a set union keeps a string's twins' edges: its one element carries the
+# union of its collapsed twins' string contexts. A non-string union collapse drops
+# a twin's edges silently, a stated boundary (gen-view README).
 
 {
   asserts,

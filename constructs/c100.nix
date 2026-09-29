@@ -1,4 +1,4 @@
-# C100 -- a set union keeps every dependency edge. `combines.setUnion` collapses its elements
+# C100 -- a set union keeps a string's twins' edges. `combines.setUnion` collapses its elements
 # under `==`, which ignores string context, so its union of `[ drvOnly ]` and `[ drvAll ]` (one
 # `.drv` path, two contexts) is one element. That element carries the UNION of both contexts
 # (den-hoag-kunjm F2, the quotient rule), as Nix's own concatenation would; prelude `unique` kept
