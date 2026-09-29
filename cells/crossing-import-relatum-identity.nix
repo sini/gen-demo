@@ -41,10 +41,10 @@ let
     proposals = { };
     origins = { };
   };
-  projection = (x.registerSupply supply).value.projection;
+  registration = (ops.registerSupply supply).value;
   crossed =
     decl:
-    (ops.link jacquard projection supply
+    (ops.link jacquard registration
       (ops.declare {
         imports.bobbin = decl;
         exports = { };
