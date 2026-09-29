@@ -3,8 +3,10 @@
 # sealed marker. Two `selvage` kinds differing only in a refinement PREDICATE (a caller lambda,
 # sealed) mint one mark, and `kindEq` refuses the pair BY NAME rather than calling them one kind;
 # two differing only in a MINTED field type (`int` against `str`) mint apart and `kindEq` decides
-# them. Two differing only in a default are ONE kind (den-hoag-pa887 arm A: an option enters the
-# mark by its `type` alone, a collision pinned until arm C), while two whose default, written in a
+# them. Two differing only in a default are refused BY NAME at the default's `open.*` path (an
+# option's other attributes enter the mark by path as sealed components, never forced:
+# den-hoag-egei0), as are two separate constructions of one such declaration, while one
+# such kind value is one kind with itself; two whose default, written in a
 # function module pulled in through `require`, reads an instance's `name` are refused BY NAME at
 # `modules`. A predicate built from a REGISTERED constructor (`between`, over the hub's mint) is a term,
 # not a lambda: its field mints, so two `selvage` kinds differing only in its bounds mint apart and
@@ -96,10 +98,27 @@ in
     && endsWide.__mint.minted != endsLow.__mint.minted
     && decides (schema.kindEq endsWide endsLow)
     && !(schema.kindEq endsWide endsLow)
-    # an option enters by its `type` alone: a default of 80 against 443 is one kind (pa887 arm A)
-    && (schema.kindEq (selvage { options.ends = field' 80; }) (selvage {
-      options.ends = field' 443;
-    }))
+    # a default is open content, sealed at its path: 80 against 443 is refused, never one kind
+    && !(decides (
+      schema.kindEq (selvage { options.ends = field' 80; }) (selvage {
+        options.ends = field' 443;
+      })
+    ))
+    # two separate constructions of that one declaration are refused too: the default's subject
+    # is equal only to itself, and the only remedy is a sealed-literal constructor that puts an
+    # inert literal into the mark
+    && !(decides (
+      schema.kindEq (selvage { options.ends = field' 80; }) (selvage {
+        options.ends = field' 80;
+      })
+    ))
+    # and one such kind value is one kind with itself
+    && (
+      let
+        k = selvage { options.ends = field' 80; };
+      in
+      schema.kindEq k k
+    )
     # a function module under `require` is the sealed `modules` component: refused, never one kind
     && !(decides (schema.kindEq (warp "x") (warp "y")))
     # controls: a kind is one kind with itself, and a minted twin across evaluations is one kind

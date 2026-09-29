@@ -39,7 +39,7 @@ in (genMerge.evalModuleTree {
 }).config.thimbles.t1.id_hash'
 check "T5 row29 unplanted (an ORDINARY collection name, and the instance's stamp is the assertion)" \
   "${row29/COLLECTIONNAME/spools}" 0 "" \
-  "$tmpdir/row29-green.err" 'thimble:dc25275c3365e12c48cf9c10e7adfd02a2229105141f4a966239ca34dc6737b2'
+  "$tmpdir/row29-green.err" 'thimble:0282f90c805bfd070c8e5184768857db42d5ee7e265ac29e3f47c4619d043a63'
 check "T5 row29 planted   (the same declaration, the collection renamed to a key gen-schema writes)" \
   "${row29/COLLECTIONNAME/options}" 1 \
   "gen-schema: collection 'options' is reserved — cannot be used as a collection key" \
