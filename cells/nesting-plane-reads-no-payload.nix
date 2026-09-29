@@ -5,7 +5,9 @@
 # gen's own `listOf`, where it was refused as "a container outside … listOf …". The same container
 # with its `nestedTypes` stripped offers the element in its payload alone and is refused by name
 # (OQ1 arm (ii-a)), and one whose payload element differs from the one it states is refused by name
-# (OQ2 arm (b)); both defaulted, reversible.
+# (OQ2 arm (b)); both defaulted, reversible. `tryEval` cannot read which throw it caught, so this cell
+# holds that each is CAUGHT and T5 row 119 (`ci/refusals/row119.sh`) holds each refusal's NAME, with
+# the door and the option.
 {
   asserts,
   genMerge,
@@ -50,9 +52,9 @@ in
     # control: the stock container, untouched, threads the same way
     && read (t.listOf bobbin) wound == wound
     && threads (t.listOf bobbin)
-    # the payload alone states nothing it carries: refused by name, catchably
+    # the payload alone states nothing it carries: refused catchably (named in T5 row 119)
     && read (t.listOf bobbin // { nestedTypes = { }; }) wound == "refused"
-    # the two statements disagree: refused by name, catchably
+    # the two statements disagree: refused catchably (named in T5 row 119)
     && read (t.listOf t.str // { nestedTypes.elemType = bobbin; }) [ "a" ] == "refused"
     # control: a stock container over no nesting element keeps its own fold
     && read (t.listOf t.str) [ "a" ] == [ "a" ]
