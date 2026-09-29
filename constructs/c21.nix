@@ -1,23 +1,20 @@
-# ── C21 — THE SCHEMA-INHERITANCE RELOCATION PRESERVES THE CORPUS KIND'S IDENTITY CONTENT ──
-# (ADR-0016 ruling 7, ADR-0033). §2.6 of the relocation moved every kind declaration off the
-# live `config.schema.<k>` crossing and onto gen-schema's staged `evalSchema` pass, where a
-# parent travels as a NAME instead of being read out of the tree being declared.
-#
-# WHAT IS PRESERVED IS THE CONTENT, NOT THE STAMP. The retired and the relocated spelling are two
-# DECLARATIONS — `kindEq` has called them distinct since before the stamp carried the kind — and an
-# instance stamp carries its kind's minted identity (ADR-0034: nothing mints or keys by a name). So
-# the stamps FOLLOW `kindEq`, and the relocation's invariant is that the relocated instance,
-# recomputed under the retired kind, is the retired instance, over one closed key set. The
-# proposition "the two spellings mint ONE `id_hash`" held only while the stamp's kind input was the
-# name, and it is retired.
+# ── C21 — THE SCHEMA-INHERITANCE RELOCATION, AND ITS RETIRED SPELLING REFUSED ──
+# (ADR-0016 ruling 7, ADR-0033, ADR-0025 item 1). §2.6 of the relocation moved every kind
+# declaration off the live `config.schema.<k>` crossing and onto gen-schema's staged `evalSchema`
+# pass, where a parent travels as a NAME instead of being read out of the tree being declared.
+# gen-schema now REFUSES the retired spelling by name (den-hoag-cxlc0): a kind value in a kind
+# entry's `imports` is a value test's to see.
 #
 # THREE ARMS, ONE COMPOSITION ATTRIBUTE APART, over the corpus's real instrument: gen-aspects'
 # own `schemaOption`, `mkInstanceRegistry`, and C17's `extraModules` inlet.
-#   head       — the RETIRED idiom, `imports = [ config.schema.hank ]`. It is APPARATUS, not a
-#                survival of the migrated class: the reference value has to be built the old
-#                way or there is nothing for the new way to be compared against.
+#   head       — the RETIRED idiom, `imports = [ config.schema.hank ]`: the PLANT. It is refused,
+#                catchably and by name (`refusals` row 120); nothing composes it any more.
 #   relocated  — `inherits = [ "hank" ]`, resolved by the staged pass.
 #   no-inherit — the same staged tree with the parent dropped: the PERTURBATION.
+#
+# The head arm is not rebuilt through the hand-applied functor, which still composes: that form is
+# a member of the refusal's declared exception, and making it the corpus's reference value would
+# let closing the exception silently change a pinned relation.
 #
 # `hank` carries ONE primitive option, so it enters the identity key set (`name`/`selvage`/
 # `spool` against `name`/`spool`): dropping the inheritance moves the KEY SET, which is where the
@@ -25,8 +22,8 @@
 # no-inherit arm's content and key set are the corpus's own thimble's (`c17Thimble`/`c17Pewter`),
 # which is what shows this instrument is the corpus's and not a lookalike built beside it.
 #
-# Exported as INSTANCES and KINDS, not only stamps, because every conjunct above is a relation over
-# the kind, the key set and the recompute. Asserted RELATIONALLY and never as a literal digest.
+# Exported as INSTANCES and KINDS, not only stamps, because the conjuncts are relations over the
+# kind, the key set and the recompute. Asserted RELATIONALLY and never as a literal digest.
 {
   genAspects,
   genMerge,
@@ -103,7 +100,6 @@ let
   c21HeadKind = c21HeadSchema.thimble;
   c21RelocatedKind = (c21RelocatedSchema { inherits = [ "hank" ]; }).thimble;
   c21NoInheritKind = (c21RelocatedSchema { }).thimble;
-  c21HeadInstance = c21Instance c21HeadKind;
   c21RelocatedInstance = c21Instance c21RelocatedKind;
   c21NoInheritInstance = c21Instance c21NoInheritKind;
 in
@@ -119,7 +115,6 @@ in
     c21HeadKind
     c21RelocatedKind
     c21NoInheritKind
-    c21HeadInstance
     c21RelocatedInstance
     c21NoInheritInstance
     ;
