@@ -1,19 +1,20 @@
-# ── C21 — THE SCHEMA-INHERITANCE RELOCATION, AND ITS RETIRED SPELLING REFUSED ──
+# ── C21 — THE SCHEMA-INHERITANCE RELOCATION, AND ITS DEPRECATED SPELLING READ AS `inherits` ──
 # (ADR-0016 ruling 7, ADR-0033, ADR-0025 item 1). §2.6 of the relocation moved every kind
 # declaration off the live `config.schema.<k>` crossing and onto gen-schema's staged `evalSchema`
 # pass, where a parent travels as a NAME instead of being read out of the tree being declared.
-# gen-schema now REFUSES the retired spelling by name (den-hoag-cxlc0): a kind value in a kind
-# entry's `imports` is a value test's to see.
+# gen-schema reads the deprecated spelling as `inherits`, with a warning (den-hoag-cxlc0, the alias
+# ruling): a kind value in a kind entry's `imports` is a value test's to see, and its name is
+# recorded where a declared parent's would be.
 #
 # THREE ARMS, ONE COMPOSITION ATTRIBUTE APART, over the corpus's real instrument: gen-aspects'
 # own `schemaOption`, `mkInstanceRegistry`, and C17's `extraModules` inlet.
-#   head       — the RETIRED idiom, `imports = [ config.schema.hank ]`: the PLANT. It is refused,
-#                catchably and by name (`refusals` row 120); nothing composes it any more.
+#   head       — the DEPRECATED idiom, `imports = [ config.schema.hank ]`, read as
+#                `inherits = [ "hank" ]`: the same kind as `relocated`, and it warns.
 #   relocated  — `inherits = [ "hank" ]`, resolved by the staged pass.
 #   no-inherit — the same staged tree with the parent dropped: the PERTURBATION.
 #
-# The head arm is not rebuilt through the hand-applied functor, which still composes: that form is
-# a member of the refusal's declared exception, and making it the corpus's reference value would
+# The head arm is not rebuilt through the hand-applied functor, which composes unaliased: that form
+# is a member of the alias's declared exception, and making it the corpus's reference value would
 # let closing the exception silently change a pinned relation.
 #
 # `hank` carries ONE primitive option, so it enters the identity key set (`name`/`selvage`/
@@ -100,6 +101,7 @@ let
   c21HeadKind = c21HeadSchema.thimble;
   c21RelocatedKind = (c21RelocatedSchema { inherits = [ "hank" ]; }).thimble;
   c21NoInheritKind = (c21RelocatedSchema { }).thimble;
+  c21HeadInstance = c21Instance c21HeadKind;
   c21RelocatedInstance = c21Instance c21RelocatedKind;
   c21NoInheritInstance = c21Instance c21NoInheritKind;
 in
@@ -115,6 +117,7 @@ in
     c21HeadKind
     c21RelocatedKind
     c21NoInheritKind
+    c21HeadInstance
     c21RelocatedInstance
     c21NoInheritInstance
     ;
