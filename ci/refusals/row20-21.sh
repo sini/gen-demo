@@ -17,9 +17,10 @@ row20='let
   c = x.contractTerm;
   imp = { merge = "one"; contract = c.any; required = true; sealed = false; origin = "fixture"; satisfiedBy = null; };
   supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins = { }; };
-  proj = (x.registerSupply supply).value.projection;
+  reg = (x.registerSupply supply).value;
+  proj = reg.projection;
   f = x.declare { imports.host = imp; exports = { }; } { kind = "body"; };
-  l = x.link "igloo" proj supply f.value;
+  l = x.link "igloo" reg f.value;
   adapter = {
     bindFormals = vals: body: body // { bound = vals; };
     bindArgEnv = vals: { argEnv = vals; };
@@ -51,9 +52,10 @@ row21='let
   c = x.contractTerm;
   imp = { merge = "one"; contract = c.any; required = true; sealed = false; origin = "fixture"; satisfiedBy = null; };
   supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins = { }; };
-  proj = (x.registerSupply supply).value.projection;
+  reg = (x.registerSupply supply).value;
+  proj = reg.projection;
   f = x.declare { imports.host = imp; exports = { }; } { kind = "body"; };
-  l = x.link "igloo" proj supply f.value;
+  l = x.link "igloo" reg f.value;
   adapter = {
     bindFormals = vals: body: body // { bound = vals; };
     bindArgEnv = vals: { argEnv = vals; };

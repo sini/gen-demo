@@ -16,9 +16,9 @@ row71='let
   c = x.contractTerm;
   imp = { merge = "one"; contract = c.any; required = true; sealed = false; origin = "fixture"; satisfiedBy = null; };
   supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins = { }; };
-  proj = (x.registerSupply supply).value.projection;
+  reg = (x.registerSupply supply).value;
   f = x.declare { imports.host = imp; exports = { }; } { kind = "body"; };
-  l = x.link TARGET proj supply f.value;
+  l = x.link TARGET reg f.value;
 in if x.isRefusal l then throw "gen-bind:${l.refusal.code}:${l.refusal.witness.label or "NO-LABEL"}" else builtins.seq (builtins.deepSeq l.value.crossings null) "ok"'
 row71str='"igloo"'
 row71rec='{ identity = "thimble:x"; }'
