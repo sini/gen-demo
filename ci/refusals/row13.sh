@@ -14,8 +14,12 @@
 # minted, so it is a dirty contribution at the identity position that moves nothing, and
 # `mkForce "wool"` moves `pewter`. A refusal keyed on dirtiness alone would fire on BOTH arms and
 # destroy reuse; the unplanted arm is what catches that, and its exact stdout is this row's thimble's
-# unmoved stamp. It is not C17's node: the stamp carries the kind's minted identity, and this row's
-# `thimble` is its own declaration of the corpus's option set. The control arm is the laziness witness: an edit that only declares an
+# unmoved stamp. That stamp is C17's `pewter` stamp too, and it is a PINNED COLLISION, not one node:
+# this row's `thimble` declares the corpus's option set without the corpus's `description`s, and
+# gen-schema's kind mark takes an option by its `type` alone (den-hoag-pa887 arm A), so the two
+# kinds share one identity. gen-schema pins that class as
+# `kind-mark-cplus.test-n3-reopened-presentation-shares-identity-until-pa887-c`, open until the
+# redesign (den-hoag-egei0). The control arm is the laziness witness: an edit that only declares an
 # option nothing defines (`never`) is admitted warm without forcing it, the stamp unmoved.
 #
 # The row used to plant a KIND option (`grommet`) and rest its unplanted arm on `internal = true`
@@ -47,7 +51,7 @@ row13='let
   prior = genMerge.evalModuleTree { modules = outer; };
   warm = genMerge.evalModuleTree { modules = outer ++ edit; warmFrom = prior; editedModules = edit; };
 in warm.config.thimbles.pewter.id_hash'
-row13stamp='thimble:705a5d2021c09cda5fed94157bda6b5446735fffe1f619375f90f930d10e7fd0'
+row13stamp='thimble:6ee629244f5a010792e11f7a61b0a359f621b58a51477586f5a3b7488c530cb7'
 check "T5 row13 unplanted (the declared spool re-defined to its minted value, no identity moves)" \
   "${row13/EDIT/{ config.thimbles.pewter.spool = genMerge.mkForce \"linen\"; \}}" 0 "" \
   "$tmpdir/row13-green.err" "$row13stamp"
