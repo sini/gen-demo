@@ -4,7 +4,10 @@
 # lists are payload, not identity, so gen-aspects concatenates them as nixpkgs concatenates a
 # submodule's `modules`: `stitch` reads all three in either declaration order. Alone, the second
 # declaration's aspect has no `baize`, so the union is what supplies it. A declaration differing
-# at an inert key (`closedKeys`) is still refused, catchably.
+# at an inert key (`closedKeys`) is still refused, catchably. The differing declaration flips
+# whatever `aspect-cnf.nix` states, so it differs under both states of the corpus's own cnf; the
+# `or false` restates gen-aspects' default for `closedKeys` at this consumer. If that default ever
+# flips to `true` and the corpus drops its own `closedKeys = true`, this cell reds, loudly.
 {
   asserts,
   genAspects,
@@ -59,7 +62,7 @@ in
     && !(builtins.tryEval (
       builtins.deepSeq (read (stitch [
         first
-        (second // { closedKeys = true; })
+        (second // { closedKeys = !(cnf.closedKeys or false); })
       ])) null
     )).success
   );

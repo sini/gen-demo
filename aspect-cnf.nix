@@ -15,8 +15,25 @@
 #              representable absence of a declared-but-unset class. `null` never carries content, so
 #              it never realizes either, for a different reason than `welt`'s: `welt`'s category says
 #              "never a class"; `gusset`'s category says "a class", but its content says "nothing here".
+#
+# The body vocabulary is CLOSED (C111). Under gen-aspects' open default an undeclared body key
+# becomes a nested aspect, so a misspelt `nixos` emptied `nixosConfigurations` at exit 0. With
+# `closedKeys`, a key at an aspect body's first level that is neither declared above nor listed in
+# `freeformKeys` is refused by name, with its aspect. The list is exactly the corpus's intended
+# undeclared body keys: `binding` and `trim` are the two freeform witnesses of
+# `multidef-witness.nix`, kept undeclared so they keep exercising the freeform merge, and `placket`
+# and `facing` are C16's nested aspects under `hemline`. A listed key opens an UNGATED subtree, so
+# the closure holds at the first level only: a typo below `placket` still nests silently
+# (`aspect-body-key-below-listed` pins that).
 {
   keySemantics.nixos.category = "class";
+  closedKeys = true;
+  freeformKeys = [
+    "binding"
+    "trim"
+    "placket"
+    "facing"
+  ];
   keySemantics.welt.category = "channel";
   keySemantics.gusset.category = "class";
 }
