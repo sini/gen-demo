@@ -7,8 +7,14 @@
 # rather than serving an `included = true` the final graph falsifies. The fact `furl:damask` is
 # negation-free and is served at pass 1: the withholding is per atom, never per pass.
 #
-# Pass 2 is handed pass 1's result record as `prior`, so its carry is DERIVED (pass 1's `undefined`
-# atoms only), and a pass 2 that resubmits only its own new declaration is refused by name.
+# Pass 2 is handed pass 1's result record as `prior`, which only guards the cumulation: no verdict
+# of pass 1 crosses, and a pass 2 that resubmits only its own new declaration is refused by name.
+#
+# The tuck pair is where a carried verdict would show. Pass 1 declares the negation cycle
+# `tuck:damask :- not pleat:damask`, `pleat:damask :- not tuck:damask`, at `complete = false`, so
+# `tuck:damask` is `U`; pass 2 resubmits both and adds the fact `pleat:damask`, at
+# `complete = true`. Solved from scratch, the fact breaks the cycle and `tuck:damask` is `T`, out;
+# a pass that carried pass 1's `U` into its interpretation would still answer `U`.
 { genProgram }:
 let
   shirrHead = "shirr:damask:faille";
@@ -43,11 +49,34 @@ let
       inherit prior complete;
     };
   shirrPass1 = passOver [ furl shirr ] null false;
-  # Pass 2 takes pass 1's RECORD: the carry is derived from it, and every pass-1 declaration must
-  # be resubmitted.
+  # Pass 2 takes pass 1's RECORD, and every pass-1 declaration must be resubmitted.
   shirrFinal = passOver [ furl shirr smocked ] shirrPass1 true;
   # The same pass submitting only what it adds is refused by name: it drops pass 1's declarations.
   shirrDeltaOnly = passOver [ smocked ] shirrPass1 true;
+
+  tuckHead = "tuck:damask";
+  tuckCycle = [
+    {
+      head = tuckHead;
+      neg = [ "pleat:damask" ];
+      relata = [ "damask" ];
+    }
+    {
+      head = "pleat:damask";
+      neg = [ tuckHead ];
+      relata = [ "damask" ];
+    }
+  ];
+  tuckPass1 = passOver tuckCycle null false;
+  tuckFinal = passOver (
+    tuckCycle
+    ++ [
+      {
+        head = "pleat:damask";
+        relata = [ "damask" ];
+      }
+    ]
+  ) tuckPass1 true;
 in
 {
   inherit
@@ -55,5 +84,8 @@ in
     shirrPass1
     shirrFinal
     shirrDeltaOnly
+    tuckHead
+    tuckPass1
+    tuckFinal
     ;
 }

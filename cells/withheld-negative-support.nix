@@ -4,12 +4,17 @@
 # `smocked:damask` and answers it `T`, out; a pass 2 that drops pass 1's declarations is refused.
 # The control is the negation-free `furl:damask` on the same pass-1 record, served `P`, in. Reds on
 # a gen-program that serves a derived atom `included = true` under `P` regardless of its support.
+# The tuck cycle is `U` at pass 1, and pass 2's fact `pleat:damask` settles it: `tuck:damask` is
+# `T`, out. Reds on a gen-program that carries a prior pass's `undefined` atoms across the boundary.
 {
   asserts,
   shirrHead,
   shirrPass1,
   shirrFinal,
   shirrDeltaOnly,
+  tuckHead,
+  tuckPass1,
+  tuckFinal,
 }:
 let
   withheld = shirrPass1.resolve shirrHead;
@@ -30,6 +35,12 @@ in
       shirrPass1.resolve "furl:damask" == {
         flag = "P";
         included = true;
+      }
+    && (tuckPass1.resolve tuckHead).flag == "U"
+    &&
+      tuckFinal.resolve tuckHead == {
+        flag = "T";
+        included = false;
       }
   );
 }
