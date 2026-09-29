@@ -40,6 +40,7 @@ let
     ];
   };
   mdl = genProgram.model {
+    prior = null;
     program = prog;
     interpretation = [ ];
     complete = true;

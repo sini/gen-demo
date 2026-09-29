@@ -6,6 +6,7 @@ row4='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genProgram = gen.lib.framework.program;
   mkModel = negSelf: genProgram.model {
+    prior = null;
     program = genProgram.program {
       frozen = [ "pewter" ];
       declarations = [ { head = "nap:pewter"; neg = if negSelf then [ "nap:pewter" ] else [ ]; relata = [ "pewter" ]; } ];
