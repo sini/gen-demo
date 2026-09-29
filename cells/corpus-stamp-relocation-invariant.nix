@@ -1,36 +1,24 @@
-# `corpus-stamp-relocation-invariant` — C21, den-hoag-ppv0z. The EQUALITY half. A `thimble` composed
-# the RETIRED way (`imports = [ config.schema.hank ]`, read live off the tree being declared) and
-# the RELOCATED way (`inherits = [ "hank" ]`, resolved by gen-schema's staged `evalSchema` pass)
-# carry the same identity CONTENT, over the corpus's real instrument — gen-aspects' own
-# `schemaOption`, `mkInstanceRegistry`, and C17's `extraModules` inlet. The two spellings are two
-# declarations (`kindEq` says so), and an instance stamp carries its kind's minted identity, so the
-# stamps themselves FOLLOW `kindEq` rather than agreeing. Relational, never a literal digest. The
-# retired arm is APPARATUS, not a survival of the migrated class — the reference value has to be
-# built the old way or there is nothing for the new way to be compared against.
+# `corpus-stamp-relocation-invariant` — C21, den-hoag-ppv0z, den-hoag-cxlc0. A `thimble` composed
+# the RETIRED way (`imports = [ config.schema.hank ]`, read live off the tree being declared) is
+# REFUSED, catchably; the same `thimble` composed the RELOCATED way (`inherits = [ "hank" ]`,
+# resolved by gen-schema's staged `evalSchema` pass) carries `hank`'s identity-bearing `selvage`,
+# over the corpus's real instrument — gen-aspects' own `schemaOption`, `mkInstanceRegistry`, and
+# C17's `extraModules` inlet; and the no-inherit arm does not, so the composition conjunct is not
+# vacuous. The refusal's message is `refusals` row 119's.
 #
-# C21 — the EQUALITY cell: the relocated instance, recomputed under the retired kind, IS the retired
-# instance, over one closed key set; and the stamps decide exactly as `kindEq` does. The recompute
-# is not a tautology: it reads the relocated instance's values at the RETIRED kind's key set, and
-# the key-set conjunct closes the extra-key direction.
-# DRIVEN RED: seeding gen-schema's `evalSchema` so `parentsOf` returns `[ ]` (the `inherits`
-# built-in dropped) reds the content and key-set conjuncts and leaves the discriminator green. The
-# law conjunct is red at a stamp keyed by the kind NAME (the two spellings then mint one identity
-# while `kindEq` says two).
+# DRIVEN RED: gen-schema before den-hoag-cxlc0 composes the retired arm, which reds the first
+# conjunct; seeding `evalSchema` so `parentsOf` returns `[ ]` reds the second.
 {
   asserts,
-  c21Schema,
   c21HeadKind,
-  c21RelocatedKind,
-  c21HeadInstance,
   c21RelocatedInstance,
+  c21NoInheritInstance,
 }:
 {
   construct = [ "C21" ];
   check = asserts (
-    c21Schema.identityHashForKind c21HeadKind c21RelocatedInstance == c21HeadInstance.id_hash
-    && c21RelocatedInstance._identityKeys == c21HeadInstance._identityKeys
-    &&
-      (c21HeadInstance.id_hash == c21RelocatedInstance.id_hash)
-      == c21Schema.kindEq c21HeadKind c21RelocatedKind
+    !(builtins.tryEval c21HeadKind.kind).success
+    && builtins.elem "selvage" c21RelocatedInstance._identityKeys
+    && !(builtins.elem "selvage" c21NoInheritInstance._identityKeys)
   );
 }
