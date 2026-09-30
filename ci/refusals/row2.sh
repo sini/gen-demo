@@ -14,5 +14,5 @@ in builtins.toJSON (mkProg FROZEN).atoms'
 check "T5 row2 unplanted (faille frozen)" "${row2/FROZEN/[ \"pewter\" \"damask\" \"grosgrain\" \"faille\" ]}" 0 "" \
   "$tmpdir/row2-green.err" '["nap:pewter","piping:grosgrain:faille","scotched:pewter"]'
 check "T5 row2 planted   (faille not frozen)" "${row2/FROZEN/[ \"pewter\" \"damask\" \"grosgrain\" ]}" 1 \
-  "gen-program: 'faille' is not in the frozen set of relata that strictly earlier passes settled (ADR-0016 ruling 7)" \
+  "gen-program: 'faille' is not in the frozen set of relata that strictly earlier passes settled, so it does not resolve" \
   "$tmpdir/row2-red.err"

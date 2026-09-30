@@ -18,5 +18,5 @@ in builtins.toJSON ((mkModel SELFNEG).resolve "nap:pewter").included'
 check "T5 row4 unplanted (nap:pewter an ordinary fact)" "${row4/SELFNEG/false}" 0 "" \
   "$tmpdir/row4-green.err" "true"
 check "T5 row4 planted   (nap:pewter self-negates, UNDEFINED)" "${row4/SELFNEG/true}" 1 \
-  "gen-program: the membership 'nap:pewter' is UNDEFINED — ADR-0020's third value" \
+  "gen-program: the membership 'nap:pewter' is UNDEFINED — the well-founded model's third truth value" \
   "$tmpdir/row4-red.err"
