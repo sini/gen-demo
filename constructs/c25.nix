@@ -39,7 +39,7 @@ let
         bobbin = c25Payload.bobbins;
       };
       relations = c25Relations;
-      program.rules = [ ];
+      declarations = [ ];
       model = {
         trueAtoms = [ ];
         verdict = _: "false";
