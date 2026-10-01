@@ -32,7 +32,7 @@ check "T5 row134 unplanted (one construction imported twice is one module)" \
   "${row134/BODY/green}" 0 "" "$tmpdir/row134-green.err" 'one'
 check "T5 row134 planted   (two constructions sharing a key are refused by name)" \
   "${row134/BODY/red}" 1 \
-  "gen-schema: kind 'a' is imported twice under one key, as two separate constructions of one declaration: they mint one identity, and a sealed component compares by its seal, never by its value, so two constructions differ there even where their values are equal. The component(s) whose seals differ: 'modules', 'open.options.o_a.default'." \
+  "gen-schema: kind 'a' is imported twice under one key, as two separate constructions of one declaration: they mint one identity, and a sealed component is compared by its seal, the whole value under Nix \`==\`, where two separately built functions are never equal, so two constructions differ there even where the values they compute are equal. The component(s) whose seals differ: 'modules', 'open.options.o_a.default'." \
   "$tmpdir/row134-red.err"
 check "T5 row134 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row134/BODY/caught}" 0 "" "$tmpdir/row134-catch.err" 'CAUGHT'
