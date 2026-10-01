@@ -9,7 +9,8 @@
 # edges (den-hoag-zxgan: the by-value first position and the bare-string fourth resolve to the SAME
 # node, `hemline/placket`, and the algebraic graph layer keeps a duplicate rather than deduping it —
 # `gen-scope/lib/graph.nix`'s own documented tolerance), one inline body, one foreign reference —
-# over seven vertices and two `declares` edges, with the totality control that a node declaring no
+# over nine vertices and three `declares` edges (C113's `interfacing` includes `selvage`), with the
+# totality control that a node declaring no
 # foreign reference is PRESENT with an empty list rather than absent. The declaration was
 # UNDECLARABLE before gen-aspects `3b6d41d`: the reference entered
 # `includesOf`, became a `declares` edge to a non-member, and `genAssemble`'s
@@ -30,13 +31,15 @@
 # therefore red against the previous gen-aspects for two independent reasons: the
 # relation it reads did not exist, and the corpus it reads did not evaluate.
 #
-# ★★ CARDINALITY IS STATED BECAUSE THE POPULATION IS TINY. `bartack.includes` is the
-# only `includes` list in the whole corpus and it holds FOUR positions — two checked
-# edges to the same target, one inline body, one foreign reference. Clause 3 below is a universal
-# over a population of TWO edges across SEVEN vertices, and a run that did not say so would
-# be reporting a vacuous truth. Every figure here was read off this corpus, not
-# copied — the seventh vertex is `stitch/trim`, the guard leaf den-hoag-sezf's
-# witness 2 declares, and the totality control below covers it like any other node.
+# ★★ CARDINALITY IS STATED BECAUSE THE POPULATION IS TINY. The corpus carries two
+# `includes` lists. `bartack.includes` holds FOUR positions — two checked edges to the
+# same target, one inline body, one foreign reference. C113's `interfacing.includes` holds
+# TWO — one checked edge to `selvage`, and the inline content gen-aspects makes of
+# `interfacing`'s second, function definition (`gen-modules/interfacing.nix`). Clause 3
+# below is a universal over a population of THREE edges across NINE vertices, and a run
+# that did not say so would be reporting a vacuous truth. Every figure here was read off
+# this corpus, not copied — `stitch/trim` is the guard leaf den-hoag-sezf's witness 2
+# declares, and the totality control below covers it like any other node.
 {
   asserts,
   c16AspectGraph,
@@ -80,11 +83,11 @@
     && builtins.all (
       e: builtins.elem e.from c16AspectGraph.vertices && builtins.elem e.to c16AspectGraph.vertices
     ) (builtins.head c16AspectGraph.edgeGraphs).graph.edges
-    # CARDINALITY, all four figures from this corpus's own evaluation. The four
+    # CARDINALITY, all four figures from this corpus's own evaluation. `bartack`'s four
     # declared positions are accounted for EXACTLY ONCE across the three relations, so
     # neither clause above can pass by a position having been dropped.
-    && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 2
-    && builtins.length c16AspectGraph.vertices == 7
+    && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 3
+    && builtins.length c16AspectGraph.vertices == 9
     && builtins.length (builtins.concatLists (builtins.attrValues c16Facts.foreignIncludesOf)) == 1
     && builtins.length genValues.aspects.bartack.includes == 4
     &&

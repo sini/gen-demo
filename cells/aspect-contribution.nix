@@ -44,6 +44,8 @@
       "hemline/facing"
       "hemline/placket"
       "hemline/placket/eyelet"
+      "interfacing"
+      "selvage"
       "stitch"
       "stitch/trim"
     ]
@@ -54,6 +56,8 @@
         "hemline/facing"
         "hemline/placket"
         "hemline/placket/eyelet"
+        "interfacing"
+        "selvage"
         "stitch"
         "stitch/trim"
         "damask"
@@ -178,6 +182,7 @@
         "faille"
         "grosgrain"
         "hemline"
+        "interfacing"
         "pewter"
       ]
     &&
@@ -189,6 +194,7 @@
         "grosgrain"
         "hemline/facing"
         "hemline/placket/eyelet"
+        "selvage"
         "stitch/trim"
       ]
     && genGraph.cycles (genGraph.forgetLabels c16Lg) == [ ]

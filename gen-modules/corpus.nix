@@ -286,5 +286,12 @@ in
       (genAspects.keyRef "mill/stitch") # a FOREIGN REFERENCE — published as a ref, never an edge
       "hemline/placket" # a BARE STRING — the same by-key edge as the first, den-hoag-zxgan
     ];
+
+    # ── C113 — A NODE RECEIVES WHAT ITS ASPECTS INCLUDE (den-hoag-5q36i) ──
+    # `interfacing` carries no `nixos` here; it includes `selvage`, which does. Its second definition
+    # is `interfacing.nix`, a `{ config, ... }:` function in its own file: the split shape, whose
+    # function part delivers too. No host lists either aspect; C113's own projection reads them.
+    aspects.selvage.nixos.environment.etc."gen-demo/selvage".text = "selvage";
+    aspects.interfacing.includes = [ "selvage" ];
   };
 }
