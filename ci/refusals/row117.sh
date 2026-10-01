@@ -47,11 +47,11 @@ check "T5 row117 unplanted (a coordinate matches its own cell of the space)" \
   "${row117/BODY/builtins.toJSON matchOwn}" 0 "" "$tmpdir/row117-own.err" 'true'
 check "T5 row117 planted   (two coordinates of kinds differing only at a sealed field, refused by name)" \
   "${row117/BODY/builtins.toJSON planted}" 1 \
-  "gen-select: selectorEq (adapters.product.coord): two declarations of 'selvage' mint one identity and differ, compared as values, only at sealed component(s) 'options.ends.type'" \
+  "gen-select: selectorEq (adapters.product.coord): two declarations of 'selvage' mint one identity and are unequal only at sealed component(s) 'options.ends.type'" \
   "$tmpdir/row117-red.err"
 check "T5 row117 planted   (the coordinate matched on the other kind's cell, refused by name)" \
   "${row117/BODY/builtins.toJSON matchPlanted}" 1 \
-  "gen-select: adapters.product.coord: two declarations of 'selvage' mint one identity and differ, compared as values, only at sealed component(s) 'options.ends.type'" \
+  "gen-select: adapters.product.coord: two declarations of 'selvage' mint one identity and are unequal only at sealed component(s) 'options.ends.type'" \
   "$tmpdir/row117-match-red.err"
 check "T5 row117 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row117/BODY/if (builtins.tryEval planted).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \

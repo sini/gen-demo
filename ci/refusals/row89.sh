@@ -33,7 +33,7 @@ check "T5 row89 unplanted (an entity compared with itself is one entity)" \
   "${row89/BODY/builtins.toJSON unplanted}" 0 "" "$tmpdir/row89-green.err" 'true'
 check "T5 row89 planted   (two entities of kinds differing only at a sealed field, refused by name)" \
   "${row89/BODY/builtins.toJSON planted}" 1 \
-  "gen-select: selectorEq: two declarations of 'selvage' mint one identity and differ, compared as values, only at sealed component(s) 'options.ends.type'" \
+  "gen-select: selectorEq: two declarations of 'selvage' mint one identity and are unequal only at sealed component(s) 'options.ends.type'" \
   "$tmpdir/row89-red.err"
 check "T5 row89 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row89/BODY/if (builtins.tryEval planted).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \

@@ -19,7 +19,7 @@ check "T5 row82 unplanted (a kind compared with itself is one kind)" \
   "$tmpdir/row82-green.err" 'true'
 check "T5 row82 planted   (two kinds differing only at a sealed field, refused by name)" \
   "${row82/BODY/builtins.toJSON (schema.kindEq ends (selvage schema.refinements.positive))}" 1 \
-  "gen-schema: kindEq: two declarations of 'selvage' mint one identity and differ, compared as values, only at sealed component(s) 'options.ends.type'" \
+  "gen-schema: kindEq: two declarations of 'selvage' mint one identity and are unequal only at sealed component(s) 'options.ends.type'" \
   "$tmpdir/row82-red.err"
 check "T5 row82 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row82/BODY/if (builtins.tryEval (schema.kindEq ends (selvage schema.refinements.positive))).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
