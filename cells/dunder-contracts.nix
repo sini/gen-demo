@@ -2,8 +2,9 @@
 # another carry exactly the `__` keys their owners state as R12 contracts (each owner's AGENTS.md):
 # gen-aspects' node data projected by gen-select's registry adapter carries gen-select's `__identity`;
 # gen-aspects' `keyRef` (read by gen-link) carries `__keyRef`; a gen-schema kind value (read by
-# gen-select) carries gen-algebra's `__mint` and gen-schema's `__sealed`, `__kindImports` and
-# `__kindWitness` (the inheritance-cycle walk's parents and witness) beside Nix's own `__functor`;
+# gen-select) carries gen-algebra's `__mint` and gen-schema's `__sealed`, `__kindImports`,
+# `__kindWitness` (the inheritance-cycle walk's parents and witness) and `__kindAncestors` (its
+# transitive ancestors, kind values keyed by mark) beside Nix's own `__functor`;
 # a gen-select selector (read by gen-dispatch) carries `__sel`. Red when any of them grows ANY new `__`
 # key, declared or not, or loses one. This is the corpus declaration of those crossings; whether each
 # key has its contract line is the census's to say, not this cell's.
@@ -34,6 +35,7 @@ in
     &&
       dunder kind == [
         "__functor"
+        "__kindAncestors"
         "__kindImports"
         "__kindWitness"
         "__mint"

@@ -35,14 +35,29 @@ let
         k: c: if builtins.isAttrs c && (c.key or null) == "${a.key}/${k}" then rhoAspect c else c
       ) a
     );
+  # A kind value publishes its transitive ancestors as kind values under `__kindAncestors`; each
+  # carries its own `keySemantics`, so ρ renames through the map as well.
+  rhoKind =
+    s:
+    if s ? keySemantics then
+      s
+      // {
+        keySemantics = renameKey from to s.keySemantics;
+      }
+      // (
+        if s ? __kindAncestors then
+          { __kindAncestors = builtins.mapAttrs (_: rhoKind) s.__kindAncestors; }
+        else
+          { }
+      )
+    else
+      s;
   rho =
     v:
     v
     // {
       aspects = builtins.mapAttrs (_: rhoAspect) v.aspects;
-      schema = builtins.mapAttrs (
-        _: s: if s ? keySemantics then s // { keySemantics = renameKey from to s.keySemantics; } else s
-      ) v.schema;
+      schema = builtins.mapAttrs (_: rhoKind) v.schema;
     };
 
   values = genValues // {
