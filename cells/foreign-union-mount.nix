@@ -3,7 +3,7 @@
 # `.type`). The tree's `check` answers its module-value domain, so the foreign eval folds the tree
 # and reads `sateen` through it and `selvedge` as the string, which are nixpkgs' values for the same
 # construction over its own `(evalModules …).type`. gen-merge used to refuse both with the tree's
-# tombstone `check`. The control is the bare `spool` mounted there, which is still refused,
+# tombstone `check`. The control is a definition outside the union's domain, which is refused,
 # catchably, so a mount that served everything cannot pass.
 {
   asserts,
@@ -38,7 +38,7 @@ in
   check = asserts (
     (mount union { spool = "sateen"; }).spool == "sateen"
     && mount union "selvedge" == "selvedge"
-    # control: the bare tree, mounted where nothing holds it, is not an option type
-    && refuses (mount spool { spool = "sateen"; })
+    # control: a definition neither the tree nor the string admits is refused
+    && refuses (mount union 5)
   );
 }
