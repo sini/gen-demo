@@ -27,6 +27,18 @@ let
       ]
     );
     picks = T.listOf (T.either T.int T.str);
+    # den-hoag-b47r5: a `oneOf` over four members, the second phrased as a clause, reads nixpkgs'
+    # left fold: the clause stays parenthesised as `either`'s first operand.
+    shuttle = T.oneOf [
+      T.int
+      (T.mkOptionType {
+        name = "dent";
+        description = "reed dent, counted from the left";
+        descriptionClass = "nonRestrictiveClause";
+      })
+      T.str
+      T.bool
+    ];
     weave = T.nullOr (
       T.enum' [
         "twill"
