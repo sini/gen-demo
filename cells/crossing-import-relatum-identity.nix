@@ -39,7 +39,8 @@ let
   supply = {
     inherit bindings;
     proposals = { };
-    origins = { };
+    origins.bobbin = "loom.nix";
+    valueIdentities.bobbin = mint "thread" [ "name" ] (_: "linen");
   };
   registration = (ops.registerSupply supply).value;
   crossed =

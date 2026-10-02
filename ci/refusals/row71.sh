@@ -15,7 +15,7 @@ row71='let
   x = x0 // (x0.mkOperations { hashIdentity = _testHashIdentity; }).value;
   c = x.contractTerm;
   imp = { merge = "one"; contract = c.any; required = true; sealed = false; origin = "fixture"; satisfiedBy = null; };
-  supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins = { }; };
+  supply = { bindings.host = x.binding.plain { value = 1; mark = x.mark.open; }; proposals = { }; origins.host = "fixture"; valueIdentities.host = _testHashIdentity "entity" [ "name" ] (_: "igloo-host"); };
   reg = (x.registerSupply supply).value;
   f = x.declare { imports.host = imp; exports = { }; } { kind = "body"; };
   l = x.link TARGET reg f.value;
