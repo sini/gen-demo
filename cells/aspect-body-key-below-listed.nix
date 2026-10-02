@@ -1,9 +1,10 @@
-# `aspect-body-key-below-listed` — C111's price, den-hoag-661s2. A key listed in `freeformKeys`
-# opens an UNGATED subtree (gen-aspects' published meaning of the list), so the closed vocabulary of
-# `aspect-cnf.nix` holds at an aspect body's first level only: a misspelt `nixos` one level below
-# the listed `placket` is served, as a nested aspect, with no refusal. This cell pins that as it
-# stands, so a gen-aspects change that gates the listed subtree reds here and is read as a change
-# rather than passing unseen. The same misspelling at the first level is refused (the control).
+# `aspect-body-key-below-listed` — C111's price, den-hoag-661s2, CLOSED by den-hoag-nwshf. A key
+# listed in `freeformKeys` opens an UNGATED subtree (gen-aspects' published meaning of the list), so
+# the closed vocabulary of `aspect-cnf.nix` holds at an aspect body's first level only. Below it,
+# gen-aspects' orphan-leaf refusal (on by default) answers instead: a misspelt `nixos` one level
+# below the listed `placket` carries a scalar that is neither class content nor an aspect, and is
+# refused catchably. The listed nested aspect itself still composes (`gore/placket`), and the same
+# misspelling at the first level is refused by the closed-key gate (the control).
 {
   asserts,
   genAspects,
@@ -25,8 +26,8 @@ in
 {
   construct = [ "C111" ];
   check = asserts (
-    (builtins.tryEval (builtins.deepSeq below.placket.nixso null)).success
-    && below.placket.nixso.key == "gore/placket/nixso"
+    !(builtins.tryEval (builtins.deepSeq below.placket.nixso null)).success
+    && below.placket.key == "gore/placket"
     && !(builtins.tryEval (builtins.deepSeq first.nixso null)).success
   );
 }
