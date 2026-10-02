@@ -57,9 +57,10 @@
     # `trim` (Arm B) — two GUARD-RECORD definitions at one freeform key, merged into
     # ONE carrier holding both fragments. Pre-fix this aborted uncatchably in
     # `flatten`/`walk`; the bodies are read in order so a carrier that dropped or
-    # duplicated a fragment reads red.
+    # duplicated a fragment reads red. Each fragment's body is the term its record was lifted to
+    # (den-hoag-lwbb1: a guard body is a term of gen-algebra's algebra), a string's being `lit`.
     &&
-      map (f: f.body) config.gen.composed.aspects.stitch.trim.fragments == [
+      map (f: f.body.value) config.gen.composed.aspects.stitch.trim.fragments == [
         "piping"
         "cording"
       ]
