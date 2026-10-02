@@ -10,8 +10,9 @@
 }:
 {
   construct = [ "C16" ];
+  # `or null`: a gen-aspects that does not publish the view reds this cell, not every check.
   check = asserts (
-    c16Facts.deadNested == [
+    (c16Facts.deadNested or null) == [
       "hemline/facing"
       "hemline/placket"
       "hemline/placket/eyelet"
