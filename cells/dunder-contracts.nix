@@ -4,8 +4,8 @@
 # gen-aspects' `keyRef` (read by gen-link) carries `__keyRef`; a gen-schema kind value (read by
 # gen-select) carries gen-algebra's `__mint` and gen-schema's `__sealed`, `__kindImports` (its parent
 # kind values), `__kindCycleParents` and `__kindWitness` (the inheritance-cycle walk's parents as
-# written and witness) and `__kindAncestors` (its transitive ancestors, kind values keyed by mark)
-# beside Nix's own `__functor`;
+# written and witness), `__kindAncestors` (its transitive ancestors, kind values keyed by mark) and
+# `__kindSelf` (its completion stamp, den-hoag-1a4f6) beside Nix's own `__functor`;
 # a gen-select selector (read by gen-dispatch) carries `__sel`. Red when any of them grows ANY new `__`
 # key, declared or not, or loses one. This is the corpus declaration of those crossings; whether each
 # key has its contract line is the census's to say, not this cell's.
@@ -39,6 +39,7 @@ in
         "__kindAncestors"
         "__kindCycleParents"
         "__kindImports"
+        "__kindSelf"
         "__kindWitness"
         "__mint"
         "__sealed"
