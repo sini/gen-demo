@@ -62,6 +62,8 @@
         genClass = inputs.gen.lib.aspects.class;
         genAssemble = inputs.gen.lib.framework.assemble;
         genMerge = inputs.gen.lib.modules.merge;
+        # gen-rules, the one closure door (C142), at the `framework` bucket like gen-program.
+        genRules = inputs.gen.lib.framework.rules;
       in
       {
         imports = [
@@ -153,6 +155,7 @@
                 genClass
                 genAssemble
                 genMerge
+                genRules
                 ;
             };
 
