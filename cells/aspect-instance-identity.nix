@@ -1,4 +1,4 @@
-# `aspect-instance-identity` — C135, den-hoag-0cmbt (U6). A parametric aspect applied at a scope is a
+# `aspect-instance-identity` — C136, den-hoag-0cmbt (U6). A parametric aspect applied at a scope is a
 # node of its own, the instance, identified by its declaration and the identities that supplied what it
 # receives (gen-aspects `instanceOf`), and `instancesFor` is the relation of those nodes: one vertex
 # per instance, edges from the scopes that reach it, and edges from a vertex to the instances its body
@@ -195,7 +195,7 @@ let
     && descs (at "warpC" "temper") == [ "temper-slack" ];
 in
 {
-  construct = [ "C135" ];
+  construct = [ "C136" ];
   # B-2's bindings first: a constructor that ignores the scope makes `suppliers` name one binding
   # twice, which aborts uncatchably, so the conjunct that reads them apart must fail before it.
   check = asserts (b2 && s1 && i1 && i2 && shapes && i4 && r3 && r7);
