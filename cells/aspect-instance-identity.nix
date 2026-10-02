@@ -2,28 +2,29 @@
 # node of its own, the instance, identified by its declaration and the identities that supplied what it
 # receives (gen-aspects `instanceOf`), and `instancesFor` is the relation of those nodes: one vertex
 # per instance, edges from the scopes that reach it, and edges from a vertex to the instances its body
-# reaches. The aspects are declared in the corpus's own grammar. Two entity kinds, `loom` (a scope's
+# reaches. The aspects are declared in the corpus's own grammar as first-order guards reading their
+# coordinates (den-hoag-lwbb1 stage 2b: a context closure crosses the gen-rules door). Two entity kinds, `loom` (a scope's
 # own) and `shuttle` (a descendant's), and one argument, `tension`, supplied by a gen-scope
 # `argumentBinding` (K1): introduced at `loft` and inherited by `warpA` and `warpB`, overridden at
 # `warpC`. Every context is derived from `suppliers`, written as one literal entry per supplier node.
 #
 # Each limb names the den-hoag-0cmbt spec §3a cell it carries:
-#   S1  `{ }:` at a wider context is handed `{ }` through `wrapFn`, the aspect type's merge,
-#       `applyGuard` and a functor; before the shape classifier each aborted uncatchably;
 #   I-1 `gauge` at two looms is two instances, and the relation's vertex id is `instanceOf`'s;
 #   I-2 `warpA` and `warpB` differ in `dye`, which `gauge` never receives, and reach one instance;
-#   I-4 `twill`, defined twice (`c:` and `{ tension }:`), is a guard carrier whose formals are the
-#       union, `loom` and `tension`;
+#   I-4 `twill`, defined twice (a guard reading `loom` and one reading `tension`), is a guard carrier
+#       whose formals are the union, `loom` and `tension`;
 #   R-3 `pick`, reached inside `gauge`'s body, is one nested instance, and `warpB`'s own `pick` edge
 #       is that same vertex;
 #   R-7 `heddle` fans out over a scope's shuttles, one instance each, and has no edge where there are
 #       none;
 #   B-2 the inherited binding is one id at both scopes that inherit it, and the override another, so
 #       `temper` is one instance across `warpA` and `warpB` and another at `warpC`.
-# `ctx:`, `{ ... }:` and `{ }:` are each reached from all three warps: the first two are keyed on the
-# loom (the entity kinds narrow them), and `{ }:` is one instance everywhere.
+# `closed` (`guard pred.always`) reads nothing and is one instance everywhere. The context shapes
+# `ctx:` and `{ ... }:`, and the shape classifier's S1 limb, retired with the context door: their
+# narrowing moved to the gen-rules door.
 {
   asserts,
+  genAlgebra,
   genAspects,
   genMerge,
   genScope,
@@ -31,12 +32,27 @@
 }:
 let
   cnf = import ../aspect-cnf.nix // {
-    entityKinds = [
-      "loom"
-      "shuttle"
-    ];
+    # the declared coordinates (design Q5): two entity kinds and two argument coordinates
+    entityKinds = {
+      loom = true;
+      shuttle = true;
+      tension = false;
+      dye = false;
+    };
   };
-  keys = c: builtins.concatStringsSep "," (builtins.attrNames c);
+  t = (genAlgebra.term inputs.gen.lib.substrate.identity.hashIdentity).term;
+  inherit (genAspects) guard pred;
+  reads =
+    coord: prefix: extra:
+    guard (pred.has coord) (
+      {
+        description = t.concat [
+          (t.lit prefix)
+          (t.readCtx coord [ ])
+        ];
+      }
+      // extra
+    );
   aspects =
     (genMerge.evalModuleTree {
       modules = [
@@ -44,30 +60,21 @@ let
         {
           aspects = {
             frame.includes = [
-              "bare"
-              "open"
               "closed"
               "gauge"
               "heddle"
               "twill"
               "temper"
             ];
-            bare = c: { description = "bare:${keys c}"; };
-            open = { ... }: { description = "open"; };
-            closed = { }: { description = "closed"; };
-            gauge =
-              { loom, ... }:
-              {
-                description = "gauge-${loom}";
-                includes = [ "pick" ];
-              };
-            pick = { loom, ... }: { description = "pick-${loom}"; };
-            heddle = { shuttle, ... }: { description = "heddle-${shuttle}"; };
-            temper = { tension, ... }: { description = "temper-${tension}"; };
+            closed = guard pred.always { description = "closed"; };
+            gauge = reads "loom" "gauge-" { includes = [ "pick" ]; };
+            pick = reads "loom" "pick-" { };
+            heddle = reads "shuttle" "heddle-" { };
+            temper = reads "tension" "temper-" { };
           };
         }
-        { aspects.twill = c: { description = "twill:${keys c}"; }; }
-        { aspects.twill = { tension }: { description = "twill-${tension}"; }; }
+        { aspects.twill = reads "loom" "twill:" { }; }
+        { aspects.twill = reads "tension" "twill-" { }; }
       ];
     }).config.aspects;
 
@@ -128,14 +135,6 @@ let
     loom = "jacquard";
     dye = "madder";
   };
-  closedEmpty = { }: { description = "ce"; };
-  s1 =
-    (genAspects.wrapFn cnf "closedEmpty" closedEmpty wide).description == "ce"
-    && (aspects.closed wide).description == "closed"
-    && (genAspects.applyGuard wide closedEmpty).description == "ce"
-    &&
-      (genAspects.applyGuard wide { __functor = _: { }: { description = "fce"; }; }).description == "fce";
-
   gaugeA = builtins.head (at "warpA" "gauge");
   i1 =
     apart "gauge"
@@ -154,12 +153,9 @@ let
       }).id == gaugeA;
   i2 = one "gauge" && r.vertices.${gaugeA}.formals == { loom = entity "jacquard"; };
   shapes =
-    apart "bare"
-    && apart "open"
-    && one "closed"
+    one "closed"
     && at "warpC" "closed" == at "warpA" "closed"
-    && r.vertices.${builtins.head (at "warpA" "closed")}.formals == { }
-    && descs (at "warpB" "bare") == [ "bare:loom" ];
+    && r.vertices.${builtins.head (at "warpA" "closed")}.formals == { };
   twillA = r.vertices.${builtins.head (at "warpA" "twill")};
   i4 =
     aspects.twill ? fragments
@@ -198,5 +194,5 @@ in
   construct = [ "C136" ];
   # B-2's bindings first: a constructor that ignores the scope makes `suppliers` name one binding
   # twice, which aborts uncatchably, so the conjunct that reads them apart must fail before it.
-  check = asserts (b2 && s1 && i1 && i2 && shapes && i4 && r3 && r7);
+  check = asserts (b2 && i1 && i2 && shapes && i4 && r3 && r7);
 }

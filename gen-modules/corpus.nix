@@ -282,7 +282,7 @@ in
     # which a distinct target could not show.
     aspects.bartack.includes = [
       config.aspects.hemline.placket # a REFERENCE — resolves to the node "hemline/placket"
-      ({ node, ... }: { }) # INLINE CONTENT — its POSITION is published, not an edge
+      (genAspects.guard genAspects.pred.always { }) # INLINE CONTENT (sealed) — its POSITION is published, not an edge
       (genAspects.keyRef "mill/stitch") # a FOREIGN REFERENCE — published as a ref, never an edge
       "hemline/placket" # a BARE STRING — the same by-key edge as the first, den-hoag-zxgan
     ];
