@@ -6,6 +6,12 @@
 # by nixpkgs' own `lib.evalModules` folding the pair; under `listOf` it stays the element; and it is
 # not `typeEq` to its base. Live controls: the base declared twice still merges, and two derivations
 # of different ids refuse, so a `deriveType` refusing everything cannot pass.
+#
+# A derivation closing its own cycle (`tb`, id `bobbin`, den-hoag-djbhc) is described by its base's
+# phrase within the budget: mounted through nixpkgs' own `lib.evalModules` its docs entry renders the
+# head the same shape without the derivation renders, and a definition its check rejects is a refusal
+# `tryEval` catches, where copying the base's phrase aborted all three. Live control: a definition in
+# its domain is served.
 {
   asserts,
   genMerge,
@@ -57,6 +63,36 @@
             null
         )).success;
       bobbins = t.listOf tagged;
+      tb = deriveType (t.nullOr (
+        t.oneOf [
+          t.str
+          (t.attrsOf tb)
+          (t.listOf tb)
+        ]
+      )) { id = "bobbin"; };
+      vb = t.nullOr (
+        t.oneOf [
+          t.str
+          (t.attrsOf vb)
+          (t.listOf vb)
+        ]
+      );
+      head200 = builtins.substring 0 200;
+      mountTb =
+        v:
+        (lib.evalModules {
+          modules = [
+            { options.reel = lib.mkOption { type = tb; }; }
+            { reel = v; }
+          ];
+        }).config.reel;
+      tbDocs =
+        (builtins.head (
+          builtins.filter (o: o.name == "reel") (
+            lib.optionAttrSetToDocList
+              (lib.evalModules { modules = [ { options.reel = lib.mkOption { type = tb; }; } ]; }).options
+          )
+        )).type;
     in
     idOf (mergeTypes tagged tagged) == "tagged"
     && declares tagged tagged
@@ -71,9 +107,12 @@
     && !(tagged.check 1)
     && !(typeEq tagged t.str)
     && typeEq tagged tagged
+    && head200 tbDocs == head200 vb.description
+    && !(builtins.tryEval (builtins.deepSeq (mountTb 5) null)).success
     # controls
     && declares t.str t.str
     && mountsInNixpkgs t.str t.str
     && !(declares tagged other)
+    && mountTb { a = [ "x" ]; } == { a = [ "x" ]; }
   );
 }
