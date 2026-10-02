@@ -1,14 +1,14 @@
-# `crossing-binding-key` — C104, den-hoag-bme8i (B1) clause 1. A crossing's BINDING relatum is the
-# binding's KEY minted through the hub's ONE mint (`substrate.identity.hashIdentity`), never the key
-# itself, and the binding node is minted at `registerSupply`, one pass before the `link` that
-# relates it (ADR-0034's 2026-09-28 rider; ADR-0016 ruling 7), which reads it off the registration.
+# `crossing-binding-key` — C104, den-hoag-bme8i (B1) clause 1, amended 2026-09-30 (Q1a). A
+# crossing's BINDING relatum is the binding's KEY together with its VALUE's node identity, minted
+# through the hub's ONE mint (`substrate.identity.hashIdentity`), never the key itself, and the
+# binding node is minted at `registerSupply`, one pass before the `link` that relates it (ADR-0034's
+# rider; ADR-0016 ruling 7), which reads it off the registration.
 #
-# Two looms bind the import `bobbin` under the one key `bobbin`, with two different Wrapped bodies
-# declared in `warp.nix` and `weft.nix`, and cross the same target. Both crossings carry the one
-# binding relatum, because the sealed body enters no mint. A build that keeps the key as the
-# relatum, or mints the binding at `link` rather than at registration, goes red here. What `merge`
-# does with the two is clause 2, which waits on its predicate's reading, so this cell asserts
-# nothing about it.
+# Two looms bind the import `bobbin` under the one key `bobbin` to one value, `cotton`, with two
+# different Wrapped bodies declared in `warp.nix` and `weft.nix`, and cross the same target. Both
+# crossings carry the one binding relatum, because the sealed body enters no mint. A build that
+# keeps the key as the relatum, or mints the binding at `link` rather than at registration, goes
+# red here. What `merge` does with the two is C132's (`crossing-binding-origin`).
 {
   asserts,
   genBind,
@@ -44,6 +44,7 @@ let
       };
       proposals = { };
       origins.bobbin = file;
+      valueIdentities.bobbin = mint "thread" [ "name" ] (_: "cotton");
     }).value;
   nodeOf =
     registration:
@@ -64,7 +65,9 @@ in
 {
   construct = [ "C104" ];
   check = asserts (
-    (nodeOf linen).binding == mint "binding" [ "key" ] (_: "bobbin")
+    (nodeOf linen).binding == mint "binding" [ "key" "value" ] (
+      l: if l == "key" then "bobbin" else mint "thread" [ "name" ] (_: "cotton")
+    )
     && (nodeOf linen).binding == linen.bindingIdentities.bobbin
     && (nodeOf wool).binding == (nodeOf linen).binding
     && (nodeOf linen).name == "bobbin"
