@@ -7,6 +7,9 @@
 # (`aspects.svc.priority = 50`) and in the declared option set, and is absent from both without it.
 # Before, the value plane moved and the declaration plane read `[ ]` in both arms, which is what
 # made the two arms look like a class boundary (den-hoag-aspects-suboptions-invisible-getsuboptions-915wt).
+# `_freeformOptions` is set aside BY NAME: nixpkgs' `getSubOptions` on a freeform submodule carries it
+# as a pseudo-key, not a declared option, and gen-merge publishes nixpkgs' answer
+# (den-hoag-foreign-mount-parity-knhyg). Only that name: a declared `_x` option is still compared.
 {
   asserts,
   config,
@@ -16,7 +19,9 @@
 let
   declared = t: builtins.attrNames (t.getSubOptions [ "aspects" ]);
   cnf = import ../aspect-cnf.nix;
-  corpusDeclared = declared (genAspects.aspectsRoot cnf);
+  corpusDeclared = builtins.filter (k: k != "_freeformOptions") (
+    declared (genAspects.aspectsRoot cnf)
+  );
 
   schema = genAspects.mkAspectSchema cnf;
   tree =
