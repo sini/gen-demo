@@ -36,6 +36,9 @@
         "Concat"
         "PathJoin"
         "Apply"
+        "Default"
+        "Ref"
+        "Not"
       ]
     &&
       builtins.attrNames crossingPrims == [
