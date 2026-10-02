@@ -25,5 +25,5 @@ in toString (genMerge.evalModuleTree {
 check "T5 row32 unplanted (an admissible value on the refined option)" "${row32/PICKS/3}" 0 "" \
   "$tmpdir/row32-green.err" '3'
 check "T5 row32 planted   (a value the refinement forbids)" "${row32/PICKS/0}" 1 \
-  "gen-schema: refinement failed at bobbin:grosgrain.picks" \
+  "gen-merge: a definition for option \`bobbins.grosgrain.picks' is not of the expected type: must be positive" \
   "$tmpdir/row32-red.err"

@@ -31,5 +31,5 @@ check "T5 row126 unplanted (the gen union holding a tree, no added check)" "$row
 check "T5 row126 passing   (a passing check added over a gen union holding a tree)" "$row126served" 0 "" \
   "$tmpdir/row126-passing.err" 'sateen'
 check "T5 row126 planted   (a failing check added over a gen union holding a tree)" "$row126planted" 1 \
-  "gen-merge: a definition for option \`spool' is not of type \`either'" \
+  "gen-merge: a definition for option \`spool' is not of type \`(submodule) or string'" \
   "$tmpdir/row126-red.err"

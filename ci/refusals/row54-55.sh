@@ -51,5 +51,5 @@ check "T5 row55 unplanted (an imported refined option, a value inside its contra
   "$tmpdir/row55-green.err" '8080'
 check "T5 row55 planted   (the same option, 70000: its contract is enforced, by name)" \
   "${row55/PORT/70000}" 1 \
-  "gen-schema: refinement failed at thimble:a.gauge" \
+  "gen-merge: a definition for option \`thimbles.a.gauge' is not of the expected type: must be a valid TCP port (1-65535)" \
   "$tmpdir/row55-red.err"
