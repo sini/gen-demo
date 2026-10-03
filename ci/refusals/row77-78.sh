@@ -5,7 +5,9 @@
 # different builder bodies are indistinguishable to every builtin, so the declared revision is the
 # only term that separates them, and a registry without one is refused at construction rather than
 # defaulted. Row 78: a lambda in `args` is ADR-0034's excluded population -- its collapse is replaced
-# by a refusal, never by a structural identity -- so demanding the mint refuses by name. Both reach
+# by a refusal, never by a structural identity. A registered construction is compared by its declared
+# subject and never minted (den-hoag-6orb8 U1), so the refusal lands where two constructions are
+# compared: two `typedef`s over the term are refused by name, where inert args decide one type. Both reach
 # the encoder through the hub's `genAlgebra` with the hub's one mint injected. Each unplanted arm is
 # the same construction with the plant removed, and asserts the answer; the catchable arm is row
 # 33's form.
@@ -31,19 +33,19 @@ check "T5 row77 catchable  (the refusal is caught by tryEval, not an abort)" \
 row78='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genAlgebra = gen.lib.substrate.algebra;
+  T = gen.lib.modules.merge.types;
   mk = genAlgebra.mkIntensional gen.lib.substrate.identity.hashIdentity { revision = "r1"; members.whipstitch = args: (x: x); };
-  v = mk "whipstitch" { thread = THREAD; };
-  minted = (genAlgebra.identityOf v).minted;
+  twice = T.typeEq (T.typedef "stitched" (mk "whipstitch" { thread = THREAD; })) (T.typedef "stitched" (mk "whipstitch" { thread = THREAD; }));
 in BODY'
-row78unplanted="${row78/THREAD/\"madder\"}"
-row78planted="${row78/THREAD/x: x}"
-check "T5 row78 unplanted (inert args mint an identity; that it is a string is the answer)" \
-  "${row78unplanted/BODY/builtins.toJSON (builtins.isString minted)}" 0 "" \
+row78unplanted="${row78//THREAD/\"madder\"}"
+row78planted="${row78//THREAD/x: x}"
+check "T5 row78 unplanted (inert args: two constructions of one term are one type; that it is true is the answer)" \
+  "${row78unplanted/BODY/builtins.toJSON twice}" 0 "" \
   "$tmpdir/row78-green.err" 'true'
-check "T5 row78 planted   (a lambda in args, refused by name when the identity is demanded)" \
-  "${row78planted/BODY/builtins.toJSON (builtins.isString minted)}" 1 \
-  "identity: a lambda in an identity position" \
+check "T5 row78 planted   (a lambda in args: two constructions are refused by name, never decided)" \
+  "${row78planted/BODY/builtins.toJSON twice}" 1 \
+  "gen-types: typeEq: two declarations of 'stitched' mint one identity and are unequal only at sealed component(s) 'pred'" \
   "$tmpdir/row78-red.err"
 check "T5 row78 catchable  (the refusal is caught by tryEval, not an abort)" \
-  "${row78planted/BODY/if (builtins.tryEval minted).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
+  "${row78planted/BODY/if (builtins.tryEval twice).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
   "$tmpdir/row78-catch.err" 'CAUGHT'

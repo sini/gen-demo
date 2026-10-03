@@ -16,8 +16,11 @@ row89='let
     { options.schema = schema.mkSchemaOption { }; }
     { config.schema.selvage.options.ends = merge.mkOption { type = schema.refined merge.types.int r; }; }
   ]; }).config.schema.selvage;
-  ends = selvage schema.refinements.tcpPort;
-  endsP = selvage schema.refinements.positive;
+  inRange = check: { inherit check; message = "must be in range"; };
+  tcpLike = inRange (v: v > 0 && v < 65536);
+  posLike = inRange (v: v > 0);
+  ends = selvage tcpLike;
+  endsP = selvage posLike;
   bolt = k: (merge.evalModuleTree { modules = [
     { options.r = schema.mkInstanceRegistry k { }; config.r.bolt.ends = 443; }
   ]; }).config.r.bolt;
