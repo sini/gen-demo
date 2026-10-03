@@ -7,6 +7,10 @@
 # is the target, and `lacet` references it once through `tip` (`declarationOf "aglet"`) and as a
 # set through `spares` (`setOf (declarationOf "aglet")`). `c87Lacets.byName` names its targets by
 # identifier, with a duplicate in the set; `c87Lacets.byValue` hands over the declaration values.
+#
+# `c87Unbound` declares the same two types on plain options that no registry binds, given `"gilt"`
+# and `[ "gilt" "gilt" ]` (den-hoag-registry-types-outside-kind-d24lq): with no binding there is no
+# scope to resolve them in, so both are refused by name rather than served raw.
 { genMerge, inputs }:
 let
   c87Schema = inputs.gen.lib.substrate.schema;
@@ -48,8 +52,23 @@ let
       }
     ];
   };
+  c87Unbound =
+    (genMerge.evalModuleTree {
+      modules = [
+        {
+          options.tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
+          options.spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
+          config.tip = "gilt";
+          config.spares = [
+            "gilt"
+            "gilt"
+          ];
+        }
+      ];
+    }).config;
 in
 {
+  inherit c87Unbound;
   c87Aglets = c87Eval.config.aglets;
   c87Lacets = c87Eval.config.lacets;
   c87TipType = c87Schema.declarationOf "aglet";
