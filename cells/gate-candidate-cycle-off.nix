@@ -29,17 +29,15 @@ let
   call = f: env: f (builtins.intersectAttrs (builtins.functionArgs f) env);
   offProgram = genProgram // {
     program =
-      a:
-      genProgram.program (
-        a
-        // {
-          declarations = a.declarations ++ [
-            {
-              head = "scotched:pewter";
-              relata = [ "pewter" ];
-            }
-          ];
-        }
+      frozen: declarations:
+      genProgram.program frozen (
+        declarations
+        ++ [
+          {
+            head = "scotched:pewter";
+            relata = [ "pewter" ];
+          }
+        ]
       );
   };
   stateWith =

@@ -52,10 +52,9 @@ let
   onePass =
     declarations:
     genProgram.model {
-      program = genProgram.program {
-        frozen = [ "bolt" ]; # one pass, no earlier pass to carry
-        inherit declarations;
-      };
+      program =
+        genProgram.program [ "bolt" ] # one pass, no earlier pass to carry
+          declarations;
       interpretation = [ ];
       prior = null;
       complete = true;

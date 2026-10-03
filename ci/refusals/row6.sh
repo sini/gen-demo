@@ -12,7 +12,7 @@ row6='let
       to = "grosgrain";
     }; } ];
     decls = { grosgrain = { gauge = "fine"; }; faille = { gauge = "coarse"; }; }; };
-in builtins.toJSON (builtins.attrNames (genAssemble.assemble { contributions = [ thimbles (mkBobbins BOBBINVERTICES) ]; }).nodes)'
+in builtins.toJSON (builtins.attrNames (genAssemble.assemble { } [ thimbles (mkBobbins BOBBINVERTICES) ]).nodes)'
 check "T5 row6 unplanted (grosgrain declared a member)" "${row6/BOBBINVERTICES/[ \"grosgrain\" \"faille\" ]}" 0 "" \
   "$tmpdir/row6-green.err" '["damask","faille","grosgrain","pewter"]'
 check "T5 row6 planted   (grosgrain named by an edge and a decls entry, never a declared member)" \

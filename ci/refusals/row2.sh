@@ -3,13 +3,10 @@
 row2='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genProgram = gen.lib.framework.program;
-  mkProg = frozenList: genProgram.program {
-    frozen = frozenList;
-    declarations = [
+  mkProg = frozenList: genProgram.program frozenList [
       { head = "nap:pewter"; relata = [ "pewter" ]; }
       { head = "piping:grosgrain:faille"; pos = [ "nap:pewter" ]; neg = [ "scotched:pewter" ]; relata = [ "grosgrain" "faille" ]; }
     ];
-  };
 in builtins.toJSON (mkProg FROZEN).atoms'
 check "T5 row2 unplanted (faille frozen)" "${row2/FROZEN/[ \"pewter\" \"damask\" \"grosgrain\" \"faille\" ]}" 0 "" \
   "$tmpdir/row2-green.err" '["nap:pewter","piping:grosgrain:faille","scotched:pewter"]'

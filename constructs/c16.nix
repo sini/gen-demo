@@ -109,8 +109,8 @@ let
     c16AspectGraph
     c16Registry
   ];
-  c16Union = genAssemble.union { contributions = c16Contributions; };
-  c16Assembled = genAssemble.assemble { contributions = c16Contributions; };
+  c16Union = genAssemble.union { } c16Contributions;
+  c16Assembled = genAssemble.assemble { } c16Contributions;
 
   # ── the queries — §3.3's primitive table, both doors ──
   #

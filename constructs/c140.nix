@@ -47,10 +47,7 @@ let
   onePass =
     declarations:
     genProgram.model {
-      program = genProgram.program {
-        frozen = [ "bolt" ];
-        inherit declarations;
-      };
+      program = genProgram.program [ "bolt" ] declarations;
       interpretation = [ ];
       prior = null;
       complete = true;
@@ -82,14 +79,15 @@ let
   fireAt =
     context:
     genProgram.groundInstances {
-      body = trimBody;
-      inherit context;
       sources.spool = spoolSource;
-    };
+    } context trimBody;
 in
 {
   whenPass = onePass whenDecls;
-  whenYoke = (genProgram.declaration (decl "yoke:bolt" (not (has "gusset-held:bolt")))).neg;
+  whenYoke =
+    (genProgram.declaration {
+      when = not (has "gusset-held:bolt");
+    } [ "bolt" ] "yoke:bolt").neg;
   trimCodomain = genProgram.deriveCodomain trimBody;
   trimFired = fireAt { spool.fibre = "silk"; };
   trimFiredCotton = fireAt { spool.fibre = "cotton"; };

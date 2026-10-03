@@ -83,14 +83,18 @@ in
   );
   c159FireEscape = genProgram.fireEscape escapeRecord { thimble = "brass"; };
   c159Admitted = genProgram.admit escapeRecord;
-  c159DoorFired = genProgram.groundInstances {
-    body = genProgram.body {
-      name = "tack";
-      declared = D;
-      clauses = [ bench.config.bench.rules.tack ];
-    };
-    context.thimble = "brass";
-    sources.thimble = "entity:" + builtins.hashString "sha256" "thimble";
-    inherit door;
-  };
+  c159DoorFired =
+    genProgram.groundInstances
+      {
+        sources.thimble = "entity:" + builtins.hashString "sha256" "thimble";
+        inherit door;
+      }
+      { thimble = "brass"; }
+      (
+        genProgram.body {
+          name = "tack";
+          declared = D;
+          clauses = [ bench.config.bench.rules.tack ];
+        }
+      );
 }

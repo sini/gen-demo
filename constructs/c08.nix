@@ -56,15 +56,13 @@ let
     c8Bobbins
     c8Overlay
   ];
-  c8Assembled = genAssemble.assemble { contributions = c8Contributions; };
-  c8Unioned = genAssemble.union { contributions = c8Contributions; };
-  c8Permuted = genAssemble.union {
-    contributions = [
-      c8Overlay
-      c8Thimbles
-      c8Bobbins
-    ];
-  };
+  c8Assembled = genAssemble.assemble { } c8Contributions;
+  c8Unioned = genAssemble.union { } c8Contributions;
+  c8Permuted = genAssemble.union { } [
+    c8Overlay
+    c8Thimbles
+    c8Bobbins
+  ];
 in
 {
   inherit
