@@ -4,12 +4,14 @@
 #
 # The five `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
 # `ci/refusals/row77-78.sh`):
-#   1. the MINT carries the relation, not the name — one coordinate mints one identity, differing
-#      `args` mint two, and the two carry EQUAL names;
-#   2. the registry coordinate is in the preimage — one `(ctor, args)` under two `revision`s mints
-#      apart, names equal again. Its negative arm (same members, same revision, different builder
-#      bodies ⇒ ONE identity) is undiscriminable by any builtin and is a declared residue, not a
-#      cell: asserting the merge would be asserting the defect;
+#   1. a registered construction DECIDES ONE TYPE AND KEYS NOTHING (den-hoag-6orb8 U1; den-hoag-hhki8):
+#      it carries no exact identity (no digest, so no key site keys on it), and its declared
+#      comparison subject carries the relation, not the name — one coordinate built twice is one
+#      value, differing `args` are two, and the two carry EQUAL names;
+#   2. the registry coordinate is in the subject — one `(ctor, args)` under two `revision`s is two,
+#      names equal again. Its negative arm (same members, same revision, different builder bodies ⇒
+#      ONE value) is undiscriminable by any builtin and is a declared residue, not a cell: asserting
+#      the merge would be asserting the defect;
 #   3. the SEALED regime decides where the producer's refusal is the `__id` accessor — and ONLY
 #      there: a refusal under an ordinary key surfaces, catchably, beside inert controls that decide
 #      both ways, so the cell separates "`__id` is excluded" from "every key is". A
@@ -47,7 +49,6 @@ let
   madder = mk "whipstitch" { thread = "madder"; };
   madder' = mk "whipstitch" { thread = "madder"; };
   woad = mk "whipstitch" { thread = "woad"; };
-  idOf = v: (identityOf v).minted;
 
   # Sealed values the encoder cannot produce: hand-built, sharing ONE base and overriding ONE key,
   # because Nix `==` compares values in name order with a pointer fast path — two independently
@@ -75,15 +76,15 @@ in
 {
   construct = [ "C56" ];
   check = asserts (
-    # 1 — the mint, not the name
+    # 1 — decided by the declared subject, keyed by nothing; the name decides nothing
     madder.name == woad.name
-    && idOf madder == idOf madder'
-    && idOf madder != idOf woad
+    && !(genAlgebra.isExact (identityOf madder))
+    && regimeTagOf (identityOf madder) == "s"
     && conservativeEq madder madder'
     && !(conservativeEq madder woad)
     # 2 — the registry coordinate
     && madder.name == (mkR2 "whipstitch" { thread = "madder"; }).name
-    && idOf madder != idOf (mkR2 "whipstitch" { thread = "madder"; })
+    && !(conservativeEq madder (mkR2 "whipstitch" { thread = "madder"; }))
     # 3 — the sealed regime: the `__id` arm decides, an ordinary-key refusal surfaces
     && regimeTagOf (identityOf sealed) == "s"
     && sealedEq { __id = throw "identity: no mintable identity"; } {

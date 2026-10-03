@@ -53,5 +53,5 @@ check "T5 row30id unplanted (the BARE base still mints, and the digest is the as
   "$tmpdir/row30id-green.err" 'type:d56681ac4aa3f64b427f9aceaab601fa2fe1e0db2cce50349be86f3fa0d886b6'
 check "T5 row30id planted   (an identity demanded of a refinement over a caller predicate)" \
   "${row30id/SUBJECT/(genSchema.refined genMerge.types.int [ genSchema.refinements.tcpPort ])}" 1 \
-  "identity: a lambda in an identity position" \
+  "identity: type 'refined<int>' has sealed component(s) 'refinements.0'" \
   "$tmpdir/row30id-red.err"
