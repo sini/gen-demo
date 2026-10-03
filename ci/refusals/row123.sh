@@ -40,7 +40,7 @@ check "T5 row123 planted   (the same plain tree with the parent undeclared is re
   "$tmpdir/row123-red.err"
 check "T5 row123 cycle     (the parent inheriting the child back is refused by name)" \
   "${row123/BODY/cycle}" 1 \
-  "gen-schema: inheritance cycle among kinds [dart notch]" \
+  "gen-schema: kind 'dart' reaches a kind with its own content witness through its parents (dart -> notch -> dart), among kinds [dart notch]: either it inherits itself, an inheritance cycle" \
   "$tmpdir/row123-cycle.err"
 check "T5 row123 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row123/BODY/caught}" 0 "" "$tmpdir/row123-catch.err" 'CAUGHT'
