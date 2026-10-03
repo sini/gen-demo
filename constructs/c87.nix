@@ -5,11 +5,13 @@
 #
 # Two NEW kinds in a fresh `evalSchema`, so no stamp pinned elsewhere in this corpus moves: `aglet`
 # is the target, and `lacet` references it once through `tip` (`declarationOf "aglet"`) and as a
-# set through `spares` (`setOf (declarationOf "aglet")`). `c87Lacets.byName` names its targets by
-# identifier, with a duplicate in the set; `c87Lacets.byValue` hands over the declaration values.
+# set through `spares` (`setOf (declarationOf "aglet")`) and as a set keyed by name through `cords`
+# (`attrsOf (declarationOf "aglet")`, den-hoag-4tgvb). `c87Lacets.byName` names its targets by
+# identifier, with a duplicate in the set and one `cords` key written as the declaration itself;
+# `c87Lacets.byValue` hands over the declaration values.
 #
-# `c87Unbound` declares the same two types on plain options that no registry binds, given `"gilt"`
-# and `[ "gilt" "gilt" ]` (den-hoag-registry-types-outside-kind-d24lq): with no binding there is no
+# `c87Unbound` declares the same three types on plain options that no registry binds, given `"gilt"`,
+# `[ "gilt" "gilt" ]` and `{ a = "gilt"; }` (den-hoag-registry-types-outside-kind-d24lq): with no binding there is no
 # scope to resolve them in, so both are refused by name rather than served raw.
 { genMerge, inputs }:
 let
@@ -21,6 +23,10 @@ let
         config.schema.lacet.options = {
           tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
           spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
+          cords = genMerge.mkOption {
+            type = genMerge.types.attrsOf (c87Schema.declarationOf "aglet");
+            default = { };
+          };
         };
       }
     ];
@@ -33,6 +39,7 @@ let
           refs = {
             tip = c87Eval.config.aglets;
             spares = c87Eval.config.aglets;
+            cords = c87Eval.config.aglets;
           };
         };
         config.aglets.gilt.finish = "gilded";
@@ -44,6 +51,10 @@ let
             "horn"
             "gilt"
           ];
+          cords = {
+            a = "gilt";
+            b = c87Eval.config.aglets.gilt;
+          };
         };
         config.lacets.byValue = {
           tip = c87Eval.config.aglets.gilt;
@@ -58,11 +69,15 @@ let
         {
           options.tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
           options.spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
+          options.cords = genMerge.mkOption {
+            type = genMerge.types.attrsOf (c87Schema.declarationOf "aglet");
+          };
           config.tip = "gilt";
           config.spares = [
             "gilt"
             "gilt"
           ];
+          config.cords.a = "gilt";
         }
       ];
     }).config;
