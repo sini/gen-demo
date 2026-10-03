@@ -8,7 +8,11 @@
 # row hold the framework VALUE, and over one registry context `sel.subkind` of the framework kind
 # matches both nodes while `sel.kind` matches only the framework's. The refused twins (a consumer
 # schema omitting the framework's class, and a `//` copy of the framework kind) are red here by
-# `tryEval` and by name in `refusals` row 140. Red when the topology aborts or any conjunct fails.
+# `tryEval` and by name in `refusals` row 140. A THIRD tree (den-hoag-4i0o5): the consumer's `aspect` is
+# re-layered through one helper that tags each application with its own module `_file`, applied as
+# framework <- consumer <- site; the site's options are the union. Without the tag the two applications
+# share a content witness, and the chain is refused by a text naming both readings and the remedy
+# (`refusals` row 141). Red when the topology aborts or any conjunct fails.
 {
   asserts,
   genAspects,
@@ -66,6 +70,20 @@ let
   opts = k: builtins.attrNames k.options;
   refused = v: !(builtins.tryEval (builtins.deepSeq v v)).success;
   inheritsEdges = builtins.filter (e: e.type == "inherits") consumer._edges;
+  layer = tag: parent: {
+    _file = "aspect-layer:${tag}";
+    config.schema.aspect = {
+      inherits = [ parent ];
+      options.warp = intOpt;
+    };
+  };
+  layered =
+    tag: parent:
+    (ev [
+      { options.schema = both.schemaOption; }
+      (layer tag parent)
+    ]).schema.aspect;
+  siteAspect = layered "site" (layered "consumer" frameworkAspect);
 in
 {
   construct = [ "C166" ];
@@ -86,5 +104,10 @@ in
       opts (consumerTree (consumerSchema { spindle.category = "class"; }) frameworkAspect).aspect
     )
     && refused (opts (consumerTree both (frameworkAspect // { options = { }; })).aspect)
+    &&
+      opts siteAspect == [
+        "warp"
+        "weft"
+      ]
   );
 }
