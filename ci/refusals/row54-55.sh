@@ -12,12 +12,10 @@ row54='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   gauge = genMerge.mkOption { type = genSchema.refined genMerge.types.int genSchema.refinements.tcpPort; };
-  tree = genMerge.evalModuleTree {
-    modules = [
+  tree = genMerge.evalModuleTree { } [
       { options.schema = genSchema.mkSchemaOption {}; }
       { config.schema.thimble = DECL; }
     ];
-  };
 in builtins.toJSON (builtins.attrNames tree.config.schema.thimble.options)'
 row54unplant='{ imports = [ ]; options.gauge = gauge; }'
 row54plant='{ imports = [ ]; inherit gauge; }'
@@ -33,18 +31,14 @@ row55='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   gauge = genMerge.mkOption { type = genSchema.refined genMerge.types.int genSchema.refinements.tcpPort; };
-  kind = (genMerge.evalModuleTree {
-    modules = [
+  kind = (genMerge.evalModuleTree { } [
       { options.schema = genSchema.mkSchemaOption {}; }
       { config.schema.thimble.imports = [ { options.gauge = gauge; } ]; }
-    ];
-  }).config.schema.thimble;
-  tree = genMerge.evalModuleTree {
-    modules = [
+    ]).config.schema.thimble;
+  tree = genMerge.evalModuleTree { } [
       { options.thimbles = genSchema.mkInstanceRegistry kind { }; }
       { config.thimbles.a.gauge = PORT; }
     ];
-  };
 in builtins.toJSON tree.config.thimbles.a.gauge'
 check "T5 row55 unplanted (an imported refined option, a value inside its contract)" \
   "${row55/PORT/8080}" 0 "" \

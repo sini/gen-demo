@@ -14,7 +14,7 @@ row96='let
   genAspects = gen.lib.aspects.aspects;
   genMerge = gen.lib.modules.merge;
   schema = genAspects.mkAspectSchema { };
-  mk = mods: genMerge.evalModuleTree { modules = [ { options.schema = schema.schemaOption; } (schema.mkAspectModule { }) ] ++ mods; };
+  mk = mods: genMerge.evalModuleTree { } ([ { options.schema = schema.schemaOption; } (schema.mkAspectModule { }) ] ++ mods);
   other = mk [ { config.aspects.elsewhere.thing = { }; } ];
   contentOnly = [ { description = "second"; } ];
   withOtherTree = [ { description = "second"; } other.config.aspects.elsewhere.thing ];

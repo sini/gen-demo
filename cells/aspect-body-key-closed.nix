@@ -15,12 +15,10 @@ let
   cnf = import ../aspect-cnf.nix;
   gore =
     body:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        { aspects.gore = body; }
-      ];
-    }).config.aspects.gore;
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      { aspects.gore = body; }
+    ]).config.aspects.gore;
   misspelt = gore { nixso.boot.loader.grub.enable = false; };
   nested = gore { placket.eyelet = { }; };
   spelt = gore { nixos.boot.loader.grub.enable = false; };

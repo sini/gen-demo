@@ -16,12 +16,10 @@ let
   cnf.keySemantics.nixos.category = "class";
   place =
     defs:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        { config.aspects = defs; }
-      ];
-    }).config.aspects;
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      { config.aspects = defs; }
+    ]).config.aspects;
   refused = v: !(builtins.tryEval (builtins.deepSeq v true)).success;
   escaped = genProgram.escape {
     name = "tack";

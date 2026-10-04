@@ -50,18 +50,16 @@ let
       options.spool = genMerge.mkOption { type = genMerge.types.str; };
     };
   c21HeadSchema =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = c21AspectSchema.schemaOption; }
-        (
-          { config, ... }:
-          {
-            config.schema.hank = c21Parent;
-            config.schema.thimble = c21ThimbleWith { imports = [ config.schema.hank ]; };
-          }
-        )
-      ];
-    }).config.schema;
+    (genMerge.evalModuleTree { } [
+      { options.schema = c21AspectSchema.schemaOption; }
+      (
+        { config, ... }:
+        {
+          config.schema.hank = c21Parent;
+          config.schema.thimble = c21ThimbleWith { imports = [ config.schema.hank ]; };
+        }
+      )
+    ]).config.schema;
   c21RelocatedSchema =
     compose:
     c21Schema.evalSchema {
@@ -75,29 +73,27 @@ let
     };
   c21Instance =
     kind:
-    (genMerge.evalModuleTree {
-      modules = [
-        { imports = [ (c21AspectSchema.mkAspectModule { }) ]; }
-        {
-          options.thimbles = c21Schema.mkInstanceRegistry kind {
-            extraModules = [
-              {
-                options.shirring = genMerge.mkOption {
-                  type = genMerge.types.str;
-                  default = "gathered";
-                };
-              }
-            ];
-          };
-        }
-        {
-          config.thimbles.pewter = {
-            aspects = [ "stitch" ];
-            spool = "linen";
-          };
-        }
-      ];
-    }).config.thimbles.pewter;
+    (genMerge.evalModuleTree { } [
+      { imports = [ (c21AspectSchema.mkAspectModule { }) ]; }
+      {
+        options.thimbles = c21Schema.mkInstanceRegistry kind {
+          extraModules = [
+            {
+              options.shirring = genMerge.mkOption {
+                type = genMerge.types.str;
+                default = "gathered";
+              };
+            }
+          ];
+        };
+      }
+      {
+        config.thimbles.pewter = {
+          aspects = [ "stitch" ];
+          spool = "linen";
+        };
+      }
+    ]).config.thimbles.pewter;
   c21HeadKind = c21HeadSchema.thimble;
   c21RelocatedKind = (c21RelocatedSchema { inherits = [ "hank" ]; }).thimble;
   c21NoInheritKind = (c21RelocatedSchema { }).thimble;

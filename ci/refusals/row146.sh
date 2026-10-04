@@ -15,7 +15,7 @@ row146='let
   merge = gen.lib.modules.merge;
   int = merge.mkOption { type = merge.types.int; };
   schema = genAspects.mkAspectSchema { };
-  tree = modules: (merge.evalModuleTree { modules = [ { options.schema = schema.schemaOption; } ] ++ modules; }).config.schema;
+  tree = modules: (merge.evalModuleTree { } ([ { options.schema = schema.schemaOption; } ] ++ modules)).config.schema;
   aspect = parent: o: { config.schema.aspect = { inherits = [ parent ]; options.${o} = int; }; };
   pairWith = bParent: let
     tA = tree [ (aspect tB.aspect "warp") ];

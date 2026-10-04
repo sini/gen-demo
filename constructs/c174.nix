@@ -30,34 +30,32 @@ let
     aspectPaths = [ [ "aspects" ] ];
     rulePaths = [ ];
   };
-  tree = genMerge.evalModuleTree {
-    modules = [
-      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-      { options.lambdas = genRules.lambdas; }
-      (load {
-        aspects.selvage =
-          { thimble, ... }:
-          {
-            description = "selvage-${thimble}";
-            includes = [ ({ thimble, bobbin, ... }: { description = "fringe-${thimble}-${bobbin}"; }) ];
-          };
-        aspects.warp =
-          { thimble, ... }:
-          {
-            description = "warp-${thimble}";
-            includes = [
-              (
-                { thimble, ... }:
-                {
-                  description = "weft-${thimble}";
-                  includes = [ ({ thimble, bobbin, ... }: { description = "tassel-${thimble}-${bobbin}"; }) ];
-                }
-              )
-            ];
-          };
-      })
-    ];
-  };
+  tree = genMerge.evalModuleTree { } [
+    { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+    { options.lambdas = genRules.lambdas; }
+    (load {
+      aspects.selvage =
+        { thimble, ... }:
+        {
+          description = "selvage-${thimble}";
+          includes = [ ({ thimble, bobbin, ... }: { description = "fringe-${thimble}-${bobbin}"; }) ];
+        };
+      aspects.warp =
+        { thimble, ... }:
+        {
+          description = "warp-${thimble}";
+          includes = [
+            (
+              { thimble, ... }:
+              {
+                description = "weft-${thimble}";
+                includes = [ ({ thimble, bobbin, ... }: { description = "tassel-${thimble}-${bobbin}"; }) ];
+              }
+            )
+          ];
+        };
+    })
+  ];
   inherit (tree.config) aspects lambdas;
   doorOver =
     ls:

@@ -21,13 +21,11 @@ let
     let
       s = genAspects.mkAspectSchema cnf;
     in
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = s.schemaOption; }
-        (s.mkAspectModule { })
-        { config.schema.aspect = { }; }
-      ];
-    }).config.schema.aspect;
+    (genMerge.evalModuleTree { } [
+      { options.schema = s.schemaOption; }
+      (s.mkAspectModule { })
+      { config.schema.aspect = { }; }
+    ]).config.schema.aspect;
   # two lambdas of one text: genuinely different functions
   shaped =
     { defs, kind, ... }:
@@ -43,12 +41,10 @@ let
     };
   selvage =
     mkType:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { inherit mkType; }; }
-        { config.schema.selvage.options.ends = genMerge.mkOption { type = genMerge.types.int; }; }
-      ];
-    }).config.schema.selvage;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { inherit mkType; }; }
+      { config.schema.selvage.options.ends = genMerge.mkOption { type = genMerge.types.int; }; }
+    ]).config.schema.selvage;
   decided = e: (builtins.tryEval e).success;
 in
 {

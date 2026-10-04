@@ -9,10 +9,7 @@
 let
   T = genMerge.types;
   read =
-    freeformType: defs:
-    (genMerge.evalModuleTree {
-      modules = [ { inherit freeformType; } ] ++ defs;
-    }).config;
+    freeformType: defs: (genMerge.evalModuleTree { } ([ { inherit freeformType; } ] ++ defs)).config;
   warp = {
     _file = "/demo/warp.nix";
     selvage = "twill";

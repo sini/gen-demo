@@ -22,7 +22,7 @@
         { options.seam = genMerge.mkOption { inherit type; }; }
         { seam = v; }
       ];
-      read = type: v: (genMerge.evalModuleTree { modules = seam type v; }).config.seam;
+      read = type: v: (genMerge.evalModuleTree { } (seam type v)).config.seam;
       nixpkgsRead = type: v: (lib.evalModules { modules = seam type v; }).config.seam;
       same = type: v: builtins.toJSON (read type v) == builtins.toJSON (nixpkgsRead type v);
       refused = type: v: !(builtins.tryEval (builtins.deepSeq (read type v) null)).success;

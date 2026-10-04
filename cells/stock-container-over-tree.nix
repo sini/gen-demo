@@ -12,24 +12,20 @@
 }:
 let
   liningTree =
-    (genMerge.evalModuleTree {
-      modules = [
-        {
-          options.weave = genMerge.mkOption {
-            type = genMerge.types.str;
-            default = "plain";
-          };
-        }
-      ];
-    }).type;
+    (genMerge.evalModuleTree { } [
+      {
+        options.weave = genMerge.mkOption {
+          type = genMerge.types.str;
+          default = "plain";
+        };
+      }
+    ]).type;
   linings =
     type: def:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.linings = genMerge.mkOption { inherit type; }; }
-        { linings = def; }
-      ];
-    }).config.linings;
+    (genMerge.evalModuleTree { } [
+      { options.linings = genMerge.mkOption { inherit type; }; }
+      { linings = def; }
+    ]).config.linings;
   refuses = e: !(builtins.tryEval (builtins.deepSeq e null)).success;
 in
 {

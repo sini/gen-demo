@@ -11,15 +11,11 @@ row126='let
   flake = builtins.getFlake (toString ./.);
   genMerge = flake.inputs.gen.lib.modules.merge;
   lib = flake.inputs.nixpkgs.lib;
-  selvage = (genMerge.evalModuleTree {
-    modules = [ { options.weave = genMerge.mkOption { type = genMerge.types.str; default = "plain"; }; } ];
-  }).type;
-in (genMerge.evalModuleTree {
-  modules = [
+  selvage = (genMerge.evalModuleTree { } [ { options.weave = genMerge.mkOption { type = genMerge.types.str; default = "plain"; }; } ]).type;
+in (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { type = TYPE; }; }
     { spool = "sateen"; }
-  ];
-}).config.spool'
+  ]).config.spool'
 row126stated='genMerge.types.either selvage genMerge.types.str'
 row126plant="lib.types.addCheck ($row126stated) builtins.isAttrs"
 row126passing="lib.types.addCheck ($row126stated) builtins.isString"

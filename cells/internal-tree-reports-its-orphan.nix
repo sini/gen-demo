@@ -18,50 +18,41 @@
   check = asserts (
     let
       hemTree =
-        (genMerge.evalModuleTree {
-          check = false;
-          modules = [
-            {
-              options.selvedge = genMerge.mkOption {
-                type = genMerge.types.str;
-                default = "raw";
-              };
-            }
-          ];
-        }).type;
-      nested = genMerge.evalModuleTree {
-        check = false;
-        modules = [
-          {
-            options.hem = genMerge.mkOption {
-              type = hemTree;
-              default = { };
-            };
-          }
-          {
-            _file = "c30";
-            config.hem = {
-              selvedge = "pinked";
-              fray = "loose";
-            };
-          }
-        ];
-      };
-      topLevel = genMerge.evalModuleTree {
-        check = false;
-        modules = [
+        (genMerge.evalModuleTree { check = false; } [
           {
             options.selvedge = genMerge.mkOption {
               type = genMerge.types.str;
               default = "raw";
             };
           }
-          {
-            _file = "c30";
-            config.fray = "loose";
-          }
-        ];
-      };
+        ]).type;
+      nested = genMerge.evalModuleTree { check = false; } [
+        {
+          options.hem = genMerge.mkOption {
+            type = hemTree;
+            default = { };
+          };
+        }
+        {
+          _file = "c30";
+          config.hem = {
+            selvedge = "pinked";
+            fray = "loose";
+          };
+        }
+      ];
+      topLevel = genMerge.evalModuleTree { check = false; } [
+        {
+          options.selvedge = genMerge.mkOption {
+            type = genMerge.types.str;
+            default = "raw";
+          };
+        }
+        {
+          _file = "c30";
+          config.fray = "loose";
+        }
+      ];
     in
     map (u: u.path) nested.undeclared == [
       [

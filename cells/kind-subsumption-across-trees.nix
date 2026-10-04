@@ -21,7 +21,7 @@
 }:
 let
   intOpt = genMerge.mkOption { type = genMerge.types.int; };
-  ev = modules: (genMerge.evalModuleTree { inherit modules; }).config;
+  ev = modules: (genMerge.evalModuleTree { } modules).config;
   framework = genAspects.mkAspectSchema { keySemantics.loom.category = "class"; };
   consumerSchema =
     keySemantics:

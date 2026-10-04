@@ -10,12 +10,10 @@ row136='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
-  read = v: toString (merge.evalModuleTree {
-    modules = [
+  read = v: toString (merge.evalModuleTree { } [
       { options.spool = merge.mkOption { type = schema.refined merge.types.int schema.refinements.positive; }; }
       { spool = v; }
-    ];
-  }).config.spool;
+    ]).config.spool;
   green = read 4;
   red = read (-1);
   caught = if (builtins.tryEval red).success then "ADMITTED" else "CAUGHT";

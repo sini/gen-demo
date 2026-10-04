@@ -12,14 +12,10 @@ row135='let
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
   int = merge.mkOption { type = merge.types.int; };
-  tree = modules: (merge.evalModuleTree {
-    modules = [ { options.schema = schema.mkSchemaOption { }; } ] ++ modules;
-  }).config.schema;
+  tree = modules: (merge.evalModuleTree { } ([ { options.schema = schema.mkSchemaOption { }; } ] ++ modules)).config.schema;
   grommet = (tree [ { config.schema.grommet.options.eyelets = int; } ]).grommet;
   swap = k: k // { options = { }; };
-  viaAnything = v: (merge.evalModuleTree {
-    modules = [ { options.v = merge.mkOption { type = merge.types.anything; }; } { config.v = v; } ];
-  }).config.v;
+  viaAnything = v: (merge.evalModuleTree { } [ { options.v = merge.mkOption { type = merge.types.anything; }; } { config.v = v; } ]).config.v;
   sameTree = f: (tree [
     { config.schema.grommet.options.eyelets = int; }
     ({ config, ... }: { config.schema.tab = { inherits = [ (f config.schema.grommet) ]; options.loop = int; }; })

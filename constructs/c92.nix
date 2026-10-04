@@ -40,12 +40,10 @@ let
     };
   c92Instance =
     schema:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.looms = c92Schema.mkInstanceRegistry schema.loom { }; }
-        { config.looms.jacquard = { }; }
-      ];
-    }).config.looms.jacquard;
+    (genMerge.evalModuleTree { } [
+      { options.looms = c92Schema.mkInstanceRegistry schema.loom { }; }
+      { config.looms.jacquard = { }; }
+    ]).config.looms.jacquard;
   c92ShorthandWeft = (c92Instance (c92Loom false)).weft;
   c92TwinWeft = (c92Instance (c92Loom true)).weft;
 in

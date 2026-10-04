@@ -57,12 +57,10 @@ let
     };
   c26Instance =
     schema:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.darts = c26Schema.mkInstanceRegistry schema.dart { }; }
-        { config.darts.chambray.bevel = "shallow"; }
-      ];
-    }).config.darts.chambray;
+    (genMerge.evalModuleTree { } [
+      { options.darts = c26Schema.mkInstanceRegistry schema.dart { }; }
+      { config.darts.chambray.bevel = "shallow"; }
+    ]).config.darts.chambray;
   c26MirroredGrade = (c26Instance (c26NotchDart true)).grade;
   c26NoInheritHasGrade = (c26Instance (c26NotchDart false)) ? grade;
   # `or null`: an absent `grade` or `inherits` (the silent drop) reads as a value the cell asserts

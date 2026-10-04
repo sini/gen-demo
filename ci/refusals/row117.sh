@@ -17,18 +17,18 @@ row117='let
   product = gen.lib.substrate.product;
   merge = gen.lib.modules.merge;
   P = sel.adapters.product;
-  selvage = r: (merge.evalModuleTree { modules = [
+  selvage = r: (merge.evalModuleTree { } [
     { options.schema = schema.mkSchemaOption { }; }
     { config.schema.selvage.options.ends = merge.mkOption { type = schema.refined merge.types.int r; }; }
-  ]; }).config.schema.selvage;
+  ]).config.schema.selvage;
   inRange = check: { inherit check; message = "must be in range"; };
   tcpLike = inRange (v: v > 0 && v < 65536);
   posLike = inRange (v: v > 0);
   ends = selvage tcpLike;
   endsP = selvage posLike;
-  bolt = k: (merge.evalModuleTree { modules = [
+  bolt = k: (merge.evalModuleTree { } [
     { options.r = schema.mkInstanceRegistry k { }; config.r.bolt.ends = 443; }
-  ]; }).config.r.bolt;
+  ]).config.r.bolt;
   a = bolt ends;
   b = bolt endsP;
   space = product.productN "cartesian" [

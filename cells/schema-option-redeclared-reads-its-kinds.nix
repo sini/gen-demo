@@ -16,12 +16,13 @@ let
   registry = schema.mkSchemaOption { };
   read =
     decls:
-    (genMerge.evalModuleTree {
-      modules = decls ++ [
+    (genMerge.evalModuleTree { } (
+      decls
+      ++ [
         { config.schema.selvage = { }; }
         { config.schema.bobbin.parent = "selvage"; }
-      ];
-    }).config.schema;
+      ]
+    )).config.schema;
   once = read [ { options.schema = registry; } ];
   twice = read [
     { options.schema = registry; }

@@ -12,20 +12,18 @@
 let
   schema = inputs.gen.lib.substrate.schema;
   s =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { }; }
-        {
-          config.schema = {
-            grosgrain = { };
-            damask = { };
-            faille.parent = "damask";
-            picot.parent = "faille";
-            gusset.parent = "faille";
-          };
-        }
-      ];
-    }).config.schema;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { }; }
+      {
+        config.schema = {
+          grosgrain = { };
+          damask = { };
+          faille.parent = "damask";
+          picot.parent = "faille";
+          gusset.parent = "faille";
+        };
+      }
+    ]).config.schema;
 in
 {
   construct = [ "C84" ];

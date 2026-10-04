@@ -32,8 +32,10 @@ let
         { warp = value; }
       ];
     }).config.warp;
-  native = read genMerge.evalModuleTree genMerge.mkOption;
-  derived = t: genMerge.deriveType t { id = "warp"; };
+  native = read (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption;
+  derived = t: genMerge.deriveType { } "warp" t;
   uniqRead = builtins.tryEval (
     builtins.deepSeq (native (genMerge.mkOptionType (once types.uniq))) true
   );

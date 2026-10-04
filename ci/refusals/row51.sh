@@ -13,12 +13,10 @@ row51='let
   genMerge = modules.merge;
   t = modules.types;
   r = t.union [ t.int (t.listOf r) ];
-in builtins.toJSON (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (genMerge.evalModuleTree { } [
     { options.tree = genMerge.mkOption { type = r; }; }
     { config.tree = DEF; }
-  ];
-}).config.tree'
+  ]).config.tree'
 row51unplanted="${row51/DEF/[ 1 [ 2 ] ]}"
 row51planted="${row51/DEF/[ 1 [ \"a\" ] ]}"
 check "T5 row51 unplanted (a well-typed tree answers the value)" \

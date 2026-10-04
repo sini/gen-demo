@@ -23,7 +23,7 @@ let
       );
     in
     if r.success then r.value else null;
-  gen = served (modules: genMerge.evalModuleTree { inherit modules; });
+  gen = served (modules: genMerge.evalModuleTree { } modules);
   ref = served (modules: lib.evalModules { inherit modules; });
   halves = [
     {

@@ -12,12 +12,10 @@
 let
   read =
     type: v:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.spool = genMerge.mkOption { inherit type; }; }
-        { spool = v; }
-      ];
-    }).config.spool;
+    (genMerge.evalModuleTree { } [
+      { options.spool = genMerge.mkOption { inherit type; }; }
+      { spool = v; }
+    ]).config.spool;
   refused = type: v: !(builtins.tryEval (builtins.deepSeq (read type v) null)).success;
   short = lib.types.addCheck genMerge.types.int (n: n < 3);
   bolt = genMerge.types.submodule {

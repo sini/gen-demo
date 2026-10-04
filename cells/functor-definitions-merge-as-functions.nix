@@ -29,12 +29,12 @@ let
   heddle =
     vs:
     builtins.tryEval
-      (genMerge.evalModuleTree {
-        modules = [
+      (genMerge.evalModuleTree { } (
+        [
           { options.heddle = genMerge.mkOption { type = thread; }; }
         ]
-        ++ map (v: { heddle = v; }) vs;
-      }).config.heddle;
+        ++ map (v: { heddle = v; }) vs
+      )).config.heddle;
   beside = defsOf [
     shared
     { b = 2; }

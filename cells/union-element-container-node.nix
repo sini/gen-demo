@@ -38,8 +38,9 @@ let
     }).config.heddle;
   holds =
     wrap:
-    value genMerge.evalModuleTree genMerge.types genMerge.mkOption wrap
-    == value lib.evalModules lib.types lib.mkOption wrap;
+    value (
+      r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+    ) genMerge.types genMerge.mkOption wrap == value lib.evalModules lib.types lib.mkOption wrap;
 in
 {
   construct = [ "C134" ];

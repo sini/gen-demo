@@ -10,10 +10,10 @@ row83='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
-  selvage = (merge.evalModuleTree { modules = [
+  selvage = (merge.evalModuleTree { } [
     { options.schema = schema.mkSchemaOption { computed = _: _: { NAME = "sateen"; }; }; }
     { config.schema.selvage.options.ends = merge.mkOption { type = merge.types.int; default = 2; }; }
-  ]; }).config.schema.selvage;
+  ]).config.schema.selvage;
 in BODY'
 row83free="${row83/NAME/weft}"
 row83opts="${row83/NAME/options}"

@@ -26,7 +26,7 @@ let
     in
     if r.success then r.value else null;
   engines = {
-    gen = served (modules: genMerge.evalModuleTree { inherit modules; });
+    gen = served (modules: genMerge.evalModuleTree { } modules);
     ref = served (modules: lib.evalModules { inherit modules; });
   };
   warp = {

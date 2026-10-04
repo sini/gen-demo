@@ -46,8 +46,8 @@ row13='let
     { config.thimbles.pewter = { aspects = [ "stitch" ]; spool = "linen"; }; }
   ];
   edit = [ EDIT ];
-  prior = genMerge.evalModuleTree { modules = outer; };
-  warm = genMerge.evalModuleTree { modules = outer ++ edit; warmFrom = prior; editedModules = edit; };
+  prior = genMerge.evalModuleTree { } outer;
+  warm = genMerge.evalModuleTree { warmFrom = prior; editedModules = edit; } (outer ++ edit);
 in warm.config.thimbles.pewter.id_hash'
 row13stamp='thimble:24b7ce3368a8d0766bc679ac848352cc9343353b2d97af83f5caafd7aa4a7965'
 check "T5 row13 unplanted (the declared spool re-defined to its minted value, no identity moves)" \

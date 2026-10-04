@@ -7,12 +7,10 @@ row8='let
   genSelect = gen.lib.substrate.select;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
-  tree = genMerge.evalModuleTree {
-    modules = [
+  tree = genMerge.evalModuleTree { } [
       { options.schema = genSchema.mkSchemaOption {}; }
       { config.schema.thimble = { options.spool = genMerge.mkOption { type = genMerge.types.str; default = "linen"; }; }; }
     ];
-  };
   kindValue = tree.config.schema.thimble;
 in builtins.toJSON (builtins.attrNames (genSelect.kind ARG))'
 check "T5 row8 unplanted (a real kind value, minted through the schema)" "${row8/ARG/kindValue}" 0 "" \

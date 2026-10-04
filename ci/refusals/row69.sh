@@ -19,13 +19,11 @@ row69='let
   warp = t.submodule { options.warp = genMerge.mkOption { type = t.str; default = "tabby"; }; };
   weft = t.submodule { options.weft = genMerge.mkOption { type = t.int; default = 0; }; };
   bolt = b: r: genMerge.mkOption { type = WRAP; };
-in builtins.concatStringsSep "," (builtins.attrNames (genMerge.evalModuleTree {
-  modules = [
+in builtins.concatStringsSep "," (builtins.attrNames (genMerge.evalModuleTree { } [
     { options.cloth = bolt FIRST woven; }
     { options.cloth = bolt SECOND SECONDREFINEMENT; }
     { cloth.weft = 1; }
-  ];
-}).config.cloth)'
+  ]).config.cloth)'
 row69bare="${row69/WRAP/b}"
 row69refined="${row69/WRAP/genSchema.refined b [ r ]}"
 row69fwd="${row69refined/FIRST/warp}"

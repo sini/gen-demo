@@ -8,10 +8,10 @@ row82='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
-  selvage = r: (merge.evalModuleTree { modules = [
+  selvage = r: (merge.evalModuleTree { } [
     { options.schema = schema.mkSchemaOption { }; }
     { config.schema.selvage.options.ends = merge.mkOption { type = schema.refined merge.types.int r; }; }
-  ]; }).config.schema.selvage;
+  ]).config.schema.selvage;
   inRange = check: { inherit check; message = "must be in range"; };
   tcpLike = inRange (v: v > 0 && v < 65536);
   posLike = inRange (v: v > 0);

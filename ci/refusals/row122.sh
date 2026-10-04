@@ -24,11 +24,7 @@ row122='let
     { _file = "base"; config.skein = v; }
   ];
   warm = ty: v: v2: let edit = [ { _file = "edit"; config.skein = merge.mkForce v2; } ]; in
-    (merge.evalModuleTree {
-      modules = base ty v ++ edit;
-      warmFrom = merge.evalModuleTree { modules = base ty v; };
-      editedModules = edit;
-    }).config;
+    (merge.evalModuleTree { warmFrom = merge.evalModuleTree { } (base ty v); editedModules = edit; } (base ty v ++ edit)).config;
   green = builtins.toJSON (map (x: x.spool) (warm (t.listOf (t.submodule spoolMod) // { nestedTypes = { }; }) [ { spool = "silk"; } ] [ { spool = "satin"; } ]).skein);
   deferred = builtins.deepSeq (warm (t.deferredModuleWith { staticModules = [ spoolMod ]; }) { spool = "silk"; } { spool = "satin"; }).reel "SERVED";
   moved = builtins.deepSeq (warm (t.submodule spoolMod) { spool = "silk"; } { spool = "satin"; }).reel "SERVED";

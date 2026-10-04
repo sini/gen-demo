@@ -8,12 +8,10 @@ row36='let
   flake = builtins.getFlake (toString ./.);
   genMerge = flake.inputs.gen.lib.modules.merge;
   lib = flake.inputs.nixpkgs.lib;
-in toString (genMerge.evalModuleTree {
-  modules = [
+in toString (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { type = lib.types.str; }; }
     { _file = "/demo/spool.nix"; spool = VALUE; }
-  ];
-}).config.spool'
+  ]).config.spool'
 check "T5 row36 unplanted (a string for a foreign str)" "${row36/VALUE/\"sateen\"}" 0 "" \
   "$tmpdir/row36-green.err" 'sateen'
 check "T5 row36 planted   (an int for a foreign str)" "${row36/VALUE/1}" 1 \

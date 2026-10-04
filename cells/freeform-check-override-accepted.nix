@@ -28,26 +28,22 @@ let
   asFreeform =
     type:
     attempt
-      (genMerge.evalModuleTree {
-        modules = [
-          { freeformType = type; }
-          picks
-        ];
-      }).config;
+      (genMerge.evalModuleTree { } [
+        { freeformType = type; }
+        picks
+      ]).config;
   asDeclared =
     type:
     attempt
-      (genMerge.evalModuleTree {
-        modules = [
-          { options.spool = genMerge.mkOption { inherit type; }; }
-          {
-            _file = "/demo/spool.nix";
-            spool = {
-              picks = 1;
-            };
-          }
-        ];
-      }).config.spool;
+      (genMerge.evalModuleTree { } [
+        { options.spool = genMerge.mkOption { inherit type; }; }
+        {
+          _file = "/demo/spool.nix";
+          spool = {
+            picks = 1;
+          };
+        }
+      ]).config.spool;
   reads = r: r.success && r.value == { picks = 1; };
 in
 {

@@ -14,7 +14,7 @@ row141='let
   genAspects = gen.lib.aspects.aspects;
   merge = gen.lib.modules.merge;
   int = merge.mkOption { type = merge.types.int; };
-  ev = modules: (merge.evalModuleTree { inherit modules; }).config;
+  ev = modules: (merge.evalModuleTree { } modules).config;
   framework = genAspects.mkAspectSchema { keySemantics.loom.category = "class"; };
   consumer = genAspects.mkAspectSchema { keySemantics = { loom.category = "class"; spindle.category = "class"; }; };
   fw = (ev [ { options.schema = framework.schemaOption; } { config.schema.aspect.options.weft = int; } ]).schema.aspect;

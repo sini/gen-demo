@@ -61,36 +61,34 @@ let
       // extra
     );
   aspects =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        {
-          aspects = {
-            frame.includes = [
-              "closed"
-              "gauge"
-              "heddle"
-              "twill"
-              "temper"
-            ];
-            closed = guard pred.always { description = "closed"; };
-            gauge = reads "loom" "gauge-" { includes = [ "pick" ]; };
-            pick = reads "loom" "pick-" { };
-            heddle = reads "shuttle" "heddle-" { };
-            temper = reads "tension" "temper-" { };
-          };
-        }
-        { aspects.twill = reads "loom" "twill:" { }; }
-        {
-          aspects.twill = guard (pred.has "tension") {
-            note = t.concat [
-              (t.lit "twill-")
-              (t.readCtx "tension" [ ])
-            ];
-          };
-        }
-      ];
-    }).config.aspects;
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      {
+        aspects = {
+          frame.includes = [
+            "closed"
+            "gauge"
+            "heddle"
+            "twill"
+            "temper"
+          ];
+          closed = guard pred.always { description = "closed"; };
+          gauge = reads "loom" "gauge-" { includes = [ "pick" ]; };
+          pick = reads "loom" "pick-" { };
+          heddle = reads "shuttle" "heddle-" { };
+          temper = reads "tension" "temper-" { };
+        };
+      }
+      { aspects.twill = reads "loom" "twill:" { }; }
+      {
+        aspects.twill = guard (pred.has "tension") {
+          note = t.concat [
+            (t.lit "twill-")
+            (t.readCtx "tension" [ ])
+          ];
+        };
+      }
+    ]).config.aspects;
 
   entity = n: inputs.gen.lib.substrate.identity.hashIdentity "entity" [ "name" ] (_: n);
   binding =
@@ -203,19 +201,17 @@ let
     freeformKeys = cnf.freeformKeys ++ [ "knot" ];
   };
   twins =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema twinCnf).mkAspectOption { }; }
-        {
-          aspects = {
-            fringe = marked "fringe";
-            tassel = marked "tassel";
-            warpBeam.knot = marked "warp-knot";
-            clothBeam.knot = marked "cloth-knot";
-          };
-        }
-      ];
-    }).config.aspects;
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema twinCnf).mkAspectOption { }; }
+      {
+        aspects = {
+          fringe = marked "fringe";
+          tassel = marked "tassel";
+          warpBeam.knot = marked "warp-knot";
+          clothBeam.knot = marked "cloth-knot";
+        };
+      }
+    ]).config.aspects;
   rt = genAspects.instancesFor twinCnf twins {
     inherit suppliers;
     scopes = {

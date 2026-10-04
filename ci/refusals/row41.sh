@@ -8,12 +8,10 @@
 row41='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
-in BODY (genMerge.evalModuleTree {
-  modules = [
+in BODY (genMerge.evalModuleTree { } [
     { options.bobbins = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; }; }
     { _file = "/demo/bobbins.nix"; config.bobbins = DEF; }
-  ];
-}).config.bobbins'
+  ]).config.bobbins'
 row41unplanted="${row41/DEF/[ \"linen\" ]}"
 row41planted="${row41/DEF/\"linen\"}"
 check "T5 row41 unplanted (a list definition)" "${row41unplanted/BODY/builtins.toJSON}" 0 "" \

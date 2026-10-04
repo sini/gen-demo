@@ -26,12 +26,10 @@ let
   T = genMerge.types;
   selvage =
     decl:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { }; }
-        { config.schema.selvage = decl; }
-      ];
-    }).config.schema.selvage;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { }; }
+      { config.schema.selvage = decl; }
+    ]).config.schema.selvage;
   field = type: genMerge.mkOption { inherit type; };
   field' =
     default:

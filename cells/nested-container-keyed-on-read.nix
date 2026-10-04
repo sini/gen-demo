@@ -30,7 +30,9 @@ let
       }).config.warp;
   holds =
     shape: def: read:
-    value genMerge.evalModuleTree genMerge.types genMerge.mkOption shape def read
+    value (
+      r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+    ) genMerge.types genMerge.mkOption shape def read
     == value lib.evalModules lib.types lib.mkOption shape def read;
   forced = throw "nested-container-keyed-on-read: a sibling's element was forced";
 in

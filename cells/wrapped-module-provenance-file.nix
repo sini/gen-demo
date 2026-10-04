@@ -12,15 +12,13 @@
   construct = [ "C34" ];
   check = asserts (
     let
-      r = genMerge.evalModuleTree {
-        modules = [
-          { options.spool = genMerge.mkOption { type = genMerge.types.str; }; }
-          {
-            _file = "/demo/spool.nix";
-            imports = [ { config.spool = "sateen"; } ];
-          }
-        ];
-      };
+      r = genMerge.evalModuleTree { } [
+        { options.spool = genMerge.mkOption { type = genMerge.types.str; }; }
+        {
+          _file = "/demo/spool.nix";
+          imports = [ { config.spool = "sateen"; } ];
+        }
+      ];
     in
     map (d: d.file) r.provenance.spool.defs == [ "/demo/spool.nix" ] && r.config.spool == "sateen"
   );

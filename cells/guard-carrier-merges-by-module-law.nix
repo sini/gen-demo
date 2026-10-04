@@ -16,12 +16,12 @@ let
   fire =
     defs:
     gv.applyGuard { thimble.name = "cortex"; }
-      (genMerge.evalModuleTree {
-        modules = [
+      (genMerge.evalModuleTree { } (
+        [
           { options.aspects = (genAspects.mkAspectSchema { }).mkAspectOption { }; }
         ]
-        ++ map (d: { aspects.dup = d; }) defs;
-      }).config.aspects.dup;
+        ++ map (d: { aspects.dup = d; }) defs
+      )).config.aspects.dup;
   ok = v: (builtins.tryEval (builtins.deepSeq v true)).success;
 in
 {

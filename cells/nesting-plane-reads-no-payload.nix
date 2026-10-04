@@ -30,12 +30,10 @@ let
     ty: v:
     let
       c =
-        (evalModuleTree {
-          modules = [
-            { options.skein = mkOption { type = ty; }; }
-            { config.skein = v; }
-          ];
-        }).config.skein;
+        (evalModuleTree { } [
+          { options.skein = mkOption { type = ty; }; }
+          { config.skein = v; }
+        ]).config.skein;
       r = builtins.tryEval (builtins.deepSeq c c);
     in
     if r.success then r.value else "refused";

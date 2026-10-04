@@ -17,13 +17,11 @@ row52='let
   r = M.union [ M.int (t.listOf r) ];
   flat = M.union [ M.int (t.listOf M.int) ];
   ty = TYPE;
-in builtins.toJSON (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (genMerge.evalModuleTree { } [
     { options.tree = genMerge.mkOption { type = ty; }; }
     { options.tree = genMerge.mkOption { type = ty; }; }
     { config.tree = [ 1 2 ]; }
-  ];
-}).config.tree'
+  ]).config.tree'
 row52unplanted="${row52/TYPE/flat}"
 row52planted="${row52/TYPE/r}"
 check "T5 row52 unplanted (a flat type declared twice merges and answers the value)" \

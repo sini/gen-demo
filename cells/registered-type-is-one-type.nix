@@ -34,24 +34,20 @@ let
     a: b: v:
     let
       picks =
-        (genMerge.evalModuleTree {
-          modules = [
-            { options.picks = genMerge.mkOption { type = a; }; }
-            { options.picks = genMerge.mkOption { type = b; }; }
-            { config.picks = v; }
-          ];
-        }).config.picks;
+        (genMerge.evalModuleTree { } [
+          { options.picks = genMerge.mkOption { type = a; }; }
+          { options.picks = genMerge.mkOption { type = b; }; }
+          { config.picks = v; }
+        ]).config.picks;
       r = builtins.tryEval (builtins.deepSeq picks picks);
     in
     if r.success then r.value else "REFUSED";
   bobbin =
     t:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { }; }
-        { config.schema.bobbin.options.picks = genMerge.mkOption { type = t; }; }
-      ];
-    }).config.schema.bobbin;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { }; }
+      { config.schema.bobbin.options.picks = genMerge.mkOption { type = t; }; }
+    ]).config.schema.bobbin;
   wide = stitch {
     lo = 1;
     hi = 10;

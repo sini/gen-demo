@@ -9,7 +9,7 @@ row18='let
   refinedInt = genSchema.refined genMerge.types.int [ genSchema.refinements.tcpPort ];
   base = { options.grommet = genMerge.mkOption { type = refinedInt; }; };
   second = { options.grommet = genMerge.mkOption { type = SECOND; }; };
-  tree = genMerge.evalModuleTree { modules = [ base second ]; };
+  tree = genMerge.evalModuleTree { } [ base second ];
 in tree.options.grommet.type.functor.name'
 check "T5 row18 unplanted (grommet redeclared refined, functor identity holds)" "${row18/SECOND/refinedInt}" 0 "" \
   "$tmpdir/row18-green.err" 'refined<int>'

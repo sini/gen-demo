@@ -37,12 +37,10 @@ let
     };
   warp =
     type:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.seam = genMerge.mkOption { type = genMerge.types.attrsOf type; }; }
-        { seam.warp = { }; }
-      ];
-    }).config.seam.warp.weft;
+    (genMerge.evalModuleTree { } [
+      { options.seam = genMerge.mkOption { type = genMerge.types.attrsOf type; }; }
+      { seam.warp = { }; }
+    ]).config.seam.warp.weft;
   mounted =
     type:
     (lib.evalModules {

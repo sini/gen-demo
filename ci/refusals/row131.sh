@@ -11,12 +11,10 @@ row131='let
   genDelivery = gen.lib.framework.delivery;
   merge = gen.lib.modules.merge;
   cnf.keySemantics.couching.category = "class";
-  values = (merge.evalModuleTree {
-    modules = [
+  values = (merge.evalModuleTree { } [
       ((genAspects.mkAspectSchema cnf).mkAspectModule { })
       { aspects.braid.couching.stitches = [ "braid" ]; }
-    ];
-  }).config;
+    ]).config;
   realizeWith = deliveryClasses: genDelivery.realize {
     projected = genDelivery.project {
       inherit values cnf deliveryClasses;

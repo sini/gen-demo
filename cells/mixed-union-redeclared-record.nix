@@ -16,7 +16,7 @@ let
   t = lib.types;
   g = genMerge.types;
   engines = {
-    gen = modules: genMerge.evalModuleTree { inherit modules; };
+    gen = modules: genMerge.evalModuleTree { } modules;
     ref = modules: lib.evalModules { inherit modules; };
   };
   # whose record each level of the declared type is: `G` states `typeMergeRel`, `N` does not

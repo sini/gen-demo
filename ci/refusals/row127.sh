@@ -7,12 +7,10 @@ row127='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genAspects = gen.lib.aspects.aspects;
   merge = gen.lib.modules.merge;
-  gore = body: (merge.evalModuleTree {
-    modules = [
+  gore = body: (merge.evalModuleTree { } [
       { options.aspects = (genAspects.mkAspectSchema (import ./aspect-cnf.nix)).mkAspectOption { }; }
       { aspects.gore = body; }
-    ];
-  }).config.aspects.gore;
+    ]).config.aspects.gore;
   green = builtins.toJSON (genAspects.hasClassContent (gore { nixos.boot.loader.grub.enable = false; }).nixos);
   planted = builtins.deepSeq (gore { nixso.boot.loader.grub.enable = false; }).nixso "SERVED";
   caught = if (builtins.tryEval planted).success then "ADMITTED" else "CAUGHT";

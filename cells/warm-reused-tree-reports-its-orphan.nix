@@ -17,15 +17,12 @@
   check = asserts (
     let
       spoolTreeType =
-        (genMerge.evalModuleTree {
-          check = false;
-          modules = [
-            {
-              options.known = genMerge.mkOption { type = genMerge.types.str; };
-              options.id_hash = genMerge.mkOption { type = genMerge.types.str; };
-            }
-          ];
-        }).type;
+        (genMerge.evalModuleTree { check = false; } [
+          {
+            options.known = genMerge.mkOption { type = genMerge.types.str; };
+            options.id_hash = genMerge.mkOption { type = genMerge.types.str; };
+          }
+        ]).type;
       base = [
         { options.spoolTree = genMerge.mkOption { type = spoolTreeType; }; }
         {
@@ -43,18 +40,12 @@
           config.thread = "t";
         }
       ];
-      lax =
-        mods:
-        genMerge.evalModuleTree {
-          check = false;
-          modules = mods;
-        };
+      lax = mods: genMerge.evalModuleTree { check = false; } mods;
       warm = genMerge.evalModuleTree {
         check = false;
-        modules = base ++ edited;
         warmFrom = lax base;
         editedModules = edited;
-      };
+      } (base ++ edited);
     in
     warm.warmDecision.mode == "warm"
     && builtins.elem "spoolTree" warm.warmDecision.reused

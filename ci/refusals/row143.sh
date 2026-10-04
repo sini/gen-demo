@@ -13,7 +13,7 @@ row143='let
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
   int = merge.mkOption { type = merge.types.int; };
-  tree = modules: (merge.evalModuleTree { modules = [ { options.schema = schema.mkSchemaOption { }; } ] ++ modules; }).config.schema;
+  tree = modules: (merge.evalModuleTree { } ([ { options.schema = schema.mkSchemaOption { }; } ] ++ modules)).config.schema;
   kind = name: parent: o: { config.schema.${name} = { inherits = [ parent ]; options.${o} = int; }; };
   pairWith = bParent: let
     xA = tree [ (kind "a" xB.b "p") ];

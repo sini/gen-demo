@@ -10,23 +10,19 @@
     let
       at =
         type: def:
-        (genMerge.evalModuleTree {
-          modules = [
-            { options.seam = genMerge.mkOption { inherit type; }; }
-            { config.seam = def; }
-          ];
-        }).config.seam;
+        (genMerge.evalModuleTree { } [
+          { options.seam = genMerge.mkOption { inherit type; }; }
+          { config.seam = def; }
+        ]).config.seam;
       spoolTree =
-        (genMerge.evalModuleTree {
-          modules = [
-            {
-              options.spool = genMerge.mkOption {
-                type = genMerge.types.str;
-                default = "none";
-              };
-            }
-          ];
-        }).type;
+        (genMerge.evalModuleTree { } [
+          {
+            options.spool = genMerge.mkOption {
+              type = genMerge.types.str;
+              default = "none";
+            };
+          }
+        ]).type;
       member = genMerge.types.either spoolTree genMerge.types.str;
     in
     (at member ({ ... }: { spool = "sateen"; })).spool == "sateen" && at member "selvedge" == "selvedge"

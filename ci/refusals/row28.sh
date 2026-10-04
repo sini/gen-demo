@@ -15,12 +15,10 @@ row28='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   strOpt = genMerge.mkOption { type = genMerge.types.str; default = "linen"; };
-in builtins.toJSON (builtins.attrNames (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (builtins.attrNames (genMerge.evalModuleTree { } [
     { options.schema = genSchema.mkSchemaOption {}; }
     { config.schema.thimble = { options.spool = strOpt; SECONDSPOOL; }; }
-  ];
-}).config.schema.thimble.options)'
+  ]).config.schema.thimble.options)'
 check "T5 row28 unplanted (the second spool DECLARED, the way gen-schema reads it)" \
   "${row28/SECONDSPOOL/options.spoool = strOpt}" 0 "" \
   "$tmpdir/row28-green.err" '["spool","spoool"]'

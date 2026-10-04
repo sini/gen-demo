@@ -48,7 +48,9 @@ let
       ]
       ++ map (d: { config.heddle = d; }) w.defs;
     }).config.heddle;
-  gen = value genMerge.evalModuleTree genMerge.types genMerge.mkOption;
+  gen = value (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.types genMerge.mkOption;
   nixpkgs = value lib.evalModules lib.types lib.mkOption;
   refuses = v: !(builtins.tryEval (builtins.deepSeq v.n true)).success;
   holds = w: (gen w).k == (nixpkgs w).k && refuses (gen w) && refuses (nixpkgs w);

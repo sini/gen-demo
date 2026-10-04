@@ -10,10 +10,10 @@
 row95='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
-  read = type: (genMerge.evalModuleTree { modules = [
+  read = type: (genMerge.evalModuleTree { } [
     { options.bolts = genMerge.mkOption { inherit type; }; }
     { bolts.warp = "sateen"; }
-  ]; }).config.bolts;
+  ]).config.bolts;
   applied = (read (genMerge.types.attrsOf (genMerge.types.enum "e" [ "sateen" ]))).warp;
   bare = read (genMerge.types.attrsOf genMerge.types.enum);
   planted = builtins.toJSON bare;

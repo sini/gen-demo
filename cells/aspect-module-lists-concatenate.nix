@@ -30,11 +30,12 @@ let
   };
   stitch =
     cnfs:
-    (genMerge.evalModuleTree {
-      modules = map (c: { options.aspects = (genAspects.mkAspectSchema c).mkAspectOption { }; }) cnfs ++ [
+    (genMerge.evalModuleTree { } (
+      map (c: { options.aspects = (genAspects.mkAspectSchema c).mkAspectOption { }; }) cnfs
+      ++ [
         { aspects.stitch = { }; }
-      ];
-    }).config.aspects.stitch;
+      ]
+    )).config.aspects.stitch;
   read = s: {
     baize = s.baize or null;
     chenille = s.chenille or null;

@@ -11,10 +11,10 @@ row88='let
   genMerge = gen.lib.modules.merge;
   selfM = { lib, ... }: selfM;
   goodM = _: { spool = 5; };
-  spool = MODULE: (genMerge.evalModuleTree { modules = [
+  spool = MODULE: (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { type = genMerge.types.int; default = 0; }; }
     MODULE
-  ]; }).config.spool;
+  ]).config.spool;
 in BODY'
 check "T5 row88 unplanted (a module function returning a module merges)" \
   "${row88/BODY/builtins.toJSON (spool goodM)}" 0 "" "$tmpdir/row88-green.err" '5'

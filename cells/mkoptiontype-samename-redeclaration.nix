@@ -32,14 +32,13 @@ let
     };
   read =
     types: v:
-    (genMerge.evalModuleTree {
-      modules =
-        builtins.genList (i: {
-          _file = "/demo/beam${toString i}.nix";
-          options.tension = genMerge.mkOption { type = builtins.elemAt types i; };
-        }) (builtins.length types)
-        ++ [ { tension = v; } ];
-    }).config.tension;
+    (genMerge.evalModuleTree { } (
+      builtins.genList (i: {
+        _file = "/demo/beam${toString i}.nix";
+        options.tension = genMerge.mkOption { type = builtins.elemAt types i; };
+      }) (builtins.length types)
+      ++ [ { tension = v; } ]
+    )).config.tension;
   decides = e: (builtins.tryEval (builtins.deepSeq e true)).success;
 in
 {

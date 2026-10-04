@@ -63,11 +63,9 @@ in
     let
       s = genAspects.mkAspectSchema (cnf // { keySemantics.nixos.category = "class"; });
     in
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = s.schemaOption; }
-        (s.mkAspectModule { })
-        { config.aspects = defs; }
-      ];
-    }).config.aspects;
+    (genMerge.evalModuleTree { } [
+      { options.schema = s.schemaOption; }
+      (s.mkAspectModule { })
+      { config.aspects = defs; }
+    ]).config.aspects;
 }

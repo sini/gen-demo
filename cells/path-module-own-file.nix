@@ -21,9 +21,9 @@ let
   native =
     mods:
     map (d: d.file)
-      (genMerge.evalModuleTree {
-        modules = [ { options.warp = genMerge.mkOption { type = genMerge.types.int; }; } ] ++ mods;
-      }).provenance.warp.defs;
+      (genMerge.evalModuleTree { } (
+        [ { options.warp = genMerge.mkOption { type = genMerge.types.int; }; } ] ++ mods
+      )).provenance.warp.defs;
   nixpkgs =
     mods:
     map (d: d.file)

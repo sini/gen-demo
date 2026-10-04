@@ -17,12 +17,10 @@ rowKindHeader='let
   genSelect = gen.lib.substrate.select;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
-  tree = genMerge.evalModuleTree {
-    modules = [
+  tree = genMerge.evalModuleTree { } [
       { options.schema = genSchema.mkSchemaOption {}; }
       { config.schema.thimble = { options.spool = genMerge.mkOption { type = genMerge.types.str; default = "linen"; }; }; }
     ];
-  };
   minted = tree.config.schema.thimble;
   handWritten = { kind = "thimble"; options = { }; };
 '

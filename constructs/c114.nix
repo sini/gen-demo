@@ -47,9 +47,9 @@ let
       _file = "${scope}.nix";
       config.x = d;
     }) defs;
-  evalOf = scope: defs: gm.evalModuleTree { modules = [ optDecl ] ++ modulesOf scope defs; };
+  evalOf = scope: defs: gm.evalModuleTree { } ([ optDecl ] ++ modulesOf scope defs);
   receiverOf =
-    moved: (gm.evalModuleTree { modules = [ optDecl ] ++ map (d: { config.x = d; }) moved; }).config.x;
+    moved: (gm.evalModuleTree { } ([ optDecl ] ++ map (d: { config.x = d; }) moved)).config.x;
 
   structure =
     {
@@ -112,10 +112,7 @@ let
         map (s: {
           name = s;
           value =
-            (gm.bandedLeaves {
-              scope = s;
-              result = evals.${pairing s} or (evalOf (pairing s) contributions.${pairing s});
-            }).x;
+            (gm.bandedLeaves s (evals.${pairing s} or (evalOf (pairing s) contributions.${pairing s}))).x;
         }) scopes
       );
       pos = v.headPositions {
@@ -211,26 +208,22 @@ let
   # aside (k3, k5 and k6 carry it): `x` declared with no default and defined by nobody, and `x`
   # undeclared, so a definition of it lands on the freeform plane, which has no priority pass.
   unsetEvals = {
-    noDefinition = gm.evalModuleTree {
-      modules = [
-        {
-          _file = "r.nix";
-          options.x = gm.mkOption { type = gm.types.str; };
-        }
-      ];
-    };
-    freeform = gm.evalModuleTree {
-      modules = [
-        {
-          _file = "r.nix";
-          freeformType = gm.types.attrsOf gm.types.str;
-        }
-        {
-          _file = "r.nix";
-          x = "R";
-        }
-      ];
-    };
+    noDefinition = gm.evalModuleTree { } [
+      {
+        _file = "r.nix";
+        options.x = gm.mkOption { type = gm.types.str; };
+      }
+    ];
+    freeform = gm.evalModuleTree { } [
+      {
+        _file = "r.nix";
+        freeformType = gm.types.attrsOf gm.types.str;
+      }
+      {
+        _file = "r.nix";
+        x = "R";
+      }
+    ];
   };
 in
 {

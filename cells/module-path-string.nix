@@ -16,12 +16,10 @@
     let
       at =
         type: def:
-        (genMerge.evalModuleTree {
-          modules = [
-            { options.seam = genMerge.mkOption { inherit type; }; }
-            { config.seam = def; }
-          ];
-        }).config.seam;
+        (genMerge.evalModuleTree { } [
+          { options.seam = genMerge.mkOption { inherit type; }; }
+          { config.seam = def; }
+        ]).config.seam;
       keyed = genMerge.types.submodule {
         options.key = genMerge.mkOption {
           type = genMerge.types.str;
@@ -37,6 +35,6 @@
     at (genMerge.types.either keyed genMerge.types.str) spool == {
       key = "sateen";
     }
-    && builtins.length (genMerge.lint { modules = [ lintee ]; }) == 1
+    && builtins.length (genMerge.lint [ lintee ]) == 1
   );
 }

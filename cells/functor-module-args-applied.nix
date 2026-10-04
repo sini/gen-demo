@@ -24,7 +24,9 @@ let
     eval: mkOption: P: mods:
     (eval { modules = [ { options.x = mkOption { type = P.str; }; } ] ++ mods; }).config.x;
   nixpkgs = x lib.evalModules lib.mkOption lib.types;
-  native = x genMerge.evalModuleTree genMerge.mkOption genMerge.types;
+  native = x (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption genMerge.types;
 in
 {
   construct = [ "C135" ];

@@ -65,12 +65,10 @@ let
     .success;
   c29Bobbins =
     args:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.bobbins = c29Schema.mkInstanceRegistry c29Bobbin.bobbin args; }
-        { config.bobbins.pewter.spool = "linen"; }
-      ];
-    }).config.bobbins.pewter;
+    (genMerge.evalModuleTree { } [
+      { options.bobbins = c29Schema.mkInstanceRegistry c29Bobbin.bobbin args; }
+      { config.bobbins.pewter.spool = "linen"; }
+    ]).config.bobbins.pewter;
   c29Supplied =
     (c29Bobbins {
       specialArgs = {

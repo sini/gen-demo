@@ -27,12 +27,10 @@ let
   ];
   viaGen =
     type:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.thread = genMerge.mkOption { inherit type; }; }
-        { thread = defs; }
-      ];
-    }).config.thread;
+    (genMerge.evalModuleTree { } [
+      { options.thread = genMerge.mkOption { inherit type; }; }
+      { thread = defs; }
+    ]).config.thread;
   viaNixpkgs =
     type:
     (lib.evalModules {

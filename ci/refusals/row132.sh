@@ -12,15 +12,13 @@ row132='let
   merge = gen.lib.modules.merge;
   cnf = import ./aspect-cnf.nix;
   schema = genAspects.mkAspectSchema cnf;
-  gore = extra: (merge.evalModuleTree {
-    modules = [
+  gore = extra: (merge.evalModuleTree { } [
       (schema.mkAspectModule { })
       { options.schema = schema.schemaOption; }
       { config.schema.aspect.options.priority = merge.mkOption { type = merge.types.int; default = 0; }; }
       { config.aspects.gore.nixos = { }; }
       extra
-    ];
-  }).config.aspects.gore;
+    ]).config.aspects.gore;
   green = builtins.toJSON (gore { config.schema.aspect.imports = [ { priority = 7; } ]; }).priority;
   planted = builtins.deepSeq (builtins.attrNames (gore {
     config.schema.aspect.imports = [ { keySemantics = cnf.keySemantics // { darwin.category = "class"; }; } ];

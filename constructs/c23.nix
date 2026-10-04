@@ -15,17 +15,15 @@ let
   };
   # No definition anywhere and NO `default` — the defaultless half is the whole row. A `default
   # = { }` would green this from the declaration side and say nothing about the type.
-  c23Undefined = (genMerge.evalModuleTree { modules = [ c23Decl ]; }).config.selvedge;
+  c23Undefined = (genMerge.evalModuleTree { } [ c23Decl ]).config.selvedge;
   # Two modules, disjoint keys. The fold has to UNION them: picking either definition, or
   # refusing, is the pre-component behaviour.
   c23Disjoint =
-    (genMerge.evalModuleTree {
-      modules = [
-        c23Decl
-        { config.selvedge.warp = "flax"; }
-        { config.selvedge.weft = "tussah"; }
-      ];
-    }).config.selvedge;
+    (genMerge.evalModuleTree { } [
+      c23Decl
+      { config.selvedge.warp = "flax"; }
+      { config.selvedge.weft = "tussah"; }
+    ]).config.selvedge;
 in
 {
   inherit c23Decl c23Undefined c23Disjoint;

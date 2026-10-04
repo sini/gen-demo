@@ -17,7 +17,7 @@
         type = genMerge.types.str;
         default = "none";
       };
-      declared = m: builtins.attrNames (genMerge.declaredOptions { modules = [ m ]; });
+      declared = m: builtins.attrNames (genMerge.declaredOptions { } [ m ]);
       typo = {
         _file = "/demo/typo.nix";
         options.spool = spoolOpt;

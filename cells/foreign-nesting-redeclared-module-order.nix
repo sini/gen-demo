@@ -18,7 +18,7 @@ let
     config.l = [ "np" ];
   };
   genModule = tag: { config.l = [ tag ]; };
-  tree = modules: (genMerge.evalModuleTree { inherit modules; }).type;
+  tree = modules: (genMerge.evalModuleTree { } modules).type;
   families = {
     submodule = {
       np = t.submodule [ npModule ];
@@ -77,7 +77,7 @@ let
       );
     in
     if r.success then r.value else null;
-  gen = read genMerge.evalModuleTree;
+  gen = read (r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules);
   ref = read lib.evalModules;
 in
 {

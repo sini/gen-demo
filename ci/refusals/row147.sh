@@ -15,12 +15,10 @@ row147='let
   byName = "gore";
   byRead = t.readCtx "host" [ ];
   byLit = t.lit "gore";
-  aspects = (merge.evalModuleTree {
-    modules = [
+  aspects = (merge.evalModuleTree { } [
       { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
       { aspects.gore.nixos.marks = [ "gore" ]; aspects.panel.includes = [ EXTRA ]; }
-    ];
-  }).config.aspects;
+    ]).config.aspects;
   sites = (genAspects.graphFacts cnf aspects).includeSitesOf.panel;
   shown = builtins.toJSON sites;
   caught = if (builtins.tryEval (builtins.deepSeq sites null)).success then "ADMITTED" else "CAUGHT";

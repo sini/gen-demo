@@ -12,16 +12,14 @@ row134='let
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
   str = default: merge.mkOption { type = merge.types.str; inherit default; };
-  ferrule = x: (merge.evalModuleTree {
-    modules = [
+  ferrule = x: (merge.evalModuleTree { } [
       { options.schema = schema.mkSchemaOption { }; }
       {
         config.schema.p.options.o_p = str "p";
         config.schema.a = { inherits = [ "p" ]; options.o_a = str x; };
       }
-    ];
-  }).config.schema.a;
-  read = modules: (merge.evalModuleTree { inherit modules; }).config.o_a;
+    ]).config.schema.a;
+  read = modules: (merge.evalModuleTree { } modules).config.o_a;
   one = ferrule "one";
   green = read [ one one ];
   planted = read [ (ferrule "one") (ferrule "two") ];

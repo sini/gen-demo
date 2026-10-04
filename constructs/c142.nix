@@ -60,39 +60,37 @@ let
       }
     ];
   };
-  loom = genMerge.evalModuleTree {
-    modules = [
-      {
-        options.loom.aspects = genMerge.mkOption {
-          type = genMerge.lazyAttrsOf genMerge.raw;
-          default = { };
+  loom = genMerge.evalModuleTree { } [
+    {
+      options.loom.aspects = genMerge.mkOption {
+        type = genMerge.lazyAttrsOf genMerge.raw;
+        default = { };
+      };
+      options.loom.rules = genMerge.mkOption {
+        type = genMerge.lazyAttrsOf genMerge.raw;
+        default = { };
+      };
+      options.loom.lambdas = genRules.lambdas;
+    }
+    (load {
+      loom.aspects.hem =
+        { ... }@args:
+        {
+          description = if args ? bobbin then "hem-${args.bobbin}" else "hem";
         };
-        options.loom.rules = genMerge.mkOption {
-          type = genMerge.lazyAttrsOf genMerge.raw;
-          default = { };
-        };
-        options.loom.lambdas = genRules.lambdas;
-      }
-      (load {
-        loom.aspects.hem =
-          { ... }@args:
+    })
+    (load {
+      loom.rules.weave =
+        { thimble, ... }:
+        [
           {
-            description = if args ? bobbin then "hem-${args.bobbin}" else "hem";
-          };
-      })
-      (load {
-        loom.rules.weave =
-          { thimble, ... }:
-          [
-            {
-              ctor = "member";
-              kind = "selvage";
-              payload.weft = thimble;
-            }
-          ];
-      })
-    ];
-  };
+            ctor = "member";
+            kind = "selvage";
+            payload.weft = thimble;
+          }
+        ];
+    })
+  ];
   door = genRules.mkApply {
     lambdas = loom.config.loom.lambdas;
     inherit cnf;

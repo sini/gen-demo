@@ -14,7 +14,7 @@ let
   a = ../fixtures/path-module-own-key/a.nix;
   b = ../fixtures/path-module-own-key/b.nix;
   decl = L: { options.warp = L.mkOption { type = L.types.listOf L.types.int; }; };
-  native = mods: (genMerge.evalModuleTree { modules = [ (decl genMerge) ] ++ mods; });
+  native = mods: (genMerge.evalModuleTree { } ([ (decl genMerge) ] ++ mods));
   nixpkgs = mods: (lib.evalModules { modules = [ (decl lib) ] ++ mods; });
   unkeyed.config.warp = [ 4 ];
   pathFiled = {

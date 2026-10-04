@@ -33,36 +33,34 @@ let
   t = (genAlgebra.term inputs.gen.lib.substrate.identity.hashIdentity).term;
   inherit (genAspects) guard pred;
   aspects =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        {
-          aspects = {
-            frame.includes = [ "selvage" ];
-            selvage = guard (pred.has "loom") {
-              nixos.marks = [ "selvage" ];
-              trim = t.readCtx "loom" [ "deep" ];
-              includes = [
-                "pick"
-                "hem"
-                "heddle"
-              ];
-            };
-            pick = guard (pred.has "loom") {
-              description = t.concat [
-                (t.lit "pick-")
-                (t.readCtx "loom" [ ])
-              ];
-            };
-            hem.description = "hem";
-            heddle = guard (pred.all [
-              (pred.has "loom")
-              (pred.has "shuttle")
-            ]) { description = t.readCtx "shuttle" [ ]; };
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      {
+        aspects = {
+          frame.includes = [ "selvage" ];
+          selvage = guard (pred.has "loom") {
+            nixos.marks = [ "selvage" ];
+            trim = t.readCtx "loom" [ "deep" ];
+            includes = [
+              "pick"
+              "hem"
+              "heddle"
+            ];
           };
-        }
-      ];
-    }).config.aspects;
+          pick = guard (pred.has "loom") {
+            description = t.concat [
+              (t.lit "pick-")
+              (t.readCtx "loom" [ ])
+            ];
+          };
+          hem.description = "hem";
+          heddle = guard (pred.all [
+            (pred.has "loom")
+            (pred.has "shuttle")
+          ]) { description = t.readCtx "shuttle" [ ]; };
+        };
+      }
+    ]).config.aspects;
 
   entity = n: inputs.gen.lib.substrate.identity.hashIdentity "entity" [ "name" ] (_: n);
   suppliers = {

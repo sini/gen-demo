@@ -9,13 +9,11 @@ row72='let
   flake = builtins.getFlake (toString ./.);
   genMerge = flake.inputs.gen.lib.modules.merge;
   lib = flake.inputs.nixpkgs.lib;
-in toString (genMerge.evalModuleTree {
-  modules = [
+in toString (genMerge.evalModuleTree { } [
     { options.lathe.spindle = genMerge.mkOption { type = lib.types.port; }; }
     { options.lathe.spindle = genMerge.mkOption { type = SECOND; }; }
     { _file = "/demo/lathe.nix"; lathe.spindle = VALUE; }
-  ];
-}).config.lathe.spindle'
+  ]).config.lathe.spindle'
 row72a="${row72/SECOND/lib.types.port}"
 row72b="${row72/SECOND/lib.types.int}"
 check "T5 row72 unplanted (port redeclared as the same port, 8080)" "${row72a/VALUE/8080}" 0 "" \

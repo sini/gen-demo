@@ -12,8 +12,8 @@
 let
   threads =
     modules:
-    (genMerge.evalModuleTree {
-      modules = [
+    (genMerge.evalModuleTree { } (
+      [
         {
           options.threads = genMerge.mkOption {
             type = genMerge.types.listOf genMerge.types.str;
@@ -21,8 +21,8 @@ let
           };
         }
       ]
-      ++ modules;
-    }).config.threads;
+      ++ modules
+    )).config.threads;
   reed = ../fixtures/module-graph-identity/reed.nix;
   sley = {
     threads = [ "sley" ];

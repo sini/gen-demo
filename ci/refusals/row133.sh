@@ -12,7 +12,7 @@ row133='let
   lazyRaw = t.lazyAttrsOf t.raw;
   readBogus = { config, ... }: { options.r = merge.mkOption { }; config.r = config._module.bogus or "ABSENT"; };
   readZ = { z, ... }: { options.r = merge.mkOption { }; config.r = z; };
-  eval = modules: args: (merge.evalModuleTree ({ modules = [ { options.x = merge.mkOption { default = "x"; }; } ] ++ modules; } // args));
+  eval = modules: args: (merge.evalModuleTree args ([ { options.x = merge.mkOption { default = "x"; }; } ] ++ modules));
   absorbed = builtins.toJSON (eval [ { config._module.freeformType = lazyRaw; config._module.bogus = 1; } readBogus ] { }).config.r;
   unknown = builtins.toJSON (builtins.attrNames (eval [ { config._module.bogus = 1; } ] { }).config);
   doorArgs = builtins.toJSON (eval [ readZ ] { specialArgs.z = "door"; }).config.r;
