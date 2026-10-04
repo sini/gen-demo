@@ -3,9 +3,10 @@
 # stated once, then mapped over three module lists: each reads the one `loom`, where the same door
 # under `{ }` leaves the option at its default. `twilled` is `deriveType` with its description stated
 # once and its `id` supplied, then applied to two bases. Each door's contract is read AS DATA
-# (`__contract`), and three refusals are caught at the door's own application: an unknown option in
-# the options position, the unmigrated one-record call (`modules` is no option of the door), and
-# `mergeTypes` without its `partner`.
+# (`__contract`), and two refusals are caught at the door's own application: an unknown option in
+# the options position, and the unmigrated one-record call (`modules` is no option of the door).
+# `mergeTypes` takes its two types positionally and asks the FIRST: `heddle`, whose own relation
+# merges with anything, answers where it comes first and `int` refuses where `int` does.
 {
   asserts,
   genMerge,
@@ -25,6 +26,14 @@ let
   evalUnder = genMerge.evalModuleTree { specialArgs.loom = "jacquard"; };
 
   twilled = genMerge.deriveType { description = "a twilled value"; } "twilled";
+
+  heddle = t.defineType (
+    t.str
+    // {
+      name = "heddle";
+      typeMergeRel = _: { merged = t.str; };
+    }
+  );
 
   refuses = e: !(builtins.tryEval (builtins.seq e null)).success;
 in
@@ -61,18 +70,10 @@ in
         "warmFrom"
         "editedModules"
       ]
-    &&
-      genMerge.mergeTypes.__contract.required == [
-        "deciding"
-        "partner"
-      ]
-    &&
-      (genMerge.mergeTypes {
-        deciding = t.str;
-        partner = t.str;
-      }).name == t.str.name
+    && (genMerge.mergeTypes t.str t.str).name == t.str.name
+    && (genMerge.mergeTypes heddle t.int).name == t.str.name
+    && genMerge.mergeTypes t.int heddle == null
     && refuses (genMerge.evalModuleTree { specialArg = { }; })
     && refuses (genMerge.evalModuleTree { modules = [ shuttle ]; })
-    && refuses (genMerge.mergeTypes { deciding = t.str; })
   );
 }

@@ -91,27 +91,15 @@
           )
         )).type;
     in
-    idOf (mergeTypes {
-      deciding = tagged;
-      partner = tagged;
-    }) == "tagged"
+    idOf (mergeTypes tagged tagged) == "tagged"
     && declares tagged tagged
     && !(declares t.str tagged)
     && !(declares tagged t.str)
     && !(mountsInNixpkgs t.str tagged)
     && !(mountsInNixpkgs tagged t.str)
     && mountsInNixpkgs tagged tagged
-    &&
-      idOf
-        (mergeTypes {
-          deciding = bobbins;
-          partner = bobbins;
-        }).carries.element == "tagged"
-    &&
-      mergeTypes {
-        deciding = bobbins;
-        partner = (t.listOf t.str);
-      } == null
+    && idOf (mergeTypes bobbins bobbins).carries.element == "tagged"
+    && mergeTypes bobbins (t.listOf t.str) == null
     && tagged.check "sateen"
     && !(tagged.check 1)
     && !(typeEq tagged t.str)
