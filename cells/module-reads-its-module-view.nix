@@ -48,7 +48,7 @@ let
   gen =
     args: extra:
     read
-      (genMerge.evalModuleTree (
+      ((r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules) (
         args // { modules = loom genMerge genMerge.types.submodule (extra genMerge genMerge.types); }
       )).config;
   ref =

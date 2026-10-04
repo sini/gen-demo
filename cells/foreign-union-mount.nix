@@ -12,16 +12,14 @@
 }:
 let
   spool =
-    (genMerge.evalModuleTree {
-      modules = [
-        {
-          options.spool = genMerge.mkOption {
-            type = genMerge.types.str;
-            default = "none";
-          };
-        }
-      ];
-    }).type;
+    (genMerge.evalModuleTree { } [
+      {
+        options.spool = genMerge.mkOption {
+          type = genMerge.types.str;
+          default = "none";
+        };
+      }
+    ]).type;
   mount =
     type: v:
     (lib.evalModules {

@@ -14,14 +14,12 @@ row32='let
     inherit (aspectSchema) schemaOption;
     modules = [ { config.schema.bobbin.options.picks = genMerge.mkOption { type = genSchema.refined genMerge.types.int [ genSchema.refinements.positive ]; default = 1; }; } ];
   };
-in toString (genMerge.evalModuleTree {
-  modules = [
+in toString (genMerge.evalModuleTree { } [
     { imports = [ (aspectSchema.mkAspectModule { }) ]; }
     { options.schema = genMerge.mkOption { type = genMerge.types.raw; default = schema; }; }
     { options.bobbins = genSchema.mkInstanceRegistry schema.bobbin { }; }
     { config.bobbins.grosgrain.picks = PICKS; }
-  ];
-}).config.bobbins.grosgrain.picks'
+  ]).config.bobbins.grosgrain.picks'
 check "T5 row32 unplanted (an admissible value on the refined option)" "${row32/PICKS/3}" 0 "" \
   "$tmpdir/row32-green.err" '3'
 check "T5 row32 planted   (a value the refinement forbids)" "${row32/PICKS/0}" 1 \

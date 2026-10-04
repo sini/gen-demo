@@ -24,18 +24,16 @@
       };
       read =
         on:
-        (genMerge.evalModuleTree {
-          modules = [
-            {
-              options.selvage = genMerge.mkOption { type = selvage; };
-              options.bolts = genMerge.mkOption { type = genMerge.types.attrsOf selvage; };
-            }
-            {
-              selvage = genMerge.mkIf on { weft = "twill"; };
-              bolts.linen = genMerge.mkIf on { weft = "twill"; };
-            }
-          ];
-        }).config;
+        (genMerge.evalModuleTree { } [
+          {
+            options.selvage = genMerge.mkOption { type = selvage; };
+            options.bolts = genMerge.mkOption { type = genMerge.types.attrsOf selvage; };
+          }
+          {
+            selvage = genMerge.mkIf on { weft = "twill"; };
+            bolts.linen = genMerge.mkIf on { weft = "twill"; };
+          }
+        ]).config;
     in
     (read false).selvage.weft == "plain"
     && builtins.attrNames (read false).bolts == [ ]

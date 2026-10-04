@@ -15,22 +15,18 @@ rowIdentityHeader='let
   genSelect = gen.lib.substrate.select;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
-  treeOf = extra: genMerge.evalModuleTree {
-    modules = [
+  treeOf = extra: genMerge.evalModuleTree { } [
       { options.schema = genSchema.mkSchemaOption {}; }
       { config.schema.thimble.options = { spool = genMerge.mkOption { type = genMerge.types.str; }; } // extra; }
     ];
-  };
   thimbleA = (treeOf { }).config.schema.thimble;
   thimbleB = (treeOf { notches = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; }; }).config.schema.thimble;
-  inst = genMerge.evalModuleTree {
-    modules = [ {
+  inst = genMerge.evalModuleTree { } [ {
       options.a = genSchema.mkInstanceRegistry thimbleA { };
       options.b = genSchema.mkInstanceRegistry thimbleB { };
       config.a.pewter.spool = "linen";
       config.b.pewter.spool = "linen";
     } ];
-  };
   ctx = kindFor: genSelect.adapters.registry.mkContext {
     nodes = [ "a" "b" ]; data = id: if id == "a" then inst.config.a.pewter else inst.config.b.pewter;
     parent = _: null; inherit kindFor;

@@ -23,7 +23,7 @@ let
     )
   ];
   forced = mkForce: [ { _module.args.name = mkForce "forced"; } ];
-  spool = extra: (genMerge.evalModuleTree { modules = mods genMerge.mkOption ++ extra; }).type;
+  spool = extra: (genMerge.evalModuleTree { } (mods genMerge.mkOption ++ extra)).type;
   ref = extra: (lib.evalModules { modules = mods lib.mkOption ++ extra; }).type;
   # `eval` and `mkOption` are the evaluating module system's; `P` the container's.
   warp =
@@ -35,7 +35,9 @@ let
       ];
     }).config.seam.warp.weft;
   mounted = warp lib.evalModules lib.mkOption lib.types;
-  native = warp genMerge.evalModuleTree genMerge.mkOption genMerge.types;
+  native = warp (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption genMerge.types;
   docs = type: (type.getSubOptions [ ]).weft.default;
 in
 {

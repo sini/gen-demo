@@ -15,23 +15,19 @@
 let
   read =
     type: v:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.seam = genMerge.mkOption { inherit type; }; }
-        { seam = v; }
-      ];
-    }).config.seam;
+    (genMerge.evalModuleTree { } [
+      { options.seam = genMerge.mkOption { inherit type; }; }
+      { seam = v; }
+    ]).config.seam;
   spool =
-    (genMerge.evalModuleTree {
-      modules = [
-        {
-          options.spool = genMerge.mkOption {
-            type = genMerge.types.str;
-            default = "none";
-          };
-        }
-      ];
-    }).type;
+    (genMerge.evalModuleTree { } [
+      {
+        options.spool = genMerge.mkOption {
+          type = genMerge.types.str;
+          default = "none";
+        };
+      }
+    ]).type;
   answers =
     holder:
     let

@@ -14,19 +14,17 @@ let
   };
   read =
     a: b:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.heddle = genMerge.mkOption { type = thread; }; }
-        {
-          _file = "/demo/warp.nix";
-          heddle = a;
-        }
-        {
-          _file = "/demo/weft.nix";
-          heddle = b;
-        }
-      ];
-    }).config.heddle;
+    (genMerge.evalModuleTree { } [
+      { options.heddle = genMerge.mkOption { type = thread; }; }
+      {
+        _file = "/demo/warp.nix";
+        heddle = a;
+      }
+      {
+        _file = "/demo/weft.nix";
+        heddle = b;
+      }
+    ]).config.heddle;
   attempt = v: builtins.tryEval (builtins.deepSeq v v);
   refused = v: !(attempt v).success;
   combined = attempt (read [ "warp" ] [ "weft" ]);

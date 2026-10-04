@@ -16,19 +16,17 @@ let
   cnf = import ../aspect-cnf.nix;
   t = (genAlgebra.term inputs.gen.lib.substrate.identity.hashIdentity).term;
   tuck =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        {
-          aspects.tuck = genAspects.guard (genAspects.pred.has "thimble") {
-            description = t.concat [
-              (t.lit "tuck-")
-              (t.readCtx "thimble" [ ])
-            ];
-          };
-        }
-      ];
-    }).config.aspects.tuck;
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      {
+        aspects.tuck = genAspects.guard (genAspects.pred.has "thimble") {
+          description = t.concat [
+            (t.lit "tuck-")
+            (t.readCtx "thimble" [ ])
+          ];
+        };
+      }
+    ]).config.aspects.tuck;
   fire = (genAspects.mkGuardVocab cnf).applyGuard;
   wide = fire {
     thimble = "pewter";

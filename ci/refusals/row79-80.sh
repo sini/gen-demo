@@ -9,12 +9,10 @@ row79='let
   flake = builtins.getFlake (toString ./.);
   genMerge = flake.inputs.gen.lib.modules.merge;
   lib = flake.inputs.nixpkgs.lib;
-in (genMerge.evalModuleTree {
-  modules = [
+in (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { type = TYPE; }; }
     { spool.warp = "sateen"; }
-  ];
-}).config.spool.warp'
+  ]).config.spool.warp'
 row79stated='lib.types.addCheck (lib.types.attrsOf lib.types.str) builtins.isAttrs'
 row79plant='lib.types.attrsOf lib.types.str // { check = builtins.isAttrs; }'
 row79unplanted="${row79/TYPE/$row79stated}"

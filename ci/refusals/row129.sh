@@ -9,13 +9,11 @@ row129='let
   genMerge = flake.inputs.gen.lib.modules.merge;
   lib = flake.inputs.nixpkgs.lib;
   short = lib.types.addCheck genMerge.types.int (n: n < 3);
-in toString (genMerge.evalModuleTree {
-  modules = [
+in toString (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { type = EARLIER; }; }
     { options.spool = genMerge.mkOption { type = short; }; }
     { spool = 2; }
-  ];
-}).config.spool'
+  ]).config.spool'
 row129unplanted="${row129/EARLIER/short}"
 row129planted="${row129/EARLIER/genMerge.types.int}"
 check "T5 row129 unplanted (one wrapped value declared twice)" "$row129unplanted" 0 "" \

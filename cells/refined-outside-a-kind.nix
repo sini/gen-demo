@@ -14,12 +14,10 @@ let
   spool = schema.refined T.int schema.refinements.positive;
   read =
     type: v:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.spool = genMerge.mkOption { inherit type; }; }
-        { spool = v; }
-      ];
-    }).config.spool;
+    (genMerge.evalModuleTree { } [
+      { options.spool = genMerge.mkOption { inherit type; }; }
+      { spool = v; }
+    ]).config.spool;
   refused = type: v: !(builtins.tryEval (builtins.deepSeq (read type v) null)).success;
 in
 {

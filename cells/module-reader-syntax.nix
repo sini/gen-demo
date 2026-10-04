@@ -17,17 +17,15 @@
     let
       read =
         m:
-        (genMerge.evalModuleTree {
-          modules = [
-            {
-              options.spool = genMerge.mkOption {
-                type = genMerge.types.str;
-                default = "none";
-              };
-            }
-            m
-          ];
-        }).config.spool;
+        (genMerge.evalModuleTree { } [
+          {
+            options.spool = genMerge.mkOption {
+              type = genMerge.types.str;
+              default = "none";
+            };
+          }
+          m
+        ]).config.spool;
       typo = {
         _file = "/demo/typo.nix";
         config.spool = "sateen";

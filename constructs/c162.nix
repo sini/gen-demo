@@ -10,8 +10,8 @@ let
       }).config.hem;
 in
 {
-  nullableHem = hem genMerge.evalModuleTree genMerge.mkOption (
-    genMerge.types.nullOr genMerge.types.int
-  );
+  nullableHem = hem (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption (genMerge.types.nullOr genMerge.types.int);
   nullableHemNixpkgs = hem lib.evalModules lib.mkOption (lib.types.nullOr lib.types.int);
 }

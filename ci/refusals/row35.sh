@@ -7,9 +7,7 @@ row35='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
   o = genMerge.mkOption { type = genMerge.types.str; default = "none"; };
-in builtins.concatStringsSep "," (builtins.attrNames (genMerge.declaredOptions {
-  modules = [ { _file = "/demo/typo.nix"; options.spool = o; KEY.weft = o; } ];
-}))'
+in builtins.concatStringsSep "," (builtins.attrNames (genMerge.declaredOptions { } [ { _file = "/demo/typo.nix"; options.spool = o; KEY.weft = o; } ]))'
 check "T5 row35 unplanted (both options spelled right)" "${row35/KEY/options}" 0 "" \
   "$tmpdir/row35-green.err" 'spool,weft'
 check "T5 row35 planted   (a declaration-only read of a typo key)" "${row35/KEY/option}" 1 \

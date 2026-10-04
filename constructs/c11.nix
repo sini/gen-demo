@@ -28,13 +28,13 @@ let
     let
       selvageSchema = genAspects.mkAspectSchema { keySemantics = selvageFacets; };
     in
-    genMerge.evalModuleTree {
-      modules = [
+    genMerge.evalModuleTree { } (
+      [
         { options.schema = selvageSchema.schemaOption; }
         (selvageSchema.mkAspectModule { })
       ]
-      ++ modules;
-    };
+      ++ modules
+    );
   mill = mkSelvageRegistry [
     {
       config.aspects.stitch.selvageCap = {

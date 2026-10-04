@@ -17,9 +17,9 @@ let
   kinds =
     decls:
     builtins.attrNames
-      (genMerge.evalModuleTree {
-        modules = map (o: { options.schema = o; }) decls ++ [ { config.schema.selvage = { }; } ];
-      }).config.schema.selvage;
+      (genMerge.evalModuleTree { } (
+        map (o: { options.schema = o; }) decls ++ [ { config.schema.selvage = { }; } ]
+      )).config.schema.selvage;
   decides = e: (builtins.tryEval (builtins.deepSeq e true)).success;
   # a facet whose option is typed by a check-only `mkOptionType`: the one position the
   # `keySemantics` grammar places a type record, and a cyclic one. Its back-edge sits under

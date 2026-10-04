@@ -8,10 +8,10 @@
 row92='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
-  read = type: (genMerge.evalModuleTree { modules = [
+  read = type: (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { inherit type; }; }
     { spool = "sateen"; }
-  ]; }).config.spool;
+  ]).config.spool;
   applied = read (genMerge.types.enum "e" [ "sateen" ]);
   bare = read genMerge.types.enum;
 in BODY'

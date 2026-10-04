@@ -20,16 +20,14 @@ row107='let
       }
     ];
   };
-  tipOf = pick: (merge.evalModuleTree {
-    modules = [
+  tipOf = pick: (merge.evalModuleTree { } [
       ({ config, ... }: {
         options.aglets = schema.mkInstanceRegistry kinds.aglet { };
         options.lacets = schema.mkInstanceRegistry kinds.lacet { refs.tip = config.aglets; };
         config.aglets.gilt.finish = "gilded";
         config.lacets.l.tip = pick config.aglets.gilt;
       })
-    ];
-  }).config.lacets.l.tip.finish;
+    ]).config.lacets.l.tip.finish;
   green = tipOf (g: g);
   planted = tipOf (g: g // { finish = "tarnished"; });
   red = planted;

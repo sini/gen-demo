@@ -17,7 +17,10 @@ let
   spin = x: x + 1;
   twist = _: x: x;
   read =
-    args: modules: (genMerge.evalModuleTree (args // { modules = [ decl ] ++ modules; })).config.heddle;
+    args: modules:
+    ((r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules) (
+      args // { modules = [ decl ] ++ modules; }
+    )).config.heddle;
   pair =
     a: b:
     read { } [

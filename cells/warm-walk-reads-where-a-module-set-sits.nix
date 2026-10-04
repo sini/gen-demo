@@ -26,14 +26,13 @@ let
       config.id_hash = "bobbin:" + builtins.hashString "sha256" config.spool;
     };
   spool = t.submodule spoolMod;
-  coldOf = mods: evalModuleTree { modules = mods; };
+  coldOf = mods: evalModuleTree { } mods;
   warmOf =
     base: edited:
     evalModuleTree {
-      modules = base ++ edited;
       warmFrom = coldOf base;
       editedModules = edited;
-    };
+    } (base ++ edited);
   # a minted instance in the base, so the warm walk is forced
   anchor = [
     { options.reel = mkOption { type = gt.attrsOf (gt.submodule spoolMod); }; }

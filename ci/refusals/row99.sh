@@ -12,10 +12,10 @@ row99='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
-  schema = kinds: (genMerge.evalModuleTree { modules = [
+  schema = kinds: (genMerge.evalModuleTree { } [
     { options.schema = genSchema.mkSchemaOption { }; }
     { config.schema = kinds; }
-  ]; }).config.schema;
+  ]).config.schema;
   nested = schema { loom = { }; frame.parent = "loom"; heddle.parent = "frame"; };
   looped = schema { loom = { }; frame.parent = "heddle"; heddle.parent = "frame"; };
   selfed = schema { loom = { }; frame.parent = "frame"; };

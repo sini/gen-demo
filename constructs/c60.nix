@@ -30,17 +30,15 @@ let
   };
   c60Brass =
     { lot, tally }:
-    (genMerge.evalModuleTree {
-      modules = [
-        {
-          options.grommets = c60Schema.mkInstanceRegistry c60Kinds.grommet { };
-          config.grommets.brass = {
-            crimp = "rolled";
-            inherit lot tally;
-          };
-        }
-      ];
-    }).config.grommets.brass;
+    (genMerge.evalModuleTree { } [
+      {
+        options.grommets = c60Schema.mkInstanceRegistry c60Kinds.grommet { };
+        config.grommets.brass = {
+          crimp = "rolled";
+          inherit lot tally;
+        };
+      }
+    ]).config.grommets.brass;
 in
 {
   inherit c60Brass;

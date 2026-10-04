@@ -19,7 +19,7 @@ let
       };
     }
   ];
-  spool = (genMerge.evalModuleTree { modules = mods genMerge.mkOption; }).type;
+  spool = (genMerge.evalModuleTree { } (mods genMerge.mkOption)).type;
   ref = (lib.evalModules { modules = mods lib.mkOption; }).type;
   eval =
     type: v:

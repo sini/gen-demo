@@ -12,13 +12,12 @@ let
   read =
     sets: v:
     builtins.tryEval
-      (genMerge.evalModuleTree {
-        modules =
-          map (elems: {
-            options.weave = genMerge.mkOption { type = genMerge.types.enum "weave" elems; };
-          }) sets
-          ++ [ { weave = v; } ];
-      }).config.weave;
+      (genMerge.evalModuleTree { } (
+        map (elems: {
+          options.weave = genMerge.mkOption { type = genMerge.types.enum "weave" elems; };
+        }) sets
+        ++ [ { weave = v; } ]
+      )).config.weave;
   twoSets = [
     [ "twill" ]
     [ "sateen" ]

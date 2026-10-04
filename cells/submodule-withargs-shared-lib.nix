@@ -29,14 +29,11 @@ let
   loom =
     a: b:
     builtins.tryEval
-      (genMerge.evalModuleTree {
-        specialArgs = { inherit lib; };
-        modules = [
-          (declare "/demo/warp.nix" a)
-          (declare "/demo/weft.nix" b)
-          { loom = { }; }
-        ];
-      }).config.loom.seen;
+      (genMerge.evalModuleTree { specialArgs = { inherit lib; }; } [
+        (declare "/demo/warp.nix" a)
+        (declare "/demo/weft.nix" b)
+        { loom = { }; }
+      ]).config.loom.seen;
 in
 {
   construct = [ "C77" ];

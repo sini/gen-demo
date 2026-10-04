@@ -13,14 +13,14 @@ row98='let
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
   gauge = merge.mkOption { type = merge.types.int; };
-  thimble = extra: (merge.evalModuleTree { modules = [
+  thimble = extra: (merge.evalModuleTree { } ([
     { options.schema = schema.mkSchemaOption { }; }
     { config.schema.thimble.options.declaredGauge = gauge; }
-  ] ++ extra; }).config.schema.thimble;
-  bolt = extra: (merge.evalModuleTree { modules = [
+  ] ++ extra)).config.schema.thimble;
+  bolt = extra: (merge.evalModuleTree { } [
     { options.bolts = schema.mkInstanceRegistry (thimble extra) { }; }
     { config.bolts.instancePewter = { declaredGauge = 3; undeclaredWelt = 5; }; }
-  ]; }).config.bolts.instancePewter;
+  ]).config.bolts.instancePewter;
   planted = bolt [ ];
   remedied = bolt [ { config.schema.thimble.options.undeclaredWelt = gauge; } ];
   unplanted = builtins.toJSON [ remedied.declaredGauge remedied.undeclaredWelt ];

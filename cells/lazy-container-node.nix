@@ -9,30 +9,28 @@
   check = asserts (
     let
       cfg =
-        (genMerge.evalModuleTree {
-          modules = [
-            {
-              options.o = genMerge.mkOption {
-                type = genMerge.types.lazyAttrsOf (
-                  genMerge.types.attrsOf (
-                    genMerge.types.submodule (
-                      { name, ... }:
-                      {
-                        options.x = genMerge.mkOption { type = genMerge.types.int; };
-                        options.n = genMerge.mkOption {
-                          type = genMerge.types.str;
-                          default = name;
-                        };
-                      }
-                    )
+        (genMerge.evalModuleTree { } [
+          {
+            options.o = genMerge.mkOption {
+              type = genMerge.types.lazyAttrsOf (
+                genMerge.types.attrsOf (
+                  genMerge.types.submodule (
+                    { name, ... }:
+                    {
+                      options.x = genMerge.mkOption { type = genMerge.types.int; };
+                      options.n = genMerge.mkOption {
+                        type = genMerge.types.str;
+                        default = name;
+                      };
+                    }
                   )
-                );
-              };
-              config.o.foo.a.x = 1;
-              config.o.bar = throw "sibling read";
-            }
-          ];
-        }).config;
+                )
+              );
+            };
+            config.o.foo.a.x = 1;
+            config.o.bar = throw "sibling read";
+          }
+        ]).config;
     in
     cfg.o.foo.a.x == 1 && cfg.o.foo.a.n == "a"
   );

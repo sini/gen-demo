@@ -17,15 +17,11 @@ row123='let
       options.bevel = merge.mkOption { type = merge.types.str; };
     };
   };
-  plainTree = kinds: (merge.evalModuleTree {
-    modules = [ { options.schema = schema.mkSchemaOption { }; } { config.schema = kinds; } ];
-  }).config.schema;
-  gradeOf = kinds: (merge.evalModuleTree {
-    modules = [
+  plainTree = kinds: (merge.evalModuleTree { } [ { options.schema = schema.mkSchemaOption { }; } { config.schema = kinds; } ]).config.schema;
+  gradeOf = kinds: (merge.evalModuleTree { } [
       { options.darts = schema.mkInstanceRegistry kinds.dart { }; }
       { config.darts.chambray.bevel = "shallow"; }
-    ];
-  }).config.darts.chambray.grade;
+    ]).config.darts.chambray.grade;
   green = gradeOf (plainTree (notch { } // dart));
   planted = gradeOf (plainTree dart);
   red = planted;

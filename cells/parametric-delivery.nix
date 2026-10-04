@@ -34,34 +34,32 @@ let
   t = (genAlgebra.term inputs.gen.lib.substrate.identity.hashIdentity).term;
   inherit (genAspects) guard pred;
   aspects =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        {
-          aspects = {
-            frame.nixos.marks = [ "frame" ];
-            frame.includes = [ "selvage" ];
-            bobbin.nixos.marks = [ "bobbin" ];
-            bobbin.includes = [ "nap" ];
-            selvage = guard (pred.has "loom") {
-              nixos.marks = [ "selvage" ];
-              description = "selvage";
-              includes = [
-                "pick"
-                (t.readCtx "loom" [ ])
-              ];
-            };
-            pick = guard (pred.has "loom") {
-              nixos.marks = [ "pick" ];
-              description = "pick";
-            };
-            nap = guard (pred.has "shuttle") { nixos.marks = [ "nap" ]; };
-            jacquard.nixos.marks = [ "jacquard" ];
-            dobby.nixos.marks = [ "dobby" ];
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      {
+        aspects = {
+          frame.nixos.marks = [ "frame" ];
+          frame.includes = [ "selvage" ];
+          bobbin.nixos.marks = [ "bobbin" ];
+          bobbin.includes = [ "nap" ];
+          selvage = guard (pred.has "loom") {
+            nixos.marks = [ "selvage" ];
+            description = "selvage";
+            includes = [
+              "pick"
+              (t.readCtx "loom" [ ])
+            ];
           };
-        }
-      ];
-    }).config.aspects;
+          pick = guard (pred.has "loom") {
+            nixos.marks = [ "pick" ];
+            description = "pick";
+          };
+          nap = guard (pred.has "shuttle") { nixos.marks = [ "nap" ]; };
+          jacquard.nixos.marks = [ "jacquard" ];
+          dobby.nixos.marks = [ "dobby" ];
+        };
+      }
+    ]).config.aspects;
   entity = n: inputs.gen.lib.substrate.identity.hashIdentity "entity" [ "name" ] (_: n);
   loomed = n: {
     members = [ "frame" ];
@@ -109,12 +107,12 @@ let
     };
   marksOf =
     p: n:
-    (genMerge.evalModuleTree {
-      modules = [
+    (genMerge.evalModuleTree { } (
+      [
         { freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything; }
       ]
-      ++ p.nodes.${n}.classes.nixos;
-    }).config.marks;
+      ++ p.nodes.${n}.classes.nixos
+    )).config.marks;
   refuses = v: !(builtins.tryEval (builtins.deepSeq v v)).success;
   p = projectWith r;
   sort = builtins.sort builtins.lessThan;

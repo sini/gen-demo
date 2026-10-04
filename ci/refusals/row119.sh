@@ -11,9 +11,7 @@ row119='let
   merge = gen.lib.modules.merge;
   t = gen.inputs.nixpkgs.lib.types;
   bobbin = merge.types.submodule { options.turns = merge.mkOption { type = merge.types.int; default = 0; }; };
-  read = ty: v: (merge.evalModuleTree {
-    modules = [ { options.skein = merge.mkOption { type = ty; }; } { config.skein = v; } ];
-  }).config.skein;
+  read = ty: v: (merge.evalModuleTree { } [ { options.skein = merge.mkOption { type = ty; }; } { config.skein = v; } ]).config.skein;
   topOnly = (builtins.removeAttrs (t.listOf bobbin) [ "nestedTypes" ]) // { elemType = bobbin; };
   green = builtins.toJSON (read topOnly [ { turns = 3; } ]);
   offered = builtins.deepSeq (read (t.listOf bobbin // { nestedTypes = { }; }) [ { turns = 3; } ]) "SERVED";

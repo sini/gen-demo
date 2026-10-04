@@ -14,12 +14,10 @@
     let
       read =
         type: v:
-        (genMerge.evalModuleTree {
-          modules = [
-            { options.spool = genMerge.mkOption { inherit type; }; }
-            { spool = v; }
-          ];
-        }).config.spool;
+        (genMerge.evalModuleTree { } [
+          { options.spool = genMerge.mkOption { inherit type; }; }
+          { spool = v; }
+        ]).config.spool;
       refused = type: v: !(builtins.tryEval (builtins.deepSeq (read type v) null)).success;
       bolt = lib.types.submodule { options.warp = lib.mkOption { type = lib.types.str; }; };
     in

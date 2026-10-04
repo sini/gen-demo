@@ -18,8 +18,7 @@ row142='let
       }
     ];
   };
-  bound = merge.evalModuleTree {
-    modules = [
+  bound = merge.evalModuleTree { } [
       {
         options.aglets = schema.mkInstanceRegistry kinds.aglet { };
         options.lacets = schema.mkInstanceRegistry kinds.lacet { refs.tip = bound.config.aglets; };
@@ -27,17 +26,14 @@ row142='let
         config.lacets.l.tip = "gilt";
       }
     ];
-  };
-  unbound = (merge.evalModuleTree {
-    modules = [
+  unbound = (merge.evalModuleTree { } [
       {
         options.tip = merge.mkOption { type = schema.declarationOf "aglet"; };
         options.spares = merge.mkOption { type = schema.setOf (schema.declarationOf "aglet"); };
         config.tip = "gilt";
         config.spares = [ "gilt" "gilt" ];
       }
-    ];
-  }).config;
+    ]).config;
   green = bound.config.lacets.l.tip.finish;
   tipRed = builtins.seq unbound.tip "admitted";
   sparesRed = builtins.deepSeq unbound.spares "admitted";

@@ -8,17 +8,11 @@
 row37='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
-  pocketTree = (genMerge.evalModuleTree {
-    check = false;
-    modules = [ { options.selvedge = genMerge.mkOption { type = genMerge.types.str; }; } ];
-  }).type;
-in builtins.toJSON (genMerge.evalModuleTree {
-  check = false;
-  modules = [
+  pocketTree = (genMerge.evalModuleTree { check = false; } [ { options.selvedge = genMerge.mkOption { type = genMerge.types.str; }; } ]).type;
+in builtins.toJSON (genMerge.evalModuleTree { check = false; } [
     { options.pockets = genMerge.mkOption { type = genMerge.types.attrsOf pocketTree; }; }
     { _file = "row37"; config.pockets.welt = { selvedge = "pinked"; } // PLANT; }
-  ];
-}).config.pockets'
+  ]).config.pockets'
 check "T5 row37 unplanted (a clean element of a lax nested tree)" \
   "${row37/PLANT/{ \}}" 0 "" \
   "$tmpdir/row37-green.err" '{"welt":{"selvedge":"pinked"}}'

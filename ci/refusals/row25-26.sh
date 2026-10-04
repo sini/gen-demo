@@ -17,13 +17,11 @@ row25='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
   decl = { options.selvedge = genMerge.mkOption { type = genMerge.types.attrs; }; };
-in builtins.toJSON (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (genMerge.evalModuleTree { } [
     decl
     { _file = "/corpus/a.nix"; config.selvedge.warp = "flax"; }
     { _file = "/corpus/b.nix"; config.selvedge.SECONDKEY = "tussah"; }
-  ];
-}).config.selvedge'
+  ]).config.selvedge'
 
 check "T5 row25 unplanted (two files, disjoint keys -- the fold unions them)" "${row25/SECONDKEY/weft}" 0 "" \
   "$tmpdir/row25-green.err" '{"warp":"flax","weft":"tussah"}'
@@ -43,12 +41,10 @@ row26Base='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
   decl = { options.selvedge = genMerge.mkOption { type = TYPE; }; };
-in builtins.toJSON (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (genMerge.evalModuleTree { } [
     decl
     { _file = "/corpus/bad.nix"; config.selvedge = DEFN; }
-  ];
-}).config.selvedge'
+  ]).config.selvedge'
 row26attrsetDefn='{ warp = "flax"; }'
 row26attrs="${row26Base//TYPE/genMerge.types.attrs}"
 row26="${row26attrs/DEFN/$row26attrsetDefn}"

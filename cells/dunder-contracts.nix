@@ -21,12 +21,10 @@ let
   schema = inputs.gen.lib.substrate.schema;
   dunder = v: builtins.filter (k: builtins.substring 0 2 k == "__") (builtins.attrNames v);
   kind =
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { }; }
-        { config.schema.selvage.options.ends = genMerge.mkOption { type = genMerge.types.int; }; }
-      ];
-    }).config.schema.selvage;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { }; }
+      { config.schema.selvage.options.ends = genMerge.mkOption { type = genMerge.types.int; }; }
+    ]).config.schema.selvage;
 in
 {
   construct = [ "C85" ];

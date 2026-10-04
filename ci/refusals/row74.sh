@@ -12,13 +12,11 @@ row74='let
   genAspects = flake.inputs.gen.lib.aspects.aspects;
   genMerge = flake.inputs.gen.lib.modules.merge;
   rootWith = (genAspects.aspectsRoot { keySemantics.a.category = "class"; }).functor.type;
-  tree = genMerge.evalModuleTree {
-    modules = [
+  tree = genMerge.evalModuleTree { } [
       { options.p = genMerge.mkOption { type = rootWith lib.types.port; }; }
       { options.p = genMerge.mkOption { type = rootWith lib.types.SECOND; }; }
       { p.a = VALUE; }
     ];
-  };
 in BODY'
 row74ok="${row74/SECOND/port}"
 row74ok="${row74ok/VALUE/80}"

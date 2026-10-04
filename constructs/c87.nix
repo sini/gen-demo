@@ -31,56 +31,52 @@ let
       }
     ];
   };
-  c87Eval = genMerge.evalModuleTree {
-    modules = [
-      {
-        options.aglets = c87Schema.mkInstanceRegistry c87Kinds.aglet { };
-        options.lacets = c87Schema.mkInstanceRegistry c87Kinds.lacet {
-          refs = {
-            tip = c87Eval.config.aglets;
-            spares = c87Eval.config.aglets;
-            cords = c87Eval.config.aglets;
-          };
+  c87Eval = genMerge.evalModuleTree { } [
+    {
+      options.aglets = c87Schema.mkInstanceRegistry c87Kinds.aglet { };
+      options.lacets = c87Schema.mkInstanceRegistry c87Kinds.lacet {
+        refs = {
+          tip = c87Eval.config.aglets;
+          spares = c87Eval.config.aglets;
+          cords = c87Eval.config.aglets;
         };
-        config.aglets.gilt.finish = "gilded";
-        config.aglets.horn.finish = "polished";
-        config.lacets.byName = {
-          tip = "gilt";
-          spares = [
-            "gilt"
-            "horn"
-            "gilt"
-          ];
-          cords = {
-            a = "gilt";
-            b = c87Eval.config.aglets.gilt;
-          };
+      };
+      config.aglets.gilt.finish = "gilded";
+      config.aglets.horn.finish = "polished";
+      config.lacets.byName = {
+        tip = "gilt";
+        spares = [
+          "gilt"
+          "horn"
+          "gilt"
+        ];
+        cords = {
+          a = "gilt";
+          b = c87Eval.config.aglets.gilt;
         };
-        config.lacets.byValue = {
-          tip = c87Eval.config.aglets.gilt;
-          spares = [ c87Eval.config.aglets.horn ];
-        };
-      }
-    ];
-  };
+      };
+      config.lacets.byValue = {
+        tip = c87Eval.config.aglets.gilt;
+        spares = [ c87Eval.config.aglets.horn ];
+      };
+    }
+  ];
   c87Unbound =
-    (genMerge.evalModuleTree {
-      modules = [
-        {
-          options.tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
-          options.spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
-          options.cords = genMerge.mkOption {
-            type = genMerge.types.attrsOf (c87Schema.declarationOf "aglet");
-          };
-          config.tip = "gilt";
-          config.spares = [
-            "gilt"
-            "gilt"
-          ];
-          config.cords.a = "gilt";
-        }
-      ];
-    }).config;
+    (genMerge.evalModuleTree { } [
+      {
+        options.tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
+        options.spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
+        options.cords = genMerge.mkOption {
+          type = genMerge.types.attrsOf (c87Schema.declarationOf "aglet");
+        };
+        config.tip = "gilt";
+        config.spares = [
+          "gilt"
+          "gilt"
+        ];
+        config.cords.a = "gilt";
+      }
+    ]).config;
 in
 {
   inherit c87Unbound;

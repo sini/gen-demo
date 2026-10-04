@@ -25,44 +25,35 @@
       forces = e: (builtins.tryEval (builtins.deepSeq e null)).success;
       liningOf =
         check:
-        (evalModuleTree {
-          inherit check;
-          modules = [
-            {
-              options.k = mkOption {
-                type = t.str;
-                default = "d";
-              };
-            }
-          ];
-        }).type;
+        (evalModuleTree { check = check; } [
+          {
+            options.k = mkOption {
+              type = t.str;
+              default = "d";
+            };
+          }
+        ]).type;
       boltOf =
         check:
-        (evalModuleTree {
-          inherit check;
-          modules = [
-            {
-              options.known = mkOption {
-                type = t.str;
-                default = "k";
-              };
-              options.flag = mkOption {
-                type = t.bool;
-                default = false;
-              };
-              options.sub = mkOption { type = liningOf check; };
-            }
-          ];
-        }).type;
+        (evalModuleTree { check = check; } [
+          {
+            options.known = mkOption {
+              type = t.str;
+              default = "k";
+            };
+            options.flag = mkOption {
+              type = t.bool;
+              default = false;
+            };
+            options.sub = mkOption { type = liningOf check; };
+          }
+        ]).type;
       run =
         check: ty: m:
-        evalModuleTree {
-          inherit check;
-          modules = [
-            { options.bolt = mkOption { type = ty; }; }
-            m
-          ];
-        };
+        evalModuleTree { check = check; } [
+          { options.bolt = mkOption { type = ty; }; }
+          m
+        ];
       selfRef =
         { config, ... }:
         {
@@ -96,17 +87,10 @@
         prev: next:
         evalModuleTree {
           check = next;
-          modules = base ++ edited;
-          warmFrom = evalModuleTree {
-            check = prev;
-            modules = base;
-          };
+          warmFrom = evalModuleTree { check = prev; } base;
           editedModules = edited;
-        };
-      coldLax = evalModuleTree {
-        check = false;
-        modules = base ++ edited;
-      };
+        } (base ++ edited);
+      coldLax = evalModuleTree { check = false; } (base ++ edited);
       strictOverLax = warmAt false true;
     in
     (run true (boltOf true) selfRef).config.bolt.sub.k == "s"

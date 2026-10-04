@@ -23,12 +23,10 @@ let
   resultWith = extra: { __functor = _: _: { options.spool = spool; }; } // extra;
   selvageBy =
     mkType:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { inherit mkType; }; }
-        { config.schema.selvage = { }; }
-      ];
-    }).config.schema.selvage;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { inherit mkType; }; }
+      { config.schema.selvage = { }; }
+    ]).config.schema.selvage;
   omits = selvageBy ({ ... }: resultWith { });
   echoesWrong = selvageBy ({ ... }: resultWith { kind = "bobbin"; });
   echoesRight = selvageBy ({ kind, ... }: resultWith { inherit kind; });
@@ -40,14 +38,12 @@ in
     omits.kind == "selvage"
     && (builtins.tryEval (
       builtins.deepSeq
-        (genMerge.evalModuleTree {
-          modules = [
-            {
-              options.h = genMerge.mkOption { type = schema.mkInstanceType omits { }; };
-              config.h = { };
-            }
-          ];
-        }).config.h.spool
+        (genMerge.evalModuleTree { } [
+          {
+            options.h = genMerge.mkOption { type = schema.mkInstanceType omits { }; };
+            config.h = { };
+          }
+        ]).config.h.spool
         true
     )).success
     # a wrong echo does not win over the option path

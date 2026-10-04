@@ -9,7 +9,7 @@ row7='let
   selvageFacets = { selvageCap = { category = "facet"; contract = "capability"; option = facetOpt; };
                      selvageReq = { category = "facet"; contract = "capability"; option = facetOpt; }; };
   mkReg = modules: let schema = genAspects.mkAspectSchema { keySemantics = selvageFacets; }; in
-    genMerge.evalModuleTree { modules = [ { options.schema = schema.schemaOption; } (schema.mkAspectModule { }) ] ++ modules; };
+    genMerge.evalModuleTree { } ([ { options.schema = schema.schemaOption; } (schema.mkAspectModule { }) ] ++ modules);
   mill = mkReg [ { config.aspects.stitch.selvageCap = { provides = [ "warp" "weft" ]; }; } ];
   loom = mkReg [ { config.aspects.braid = { selvageReq = { requires = [ "warp" ]; }; includes = [ (genAspects.keyRef "mill/stitch") ]; }; } ];
   mkFederated = wired: genLink.link {

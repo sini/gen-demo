@@ -20,9 +20,9 @@ let
     tys: v:
     let
       p =
-        (genMerge.evalModuleTree {
-          modules = map (t: { options.picks = genMerge.mkOption { type = t; }; }) tys ++ [ { picks = v; } ];
-        }).config.picks;
+        (genMerge.evalModuleTree { } (
+          map (t: { options.picks = genMerge.mkOption { type = t; }; }) tys ++ [ { picks = v; } ]
+        )).config.picks;
       r = builtins.tryEval (builtins.deepSeq p p);
     in
     if r.success then r.value else "REFUSED";

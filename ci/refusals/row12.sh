@@ -9,13 +9,11 @@ row12='let
   genMerge = gen.lib.modules.merge;
   cnf = { };
   schema = genAspects.mkAspectSchema cnf;
-  tree = genMerge.evalModuleTree {
-    modules = [
+  tree = genMerge.evalModuleTree { } [
       { options.schema = schema.schemaOption; }
       (schema.mkAspectModule { })
       { config.aspects.hemline.placket = { }; config.aspects.hemline.facing = { }; }
     ];
-  };
   facts = genAspects.graphFacts cnf tree.config.aspects;
   parentGraph = genScope.overlays (map (id:
     let p = facts.parentOf.${id}; in

@@ -55,18 +55,16 @@ let
       }
     ];
   };
-  bench = genMerge.evalModuleTree {
-    modules = [
-      {
-        options.bench.rules = genMerge.mkOption {
-          type = genMerge.lazyAttrsOf genMerge.raw;
-          default = { };
-        };
-        options.bench.lambdas = genRules.lambdas;
-      }
-      (load { bench.rules.tack = tack; })
-    ];
-  };
+  bench = genMerge.evalModuleTree { } [
+    {
+      options.bench.rules = genMerge.mkOption {
+        type = genMerge.lazyAttrsOf genMerge.raw;
+        default = { };
+      };
+      options.bench.lambdas = genRules.lambdas;
+    }
+    (load { bench.rules.tack = tack; })
+  ];
   door = genRules.mkApply {
     lambdas = bench.config.bench.lambdas;
     inherit cnf;

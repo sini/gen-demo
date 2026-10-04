@@ -27,7 +27,9 @@ let
       ];
     }).config.beam
     }";
-  native = read genMerge.evalModuleTree genMerge.mkOption genMerge.types.path;
+  native = read (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption genMerge.types.path;
   nixpkgs = read lib.evalModules lib.mkOption lib.types.path;
 in
 {

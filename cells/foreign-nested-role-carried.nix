@@ -32,9 +32,9 @@ let
   spool =
     tys: v:
     let
-      res = genMerge.evalModuleTree {
-        modules = map (ty: { options.spool = genMerge.mkOption { type = ty; }; }) tys ++ [ { spool = v; } ];
-      };
+      res = genMerge.evalModuleTree { } (
+        map (ty: { options.spool = genMerge.mkOption { type = ty; }; }) tys ++ [ { spool = v; } ]
+      );
     in
     (builtins.tryEval (builtins.deepSeq res.config.spool res.config.spool)).success;
   root = genAspects.aspectsRoot { };

@@ -19,13 +19,11 @@ row34='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   reed = e: genMerge.mkOption { type = genSchema.refined (lib.types.listOf e) [ genSchema.refinements.nonEmpty ]; };
-in builtins.concatStringsSep "," (genMerge.evalModuleTree {
-  modules = [
+in builtins.concatStringsSep "," (genMerge.evalModuleTree { } [
     { options.reed = reed lib.types.str; }
     { options.reed = reed ELEM; }
     { config.reed = [ "warp" "weft" ]; }
-  ];
-}).config.reed'
+  ]).config.reed'
 check "T5 row34 unplanted (one foreign container and element declared twice; the value is the assertion)" \
   "${row34/ELEM/lib.types.str}" 0 "" \
   "$tmpdir/row34-green.err" 'warp,weft'

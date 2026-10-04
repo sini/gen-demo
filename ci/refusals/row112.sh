@@ -20,13 +20,11 @@ row112='let
   cnf2 = cnf1 // { keySemantics = cnf1.keySemantics // { grommet.category = "class"; }; };
   s1 = genAspects.mkAspectSchema cnf1;
   s2 = genAspects.mkAspectSchema SECOND;
-  tree = genMerge.evalModuleTree {
-    modules = [
+  tree = genMerge.evalModuleTree { } [
       (s1.mkAspectModule { })
       (s2.mkAspectModule { })
       { aspects.probe = { }; }
     ];
-  };
 in BODY'
 row112ok="${row112/SECOND/cnf1}"
 row112ok="${row112ok/BODY/builtins.toJSON (builtins.attrNames tree.config.aspects)}"

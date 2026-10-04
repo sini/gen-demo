@@ -12,14 +12,14 @@ row137='let
   merge = gen.lib.modules.merge;
   t = merge.types;
   readSeam = { config, sateen, ... }: { options.seam = merge.mkOption { }; config.seam = [ config._module.weft sateen ]; };
-  leaf = extra: builtins.toJSON (merge.evalModuleTree { modules = [
+  leaf = extra: builtins.toJSON (merge.evalModuleTree { } [
     { options._module = merge.mkOption { type = t.submodule { options = { weft = merge.mkOption { default = 1; }; } // extra; }; default = { }; };
       config._module.weft = 2; config._module.args.sateen = "P"; }
     readSeam
-  ]; }).config.seam;
+  ]).config.seam;
   rest = leaf { };
   mapped = leaf { args = merge.mkOption { apply = a: a // { sateen = "Q"; }; }; };
-  redeclared = mods: builtins.toJSON (builtins.attrNames (merge.evalModuleTree { modules = [ { options.x = merge.mkOption { default = "x"; }; } ] ++ mods; }).config);
+  redeclared = mods: builtins.toJSON (builtins.attrNames (merge.evalModuleTree { } ([ { options.x = merge.mkOption { default = "x"; }; } ] ++ mods)).config);
   typed = redeclared [ { options._module.args = merge.mkOption { type = t.attrsOf t.int; }; config._module.args.sateen = "P"; } ];
   group = redeclared [ { options._module.args.foo = merge.mkOption { type = t.int; }; } ];
 in BODY'

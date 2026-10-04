@@ -26,12 +26,10 @@ let
   inherit (genAspects) guard pred;
   tree =
     body:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-        body
-      ];
-    }).config.aspects;
+    (genMerge.evalModuleTree { } [
+      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+      body
+    ]).config.aspects;
   caught = x: !(builtins.tryEval (builtins.deepSeq x x)).success;
   id = genAspects.aspectId [ ];
   key = genAspects.key;

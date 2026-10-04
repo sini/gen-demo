@@ -10,12 +10,10 @@ row144='let
   aspects = gen.lib.aspects.aspects;
   program = gen.lib.framework.program;
   merge = gen.lib.modules.merge;
-  place = defs: (merge.evalModuleTree {
-    modules = [
+  place = defs: (merge.evalModuleTree { } [
       { options.aspects = (aspects.mkAspectSchema { keySemantics.nixos.category = "class"; }).mkAspectOption { }; }
       { config.aspects = defs; }
-    ];
-  }).config.aspects;
+    ]).config.aspects;
   escaped = program.escape { name = "tack"; emits = [ "selvage" ]; binds = [ "weft" ]; suppresses = [ ]; fn = { thimble, ... }: [ ]; };
   green = builtins.head (map (i: i.description) (place { selvage.includes = [ { description = "fringe"; } ]; }).selvage.includes);
   admitRed = builtins.deepSeq (place { selvage.includes = [ (program.admit 42) ]; }).selvage.includes "admitted";

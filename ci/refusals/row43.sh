@@ -11,12 +11,10 @@ row43='let
   keyed = genMerge.types.submodule {
     options.key = genMerge.mkOption { type = genMerge.types.str; default = "none"; };
   };
-in builtins.toJSON (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (genMerge.evalModuleTree { } [
     { options.seam = genMerge.mkOption { type = genMerge.types.union MEMBERS; }; }
     { config.seam = DEF; }
-  ];
-}).config.seam'
+  ]).config.seam'
 row43a="${row43/MEMBERS/[ genMerge.types.str genMerge.types.int ]}"; row43unplanted="${row43a/DEF/\"sateen\"}"
 row43b="${row43/MEMBERS/[ keyed genMerge.types.str ]}"; row43planted="${row43b/DEF/{ key = \"sateen\"; \}}"
 check "T5 row43 unplanted (a union of checkers answers the value)" \

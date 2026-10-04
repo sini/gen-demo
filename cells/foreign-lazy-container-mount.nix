@@ -28,12 +28,10 @@ let
     }).config.seam;
   native =
     type: v:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.seam = genMerge.mkOption { inherit type; }; }
-        { config.seam = v; }
-      ];
-    }).config.seam;
+    (genMerge.evalModuleTree { } [
+      { options.seam = genMerge.mkOption { inherit type; }; }
+      { config.seam = v; }
+    ]).config.seam;
   attrs = T.lazyAttrsOf (T.attrsOf spool);
   list = T.lazyAttrsOf (T.listOf spool);
 in

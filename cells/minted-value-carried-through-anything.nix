@@ -15,20 +15,16 @@ let
   T = genMerge.types;
   kindOf =
     decl:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.schema = schema.mkSchemaOption { }; }
-        { config.schema.bobbin = decl; }
-      ];
-    }).config.schema.bobbin;
+    (genMerge.evalModuleTree { } [
+      { options.schema = schema.mkSchemaOption { }; }
+      { config.schema.bobbin = decl; }
+    ]).config.schema.bobbin;
   carried =
     t: v:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.v = genMerge.mkOption { type = t; }; }
-        { config.v = v; }
-      ];
-    }).config.v;
+    (genMerge.evalModuleTree { } [
+      { options.v = genMerge.mkOption { type = t; }; }
+      { config.v = v; }
+    ]).config.v;
   k = kindOf {
     options.spool = genMerge.mkOption {
       type = T.int;

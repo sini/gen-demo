@@ -19,9 +19,8 @@ let
   intOpt = genMerge.mkOption { type = genMerge.types.int; };
   tree =
     modules:
-    (genMerge.evalModuleTree {
-      modules = [ { options.schema = schema.mkSchemaOption { }; } ] ++ modules;
-    }).config.schema;
+    (genMerge.evalModuleTree { } ([ { options.schema = schema.mkSchemaOption { }; } ] ++ modules))
+    .config.schema;
   grommet =
     (tree [
       {
@@ -36,12 +35,10 @@ let
   };
   viaAnything =
     v:
-    (genMerge.evalModuleTree {
-      modules = [
-        { options.v = genMerge.mkOption { type = genMerge.types.anything; }; }
-        { config.v = v; }
-      ];
-    }).config.v;
+    (genMerge.evalModuleTree { } [
+      { options.v = genMerge.mkOption { type = genMerge.types.anything; }; }
+      { config.v = v; }
+    ]).config.v;
   # `tab` inherits the tree's own `grommet`, as `f` hands it over
   sameTreeTab =
     f:

@@ -8,12 +8,10 @@
 row31='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genMerge = gen.lib.modules.merge;
-in (genMerge.evalModuleTree {
-  modules = [
+in (genMerge.evalModuleTree { } [
     { options.spool = genMerge.mkOption { type = genMerge.types.str; default = "none"; }; }
     ({ _file = "/demo/typo.nix"; config.spool = "sateen"; } // { SURPLUS })
-  ];
-}).config.spool'
+  ]).config.spool'
 check "T5 row31 unplanted (an explicit config and nothing beside it)" "${row31/SURPLUS/}" 0 "" \
   "$tmpdir/row31-green.err" 'sateen'
 check "T5 row31 planted   (a surplus key beside an explicit config)" "${row31/SURPLUS/spol = 1;}" 1 \

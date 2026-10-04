@@ -11,13 +11,11 @@ row44='let
   genMerge = gen.lib.modules.merge;
   loom = lib.types.attrsOf lib.types.str;
   sealed = loom // { typeMerge = _: null; };
-in builtins.concatStringsSep "," (builtins.attrValues (genMerge.evalModuleTree {
-  modules = [
+in builtins.concatStringsSep "," (builtins.attrValues (genMerge.evalModuleTree { } [
     { options.shed = genMerge.mkOption { type = FIRST; }; }
     { options.shed = genMerge.mkOption { type = SECOND; }; }
     { config.shed.warp = "sateen"; }
-  ];
-}).config.shed)'
+  ]).config.shed)'
 row44a="${row44/FIRST/sealed}"; row44unplanted="${row44a/SECOND/loom}"
 row44b="${row44/FIRST/loom}"; row44planted="${row44b/SECOND/sealed}"
 check "T5 row44 unplanted (the refusing relation declared first; the later type decides and merges)" \

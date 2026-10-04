@@ -20,8 +20,7 @@ row108='let
       }
     ];
   };
-  hashOf = identity: (merge.evalModuleTree {
-    modules = [
+  hashOf = identity: (merge.evalModuleTree { } [
       {
         options.aglets = schema.mkInstanceRegistry kinds.aglet { };
         config.aglets.gilt = {
@@ -30,8 +29,7 @@ row108='let
           _identity = identity;
         };
       }
-    ];
-  }).config.aglets.gilt.id_hash;
+    ]).config.aglets.gilt.id_hash;
   green = if hashOf { keys = [ "finish" ]; } == hashOf { keys = [ "finish" "finish" ]; } then "EQUAL" else "DISTINCT";
   foreign = hashOf { bogus = [ "finish" ]; };
   foreignIfFalse = hashOf { keys = [ "finish" ]; bogus = merge.mkIf false [ "finish" ]; };

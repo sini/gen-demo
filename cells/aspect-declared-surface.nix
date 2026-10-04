@@ -26,14 +26,14 @@ let
   schema = genAspects.mkAspectSchema cnf;
   tree =
     extra:
-    genMerge.evalModuleTree {
-      modules = [
+    genMerge.evalModuleTree { } (
+      [
         { options.schema = schema.schemaOption; }
         (schema.mkAspectModule { })
         { config.aspects.svc = { }; }
       ]
-      ++ extra;
-    };
+      ++ extra
+    );
   plain = tree [ ];
   withPriority = tree [
     {

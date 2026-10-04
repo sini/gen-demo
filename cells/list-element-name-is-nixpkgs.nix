@@ -42,9 +42,9 @@ let
       }).config.bobbin;
   nixpkgs = names lib.evalModules lib.mkOption lib.mkIf lib.types lib.mkOption;
   foreign = names lib.evalModules lib.mkOption lib.mkIf genMerge.types genMerge.mkOption;
-  native =
-    names genMerge.evalModuleTree genMerge.mkOption genMerge.mkIf genMerge.types
-      genMerge.mkOption;
+  native = names (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption genMerge.mkIf genMerge.types genMerge.mkOption;
 in
 {
   construct = [ "C127" ];

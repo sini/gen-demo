@@ -12,8 +12,8 @@ let
   schema = genAspects.mkAspectSchema { keySemantics.nixos.category = "class"; };
   priorityOf =
     defs:
-    (genMerge.evalModuleTree {
-      modules = [
+    (genMerge.evalModuleTree { } (
+      [
         { options.schema = schema.schemaOption; }
         (schema.mkAspectModule { })
         {
@@ -24,8 +24,8 @@ let
         }
       ]
       ++ map (d: { config.schema.aspect = d; }) defs
-      ++ [ { config.aspects.svc = { }; } ];
-    }).config.aspects.svc.priority;
+      ++ [ { config.aspects.svc = { }; } ]
+    )).config.aspects.svc.priority;
 in
 {
   construct = [ "C171" ];

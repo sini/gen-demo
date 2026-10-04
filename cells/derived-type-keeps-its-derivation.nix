@@ -30,23 +30,18 @@
         ;
       t = genMerge.types;
       lib = inputs.nixpkgs.lib;
-      tagged = deriveType t.str {
-        id = "tagged";
-        fields = _: { description = "a tagged string"; };
-      };
-      other = deriveType t.str { id = "labelled"; };
+      tagged = deriveType { fields = _: { description = "a tagged string"; }; } "tagged" t.str;
+      other = deriveType { } "labelled" t.str;
       idOf = v: if v == null then null else v.__derivation.id or null;
       declares =
         a: b:
         (builtins.tryEval (
           builtins.deepSeq
-            (evalModuleTree {
-              modules = [
-                { options.spool = mkOption { type = a; }; }
-                { options.spool = mkOption { type = b; }; }
-                { spool = "sateen"; }
-              ];
-            }).config.spool
+            (evalModuleTree { } [
+              { options.spool = mkOption { type = a; }; }
+              { options.spool = mkOption { type = b; }; }
+              { spool = "sateen"; }
+            ]).config.spool
             null
         )).success;
       mountsInNixpkgs =
@@ -63,13 +58,15 @@
             null
         )).success;
       bobbins = t.listOf tagged;
-      tb = deriveType (t.nullOr (
-        t.oneOf [
-          t.str
-          (t.attrsOf tb)
-          (t.listOf tb)
-        ]
-      )) { id = "bobbin"; };
+      tb = deriveType { } "bobbin" (
+        t.nullOr (
+          t.oneOf [
+            t.str
+            (t.attrsOf tb)
+            (t.listOf tb)
+          ]
+        )
+      );
       vb = t.nullOr (
         t.oneOf [
           t.str
@@ -94,15 +91,27 @@
           )
         )).type;
     in
-    idOf (mergeTypes tagged tagged) == "tagged"
+    idOf (mergeTypes {
+      deciding = tagged;
+      partner = tagged;
+    }) == "tagged"
     && declares tagged tagged
     && !(declares t.str tagged)
     && !(declares tagged t.str)
     && !(mountsInNixpkgs t.str tagged)
     && !(mountsInNixpkgs tagged t.str)
     && mountsInNixpkgs tagged tagged
-    && idOf (mergeTypes bobbins bobbins).carries.element == "tagged"
-    && mergeTypes bobbins (t.listOf t.str) == null
+    &&
+      idOf
+        (mergeTypes {
+          deciding = bobbins;
+          partner = bobbins;
+        }).carries.element == "tagged"
+    &&
+      mergeTypes {
+        deciding = bobbins;
+        partner = (t.listOf t.str);
+      } == null
     && tagged.check "sateen"
     && !(tagged.check 1)
     && !(typeEq tagged t.str)

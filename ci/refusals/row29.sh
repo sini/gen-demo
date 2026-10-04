@@ -23,20 +23,16 @@ row29='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   strOpt = genMerge.mkOption { type = genMerge.types.str; default = "linen"; };
-  schema = (genMerge.evalModuleTree {
-    modules = [
+  schema = (genMerge.evalModuleTree { } [
       { options.schema = genSchema.mkSchemaOption { collections.COLLECTIONNAME = { default = [ ]; }; }; }
       { config.schema.thimble = { options.spool = strOpt; }; }
-    ];
-  }).config.schema;
-in (genMerge.evalModuleTree {
-  modules = [
+    ]).config.schema;
+in (genMerge.evalModuleTree { } [
     {
       options.thimbles = genSchema.mkInstanceRegistry schema.thimble { };
       config.thimbles.t1 = { name = "t1"; };
     }
-  ];
-}).config.thimbles.t1.id_hash'
+  ]).config.thimbles.t1.id_hash'
 check "T5 row29 unplanted (an ORDINARY collection name, and the instance's stamp is the assertion)" \
   "${row29/COLLECTIONNAME/spools}" 0 "" \
   "$tmpdir/row29-green.err" 'thimble:bc45659c8137190eb65eee15ebfa9686e39cfb3c9b2433cb60843237733f14ac'

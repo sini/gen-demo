@@ -67,8 +67,12 @@ let
       ];
     }).config.seam.warp.weft;
   native = {
-    leaf = leaf genMerge.evalModuleTree genMerge.mkOption genMerge.types;
-    warp = warp genMerge.evalModuleTree genMerge.mkOption genMerge.types;
+    leaf = leaf (
+      r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+    ) genMerge.mkOption genMerge.types;
+    warp = warp (
+      r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+    ) genMerge.mkOption genMerge.types;
   };
   ref = {
     leaf = leaf lib.evalModules lib.mkOption lib.types;

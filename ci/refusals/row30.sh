@@ -21,12 +21,10 @@ row30='let
   gauge = { check = self: self > 0 && self < 65536; message = "must be a valid gauge (1-65535)"; };
   slack = { check = self: self > 0; message = "must be slack"; };
   bolt = r: genMerge.mkOption { type = genSchema.refined genMerge.types.int [ r ]; };
-in builtins.concatStringsSep "," (map (r: r.message) (genMerge.evalModuleTree {
-  modules = [
+in builtins.concatStringsSep "," (map (r: r.message) (genMerge.evalModuleTree { } [
     { options.gauge = bolt gauge; }
     { options.gauge = bolt SECONDREFINEMENT; }
-  ];
-}).options.gauge.type.__schema.refinements)'
+  ]).options.gauge.type.__schema.refinements)'
 check "T5 row30 unplanted (the SAME refinement declared twice, and the survivor is the assertion)" \
   "${row30/SECONDREFINEMENT/gauge}" 0 "" \
   "$tmpdir/row30-green.err" 'must be a valid gauge (1-65535)'

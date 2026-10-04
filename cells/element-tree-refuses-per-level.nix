@@ -17,55 +17,43 @@
   check = asserts (
     let
       liningTree =
-        (genMerge.evalModuleTree {
-          check = false;
-          modules = [
-            {
-              options.weave = genMerge.mkOption {
-                type = genMerge.types.str;
-                default = "plain";
-              };
-            }
-          ];
-        }).type;
-      pocketTree =
-        (genMerge.evalModuleTree {
-          check = false;
-          modules = [
-            {
-              options.selvedge = genMerge.mkOption {
-                type = genMerge.types.str;
-                default = "raw";
-              };
-              options.lining = genMerge.mkOption { type = liningTree; };
-            }
-          ];
-        }).type;
-      pockets =
-        def:
-        genMerge.evalModuleTree {
-          check = false;
-          modules = [
-            { options.pockets = genMerge.mkOption { type = genMerge.types.attrsOf pocketTree; }; }
-            {
-              _file = "c44";
-              config.pockets = def;
-            }
-          ];
-        };
-      bare = genMerge.evalModuleTree {
-        check = false;
-        modules = [
-          { options.pocket = genMerge.mkOption { type = pocketTree; }; }
+        (genMerge.evalModuleTree { check = false; } [
           {
-            _file = "c44";
-            config.pocket = {
-              selvedge = "pinked";
-              fray = "loose";
+            options.weave = genMerge.mkOption {
+              type = genMerge.types.str;
+              default = "plain";
             };
           }
+        ]).type;
+      pocketTree =
+        (genMerge.evalModuleTree { check = false; } [
+          {
+            options.selvedge = genMerge.mkOption {
+              type = genMerge.types.str;
+              default = "raw";
+            };
+            options.lining = genMerge.mkOption { type = liningTree; };
+          }
+        ]).type;
+      pockets =
+        def:
+        genMerge.evalModuleTree { check = false; } [
+          { options.pockets = genMerge.mkOption { type = genMerge.types.attrsOf pocketTree; }; }
+          {
+            _file = "c44";
+            config.pockets = def;
+          }
         ];
-      };
+      bare = genMerge.evalModuleTree { check = false; } [
+        { options.pocket = genMerge.mkOption { type = pocketTree; }; }
+        {
+          _file = "c44";
+          config.pocket = {
+            selvedge = "pinked";
+            fray = "loose";
+          };
+        }
+      ];
       refuses = e: !(builtins.tryEval (builtins.deepSeq e null)).success;
     in
     # (1) clean elements are values

@@ -19,12 +19,10 @@
     let
       read =
         m:
-        (genMerge.evalModuleTree {
-          modules = [
-            { options.spool = genMerge.mkOption { type = lib.types.str; }; }
-            m
-          ];
-        }).config.spool;
+        (genMerge.evalModuleTree { } [
+          { options.spool = genMerge.mkOption { type = lib.types.str; }; }
+          m
+        ]).config.spool;
     in
     !(builtins.tryEval (read {
       _file = "/demo/spool.nix";

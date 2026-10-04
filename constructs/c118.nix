@@ -16,12 +16,10 @@
 let
   couchingCnf.keySemantics.couching.category = "class";
   couchingValues =
-    (genMerge.evalModuleTree {
-      modules = [
-        ((genAspects.mkAspectSchema couchingCnf).mkAspectModule { })
-        { aspects.braid.couching.stitches = [ "braid" ]; }
-      ];
-    }).config;
+    (genMerge.evalModuleTree { } [
+      ((genAspects.mkAspectSchema couchingCnf).mkAspectModule { })
+      { aspects.braid.couching.stitches = [ "braid" ]; }
+    ]).config;
   couchingNodes = {
     godet.aspects = [ "braid" ];
     jabot.aspects = [ "braid" ];

@@ -7,12 +7,10 @@
 # the unplanted arm asserts the value, so a type refusing every definition cannot pass it.
 row49='let
   genMerge = (builtins.getFlake (toString ./.)).inputs.gen.lib.modules.merge;
-in builtins.toJSON (genMerge.evalModuleTree {
-  modules = [
+in builtins.toJSON (genMerge.evalModuleTree { } [
     { options.port = genMerge.mkOption { type = genMerge.types.int; }; }
     { config.port = DEF; }
-  ];
-}).config.port'
+  ]).config.port'
 row49unplanted="${row49/DEF/7}"
 row49planted="${row49/DEF/let s = { self = s; \}; in s}"
 check "T5 row49 unplanted (an int definition answers the value)" \

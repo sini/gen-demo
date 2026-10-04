@@ -27,7 +27,9 @@ let
           shuttle = "weft";
         }
     );
-  native = loom genMerge.evalModuleTree genMerge.mkOption genMerge.types.function;
+  native = loom (
+    r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+  ) genMerge.mkOption genMerge.types.function;
   nixpkgs = loom lib.evalModules lib.mkOption (lib.types.functionTo lib.types.raw);
 in
 {
