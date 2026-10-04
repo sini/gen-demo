@@ -1,8 +1,8 @@
-# `walk-store-named-scope` — C46, den-hoag-u9k7j. gen-graph keys a caller's node names by their
-# text, so a labeled graph over `pewter` and two scopes named `baseNameOf` of `hello` and `jq` is
-# walked `contains*` from `pewter`: it answers all three nodes, the deepest path ends at the `jq`
-# scope, the answered names keep their context, and the graph orders. The walk used to abort with `…
-# is not allowed to refer to a store path`.
+# `walk-store-named-scope` — C46, den-hoag-u9k7j. A caller's node names are keyed by their text, so
+# an evaluated scope over `pewter` and two scopes named `baseNameOf` of `hello` and `jq` is walked
+# `contains*` from `pewter` by gen-scope's `resolve`: it answers all three nodes, the deepest
+# witness path ends at the `jq` scope, the answered names keep their context, and the same edges as
+# a labelled record order. The walk used to abort with `… is not allowed to refer to a store path`.
 #
 # C46 -- den-hoag-u9k7j. Live control: movement-dedup-equality.
 {
