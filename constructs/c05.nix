@@ -4,15 +4,18 @@
 # SAME program, never a program invented for that row.
 {
   genProgram,
+  genScope,
+  entityEmitters,
   seamCoords,
   seamHead,
-  seamSpace,
 }:
 let
   pipingHead = "piping:grosgrain:faille";
   # THE DYNAMIC EDGE is the piping declaration's own `label`: its head, when included, IS the edge
   # `grosgrain -> faille` labelled `piping`. It keeps its own label rather than borrowing a declared
-  # one (`tacks`), so it is never mistakable for a declaration.
+  # one (`tacks`), so it is never mistakable for a declaration. THE PROMOTED NODE is the seam
+  # declaration's own `promote`: its head, when included, is a `seam` node over the labelled tuple
+  # `seamCoords`. Edge or node is declared on the rule, not read off the relata count (both are 2).
   declarations = [
     {
       head = "nap:pewter";
@@ -32,7 +35,8 @@ let
       head = seamHead;
       pos = [ "nap:pewter" ];
       neg = [ "scotched:pewter" ];
-      relata = map (d: seamCoords.${d}) seamSpace.product.dims;
+      relata = seamCoords;
+      promote = "seam";
     }
   ];
   prog =
@@ -56,37 +60,37 @@ let
   # are the SAME records gated on the model, so the reached structure is a subset of the candidates
   # by construction.
   #
-  # The labelled edges come from gen-program itself: `candidates` never reads the model, and
-  # `reached` refuses a membership the model leaves undefined rather than dropping its edge.
-  pipingEdges = genProgram.ruleEdges mdl declarations;
-  # THE PROMOTION — a coordinate promoted into a node of the one graph by giving it edges
-  # (ADR-0016 ruling 2). Both the node and its edges are read off `seamCoords`/`seamSpace`,
-  # never restated as literals.
-  seamCandidate = {
-    nodes.${seamHead} = { };
-    edges = map (d: {
-      from = seamHead;
-      to = seamCoords.${d};
-      label = d;
-    }) seamSpace.product.dims;
+  # The labelled edges and the promotion records come from gen-program itself: `candidates` and
+  # `promotions` never read the model, and `reached` and `promoted` refuse a membership the model
+  # leaves undefined rather than dropping it.
+  ruled = genProgram.ruleEdges mdl declarations;
+  # THE PROMOTION — the included promoted head, minted in this one call beside the entity emitters
+  # its relata name (ADR-0016 rulings 2, 4, 5, 7), at pass 1, strictly after their pass 0. The
+  # identity is the mint's, a hash over the relata's MINTED identities; gen-program supplies none.
+  minted = genScope.mintStrata { } (entityEmitters ++ map (p: p // { pass = 1; }) ruled.promoted);
+  promotedIds = builtins.listToAttrs (
+    map (p: {
+      name = p.identifier;
+      value = null;
+    }) ruled.promoted
+  );
+  seamPromotion = {
+    nodes = builtins.intersectAttrs promotedIds minted.nodes;
+    edges = builtins.filter (e: promotedIds ? ${e.from}) minted.edges;
   };
+  # `policyCandidates.nodes` are CANDIDATE COORDINATES, keyed by the promotion records' identifiers
+  # and identity-less (ADR-0016 ruling 2: a candidate is not a node until the policy stratum
+  # promotes it). A promotion record is not a node; only the mint above makes one.
   policyCandidates = {
-    inherit (seamCandidate) nodes;
-    edges = pipingEdges.candidates ++ seamCandidate.edges;
+    nodes = builtins.listToAttrs (
+      map (p: {
+        name = p.identifier;
+        value = { };
+      }) ruled.promotions
+    );
+    edges = ruled.candidates;
   };
-  # The promotion is still gated by hand: a head that becomes a NODE needs its identity from the one
-  # mint, and gen-program's `ruleEdges` mints nothing.
-  reachedOf =
-    head: candidate:
-    if (mdl.resolve head).included then
-      candidate
-    else
-      {
-        nodes = { };
-        edges = [ ];
-      };
-  pipingEdge = pipingEdges.reached;
-  seamPromotion = reachedOf seamHead seamCandidate;
+  pipingEdge = ruled.reached;
 in
 {
   inherit

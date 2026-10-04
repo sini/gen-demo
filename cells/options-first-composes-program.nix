@@ -57,6 +57,7 @@ in
         "pos"
         "neg"
         "label"
+        "promote"
         "when"
       ]
     &&
