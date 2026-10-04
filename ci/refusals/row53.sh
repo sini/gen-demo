@@ -11,12 +11,13 @@
 # declares). The unplanted arm asserts the answer, and the catchable arm is row 33's form.
 row53='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   genuine = genView.edgeLabels { letters = [ "tacks" ]; };
   labels = LABELS;
-  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
-  order = genView.labelOrder { alphabet = labels; layers = [ labels.letters ]; endOfPath = -1; };
+  admission = genScope.wellFormed { alphabet = labels.letters; expression = "tacks*"; };
+  order = genScope.labelOrder { alphabet = labels.letters; layers = [ labels.letters ]; endOfPath = -1; };
   channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
-  relation = genView.viewRelation {
+  relation = genView.viewRelation { engine = genScope;
     definition = genView.viewDefinition {
       inherit channel admission order;
       relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
@@ -36,7 +37,7 @@ row53='let
       data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
     };
     marks = _: [ ];
-    orderMark = genView.labelOrder { alphabet = labels; layers = [ labels.letters ]; endOfPath = 0; };
+    orderMark = genScope.labelOrder { alphabet = labels.letters; layers = [ labels.letters ]; endOfPath = 0; };
   };
 in BODY'
 row53unplanted="${row53/LABELS/genuine}"

@@ -10,11 +10,12 @@
 # does not appear in the message.
 row27='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   world = letters: rec {
     labels = genView.edgeLabels { inherit letters; };
-    admission = genView.labelWellFormedness { alphabet = labels; expression = "(" + builtins.concatStringsSep "|" letters + ")*"; };
-    order = genView.labelOrder { alphabet = labels; layers = map (l: [ l ]) letters; endOfPath = -1; };
-    identity = genView.labelOrder { alphabet = labels; layers = [ letters ]; endOfPath = 0; };
+    admission = genScope.wellFormed { alphabet = labels.letters; expression = "(" + builtins.concatStringsSep "|" letters + ")*"; };
+    order = genScope.labelOrder { alphabet = labels.letters; layers = map (l: [ l ]) letters; endOfPath = -1; };
+    identity = genScope.labelOrder { alphabet = labels.letters; layers = [ letters ]; endOfPath = 0; };
   };
   G = world [ "tacks" "gathers" ];
   D = world [ ALPHABET ];
@@ -32,7 +33,7 @@ row27='let
     edges = { tacks = id: if id == "pewter" then [ "grosgrain" ] else [ ]; gathers = _: [ ]; };
     data = [ { scope = "pewter"; relation = "declares"; datum = [ "from-pewter" ]; } ];
   };
-in builtins.toJSON (map (c: c.datum) (genView.viewRelation {
+in builtins.toJSON (map (c: c.datum) (genView.viewRelation { engine = genScope;
   definition = genView.compositions.movement {
     channel = "settings"; relation = "declares"; root = "pewter"; direction = "outbound";
     admission = D.admission; order = D.order;

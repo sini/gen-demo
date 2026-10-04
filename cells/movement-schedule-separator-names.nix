@@ -9,7 +9,11 @@
 # the old `/` join, `consumer`'s write `<grosgrain/hem, selvage>` and `producer`'s
 # read `<grosgrain, hem/selvage>` rendered one key, and the schedule was refused as
 # a cycle; the `-` arm is the control, ordered on both sides of the landing.
-{ asserts, genView }:
+{
+  asserts,
+  genView,
+  genScope,
+}:
 {
   construct = [ "C49" ];
   check = asserts (
@@ -18,12 +22,12 @@
         sep:
         let
           labels = genView.edgeLabels { letters = [ "tacks" ]; };
-          admission = genView.labelWellFormedness {
-            alphabet = labels;
+          admission = genScope.wellFormed {
+            alphabet = labels.letters;
             expression = "tacks*";
           };
-          order = genView.labelOrder {
-            alphabet = labels;
+          order = genScope.labelOrder {
+            alphabet = labels.letters;
             layers = [ [ "tacks" ] ];
             endOfPath = -1;
           };
@@ -62,6 +66,7 @@
           gathered =
             root: channel:
             genView.viewRelation {
+              engine = genScope;
               definition = genView.compositions.movement {
                 inherit
                   channel
@@ -79,8 +84,8 @@
               };
               inherit graph;
               marks = _: [ ];
-              orderMark = genView.labelOrder {
-                alphabet = labels;
+              orderMark = genScope.labelOrder {
+                alphabet = labels.letters;
                 layers = [ [ "tacks" ] ];
                 endOfPath = 0;
               };

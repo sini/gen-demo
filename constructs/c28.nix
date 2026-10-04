@@ -26,6 +26,7 @@
   byLabel,
   genValues,
   genView,
+  genScope,
   identityMark,
   nodes,
 }:
@@ -36,14 +37,14 @@ let
       "gathers"
     ];
   };
-  mandateAdmission = genView.labelWellFormedness {
-    alphabet = mandateLabels;
+  mandateAdmission = genScope.wellFormed {
+    alphabet = mandateLabels.letters;
     expression = "(tacks|gathers)?";
   };
   mandateOrder =
     spec:
-    genView.labelOrder {
-      alphabet = mandateLabels;
+    genScope.labelOrder {
+      alphabet = mandateLabels.letters;
       inherit (spec) layers endOfPath;
     };
   # THE DECLINE. `$` below every letter, so the root's own path beats both arrivals.
@@ -108,6 +109,7 @@ let
   mandateUnder =
     mark:
     genView.viewRelation {
+      engine = genScope;
       definition = genView.compositions.movement {
         channel = "selvage";
         relation = "gimp";

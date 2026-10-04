@@ -10,9 +10,10 @@
 # definition alone.
 row60='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   labels = genView.edgeLabels { letters = [ "tacks" ]; };
-  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
-  order = genView.labelOrder { alphabet = labels; layers = [ labels.letters ]; endOfPath = -1; };
+  admission = genScope.wellFormed { alphabet = labels.letters; expression = "tacks*"; };
+  order = genScope.labelOrder { alphabet = labels.letters; layers = [ labels.letters ]; endOfPath = -1; };
   channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
   graph = genView.scopeGraph {
     carrier = genView.carrier {
@@ -32,11 +33,11 @@ row60='let
     tieSet = genView.tieSets.union; empty = [ ];
     combine = genView.combines.listAppend; dedup = genView.dedups.none;
   };
-  relation = genView.viewRelation {
+  relation = genView.viewRelation { engine = genScope;
     definition = DEFINITION;
     inherit graph;
     marks = _: [ ];
-    orderMark = genView.labelOrder { alphabet = labels; layers = [ labels.letters ]; endOfPath = 0; };
+    orderMark = genScope.labelOrder { alphabet = labels.letters; layers = [ labels.letters ]; endOfPath = 0; };
   };
 in BODY'
 row60unplanted="${row60/DEFINITION/genuine}"

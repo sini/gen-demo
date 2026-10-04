@@ -7,9 +7,10 @@
 # the catchable arm is the one that measures item 1 (row 33's form).
 row39='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   labels = genView.edgeLabels { letters = [ "tacks" ]; };
-  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
-  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  admission = genScope.wellFormed { alphabet = labels.letters; expression = "tacks*"; };
+  order = genScope.labelOrder { alphabet = labels.letters; layers = [ [ "tacks" ] ]; endOfPath = -1; };
   graph = genView.scopeGraph {
     carrier = genView.carrier {
       inherit labels;

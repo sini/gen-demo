@@ -13,7 +13,11 @@
 # letters in ONE layer (`endOfPath = -1`) — the exact shape `gen-view/ci/fixture.nix` ships
 # as `flatOrder`. C4's own `movementCarrier` defeats neither: it declares a single-letter
 # alphabet with `layers = [ [ "tacks" ] ]` and cannot carry this cell.
-{ genView, identityMark }:
+{
+  genView,
+  genScope,
+  identityMark,
+}:
 let
   diamondLabels = genView.edgeLabels {
     letters = [
@@ -25,12 +29,12 @@ let
     labels = diamondLabels;
     relations = genView.relations { names = [ "gimp" ]; };
     relatumLabels = genView.relatumLabels { names = [ ]; };
-    labelWellFormedness = genView.labelWellFormedness {
-      alphabet = diamondLabels;
+    labelWellFormedness = genScope.wellFormed {
+      alphabet = diamondLabels.letters;
       expression = "tacks(gimping|tacks)*|gimping(tacks)*";
     };
-    labelOrder = genView.labelOrder {
-      alphabet = diamondLabels;
+    labelOrder = genScope.labelOrder {
+      alphabet = diamondLabels.letters;
       layers = [
         [
           "tacks"
@@ -67,6 +71,7 @@ let
     ];
   };
   diamondMoved = genView.viewRelation {
+    engine = genScope;
     definition = genView.compositions.movement {
       channel = "selvage";
       relation = "gimp";
@@ -126,6 +131,7 @@ let
     ];
   };
   collisionMoved = genView.viewRelation {
+    engine = genScope;
     definition = genView.compositions.movement {
       channel = "selvage";
       relation = "gimp";
@@ -170,6 +176,7 @@ let
   collisionDedupOn =
     data:
     genView.viewRelation {
+      engine = genScope;
       definition = collisionDedupDefinition;
       marks = _: [ ];
       orderMark = identityMark diamondLabels;
@@ -261,6 +268,7 @@ let
   # admission state makes the two arrivals of `diamondGraph`'s one authored element carry two
   # DIFFERENT keys, which is exactly what a competition key may never do.
   splitKeyed = genView.viewRelation {
+    engine = genScope;
     definition = genView.compositions.registry {
       channel = "selvage";
       relation = "gimp";
