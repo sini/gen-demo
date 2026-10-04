@@ -12,7 +12,8 @@
 #   I-1 `gauge` at two looms is two instances, and the relation's vertex id is `instanceOf`'s;
 #   I-2 `warpA` and `warpB` differ in `dye`, which `gauge` never receives, and reach one instance;
 #   I-4 `twill`, defined twice (a guard reading `loom` and one reading `tension`), is a guard carrier
-#       whose formals are the union, `loom` and `tension`;
+#       whose formals are the union, `loom` and `tension` (the two bodies set distinct keys, `description`
+#       and `note`: two firing definitions that disagree on one scalar are refused, C172);
 #   R-3 `pick`, reached inside `gauge`'s body, is one nested instance, and `warpB`'s own `pick` edge
 #       is that same vertex;
 #   R-7 `heddle` fans out over a scope's shuttles, one instance each, and has no edge where there are
@@ -74,7 +75,14 @@ let
           };
         }
         { aspects.twill = reads "loom" "twill:" { }; }
-        { aspects.twill = reads "tension" "twill-" { }; }
+        {
+          aspects.twill = guard (pred.has "tension") {
+            note = t.concat [
+              (t.lit "twill-")
+              (t.readCtx "tension" [ ])
+            ];
+          };
+        }
       ];
     }).config.aspects;
 
