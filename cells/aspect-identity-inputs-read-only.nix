@@ -11,11 +11,13 @@
 #       (the stamp rides with the value: the property the fix must not move);
 #   N-5 `spool`, a guard declaring its own `name`, keeps its declared path;
 #   N-6 two modules each write one named element into `loom.includes`: swapping the modules moves neither
-#       element's key nor id (an include element has no declared path; reordering includes changes nothing).
+#       element's key nor id (a named element is keyed by its declaring site under its owner, never by its
+#       merge position; reordering includes changes nothing).
 {
   asserts,
   genAspects,
   genMerge,
+  lib,
 }:
 let
   # `closedKeys` off: `hem.selvage` is a nested aspect, which the corpus's closed vocabulary (C111) refuses
@@ -129,7 +131,7 @@ let
       reed
       heddle
     ]
-    && builtins.head hr.heddle == "loom/includes/heddle";
+    && lib.hasPrefix "loom/includes/heddle@" (builtins.head hr.heddle);
 in
 {
   construct = [ "C179" ];
