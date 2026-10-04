@@ -5,7 +5,6 @@
 {
   genAspects,
   genAssemble,
-  genGraph,
   genScope,
   genSelect,
   genValues,
@@ -116,20 +115,65 @@ let
   #
   # `c16Structural` is the same binding oracle 5's instance below substitutes — one call site
   # defined once and reused by both. `c16LabelGraph` reads one label's graph back off the
-  # union (post-protocol); `c16Out` turns that graph into the `id -> [ids]` shape
-  # `labeledFrom`'s `perLabel` wants, by the same from/to convention as containment above.
+  # union (post-protocol); `c16Out` turns that graph into the `id -> [ids]` accessor each label
+  # needs, by the same from/to convention as containment above.
   c16Structural = genAssemble.structuralDecls c16Assembled.nodes;
   c16LabelGraph =
     label: (builtins.head (builtins.filter (g: g.label == label) c16Union.edgeGraphs)).graph;
   c16Out = g: id: map (e: e.to) (builtins.filter (e: e.from == id) g.edges);
 
-  c16Lg = genGraph.labeledFrom {
+  c16PerLabel = {
     # THE INVERSION IS THE TOOLKIT'S, NOT HAND-ROLLED: `c16Structural.children` is
     # `genAssemble.structuralDecls`'s own `_self: id: filterAttrs (_: n: n.parent == id) nodes`.
     contains = id: builtins.attrNames (c16Structural.children null id);
     declares = c16Out (c16LabelGraph "declares");
     members = c16Out (c16LabelGraph "members");
-  } c16Assembled.nodeOrder;
+  };
+  c16Letters = builtins.attrNames c16PerLabel;
+
+  # THE ASSEMBLY, EVALUATED AS THE SCOPE gen-scope's resolution calculus walks: each label `l` is
+  # the attribute `edges-l`, and every node declares its boundary marks, none (ADR-0026;
+  # gen-authored, so stated rather than defaulted).
+  c16Scope = genScope.eval { } (
+    c16Structural
+    // {
+      marks = _: _: [ ];
+    }
+    // builtins.listToAttrs (
+      map (l: {
+        name = "edges-${l}";
+        value = _: c16PerLabel.${l};
+      }) c16Letters
+    )
+  ) c16Assembled;
+  # The nodes `expression` reaches from `from`, sorted.
+  c16Follow =
+    from: expression:
+    builtins.sort builtins.lessThan (
+      map (a: a.node)
+        (genScope.resolve {
+          wf = genScope.wellFormed {
+            alphabet = c16Letters;
+            inherit expression;
+          };
+          dataFilter = _: true;
+        } c16Scope from).answers
+    );
+
+  # The same edges as a LABELLED RECORD, ADR-0012's `{ nodes; labeledEdges; }` written as data, for
+  # gen-graph's structural algorithms (`forgetLabels`, `roots`, `leaves`, `cycles`).
+  c16Lg = {
+    nodes = c16Assembled.nodeOrder;
+    labeledEdges =
+      id:
+      builtins.concatMap (
+        l:
+        map (t: {
+          label = l;
+          target = t;
+        }) (c16PerLabel.${l} id)
+      ) c16Letters;
+  };
 
   # The context is built with `parent` = the PUBLISHED `parentOf`, NOT a key split and NOT
   # `_: null` — the fix §3.4 names. `entryFor` is stated explicitly so the identity the
@@ -175,6 +219,10 @@ in
     c16Structural
     c16LabelGraph
     c16Out
+    c16PerLabel
+    c16Letters
+    c16Scope
+    c16Follow
     c16Lg
     c16Ctx
     c16ArmHand

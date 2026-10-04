@@ -2,7 +2,7 @@
 # `edges` IS the one graph: what the corpus declared, plus what C5's policy stratum admitted,
 # plus C12's promoted coordinate edges.
 {
-  genGraph,
+  genScope,
   genSelect,
   genValues,
   nodes,
@@ -12,27 +12,42 @@
 let
   edges = genValues.declaredEdges ++ pipingEdge ++ seamPromotion.edges;
   byLabel = lbl: id: map (e: e.to) (builtins.filter (e: e.label == lbl && e.from == id) edges);
-  lg = genGraph.labeledFrom {
-    tacks = byLabel "tacks";
-    gathers = byLabel "gathers";
-    piping = byLabel "piping";
-  } (builtins.attrNames nodes);
+  # The one graph as an EVALUATED SCOPE, the structure gen-scope's resolution calculus walks: each
+  # label `l` is the attribute `edges-l`, and every node declares its boundary marks, none
+  # (ADR-0026; gen-authored, so stated rather than defaulted).
+  edgeScope = genScope.eval { parseParent = _: null; } {
+    children = _: _: { };
+    marks = _: _: [ ];
+    edges-tacks = _: byLabel "tacks";
+    edges-gathers = _: byLabel "gathers";
+    edges-piping = _: byLabel "piping";
+  } (genScope.buildRoots { parentGraph = genScope.vertices (builtins.attrNames nodes); });
+  follow =
+    expression:
+    builtins.sort builtins.lessThan (
+      map (a: a.node)
+        (genScope.resolve {
+          wf = genScope.wellFormed {
+            alphabet = [
+              "tacks"
+              "gathers"
+              "piping"
+            ];
+            inherit expression;
+          };
+          dataFilter = _: true;
+        } edgeScope "pewter").answers
+    );
   # The named query: tacks*, then piping* — walks the derived label, so C5's edge changes what
   # this answers without the query ever mentioning `piping` as a declared thing.
-  tacked = genGraph.query { } {
-    graph = lg;
-    from = "pewter";
-    follow = genGraph.regex.seq [
-      (genGraph.regex.star (genGraph.regex.lit "tacks"))
-      (genGraph.regex.star (genGraph.regex.lit "piping"))
-    ];
-  };
+  tacked = follow (
+    genScope.wfl.seq [
+      (genScope.wfl.star (genScope.wfl.lit "tacks"))
+      (genScope.wfl.star (genScope.wfl.lit "piping"))
+    ]
+  );
   # The discriminator: `gathers` alone, so a label filter that stopped filtering is visible.
-  gathered = genGraph.query { } {
-    graph = lg;
-    from = "pewter";
-    follow = genGraph.regex.star (genGraph.regex.lit "gathers");
-  };
+  gathered = follow (genScope.wfl.star (genScope.wfl.lit "gathers"));
 
   # A second door on the same declarations: gen-select, over the heterogeneous union. The
   # adapter's default `kindFor` (`_: kind`) projects one constant kind across the union and the
@@ -53,7 +68,7 @@ in
   inherit
     edges
     byLabel
-    lg
+    edgeScope
     tacked
     gathered
     thimbleKind

@@ -1,13 +1,14 @@
 # `aspect-contribution` — C16. The corpus's own aspect facts (`genAspects.graphFacts`) contributed
-# through `genAssemble`'s protocol alongside the node registry's declared membership; the labelled
-# graph `genGraph.labeledFrom`/`forgetLabels` produces and the selector context
+# through `genAssemble`'s protocol alongside the node registry's declared membership; the assembly
+# evaluated as a scope and walked by gen-scope's `resolve`, its labelled record read by gen-graph's
+# structural algorithms, and the selector context
 # `genSelect.adapters.registry.mkContext` builds over the PUBLISHED parent, both walked; oracle 5's
 # structural-helper substitution armed at C16's own non-flat assembly (`children`/`subtreeOf`
 # diverge) and at C1's flat one (the node set does not).
 #
 # C16 — the aspect graph, assembled through the contribution protocol (ADR-0012,
 # ADR-0010 §3 toolkit item). The corpus's own aspect facts, contributed alongside the
-# node registry's declared membership, queried through gen-graph's labelled graph and
+# node registry's declared membership, queried through gen-scope's resolution calculus and
 # gen-select's context; oracle 5's structural-helper substitution armed at C16's own
 # non-flat assembly (children/subtreeOf diverge) and at C1's flat one (the node set
 # does not).
@@ -18,11 +19,13 @@
   c16Assembled,
   c16Ctx,
   c16Facts,
+  c16Follow,
   c16Lg,
   c16O5Toolkit,
   c16Union,
   ev,
   genGraph,
+  genScope,
   genSelect,
   genValues,
 }:
@@ -134,13 +137,9 @@
         "hemline/placket"
         "hemline/placket"
       ]
-    # O6 — the query walks the labelled graph the union produced.
+    # O6 — the query walks the scope the union produced.
     &&
-      genGraph.query { } {
-        graph = c16Lg;
-        from = "hemline";
-        follow = genGraph.regex.star (genGraph.regex.lit "contains");
-      } == [
+      c16Follow "hemline" (genScope.wfl.star (genScope.wfl.lit "contains")) == [
         "hemline"
         "hemline/facing"
         "hemline/placket"
@@ -152,26 +151,22 @@
       # as `stitch` itself. `pewter`'s own `members` edge is still the single one
       # (asserted at O5 below); the second answer is the `contains` step, which is the
       # point of running the star rather than a `members` literal.
-      genGraph.query { } {
-        graph = c16Lg;
-        from = "pewter";
-        follow = genGraph.regex.seq [
-          (genGraph.regex.lit "members")
-          (genGraph.regex.star (genGraph.regex.lit "contains"))
-        ];
-      } == [
+      c16Follow "pewter" (
+        genScope.wfl.seq [
+          (genScope.wfl.lit "members")
+          (genScope.wfl.star (genScope.wfl.lit "contains"))
+        ]
+      ) == [
         "stitch"
         "stitch/trim"
       ]
     &&
-      genGraph.query { } {
-        graph = c16Lg;
-        from = "bartack";
-        follow = genGraph.regex.seq [
-          (genGraph.regex.lit "declares")
-          (genGraph.regex.star (genGraph.regex.lit "contains"))
-        ];
-      } == [
+      c16Follow "bartack" (
+        genScope.wfl.seq [
+          (genScope.wfl.lit "declares")
+          (genScope.wfl.star (genScope.wfl.lit "contains"))
+        ]
+      ) == [
         "hemline/placket"
         "hemline/placket/eyelet"
       ]
