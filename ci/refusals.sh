@@ -50,7 +50,11 @@ workers="${REFUSALS_JOBS:-$(($(nproc) < 8 ? $(nproc) : 8))}"
 # $6 wanted stdout, exact match (empty = none checked -- the planted arms, which refuse before
 # producing a value; every unplanted arm passes one, so a construction that refused everything
 # cannot pass this arm by exiting 0 with the wrong (or no) value).
-labels=() exprs=() want_exits=() want_greps=() errfiles=() want_stdouts=()
+labels=() exprs=() want_exits=() want_greps=() errfiles=() want_stdouts=() arm_opts=()
+# A row that needs an evaluator setting (a warning that must abort, say) fills `nixopts` before its
+# `check` calls and empties it after. Such an arm runs as a process: nix-eval-jobs takes its options
+# once for the whole run.
+nixopts=()
 check() {
   labels+=("$1")
   exprs+=("$2")
@@ -58,6 +62,7 @@ check() {
   want_greps+=("$4")
   errfiles+=("$5")
   want_stdouts+=("${6:-}")
+  arm_opts+=("${nixopts[*]:-}")
 }
 
 # Arm $1's verdict, from the exit code, stdout and stderr its engine left in `$tmpdir/arm$1.*` and
@@ -142,6 +147,10 @@ if [ "$engine" = nej ]; then
     echo '  __refusalsArm = v: derivation { name = "refusal-arm"; system = builtins.currentSystem; builder = "/bin/sh"; } // { refusalValue = "${v}"; };'
     echo "in {"
     for i in "${!exprs[@]}"; do
+      if [ -n "${arm_opts[$i]}" ]; then
+        proc+=("$i")
+        continue
+      fi
       e="${exprs[$i]//builtins.getFlake (toString .\/.)/__refusalsFlake}"
       e="${e//.\/aspect-cnf.nix/$root/aspect-cnf.nix}"
       if printf '%s' "$e" | grep -qE '(^|[^A-Za-z0-9._/~+-])\.\.?/'; then
@@ -198,7 +207,8 @@ for i in "${proc[@]}"; do
   while [ "$(jobs -rp | wc -l)" -ge "$workers" ]; do wait -n; done
   (
     ec=0
-    nix eval --impure --raw --expr "${exprs[$i]}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
+    # shellcheck disable=SC2086 -- the options are a space-joined word list, split on purpose
+    nix eval ${arm_opts[$i]} --impure --raw --expr "${exprs[$i]}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
     echo "$ec" >"$tmpdir/arm$i.ec"
   ) &
 done
