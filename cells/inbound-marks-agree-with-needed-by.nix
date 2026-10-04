@@ -54,6 +54,10 @@ let
       {
         children = _self: _id: { };
         imports = _self: id: importIndex.${id} or [ ];
+        # The evaluation's boundary floor, read by the resolution authority in every resolution
+        # (ADR-0026; den-hoag-gayc D1). The cell's marks ride the construct's `marks` (the query's
+        # `bound`), so the floor states none.
+        marks = _self: _id: [ ];
       }
       (
         genScope.buildRoots {

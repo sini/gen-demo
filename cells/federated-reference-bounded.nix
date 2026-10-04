@@ -1,5 +1,5 @@
 # `federated-reference-bounded` — C11. A boundary mark on the federation's include edge (ADR-0026's
-# fail-closed floor, compiled at the query authority's accessor). `genLink.link` declares no marks,
+# fail-closed floor, read by the query authority as its `bound`). `genLink.link` declares no marks,
 # so the bound is declared here directly: `genView.referenceResolution` and `genView.neededBy` over
 # C11's own requirer→provider edge, with the same gen-scope authority gen-link injects.
 #
@@ -29,6 +29,10 @@ let
       {
         children = _self: _id: { };
         imports = _self: id: importIndex.${id} or [ ];
+        # The evaluation's boundary floor, read by the resolution authority in every resolution
+        # (ADR-0026; den-hoag-gayc D1). The cell's marks ride the construct's `marks` (the query's
+        # `bound`), so the floor states none.
+        marks = _self: _id: [ ];
       }
       (
         genScope.buildRoots {
