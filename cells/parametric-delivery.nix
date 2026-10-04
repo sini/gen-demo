@@ -9,10 +9,13 @@
 #      refuses (a parametric aspect is never dropped).
 #   D3 the instantiation edge is checked: a view whose `instantiates` points `warp`'s instance at
 #      another declaration refuses, where reading the edge list alone would deliver it.
-#   D4 an undecided empty reach refuses (interim, den-hoag-n8wb5): `bobbin` reaches `nap`, which
-#      reads `shuttle`. `plain`, handed with no shuttle, gets no instance of it, and the relation does
-#      not publish whether `nap` was declined there, so `plain` refuses; `twill`, with a shuttle
-#      descendant, receives it.
+#   D4 a FALSE condition is no edge (den-hoag-n8wb5): `bobbin` reaches `nap`, which reads `shuttle`.
+#      `plain` has no shuttle (a declared coordinate, so its absence is FALSE), the relation publishes
+#      `nap` as declined there, and `plain` receives `bobbin` alone at rc 0; `twill`, with a shuttle
+#      descendant, receives `nap`.
+#   D5 an undecided reach refuses: `loose` was handed a scope without `frame`, so the relation never
+#      walked `selvage` there and neither lists nor declines it; the reach refuses rather than read as
+#      declined, while `warp` delivers.
 {
   asserts,
   genAlgebra,
@@ -82,6 +85,9 @@ let
       plain = loomed "plain" // {
         members = [ "bobbin" ];
       };
+      loose = loomed "warp" // {
+        members = [ ];
+      };
     };
   };
   projectWith =
@@ -95,6 +101,7 @@ let
           twill.aspects = [ "bobbin" ];
           plain.aspects = [ "bobbin" ];
           bare.aspects = [ "frame" ];
+          loose.aspects = [ "frame" ];
         };
       };
       inherit cnf instances;
@@ -139,7 +146,11 @@ let
       )) "warp"
     )
     && !(refuses (marksOf p "warp"));
-  d4 = builtins.elem "nap" (marksOf p "twill") && refuses (marksOf p "plain");
+  d4 =
+    builtins.elem "nap" (marksOf p "twill")
+    && marksOf p "plain" == [ "bobbin" ]
+    && r.declined.reaches.plain == [ "nap" ];
+  d5 = refuses (marksOf p "loose") && !(refuses (marksOf p "warp"));
 in
 {
   construct = [ "C180" ];
@@ -148,6 +159,7 @@ in
     d2
     d3
     d4
+    d5
     ;
-  check = asserts (d1 && d2 && d3 && d4);
+  check = asserts (d1 && d2 && d3 && d4 && d5);
 }
