@@ -89,6 +89,7 @@ let
   seamPromotion = reachedOf seamHead seamCandidate;
 in
 {
+  pipingDeclarations = declarations;
   inherit
     pipingHead
     prog
