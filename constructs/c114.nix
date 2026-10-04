@@ -17,7 +17,11 @@
 #
 # The band → head-letter map is the caller's (Q4 (i)), and here it is the identity, written as a
 # table so a placement reading the wrong band is visible against it.
-{ genMerge, genView }:
+{
+  genMerge,
+  genView,
+  genScope,
+}:
 let
   gm = genMerge;
   v = genView;
@@ -62,14 +66,14 @@ let
         inherit labels;
         relations = v.relations { names = [ "tier" ]; };
         relatumLabels = v.relatumLabels { names = [ ]; };
-        labelWellFormedness = v.labelWellFormedness {
-          alphabet = labels;
+        labelWellFormedness = genScope.wellFormed {
+          alphabet = labels.letters;
           inherit expression;
         };
         # `$` below `tacks`: the root's own shorter word beats one continuing, "most specific
         # wins". `endOfPath = 1` is the control where continuing beats stopping.
-        labelOrder = v.labelOrder {
-          alphabet = labels;
+        labelOrder = genScope.labelOrder {
+          alphabet = labels.letters;
           layers = [ [ "tacks" ] ];
           inherit endOfPath;
         };
@@ -115,6 +119,7 @@ let
         }) scopes
       );
       pos = v.headPositions {
+        engine = genScope;
         inherit heads;
         structure = structure {
           inherit
@@ -141,6 +146,7 @@ let
         ) (builtins.attrValues records);
       };
       relation = v.viewRelation {
+        engine = genScope;
         definition = v.compositions.movement {
           channel = "selvage";
           relation = "tier";

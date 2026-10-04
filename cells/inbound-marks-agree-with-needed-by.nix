@@ -79,12 +79,12 @@ let
 
   # The carrier that puts `imports` in L over the federated shape.
   labels = genView.edgeLabels { letters = [ "imports" ]; };
-  admission = genView.labelWellFormedness {
-    alphabet = labels;
+  admission = genScope.wellFormed {
+    alphabet = labels.letters;
     expression = "imports*";
   };
-  order = genView.labelOrder {
-    alphabet = labels;
+  order = genScope.labelOrder {
+    alphabet = labels.letters;
     layers = [ [ "imports" ] ];
     endOfPath = -1;
   };
@@ -119,6 +119,7 @@ let
   inbound =
     marks:
     genView.viewRelation {
+      engine = genScope;
       definition = genView.compositions.topology {
         channel = "requirers";
         relation = "needs";

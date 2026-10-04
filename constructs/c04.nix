@@ -4,6 +4,7 @@
 {
   bastingRelata,
   genView,
+  genScope,
   identityMark,
 }:
 let
@@ -12,12 +13,12 @@ let
     labels = movementLabels;
     relations = genView.relations { names = [ "gimp" ]; };
     relatumLabels = genView.relatumLabels { names = builtins.attrNames bastingRelata; };
-    labelWellFormedness = genView.labelWellFormedness {
-      alphabet = movementLabels;
+    labelWellFormedness = genScope.wellFormed {
+      alphabet = movementLabels.letters;
       expression = "tacks*";
     };
-    labelOrder = genView.labelOrder {
-      alphabet = movementLabels;
+    labelOrder = genScope.labelOrder {
+      alphabet = movementLabels.letters;
       layers = [ [ "tacks" ] ];
       endOfPath = -1;
     };
@@ -59,6 +60,7 @@ let
     ];
   };
   moved = genView.viewRelation {
+    engine = genScope;
     definition = movementDefinition;
     marks = _: [ ];
     orderMark = identityMark movementLabels;

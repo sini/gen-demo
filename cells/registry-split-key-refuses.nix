@@ -22,6 +22,7 @@
   diamondGraph,
   diamondLabels,
   genView,
+  genScope,
   identityMark,
   splitKeyed,
 }:
@@ -32,6 +33,7 @@
     && (
       let
         splitKeyedControl = genView.viewRelation {
+          engine = genScope;
           definition = genView.compositions.registry {
             channel = "selvage";
             relation = "gimp";

@@ -9,9 +9,10 @@
 # arms differ by the graph alone.
 row58='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   labels = genView.edgeLabels { letters = [ "tacks" ]; };
-  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
-  order = genView.labelOrder { alphabet = labels; layers = [ labels.letters ]; endOfPath = -1; };
+  admission = genScope.wellFormed { alphabet = labels.letters; expression = "tacks*"; };
+  order = genScope.labelOrder { alphabet = labels.letters; layers = [ labels.letters ]; endOfPath = -1; };
   channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
   genuine = genView.scopeGraph {
     carrier = genView.carrier {
@@ -24,7 +25,7 @@ row58='let
     edges.tacks = id: { pewter = [ "faille" "grosgrain" ]; faille = [ "grosgrain" ]; }.${id} or [ ];
     data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
   };
-  relation = genView.viewRelation {
+  relation = genView.viewRelation { engine = genScope;
     definition = genView.viewDefinition {
       inherit channel admission order;
       relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
@@ -34,7 +35,7 @@ row58='let
     };
     graph = GRAPH;
     marks = _: [ ];
-    orderMark = genView.labelOrder { alphabet = labels; layers = [ labels.letters ]; endOfPath = 0; };
+    orderMark = genScope.labelOrder { alphabet = labels.letters; layers = [ labels.letters ]; endOfPath = 0; };
   };
 in BODY'
 row58unplanted="${row58/GRAPH/genuine}"
