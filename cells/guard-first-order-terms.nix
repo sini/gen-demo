@@ -3,8 +3,9 @@
 # a refusal. `c141Pleat`'s inner guard survives the outer's firing as a guard and fires at its own:
 # `pleat` at `nixos`, `null` at `darwin`. `c141DoorNode` fires through `instanceOf`, which carries the
 # sources, to the stub door's `gusset-pewter`, keyed on the one coordinate it reads; through
-# `applyGuard`, which carries none, it is refused catchably. The tuck's key is the mint
-# (`guard:`), the same at two aspect positions. The control on the refusal side: a closure body is
+# `applyGuard`, which carries none, it is refused catchably. The tuck's TERM key is the mint
+# (`guard:`), the same at two aspect positions, and each position is a declaration of its own, keyed
+# by its declared path (identity design §1). The control on the refusal side: a closure body is
 # refused at declaration, catchably.
 {
   asserts,
@@ -44,8 +45,10 @@ in
     && instance.entry.description == "gusset-pewter"
     && builtins.attrNames instance.formals == [ "thimble" ]
     && !(caught (dv.applyGuard { thimble = "pewter"; } c141DoorNode))
-    && builtins.substring 0 6 (genAspects.key placed.a) == "guard:"
-    && genAspects.key placed.a == genAspects.key placed.b
+    && builtins.substring 0 6 (genAspects.guardKey placed.a) == "guard:"
+    && genAspects.guardKey placed.a == genAspects.guardKey placed.b
+    && genAspects.key placed.a == "a"
+    && genAspects.key placed.b == "b"
     && !(caught (c141Place { } { c = genAspects.guard genAspects.pred.always (ctx: { }); }).c)
   );
 }
