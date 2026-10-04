@@ -9,7 +9,7 @@
   lib,
   genAspects,
   genMerge,
-  genGraph,
+  genScope,
   genBind,
   genDelivery,
 }:
@@ -54,9 +54,8 @@ let
         }).adapter
           {
             inherit (carriage) extent extraModules;
-            peerGraph = genGraph.labeledFrom {
-              peer = _id: builtins.attrNames carriage.extent;
-            } (builtins.attrNames carriage.extent);
+            peersOf = _id: builtins.attrNames carriage.extent;
+            engine = genScope;
             marksOf = _id: [ ];
             readerId = carriage.name;
           };
