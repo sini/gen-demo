@@ -6,6 +6,7 @@
 # the only collapse.
 {
   genView,
+  genScope,
   identityMark,
   diamondLabels,
   diamondCarrier,
@@ -14,6 +15,7 @@
 }:
 {
   unionStorePath = genView.viewRelation {
+    engine = genScope;
     definition = genView.compositions.movement {
       channel = "selvage";
       relation = "gimp";

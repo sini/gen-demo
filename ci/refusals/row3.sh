@@ -4,6 +4,7 @@
 row3='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genView = gen.lib.substrate.view;
+  genScope = gen.lib.substrate.scope;
   mkCarrier = warpLabel:
     let
       bastingRelata = { ${warpLabel} = "pewter"; weft = "grosgrain"; };
@@ -12,8 +13,8 @@ row3='let
       labels = movementLabels;
       relations = genView.relations { names = [ "gimp" ]; };
       relatumLabels = genView.relatumLabels { names = builtins.attrNames bastingRelata; };
-      labelWellFormedness = genView.labelWellFormedness { alphabet = movementLabels; expression = "tacks*"; };
-      labelOrder = genView.labelOrder { alphabet = movementLabels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+      labelWellFormedness = genScope.wellFormed { alphabet = movementLabels.letters; expression = "tacks*"; };
+      labelOrder = genScope.labelOrder { alphabet = movementLabels.letters; layers = [ [ "tacks" ] ]; endOfPath = -1; };
       dataOrder = genView.dataOrder { channel = "selvage"; keyOf = _: "selvage"; };
     };
 in builtins.toJSON (mkCarrier "LABEL").relatumLabels.names'

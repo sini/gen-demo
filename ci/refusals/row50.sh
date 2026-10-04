@@ -9,11 +9,12 @@
 # renderer from the retired copy, and the catchable arm is row 33's form.
 row50='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   labels = genView.edgeLabels { letters = [ "tacks" ]; };
   definition = genView.compositions.movement {
     channel = "settings"; relation = "declares"; root = "pewter"; direction = DIRECTION;
-    admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
-    order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+    admission = genScope.wellFormed { alphabet = labels.letters; expression = "tacks*"; };
+    order = genScope.labelOrder { alphabet = labels.letters; layers = [ [ "tacks" ] ]; endOfPath = -1; };
     wellFormed = _: true; tieSet = genView.tieSets.union; empty = [ ];
     combine = genView.combines.listAppend; dedup = genView.dedups.none;
   };

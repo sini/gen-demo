@@ -10,11 +10,12 @@
 # refusing every step cannot pass it.
 row118='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
+  genScope = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.scope;
   labels = genView.edgeLabels { letters = [ "tacks" ]; };
-  admission = genView.labelWellFormedness { alphabet = labels; expression = "tacks*"; };
-  order = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = -1; };
+  admission = genScope.wellFormed { alphabet = labels.letters; expression = "tacks*"; };
+  order = genScope.labelOrder { alphabet = labels.letters; layers = [ [ "tacks" ] ]; endOfPath = -1; };
   channel = genView.dataOrder { channel = "selvage"; keyOf = c: c.scope; };
-  relation = genView.viewRelation {
+  relation = genView.viewRelation { engine = genScope;
     definition = genView.viewDefinition {
       inherit channel admission order;
       relation = "gimp"; root = "pewter"; direction = "outbound"; wellFormed = _: true;
@@ -34,7 +35,7 @@ row118='let
       data = [ { scope = "grosgrain"; relation = "gimp"; datum = [ "cambric" ]; } ];
     };
     marks = _: [ ];
-    orderMark = genView.labelOrder { alphabet = labels; layers = [ [ "tacks" ] ]; endOfPath = 0; };
+    orderMark = genScope.labelOrder { alphabet = labels.letters; layers = [ [ "tacks" ] ]; endOfPath = 0; };
   };
   scanned = genView.transform.scan {
     inherit relation;

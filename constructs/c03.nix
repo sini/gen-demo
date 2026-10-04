@@ -50,8 +50,8 @@ let
   # order it is composed with — that mismatch is a refusal, not a default.
   identityMark =
     labels:
-    genView.labelOrder {
-      alphabet = labels;
+    genScope.labelOrder {
+      alphabet = labels.letters;
       layers = [ labels.letters ];
       endOfPath = 0;
     };
