@@ -1,8 +1,13 @@
-# C46 -- a walk over scopes named after packages. gen-graph keys a caller's node names by
-# their text (den-hoag-u9k7j), so a labeled graph whose scopes are `baseNameOf` of two
-# packages is walked, and every node it answers keeps its context. C2's idiom (`lg`,
-# `tacked`) over store-named scopes.
-{ genGraph, pkgs }:
+# C46 -- a walk over scopes named after packages. A caller's node names are keyed by their text
+# (den-hoag-u9k7j), so an evaluated scope whose nodes are `baseNameOf` of two packages is walked by
+# gen-scope's resolution calculus, and every node it answers keeps its context. C2's idiom
+# (`edgeScope`, `tacked`) over store-named scopes. The same edges as a hand-built labelled record
+# (data, ADR-0012's `{ nodes; labeledEdges; }`) are what gen-graph's structural algorithms read.
+{
+  genGraph,
+  genScope,
+  pkgs,
+}:
 let
   helloScope = baseNameOf pkgs.hello;
   jqScope = baseNameOf pkgs.jq;
@@ -16,37 +21,42 @@ let
       to = jqScope;
     }
   ];
-  storeNamedWalk =
-    genGraph.labeledFrom
-      {
-        contains = id: map (e: e.to) (builtins.filter (e: e.from == id) storeNamedContains);
-      }
-      [
-        "pewter"
-        helloScope
-        jqScope
-      ];
-  storeNamedFollow = genGraph.regex.star (genGraph.regex.lit "contains");
+  storeNamedNodes = [
+    "pewter"
+    helloScope
+    jqScope
+  ];
+  containsOf = id: map (e: e.to) (builtins.filter (e: e.from == id) storeNamedContains);
+  storeNamedWalk = {
+    nodes = storeNamedNodes;
+    labeledEdges =
+      id:
+      map (t: {
+        label = "contains";
+        target = t;
+      }) (containsOf id);
+  };
+  storeNamedEval = genScope.eval { parseParent = _: null; } {
+    children = _: _: { };
+    marks = _: _: [ ];
+    edges-contains = _: containsOf;
+  } (genScope.buildRoots { parentGraph = genScope.vertices storeNamedNodes; });
+  storeNamedFollow = genScope.wellFormed {
+    alphabet = [ "contains" ];
+    expression = genScope.wfl.star (genScope.wfl.lit "contains");
+  };
   storeNamedReached =
-    genGraph.query
-      {
-        mode = "all";
-      }
-      {
-        graph = storeNamedWalk;
-        from = "pewter";
-        follow = storeNamedFollow;
-      };
+    map (a: a.node)
+      (genScope.resolve {
+        wf = storeNamedFollow;
+        dataFilter = _: true;
+      } storeNamedEval "pewter").answers;
   storeNamedPaths =
-    genGraph.query
-      {
-        mode = "paths";
-      }
-      {
-        graph = storeNamedWalk;
-        from = "pewter";
-        follow = storeNamedFollow;
-      };
+    (genScope.resolve {
+      wf = storeNamedFollow;
+      dataFilter = _: true;
+      mode = "witnesses";
+    } storeNamedEval "pewter").answers;
 in
 {
   inherit
@@ -54,6 +64,7 @@ in
     jqScope
     storeNamedContains
     storeNamedWalk
+    storeNamedEval
     storeNamedFollow
     storeNamedReached
     storeNamedPaths
