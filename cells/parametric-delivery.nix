@@ -9,8 +9,9 @@
 #      refuses (a parametric aspect is never dropped).
 #   D3 the instantiation edge is checked: a view whose `instantiates` points `warp`'s instance at
 #      another declaration refuses, where reading the edge list alone would deliver it.
-#   D4 a FALSE condition is no edge: `frame` also reaches `nap`, which reads `shuttle`. `warp` has no
-#      shuttle, so `nap` delivers nothing there at rc 0 (D1's exact lists); `twill`, with a shuttle
+#   D4 an undecided empty reach refuses (interim, den-hoag-n8wb5): `bobbin` reaches `nap`, which
+#      reads `shuttle`. `plain`, handed with no shuttle, gets no instance of it, and the relation does
+#      not publish whether `nap` was declined there, so `plain` refuses; `twill`, with a shuttle
 #      descendant, receives it.
 {
   asserts,
@@ -36,10 +37,9 @@ let
         {
           aspects = {
             frame.nixos.marks = [ "frame" ];
-            frame.includes = [
-              "selvage"
-              "nap"
-            ];
+            frame.includes = [ "selvage" ];
+            bobbin.nixos.marks = [ "bobbin" ];
+            bobbin.includes = [ "nap" ];
             selvage = guard (pred.has "loom") {
               nixos.marks = [ "selvage" ];
               description = "selvage";
@@ -69,13 +69,18 @@ let
       ${entity "warp"}.loom = "jacquard";
       ${entity "weft"}.loom = "dobby";
       ${entity "twill"}.loom = "jacquard";
+      ${entity "plain"}.loom = "jacquard";
       ${entity "boat"}.shuttle = "boat";
     };
     scopes = {
       warp = loomed "warp";
       weft = loomed "weft";
       twill = loomed "twill" // {
+        members = [ "bobbin" ];
         descendants = [ { sources.shuttle = entity "boat"; } ];
+      };
+      plain = loomed "plain" // {
+        members = [ "bobbin" ];
       };
     };
   };
@@ -87,7 +92,8 @@ let
         hosts = {
           warp.aspects = [ "frame" ];
           weft.aspects = [ "frame" ];
-          twill.aspects = [ "frame" ];
+          twill.aspects = [ "bobbin" ];
+          plain.aspects = [ "bobbin" ];
           bare.aspects = [ "frame" ];
         };
       };
@@ -133,7 +139,7 @@ let
       )) "warp"
     )
     && !(refuses (marksOf p "warp"));
-  d4 = builtins.elem "nap" (marksOf p "twill") && !(builtins.elem "nap" (marksOf p "warp"));
+  d4 = builtins.elem "nap" (marksOf p "twill") && refuses (marksOf p "plain");
 in
 {
   construct = [ "C181" ];
