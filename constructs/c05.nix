@@ -35,15 +35,15 @@ let
       relata = map (d: seamCoords.${d}) seamSpace.product.dims;
     }
   ];
-  prog = genProgram.program {
-    frozen = [
-      "pewter"
-      "damask"
-      "grosgrain"
-      "faille"
-    ]; # earlier passes settled these
-    inherit declarations;
-  };
+  prog =
+    genProgram.program
+      [
+        "pewter"
+        "damask"
+        "grosgrain"
+        "faille"
+      ] # earlier passes settled these
+      declarations;
   mdl = genProgram.model {
     prior = null;
     program = prog;
@@ -58,10 +58,7 @@ let
   #
   # The labelled edges come from gen-program itself: `candidates` never reads the model, and
   # `reached` refuses a membership the model leaves undefined rather than dropping its edge.
-  pipingEdges = genProgram.ruleEdges {
-    inherit declarations;
-    model = mdl;
-  };
+  pipingEdges = genProgram.ruleEdges mdl declarations;
   # THE PROMOTION — a coordinate promoted into a node of the one graph by giving it edges
   # (ADR-0016 ruling 2). Both the node and its edges are read off `seamCoords`/`seamSpace`,
   # never restated as literals.

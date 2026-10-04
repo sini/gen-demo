@@ -38,13 +38,13 @@ let
   passOver =
     declarations: prior: complete:
     genProgram.model {
-      program = genProgram.program {
-        frozen = [
-          "damask"
-          "faille"
-        ]; # earlier passes settled these
-        inherit declarations;
-      };
+      program =
+        genProgram.program
+          [
+            "damask"
+            "faille"
+          ] # earlier passes settled these
+          declarations;
       interpretation = [ ];
       inherit prior complete;
     };

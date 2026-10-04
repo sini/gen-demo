@@ -59,15 +59,13 @@
     # is refused by name, so the routing bought the capability without widening the
     # record the protocol declares itself total over.
     && !(builtins.tryEval (
-      builtins.deepSeq (genAssemble.union {
-        contributions = [
-          {
-            name = "corpus";
-            vertices = builtins.attrNames nodes;
-            kinds = genScope.mkKinds [ (genScope.mkKind { } "thimble") ];
-          }
-        ];
-      }) 1
+      builtins.deepSeq (genAssemble.union { } [
+        {
+          name = "corpus";
+          vertices = builtins.attrNames nodes;
+          kinds = genScope.mkKinds [ (genScope.mkKind { } "thimble") ];
+        }
+      ]) 1
     )).success
   );
 }

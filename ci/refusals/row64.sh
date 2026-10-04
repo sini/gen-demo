@@ -9,10 +9,7 @@
 row64='let
   P = (builtins.getFlake (toString ./.)).inputs.gen.lib.framework.program;
   pewter = { name = "pewter"; };
-  prog = head: relatum: P.program {
-    declarations = [ { inherit head; relata = [ relatum ]; } ];
-    frozen = [ "damask" ];
-  };
+  prog = head: relatum: P.program [ "damask" ] [ { inherit head; relata = [ relatum ]; } ];
 in BODY'
 check "T5 row64 unplanted (identifiers build a program; its atoms are the assertion)" \
   "${row64/BODY/builtins.toJSON (prog \"pewter\" \"damask\").atoms}" 0 "" \

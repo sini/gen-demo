@@ -113,10 +113,7 @@ let
   solve =
     declarations:
     genProgram.model {
-      program = genProgram.program {
-        frozen = [ "bolt" ];
-        inherit declarations;
-      };
+      program = genProgram.program [ "bolt" ] declarations;
       interpretation = [ ];
       prior = null;
       complete = true;
@@ -144,14 +141,20 @@ in
     inherit context sources;
     scope = { };
   } loom.config.loom.aspects.hem;
-  c142WeaveFired = genProgram.groundInstances {
-    body = genProgram.body {
-      name = "weave";
-      declared = D;
-      clauses = [ loom.config.loom.rules.weave ];
-    };
-    inherit context sources door;
-  };
+  c142WeaveFired =
+    genProgram.groundInstances
+      {
+        sources = sources;
+        door = door;
+      }
+      context
+      (
+        genProgram.body {
+          name = "weave";
+          declared = D;
+          clauses = [ loom.config.loom.rules.weave ];
+        }
+      );
   c142PleatHeld = solve (facts [ "fold:bolt" ] ++ pleat ++ unpicked);
   c142PleatDefeated = solve (
     facts [

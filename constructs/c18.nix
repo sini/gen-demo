@@ -25,8 +25,17 @@ let
   c18Types = builtins.mapAttrs (_: n: n.type) scope.nodes;
   c18ThroughTheProtocol =
     types:
-    genAssemble.assemble {
-      contributions = [
+    genAssemble.assemble
+      {
+        kinds = genScope.mkKinds (
+          map (n: genScope.mkKind { } n) [
+            "thimble"
+            "bobbin"
+            "seam"
+          ]
+        );
+      }
+      [
         {
           name = "corpus";
           vertices = builtins.attrNames nodes;
@@ -34,14 +43,6 @@ let
           inherit types;
         }
       ];
-      kinds = genScope.mkKinds (
-        map (n: genScope.mkKind { } n) [
-          "thimble"
-          "bobbin"
-          "seam"
-        ]
-      );
-    };
 in
 {
   inherit c18Types c18ThroughTheProtocol;

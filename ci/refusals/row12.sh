@@ -28,7 +28,7 @@ row12='let
       from = "hemline/facing";
       to = "hemline/placket";
     }; } ]; };
-in builtins.toJSON (builtins.attrNames (genAssemble.assemble { contributions = [ aspectGraph ]; }).nodes)'
+in builtins.toJSON (builtins.attrNames (genAssemble.assemble { } [ aspectGraph ]).nodes)'
 check "T5 row12 unplanted (label declares)" "${row12/LABEL/\"declares\"}" 0 "" \
   "$tmpdir/row12-green.err" '["hemline","hemline/facing","hemline/placket"]'
 check "T5 row12 planted   (label I, the reserved import-relation name)" "${row12/LABEL/\"I\"}" 1 \

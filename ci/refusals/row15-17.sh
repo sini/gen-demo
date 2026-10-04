@@ -47,10 +47,7 @@ check "T5 row15 planted   (a registry of declarations, bolt below itself)" "${ro
 # ── row 16 -- the PROTOCOL path: the same registry as a call parameter to the framework
 # toolkit, which is how C18 routes it. The refusal reaches `assemble`'s caller from the
 # substrate, with no guard of gen-assemble's own -- which is what makes one door enough. ──
-row16="$registry"'builtins.toJSON (builtins.attrNames (gen.lib.framework.assemble.assemble {
-  contributions = [ { name = "selvedge"; vertices = [ "selvage" ]; decls.selvage = { }; types.selvage = "bolt"; } ];
-  kinds = REGISTRY;
-}).nodes)'
+row16="$registry"'builtins.toJSON (builtins.attrNames (gen.lib.framework.assemble.assemble { kinds = REGISTRY; } [ { name = "selvedge"; vertices = [ "selvage" ]; decls.selvage = { }; types.selvage = "bolt"; } ]).nodes)'
 check "T5 row16 unplanted (the minted registry through the contribution protocol)" "${row16/REGISTRY/minted}" 0 "" \
   "$tmpdir/row16-green.err" '["selvage"]'
 check "T5 row16 planted   (the forged registry through the contribution protocol)" "${row16/REGISTRY/forged}" 1 \

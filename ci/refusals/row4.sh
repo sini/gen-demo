@@ -7,10 +7,7 @@ row4='let
   genProgram = gen.lib.framework.program;
   mkModel = negSelf: genProgram.model {
     prior = null;
-    program = genProgram.program {
-      frozen = [ "pewter" ];
-      declarations = [ { head = "nap:pewter"; neg = if negSelf then [ "nap:pewter" ] else [ ]; relata = [ "pewter" ]; } ];
-    };
+    program = genProgram.program [ "pewter" ] [ { head = "nap:pewter"; neg = if negSelf then [ "nap:pewter" ] else [ ]; relata = [ "pewter" ]; } ];
     interpretation = [ ];
     complete = true;
   };
