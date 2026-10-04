@@ -17,7 +17,7 @@ row145='let
 in BODY'
 check "T5 row145 unplanted (a literal when lowers to the declaration pos/neg)" \
   "${row145/BODY/lowered}" 0 "" "$tmpdir/row145-green.err" \
-  '{"head":"facing:bolt","label":null,"neg":[],"pos":["gusset-held:bolt"],"relata":["bolt"]}'
+  '{"head":"facing:bolt","label":null,"neg":[],"pos":["gusset-held:bolt"],"promote":null,"relata":["bolt"]}'
 check "T5 row145 planted   (a closure when is refused by name: it crosses the gen-rules door)" \
   "${row145/BODY/closureRed}" 1 \
   "gen-program.declaration: \`when\` is not in the literal tier: a function \`when\` stays unlowerable" \
