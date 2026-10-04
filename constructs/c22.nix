@@ -4,14 +4,17 @@
 # Deliberately OUTSIDE `config.gen.composed`, the same way C15's cyclic stratum
 # is: its own invented nodes, its own accessor. Three nodes over one invented
 # kind, a complete peer relation, one node carrying an invented mark that
-# admits no label. The REAL `mkHostedTerminal` adapter and the REAL
+# admits no label. The peer relation is handed as `peersOf`, and the adapter
+# lifts it to an evaluated scope and resolves one `peer` step with the injected
+# `engine`, gen-scope's one calculus, which reads each node's marks (ADR-0026;
+# den-hoag-gayc U2b). The REAL `mkHostedTerminal` adapter and the REAL
 # `genDelivery.realize` (never a hand-written fold) bound the marked node's
 # handed peer set to empty and name the mark on every withheld member, while
 # the unmarked node's handed set stays the whole class.
 {
   genBind,
   genDelivery,
-  genGraph,
+  genScope,
 }:
 let
   flounceNodes = [
@@ -19,9 +22,7 @@ let
     "bodkin"
     "awl"
   ];
-  flouncePeerGraph = genGraph.labeledFrom {
-    kin = _id: flounceNodes;
-  } flounceNodes;
+  flouncePeersOf = _id: flounceNodes;
   flounceMarksOf =
     id:
     if id == "grommet" then
@@ -50,8 +51,8 @@ let
   );
   # `realize`'s own per-node carriage (`{name;modules;bindings;extent;
   # extraModules;passthrough?;}`) is a different shape from the Adapter's
-  # carriage (`{extent;extraModules;peerGraph;marksOf;readerId;passthrough?;
-  # thunkBindings?;}`), so composing them needs the same thin wrapper gen-bind's
+  # carriage (`{extent;extraModules;peersOf;engine;readerId;marksOf?;
+  # passthrough?;thunkBindings?;}`), so composing them needs the same thin wrapper gen-bind's
   # own O-1/O-2 oracle cells use (`ci/tests/crossing-extent-peer.nix`).
   #
   # The hub's `genBind` module arg, the ordinary path every other construct
@@ -69,7 +70,8 @@ let
       {
         extent = flounceExtent;
         extraModules = [ ];
-        peerGraph = flouncePeerGraph;
+        peersOf = flouncePeersOf;
+        engine = genScope;
         marksOf = flounceMarksOf;
         inherit readerId;
       };
@@ -87,7 +89,7 @@ in
 {
   inherit
     flounceNodes
-    flouncePeerGraph
+    flouncePeersOf
     flounceMarksOf
     flounceExtent
     flounceAdapterOf

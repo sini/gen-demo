@@ -9,7 +9,7 @@
 #   D1 (A1, A11) `selvage` delivers a `nixos` class key beside `trim`, a member whose projection path
 #      is missing: the class key reads through `reaches` and the entry, and `trim` refuses only at its
 #      own read (before, the whole entry and the relation's edges refused with it);
-#   D2 (A8) gen-graph `query` over `instantiates · includes`, from `selvage`'s instance, answers the
+#   D2 (A8) gen-scope `resolve` over `instantiates · includes`, from `selvage`'s instance, answers the
 #      declaration's resolved members, `pick` and `hem`; `includes` from static `frame` is the control;
 #   D3 (A9, gate C3) path consistency: along every nested edge the child's substitution restricts its
 #      parent's. Live: nested edges exist, and `heddle`, which reads `shuttle` (supplied by the scope,
@@ -19,8 +19,8 @@
   asserts,
   genAlgebra,
   genAspects,
-  genGraph,
   genMerge,
+  genScope,
   inputs,
 }:
 let
@@ -95,16 +95,37 @@ let
     && refuses r.vertices.${selvageI}.entry.trim
     && builtins.attrNames r.nested.${selvageI} == [ "pick" ];
 
-  graph = genGraph.labeledFrom {
-    instantiates = id: r.instantiates.${id} or [ ];
-    includes = id: facts.includesOf.${id} or [ ];
-  } (builtins.attrNames r.vertices ++ facts.nodes);
+  # The instances and the declarations as one EVALUATED SCOPE: each edge label `l` is the attribute
+  # `edges-l` gen-scope's resolution calculus reads, and every node declares its marks, none.
+  scope =
+    genScope.eval { parseParent = _: null; }
+      {
+        children = _: _: { };
+        marks = _: _: [ ];
+        edges-instantiates = _: id: r.instantiates.${id} or [ ];
+        edges-includes = _: id: facts.includesOf.${id} or [ ];
+      }
+      (
+        genScope.buildRoots {
+          parentGraph = genScope.vertices (builtins.attrNames r.vertices ++ facts.nodes);
+        }
+      );
   walk =
-    from: follow:
-    genGraph.query { } {
-      inherit graph from follow;
-    };
-  rx = genGraph.regex;
+    from: expression:
+    builtins.sort builtins.lessThan (
+      map (a: a.node)
+        (genScope.resolve {
+          wf = genScope.wellFormed {
+            alphabet = [
+              "instantiates"
+              "includes"
+            ];
+            inherit expression;
+          };
+          dataFilter = _: true;
+        } scope from).answers
+    );
+  rx = genScope.wfl;
   d2 =
     walk selvageI (rx.lit "instantiates") == [ "selvage" ]
     &&
