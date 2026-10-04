@@ -5,7 +5,9 @@
 # refused. The same door under `{ }` walks to `reed` too, so the cap is carried by the partial
 # application, not dropped. `ancestorsOf { }`, mapped the same way, is the composition over a door
 # whose one option is retired; its published contract is read AS DATA (`__contract`), and names
-# `maxDepth` (accepted only to be refused as retired) and the accessor record's `parent`.
+# `maxDepth` (accepted only to be refused as retired) and the accessor record's `parent`. The record
+# step is also published WITHOUT application, nested in the first step's contract (`__contract.next`,
+# den-hoag-ak8va; OQ16 "nest"), and that nest is the contract the applied step answers with.
 {
   asserts,
   genGraph,
@@ -65,5 +67,7 @@ in
     && genGraph.ancestorsOf.__contract.optional == [ "maxDepth" ]
     && (genGraph.ancestorsOf { }).__contract.required == [ "parent" ]
     && genGraph.pathsBetween.__contract.optional == [ "maxDepth" ]
+    && genGraph.ancestorsOf.__contract.next or null == (genGraph.ancestorsOf { }).__contract
+    && genGraph.pathsBetween.__contract.next or null == (genGraph.pathsBetween { }).__contract
   );
 }
