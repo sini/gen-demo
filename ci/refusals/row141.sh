@@ -7,7 +7,7 @@
 # two applications share a content witness (the name, the source position, the parent names and the
 # directly declared option names), which no reading before composition tells from a cycle, so the
 # site's walk meets its own witness on the consumer and refuses. The planted arm pins the refusal's
-# second reading and its remedy; the unplanted arm gives each application its own `_file` and asserts
+# second reading and its remedy (the path-module clause included); the unplanted arm gives each application its own `_file` and asserts
 # a STDOUT VALUE, so a reader that refused every layered chain cannot pass it.
 row141='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
@@ -30,7 +30,7 @@ check "T5 row141 unplanted (each application tagged with its own _file: the chai
   "${row141/BODY/green}" 0 "" "$tmpdir/row141-green.err" 'warp weft'
 check "T5 row141 planted   (untagged, the chain is refused naming both readings and the remedy)" \
   "${row141/BODY/red}" 1 \
-  "gen-schema: kind 'aspect' reaches a kind with its own content witness through its parents (aspect -> aspect), among kinds [aspect]: either it inherits itself, an inheritance cycle, and a kind may inherit only kinds resolved in a strictly earlier pass; or two kinds named 'aspect' were declared from one source with the same parent names and the same directly declared option names, which the witness does not tell apart before composition, and giving each such module value its own \`_file\` separates them" \
+  "gen-schema: kind 'aspect' reaches a kind with its own content witness through its parents (aspect -> aspect), among kinds [aspect]: either it inherits itself, an inheritance cycle, and a kind may inherit only kinds resolved in a strictly earlier pass; or two kinds named 'aspect' were declared from one source with the same parent names and the same directly declared option names, which the witness does not tell apart before composition, and giving each such module its own \`_file\` separates them (a module imported by path is named by the \`_file\` its own content sets, else by its path; an importing module's \`_file\` does not reach it)" \
   "$tmpdir/row141-red.err"
 check "T5 row141 catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row141/BODY/caught}" 0 "" "$tmpdir/row141-catch.err" 'CAUGHT'
