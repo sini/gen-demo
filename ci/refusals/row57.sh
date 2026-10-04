@@ -1,12 +1,13 @@
 # shellcheck shell=bash
 # ── row 57 -- the library restates a scope graph's labelled edges, never the `labeled` it carries
 #    (gen-view cer8j; p79do Q1: an element tag is a CLAIM, ADR-0025 item 1) ──
-# `scopeGraph` publishes `labeled`, a gen-graph labelled graph derived from its `edges`, `scopes`
-# and carrier, and `viewRelation` used to WALK it: a hand-built graph whose `labeled` answered no
-# edges materialized an empty answer at exit 0, and one whose `labeledEdges` returned an int
-# aborted past `tryEval`. The walk now restates the labelled graph from the checked fields, so a
-# forged `labeled` is inert (the first planted arm answers exactly what the unplanted one does), and
-# a forged `edges` meets the constructor's own law at the reading door (the second, refused by
+# `scopeGraph` once published `labeled`, a gen-graph labelled graph derived from its `edges`,
+# `scopes` and carrier, and `viewRelation` used to WALK it: a hand-built graph whose `labeled`
+# answered no edges materialized an empty answer at exit 0, and one whose `labeledEdges` returned an
+# int aborted past `tryEval`. The walk restates the edges from the checked fields, and the field
+# itself retired (gen-view gayc U2f): a genuine graph carries no `labeled`, and a hand-built
+# labelled record carried on one is inert (the forged arm answers exactly what the unplanted one
+# does), and a forged `edges` meets the constructor's own law at the reading door (refused by
 # name). Row 53's pewter/grosgrain declaration; the arms differ by the graph alone.
 row57='let
   genView = (builtins.getFlake (toString ./.)).inputs.gen.lib.substrate.view;
@@ -40,7 +41,7 @@ row57='let
   };
 in BODY'
 row57unplanted="${row57/GRAPH/genuine}"
-row57forged='genuine // { labeled = genuine.labeled // { labeledEdges = _: [ ]; }; }'
+row57forged='genuine // { labeled = { nodes = genuine.scopes; labeledEdges = _: [ ]; }; }'
 row57inert="${row57/GRAPH/$row57forged}"
 row57edges='genuine // { edges.tacks = 42; }'
 row57planted="${row57/GRAPH/$row57edges}"
@@ -50,6 +51,9 @@ check "T5 row57 unplanted (a genuine graph; the answer is the assertion)" \
 check "T5 row57 unplanted (a forged labeled answering no edges is inert: the same answer)" \
   "${row57inert/BODY/builtins.toJSON relation.value}" 0 "" \
   "$tmpdir/row57-inert.err" '["cambric"]'
+check "T5 row57 unplanted (scopeGraph publishes no labeled field)" \
+  "${row57unplanted/BODY/builtins.toJSON (genuine ? labeled)}" 0 "" \
+  "$tmpdir/row57-nolabeled.err" 'false'
 check "T5 row57 planted   (a forged edges accessor, refused by name at the reading door)" \
   "${row57planted/BODY/builtins.toJSON relation.value}" 1 \
   "gen-view.viewRelation: field 'graph.edges' carry the label 'tacks' bound to 42" \
