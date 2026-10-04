@@ -24,6 +24,7 @@
   seamCoords,
   seamHead,
   seamSpace,
+  entityEmitters,
 }:
 let
   call = f: env: f (builtins.intersectAttrs (builtins.functionArgs f) env);
@@ -48,7 +49,12 @@ let
       };
       c5 = call (import ../constructs/c05.nix) {
         genProgram = offProgram;
-        inherit seamCoords seamHead seamSpace;
+        inherit
+          genScope
+          entityEmitters
+          seamCoords
+          seamHead
+          ;
       };
       c1 = call (import ../constructs/c01.nix) {
         inherit genScope;

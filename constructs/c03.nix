@@ -7,7 +7,7 @@ let
     warp = "pewter";
     weft = "grosgrain";
   };
-  minted = genScope.mintStrata { } [
+  entityEmitters = [
     {
       pass = 0;
       identifier = "pewter";
@@ -28,17 +28,22 @@ let
       };
       site = "c:gros";
     }
-    {
-      pass = 1;
-      identifier = "basting:pewter:grosgrain";
-      kind = "basting";
-      content = {
-        tension = "slack";
-      };
-      relata = bastingRelata;
-      site = "c:basting";
-    }
   ];
+  minted = genScope.mintStrata { } (
+    entityEmitters
+    ++ [
+      {
+        pass = 1;
+        identifier = "basting:pewter:grosgrain";
+        kind = "basting";
+        content = {
+          tension = "slack";
+        };
+        relata = bastingRelata;
+        site = "c:basting";
+      }
+    ]
+  );
 
   # THE IDENTITY ORDER MARK — one layer holding every letter of the alphabet, with `$` tied to
   # them. `viewRelation`'s `orderMark` is REQUIRED and total (M9), so "this query carries no
@@ -57,5 +62,10 @@ let
     };
 in
 {
-  inherit bastingRelata minted identityMark;
+  inherit
+    bastingRelata
+    entityEmitters
+    minted
+    identityMark
+    ;
 }
