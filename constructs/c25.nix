@@ -11,7 +11,13 @@
 # published path for exactly this, and a consumer that needed the hub to grow a module-arg
 # line before it could reach a new member would make every roster landing a two-repository
 # change. Adding the line remains available and is not needed.
-{ config, inputs }:
+{
+  config,
+  inputs,
+  pipingDeclarations,
+  mdl,
+  seamPromotion,
+}:
 let
   c25Inspect = inputs.gen.lib.framework.inspect;
   c25Payload = config.gen.composed.values;
@@ -28,10 +34,10 @@ let
       };
     }
   ) { } c25Payload.declaredEdges;
-  # THE DEGENERATE SUBJECT: this corpus's DECLARED half, with an empty policy half. C5's
-  # dynamic edge is admitted by a gen-scope program rather than a gen-program model, so the
-  # policy half stays empty here and the construct is about the declared graph — an honest
-  # scope, and the one whose figures this corpus already states elsewhere.
+  # THE DEGENERATE SUBJECT: this corpus's DECLARED half, with an empty policy half. It carries
+  # no labelled declaration, so its model is never read; the construct is about the declared
+  # graph — an honest scope, and the one whose figures this corpus already states elsewhere.
+  # Nothing is promoted, so its mint is empty. The policy half is `c25PolicyIr` below.
   c25Ir = (
     c25Inspect.mkInspector {
       register = {
@@ -44,8 +50,25 @@ let
         trueAtoms = [ ];
         verdict = _: "false";
       };
+      minted = {
+        nodes = { };
+        edges = [ ];
+      };
     }
   );
+  # THE POLICY HALF, THROUGH THE DOCUMENTED FORM: C5's own declarations, its gen-program result
+  # record and its mint of the promoted seam head (`seamPromotion`), so the dynamic edge is in the
+  # IR with a rule origin, and the seam head is a node whose two edges carry one.
+  c25PolicyIr = c25Inspect.mkInspector {
+    register = {
+      thimble = c25Payload.thimbles;
+      bobbin = c25Payload.bobbins;
+    };
+    relations = c25Relations;
+    declarations = pipingDeclarations;
+    model = mdl;
+    minted = seamPromotion;
+  };
   # The door, driven. `tryEval` reports THAT it refused; WHICH refusal fired is a claim about a
   # message and belongs on the plane that can read one, so this arm asserts the pair: a name
   # this graph does not carry refuses, and a name it does carry answers.
@@ -57,6 +80,7 @@ in
     c25Payload
     c25Relations
     c25Ir
+    c25PolicyIr
     c25Refuses
     ;
 }
