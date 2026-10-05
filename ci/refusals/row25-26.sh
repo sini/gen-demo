@@ -25,9 +25,9 @@ in builtins.toJSON (genMerge.evalModuleTree { } [
 
 check "T5 row25 unplanted (two files, disjoint keys -- the fold unions them)" "${row25/SECONDKEY/weft}" 0 "" \
   "$tmpdir/row25-green.err" '{"warp":"flax","weft":"tussah"}'
-check "T5 row25 planted   (two files, the SAME key -- refused naming the key and both files)" \
+check "T5 row25 planted   (two files, the SAME key set to different values -- refused naming the key and both files)" \
   "${row25/SECONDKEY/warp}" 1 \
-  "has \`attrs' definitions that collide at \`warp' (/corpus/b.nix, /corpus/a.nix)" \
+  "has \`attrs' definitions that set \`warp' to different values (/corpus/b.nix, /corpus/a.nix)" \
   "$tmpdir/row25-red.err"
 
 # Row 26's third and fourth arms are a CONTROL and its `catchable` twin, not unplanted counterparts,

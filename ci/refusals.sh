@@ -300,7 +300,7 @@ elif grep -qF "adapter-malformed" "$tmpdir/row24-red.err"; then
 elif grep -qF "cannot consume" "$tmpdir/row25-red.err"; then
   echo "FAIL control: row26's message leaked into row25's refusal"
   fail=1
-elif grep -qF "definitions that collide at" "$tmpdir/row26-red.err"; then
+elif grep -qF "to different values" "$tmpdir/row26-red.err"; then
   echo "FAIL control: row25's message leaked into row26's refusal"
   fail=1
 elif grep -qF "is reserved — cannot be used as a collection key" "$tmpdir/row28-red.err"; then
