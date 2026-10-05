@@ -13,12 +13,10 @@ row153='let
   genAspects = gen.lib.aspects.aspects;
   merge = gen.lib.modules.merge;
   cnf = import ./aspect-cnf.nix;
-  facts = body: genAspects.graphFacts cnf (merge.evalModuleTree {
-    modules = [
-      { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
-      { aspects = body; }
-    ];
-  }).config.aspects;
+  facts = body: genAspects.graphFacts cnf (merge.evalModuleTree { } [
+    { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
+    { aspects = body; }
+  ]).config.aspects;
   placeholders = { hemline = { nixos.x = { }; placket.eyelet = { }; facing = { }; }; };
   green = toString (builtins.length (facts placeholders).deadNested);
   planted = toString (builtins.length (facts (placeholders // { hemline = placeholders.hemline // { placket = { eyelet = { }; nixso = { }; }; }; })).deadNested);

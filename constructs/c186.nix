@@ -41,44 +41,42 @@ let
   };
   valuesOf =
     extraAspects: looms:
-    (genMerge.evalModuleTree {
-      modules = [
-        (schema.mkAspectModule { })
-        {
-          options.looms = genMerge.mkOption {
-            type = genMerge.types.attrsOf genMerge.types.raw;
-            default = { };
+    (genMerge.evalModuleTree { } [
+      (schema.mkAspectModule { })
+      {
+        options.looms = genMerge.mkOption {
+          type = genMerge.types.attrsOf genMerge.types.raw;
+          default = { };
+        };
+      }
+      {
+        aspects = {
+          braid.couching.stitches = [ "braid" ];
+          tuck = guard (pred.has "bolt") {
+            couching.stitches = [ "tuck" ];
+            description = "tuck";
+            includes = [ (t.readCtx "bolt" [ ]) ];
           };
-        }
-        {
-          aspects = {
-            braid.couching.stitches = [ "braid" ];
-            tuck = guard (pred.has "bolt") {
-              couching.stitches = [ "tuck" ];
-              description = "tuck";
-              includes = [ (t.readCtx "bolt" [ ]) ];
-            };
-            hem = guard (pred.has "weave") {
-              couching.stitches = [ "hem" ];
-              description = "hem";
-            };
-            pleat-godet.couching.stitches = [ "pleat-godet" ];
-            pleat-jabot.couching.stitches = [ "pleat-jabot" ];
-            pleat-ruffle.couching.stitches = [ "pleat-ruffle" ];
-            # one sibling per tassel descendant
-            fringe = guard (pred.has "tassel") {
-              couching.stitches = [ "fringe" ];
-              description = "fringe";
-              includes = [ (t.readCtx "tassel" [ ]) ];
-            };
-            tassel-1.couching.stitches = [ "tassel-1" ];
-            tassel-2.couching.stitches = [ "tassel-2" ];
+          hem = guard (pred.has "weave") {
+            couching.stitches = [ "hem" ];
+            description = "hem";
           };
-          inherit looms;
-        }
-        { aspects = extraAspects; }
-      ];
-    }).config;
+          pleat-godet.couching.stitches = [ "pleat-godet" ];
+          pleat-jabot.couching.stitches = [ "pleat-jabot" ];
+          pleat-ruffle.couching.stitches = [ "pleat-ruffle" ];
+          # one sibling per tassel descendant
+          fringe = guard (pred.has "tassel") {
+            couching.stitches = [ "fringe" ];
+            description = "fringe";
+            includes = [ (t.readCtx "tassel" [ ]) ];
+          };
+          tassel-1.couching.stitches = [ "tassel-1" ];
+          tassel-2.couching.stitches = [ "tassel-2" ];
+        };
+        inherit looms;
+      }
+      { aspects = extraAspects; }
+    ]).config;
   values = valuesOf { } baseLooms;
   # A source is an identity, never the value it supplies.
   src = n: "entity:${builtins.hashString "sha256" n}";
