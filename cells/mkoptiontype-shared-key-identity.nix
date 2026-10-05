@@ -1,10 +1,12 @@
 # `mkoptiontype-shared-key-identity` — C69, den-hoag-jzatq. A check-only `mkOptionType` decides a
 # shared attrset key with `==` on each definer's own value, so one function bound once and written
-# in two files, `heddle = { a = spin; }` twice, reads `[ "a" ]` on Nix, Determinate and Lix alike,
-# where Nix and Determinate used to refuse the pair and Lix kept it. The same holds for one function
-# passed to both modules through `specialArgs`: a `specialArgs` formal is that attribute itself, not
-# a copy. Beside them, two DIFFERENT closures of one lambda are still refused catchably on all three,
-# so a fold that calls every shared function equal cannot pass.
+# in two files, `heddle = { a = spin; }` twice, keeps `heddle.a` a function on Nix, Determinate and
+# Lix alike, where Nix and Determinate used to refuse the pair and Lix kept it. The same holds for one
+# function passed to both modules through `specialArgs`: a `specialArgs` formal is that attribute
+# itself, not a copy. Beside them, two DIFFERENT closures of one lambda are still refused catchably on
+# all three, so a fold that calls every shared function equal cannot pass. The fold decides a shared
+# key where that key is read (den-hoag-11c5o), so every observation reads `heddle.a`, not the key set:
+# the key set is served whatever `a` decides.
 { asserts, genMerge }:
 let
   thread = genMerge.mkOptionType {
@@ -39,12 +41,12 @@ let
       a = spin;
     };
   };
-  keys = v: builtins.tryEval (builtins.attrNames v);
+  readA = v: builtins.tryEval (builtins.typeOf v.a);
   kept =
     v:
-    keys v == {
+    readA v == {
       success = true;
-      value = [ "a" ];
+      value = "lambda";
     };
 in
 {
@@ -57,6 +59,6 @@ in
         (viaArg "/demo/weft.nix")
       ]
     )
-    && !(keys (pair { a = twist 1; } { a = twist 2; })).success
+    && !(readA (pair { a = twist 1; } { a = twist 2; })).success
   );
 }
