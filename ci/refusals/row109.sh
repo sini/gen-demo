@@ -3,22 +3,16 @@
 #    (den-hoag-7gp66 P1; ADR-0025 item 1) ──
 # Before P1, `mkMixin`'s native closed formal (`{ define, requires ? [], provides ? [], kinds ?
 # null, name ? null }:`) aborted UNCATCHABLY on an argument outside that set -- not even
-# `builtins.tryEval` could see it. The door now takes a bare formal and applies gen-prelude's
-# `checkOptions` over `checkRequired`'s result, so the same violation is NAMED and CATCHABLE. The
-# unplanted arm builds a mixin from only its accepted options; the planted arm adds one the door
-# does not declare.
+# `builtins.tryEval` could see it. After P2 L4 the options are one closed `prelude.door` set, first
+# in the call, and `define` is the operand after it, so the same violation is NAMED and CATCHABLE at
+# the options application. The unplanted arm builds a mixin from only its accepted options; the
+# planted arm adds one the door does not declare.
 row109='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   build =
     extra:
-    schema.mkMixin (
-      {
-        define = _parent: { metrics_port = 9090; };
-        provides = [ "metrics_port" ];
-      }
-      // extra
-    );
+    schema.mkMixin ({ provides = [ "metrics_port" ]; } // extra) (_parent: { metrics_port = 9090; });
   green = if (build { }) ? __isMixin then "MIXIN" else "NOT-A-MIXIN";
   red = build { bogus = 1; };
   caught = if (builtins.tryEval (build { bogus = 1; })).success then "ADMITTED" else "CAUGHT";

@@ -34,10 +34,7 @@ let
   ];
   c26NotchDart =
     withInherit:
-    c26Schema.evalSchema {
-      schemaOption = c26Schema.mkSchemaOption { };
-      modules = c26Modules withInherit;
-    };
+    c26Schema.evalSchema { schemaOption = c26Schema.mkSchemaOption { }; } (c26Modules withInherit);
   c26BareMkTypeNotchDart =
     withInherit:
     c26Schema.evalSchema {
@@ -53,12 +50,11 @@ let
               };
           };
       };
-      modules = c26Modules withInherit;
-    };
+    } (c26Modules withInherit);
   c26Instance =
     schema:
     (genMerge.evalModuleTree { } [
-      { options.darts = c26Schema.mkInstanceRegistry schema.dart { }; }
+      { options.darts = c26Schema.mkInstanceRegistry { } schema.dart; }
       { config.darts.chambray.bevel = "shallow"; }
     ]).config.darts.chambray;
   c26MirroredGrade = (c26Instance (c26NotchDart true)).grade;

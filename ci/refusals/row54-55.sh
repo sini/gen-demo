@@ -36,7 +36,7 @@ row55='let
       { config.schema.thimble.imports = [ { options.gauge = gauge; } ]; }
     ]).config.schema.thimble;
   tree = genMerge.evalModuleTree { } [
-      { options.thimbles = genSchema.mkInstanceRegistry kind { }; }
+      { options.thimbles = genSchema.mkInstanceRegistry { } kind; }
       { config.thimbles.a.gauge = PORT; }
     ];
 in builtins.toJSON tree.config.thimbles.a.gauge'

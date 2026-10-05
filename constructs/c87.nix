@@ -16,31 +16,29 @@
 { genMerge, inputs }:
 let
   c87Schema = inputs.gen.lib.substrate.schema;
-  c87Kinds = c87Schema.evalSchema {
-    modules = [
-      {
-        config.schema.aglet.options.finish = genMerge.mkOption { type = genMerge.types.str; };
-        config.schema.lacet.options = {
-          tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
-          spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
-          cords = genMerge.mkOption {
-            type = genMerge.types.attrsOf (c87Schema.declarationOf "aglet");
-            default = { };
-          };
+  c87Kinds = c87Schema.evalSchema { } [
+    {
+      config.schema.aglet.options.finish = genMerge.mkOption { type = genMerge.types.str; };
+      config.schema.lacet.options = {
+        tip = genMerge.mkOption { type = c87Schema.declarationOf "aglet"; };
+        spares = genMerge.mkOption { type = c87Schema.setOf (c87Schema.declarationOf "aglet"); };
+        cords = genMerge.mkOption {
+          type = genMerge.types.attrsOf (c87Schema.declarationOf "aglet");
+          default = { };
         };
-      }
-    ];
-  };
+      };
+    }
+  ];
   c87Eval = genMerge.evalModuleTree { } [
     {
-      options.aglets = c87Schema.mkInstanceRegistry c87Kinds.aglet { };
-      options.lacets = c87Schema.mkInstanceRegistry c87Kinds.lacet {
+      options.aglets = c87Schema.mkInstanceRegistry { } c87Kinds.aglet;
+      options.lacets = c87Schema.mkInstanceRegistry {
         refs = {
           tip = c87Eval.config.aglets;
           spares = c87Eval.config.aglets;
           cords = c87Eval.config.aglets;
         };
-      };
+      } c87Kinds.lacet;
       config.aglets.gilt.finish = "gilded";
       config.aglets.horn.finish = "polished";
       config.lacets.byName = {

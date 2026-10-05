@@ -18,7 +18,7 @@ row98='let
     { config.schema.thimble.options.declaredGauge = gauge; }
   ] ++ extra)).config.schema.thimble;
   bolt = extra: (merge.evalModuleTree { } [
-    { options.bolts = schema.mkInstanceRegistry (thimble extra) { }; }
+    { options.bolts = schema.mkInstanceRegistry { } (thimble extra); }
     { config.bolts.instancePewter = { declaredGauge = 3; undeclaredWelt = 5; }; }
   ]).config.bolts.instancePewter;
   planted = bolt [ ];

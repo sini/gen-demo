@@ -44,6 +44,7 @@
         genBind,
         genDispatch,
         genAspects,
+        genSchema,
         ...
       }:
       let
@@ -153,6 +154,7 @@
                 genMemo
                 genLink
                 genClass
+                genSchema
                 genAssemble
                 genMerge
                 genRules

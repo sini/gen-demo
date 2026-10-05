@@ -25,66 +25,63 @@ let
   # §2.6's staged pass — the kind bodies moved verbatim out of `config`, below, and evaluated by
   # gen-schema's OWN `evalModuleTree` (never this file's `config`). `schema.thimble`/`schema.bobbin`
   # is the frozen result these registries and `options.schema` both read.
-  schema = genSchema.evalSchema {
-    inherit (aspectSchema) schemaOption;
-    modules = [
-      {
-        config.schema.thimble = {
-          options.aspects = mkOption {
-            type = types.listOf types.str;
-            default = [ ];
-            description = "Aspect keys this node is a member of.";
-          };
-          options.spool = mkOption {
-            type = types.str;
-            description = "An arbitrary attribute, here so the kind carries content of its own.";
-          };
+  schema = genSchema.evalSchema { schemaOption = aspectSchema.schemaOption; } [
+    {
+      config.schema.thimble = {
+        options.aspects = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "Aspect keys this node is a member of.";
         };
-        config.schema.bobbin = {
-          options.gauge = mkOption {
-            type = types.str;
-            description = "An arbitrary attribute on the second kind, carrying content of its own.";
-          };
-          # ── C36 (den-hoag-mx07b) — a refined option under gen-aspects' `mkType` arm ──
-          # `bobbin` is built through the aspect schema's `mkType`, so its `refinements` are derived
-          # from the option plane the kind publishes; the registry then refuses an inadmissible
-          # value by name (`refusals` row 32). The default keeps every existing instance unedited.
-          options.picks = mkOption {
-            type = picksType;
-            default = 1;
-            description = "Weft picks per unit; refined positive.";
-          };
+        options.spool = mkOption {
+          type = types.str;
+          description = "An arbitrary attribute, here so the kind carries content of its own.";
         };
+      };
+      config.schema.bobbin = {
+        options.gauge = mkOption {
+          type = types.str;
+          description = "An arbitrary attribute on the second kind, carrying content of its own.";
+        };
+        # ── C36 (den-hoag-mx07b) — a refined option under gen-aspects' `mkType` arm ──
+        # `bobbin` is built through the aspect schema's `mkType`, so its `refinements` are derived
+        # from the option plane the kind publishes; the registry then refuses an inadmissible
+        # value by name (`refusals` row 32). The default keeps every existing instance unedited.
+        options.picks = mkOption {
+          type = picksType;
+          default = 1;
+          description = "Weft picks per unit; refined positive.";
+        };
+      };
 
-        # ── C26 (den-hoag-0pk67, ADR-0016 ruling 7 / ADR-0033) — A REAL `inherits` PAIR ──
-        # `notch`/`dart` is the corpus's own exercise of the relocated capability, not a fixture
-        # built beside it: `dart` declares no `grade` option itself, `grade` travels from `notch` by
-        # NAME through this same staged pass, and `darts.chambray` below never sets it. The value
-        # every `dart` instance carries for `grade` is therefore genuinely inherited, not merely a
-        # name that happens to resolve.
-        config.schema.notch = {
-          options.grade = mkOption {
-            type = types.str;
-            default = "waxed";
-            description = "Parent-only. No `dart` instance sets this; a resolved value is the inheritance, not a coincidence.";
-          };
+      # ── C26 (den-hoag-0pk67, ADR-0016 ruling 7 / ADR-0033) — A REAL `inherits` PAIR ──
+      # `notch`/`dart` is the corpus's own exercise of the relocated capability, not a fixture
+      # built beside it: `dart` declares no `grade` option itself, `grade` travels from `notch` by
+      # NAME through this same staged pass, and `darts.chambray` below never sets it. The value
+      # every `dart` instance carries for `grade` is therefore genuinely inherited, not merely a
+      # name that happens to resolve.
+      config.schema.notch = {
+        options.grade = mkOption {
+          type = types.str;
+          default = "waxed";
+          description = "Parent-only. No `dart` instance sets this; a resolved value is the inheritance, not a coincidence.";
         };
-        config.schema.dart = {
-          inherits = [ "notch" ];
-          options.bevel = mkOption {
-            type = types.str;
-            description = "The child's own attribute, declared alongside what it inherits from notch.";
-          };
+      };
+      config.schema.dart = {
+        inherits = [ "notch" ];
+        options.bevel = mkOption {
+          type = types.str;
+          description = "The child's own attribute, declared alongside what it inherits from notch.";
         };
-      }
+      };
+    }
 
-      # ── C37 (den-hoag-refined-inherits-base-mint-oqrvg) — ONE refined option, TWO declarations ──
-      # A second module declares `bobbin.picks` again with the same let-bound refined type. The merge
-      # relation reconciles the pair and the refinement SURVIVES; `flake.nix` reads its message back.
-      # Two DIFFERENT refinements of one base refuse instead (`refusals` row 30).
-      { config.schema.bobbin.options.picks = mkOption { type = picksType; }; }
-    ];
-  };
+    # ── C37 (den-hoag-refined-inherits-base-mint-oqrvg) — ONE refined option, TWO declarations ──
+    # A second module declares `bobbin.picks` again with the same let-bound refined type. The merge
+    # relation reconciles the pair and the refinement SURVIVES; `flake.nix` reads its message back.
+    # Two DIFFERENT refinements of one base refuse instead (`refusals` row 30).
+    { config.schema.bobbin.options.picks = mkOption { type = picksType; }; }
+  ];
 in
 {
   # `mkAspectModule` declares `options.aspects` and threads schema-declared options into every
@@ -120,7 +117,7 @@ in
   # The corpus asserts it as a VALUE (C17): `thimbles.pewter.id_hash` is byte-identical to the stamp the
   # corpus carried before this option existed. Region 2's refusal is the other half and cannot be a
   # cell — a throw is not a value — so it is `refusals` row 13.
-  options.thimbles = genSchema.mkInstanceRegistry schema.thimble {
+  options.thimbles = genSchema.mkInstanceRegistry {
     extraModules = [
       {
         options.shirring = mkOption {
@@ -130,13 +127,13 @@ in
         };
       }
     ];
-  };
-  options.bobbins = genSchema.mkInstanceRegistry schema.bobbin { };
+  } schema.thimble;
+  options.bobbins = genSchema.mkInstanceRegistry { } schema.bobbin;
 
   # C26's own registries. Kept off `haberdashery`/`declaredEdges`/the aspects tree deliberately —
   # this pair exercises the schema-inheritance capability alone, not delivery or the graph.
-  options.notches = genSchema.mkInstanceRegistry schema.notch { };
-  options.darts = genSchema.mkInstanceRegistry schema.dart { };
+  options.notches = genSchema.mkInstanceRegistry { } schema.notch;
+  options.darts = genSchema.mkInstanceRegistry { } schema.dart;
 
   # ── THE DELIVERY TARGET VIEW (`den-hoag-uedvp`) ──
   # `gen.nodeRegistryPath` names ONE attribute path, and that cardinality is the ruling, not a

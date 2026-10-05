@@ -10,14 +10,11 @@ row32='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   aspectSchema = genAspects.mkAspectSchema (import ./aspect-cnf.nix);
-  schema = genSchema.evalSchema {
-    inherit (aspectSchema) schemaOption;
-    modules = [ { config.schema.bobbin.options.picks = genMerge.mkOption { type = genSchema.refined genMerge.types.int [ genSchema.refinements.positive ]; default = 1; }; } ];
-  };
+  schema = genSchema.evalSchema { schemaOption = aspectSchema.schemaOption; } [ { config.schema.bobbin.options.picks = genMerge.mkOption { type = genSchema.refined genMerge.types.int [ genSchema.refinements.positive ]; default = 1; }; } ];
 in toString (genMerge.evalModuleTree { } [
     { imports = [ (aspectSchema.mkAspectModule { }) ]; }
     { options.schema = genMerge.mkOption { type = genMerge.types.raw; default = schema; }; }
-    { options.bobbins = genSchema.mkInstanceRegistry schema.bobbin { }; }
+    { options.bobbins = genSchema.mkInstanceRegistry { } schema.bobbin; }
     { config.bobbins.grosgrain.picks = PICKS; }
   ]).config.bobbins.grosgrain.picks'
 check "T5 row32 unplanted (an admissible value on the refined option)" "${row32/PICKS/3}" 0 "" \

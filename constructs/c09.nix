@@ -20,22 +20,15 @@ let
       gauge = "coarse";
     };
   };
-  shareClasses = genClass.mkClasses {
-    nodes = shareProjections;
-    keyOf = _name: p: p.weave;
-  };
+  shareClasses = genClass.mkClasses (_name: p: p.weave) shareProjections;
   plainClass = lib.findFirst (c: c.key == "plain") null shareClasses;
   plainCore = genClass.mkCore {
     class = plainClass;
     projection = "selvage";
     projections = shareProjections;
   };
-  pewterShared = genClass.applyCoreMerge {
-    core = plainCore;
-    memberProjection = shareProjections.pewter;
-  };
-  plainGate = genClass.gateCore {
-    core = plainCore;
+  pewterShared = genClass.applyCoreMerge plainCore shareProjections.pewter;
+  plainGate = genClass.gateCore plainCore {
     candidate = pewterShared;
     real = shareProjections.pewter;
   };

@@ -10,18 +10,16 @@ row142='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
-  kinds = schema.evalSchema {
-    modules = [
+  kinds = schema.evalSchema { } [
       {
         config.schema.aglet.options.finish = merge.mkOption { type = merge.types.str; };
         config.schema.lacet.options.tip = merge.mkOption { type = schema.declarationOf "aglet"; };
       }
     ];
-  };
   bound = merge.evalModuleTree { } [
       {
-        options.aglets = schema.mkInstanceRegistry kinds.aglet { };
-        options.lacets = schema.mkInstanceRegistry kinds.lacet { refs.tip = bound.config.aglets; };
+        options.aglets = schema.mkInstanceRegistry { } kinds.aglet;
+        options.lacets = schema.mkInstanceRegistry { refs.tip = bound.config.aglets; } kinds.lacet;
         config.aglets.gilt.finish = "gilded";
         config.lacets.l.tip = "gilt";
       }

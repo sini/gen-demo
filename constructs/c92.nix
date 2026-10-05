@@ -20,28 +20,25 @@ let
   };
   c92Loom =
     explicitConfig:
-    c92Schema.evalSchema {
-      schemaOption = c92Schema.mkSchemaOption { };
-      modules = [
-        {
-          config.schema.loom =
-            if explicitConfig then
-              {
-                imports = [ c92WeftModule ];
-                config.weft = "twill";
-              }
-            else
-              {
-                imports = [ c92WeftModule ];
-                weft = "twill";
-              };
-        }
-      ];
-    };
+    c92Schema.evalSchema { schemaOption = c92Schema.mkSchemaOption { }; } [
+      {
+        config.schema.loom =
+          if explicitConfig then
+            {
+              imports = [ c92WeftModule ];
+              config.weft = "twill";
+            }
+          else
+            {
+              imports = [ c92WeftModule ];
+              weft = "twill";
+            };
+      }
+    ];
   c92Instance =
     schema:
     (genMerge.evalModuleTree { } [
-      { options.looms = c92Schema.mkInstanceRegistry schema.loom { }; }
+      { options.looms = c92Schema.mkInstanceRegistry { } schema.loom; }
       { config.looms.jacquard = { }; }
     ]).config.looms.jacquard;
   c92ShorthandWeft = (c92Instance (c92Loom false)).weft;

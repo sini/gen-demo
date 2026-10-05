@@ -29,7 +29,7 @@ row29='let
     ]).config.schema;
 in (genMerge.evalModuleTree { } [
     {
-      options.thimbles = genSchema.mkInstanceRegistry schema.thimble { };
+      options.thimbles = genSchema.mkInstanceRegistry { } schema.thimble;
       config.thimbles.t1 = { name = "t1"; };
     }
   ]).config.thimbles.t1.id_hash'
