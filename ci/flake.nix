@@ -133,7 +133,7 @@
                 }
                 {
                   name = "worktree-check";
-                  help = "den-hoag-0gsn0's declaration - a linked worktree self-provisions its pre-commit config on checkout";
+                  help = "gen-harness stagedCommitHook's declaration - a linked worktree's commit is judged on its staged tree, unstaged bytes untouched";
                   command = ''
                     exec "$FLAKE_ROOT/ci/worktree-precommit-check.sh"
                   '';
