@@ -11,28 +11,26 @@
 { genMerge, inputs }:
 let
   c60Schema = inputs.gen.lib.substrate.schema;
-  c60Kinds = c60Schema.evalSchema {
-    modules = [
-      {
-        config.schema.grommet.options = {
-          crimp = genMerge.mkOption { type = genMerge.types.str; };
-          lot = genMerge.mkOption {
-            type = genMerge.types.str;
-            internal = true;
-            readOnly = true;
-          };
-          tally = genMerge.mkOption { type = genMerge.types.str; } // {
-            identity = false;
-          };
+  c60Kinds = c60Schema.evalSchema { } [
+    {
+      config.schema.grommet.options = {
+        crimp = genMerge.mkOption { type = genMerge.types.str; };
+        lot = genMerge.mkOption {
+          type = genMerge.types.str;
+          internal = true;
+          readOnly = true;
         };
-      }
-    ];
-  };
+        tally = genMerge.mkOption { type = genMerge.types.str; } // {
+          identity = false;
+        };
+      };
+    }
+  ];
   c60Brass =
     { lot, tally }:
     (genMerge.evalModuleTree { } [
       {
-        options.grommets = c60Schema.mkInstanceRegistry c60Kinds.grommet { };
+        options.grommets = c60Schema.mkInstanceRegistry { } c60Kinds.grommet;
         config.grommets.brass = {
           crimp = "rolled";
           inherit lot tally;

@@ -40,7 +40,7 @@ in
       builtins.deepSeq
         (genMerge.evalModuleTree { } [
           {
-            options.h = genMerge.mkOption { type = schema.mkInstanceType omits { }; };
+            options.h = genMerge.mkOption { type = schema.mkInstanceType { } omits; };
             config.h = { };
           }
         ]).config.h.spool

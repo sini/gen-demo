@@ -30,19 +30,16 @@ row13='let
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   aspectSchema = genAspects.mkAspectSchema (import ./aspect-cnf.nix);
-  schema = genSchema.evalSchema {
-    inherit (aspectSchema) schemaOption;
-    modules = [
+  schema = genSchema.evalSchema { schemaOption = aspectSchema.schemaOption; } [
       {
         config.schema.thimble.options.aspects = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; };
         config.schema.thimble.options.spool = genMerge.mkOption { type = genMerge.types.str; };
       }
     ];
-  };
   outer = [
     { imports = [ (aspectSchema.mkAspectModule { }) ]; }
     { options.schema = genMerge.mkOption { type = genMerge.types.raw; default = schema; }; }
-    { options.thimbles = genSchema.mkInstanceRegistry schema.thimble { }; }
+    { options.thimbles = genSchema.mkInstanceRegistry { } schema.thimble; }
     { config.thimbles.pewter = { aspects = [ "stitch" ]; spool = "linen"; }; }
   ];
   edit = [ EDIT ];

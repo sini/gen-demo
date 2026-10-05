@@ -11,8 +11,7 @@ row105='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
-  selvageWith = extra: (schema.evalSchema {
-    modules = [
+  selvageWith = extra: (schema.evalSchema { specialArgs = { argand.selvage = "gimp"; } // extra; } [
       {
         config.schema.bobbin.imports = [
           ({ argand, ... }: {
@@ -20,9 +19,7 @@ row105='let
           })
         ];
       }
-    ];
-    specialArgs = { argand.selvage = "gimp"; } // extra;
-  }).bobbin.options.selvage.default;
+    ]).bobbin.options.selvage.default;
   green = selvageWith { };
   red = selvageWith { config = "CALLER"; };
   caught = if (builtins.tryEval red).success then "ADMITTED" else "CAUGHT";

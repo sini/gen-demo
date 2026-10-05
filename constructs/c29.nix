@@ -20,29 +20,24 @@ let
   c29Argand.selvage = "gimp";
   c29BobbinWith =
     args:
-    c29Schema.evalSchema (
+    c29Schema.evalSchema args [
       {
-        modules = [
-          {
-            config.schema.bobbin = {
-              imports = [
-                (
-                  { argand, ... }:
-                  {
-                    options.selvage = genMerge.mkOption {
-                      type = genMerge.types.str;
-                      default = argand.selvage;
-                    };
-                  }
-                )
-              ];
-              options.spool = genMerge.mkOption { type = genMerge.types.str; };
-            };
-          }
-        ];
+        config.schema.bobbin = {
+          imports = [
+            (
+              { argand, ... }:
+              {
+                options.selvage = genMerge.mkOption {
+                  type = genMerge.types.str;
+                  default = argand.selvage;
+                };
+              }
+            )
+          ];
+          options.spool = genMerge.mkOption { type = genMerge.types.str; };
+        };
       }
-      // args
-    );
+    ];
   c29Bobbin = c29BobbinWith {
     specialArgs = {
       argand = c29Argand;
@@ -66,7 +61,7 @@ let
   c29Bobbins =
     args:
     (genMerge.evalModuleTree { } [
-      { options.bobbins = c29Schema.mkInstanceRegistry c29Bobbin.bobbin args; }
+      { options.bobbins = c29Schema.mkInstanceRegistry args c29Bobbin.bobbin; }
       { config.bobbins.pewter.spool = "linen"; }
     ]).config.bobbins.pewter;
   c29Supplied =

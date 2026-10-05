@@ -22,8 +22,8 @@ rowIdentityHeader='let
   thimbleA = (treeOf { }).config.schema.thimble;
   thimbleB = (treeOf { notches = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; }; }).config.schema.thimble;
   inst = genMerge.evalModuleTree { } [ {
-      options.a = genSchema.mkInstanceRegistry thimbleA { };
-      options.b = genSchema.mkInstanceRegistry thimbleB { };
+      options.a = genSchema.mkInstanceRegistry { } thimbleA;
+      options.b = genSchema.mkInstanceRegistry { } thimbleB;
       config.a.pewter.spool = "linen";
       config.b.pewter.spool = "linen";
     } ];

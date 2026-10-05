@@ -62,21 +62,18 @@ let
     ]).config.schema;
   c21RelocatedSchema =
     compose:
-    c21Schema.evalSchema {
-      inherit (c21AspectSchema) schemaOption;
-      modules = [
-        {
-          config.schema.hank = c21Parent;
-          config.schema.thimble = c21ThimbleWith compose;
-        }
-      ];
-    };
+    c21Schema.evalSchema { schemaOption = c21AspectSchema.schemaOption; } [
+      {
+        config.schema.hank = c21Parent;
+        config.schema.thimble = c21ThimbleWith compose;
+      }
+    ];
   c21Instance =
     kind:
     (genMerge.evalModuleTree { } [
       { imports = [ (c21AspectSchema.mkAspectModule { }) ]; }
       {
-        options.thimbles = c21Schema.mkInstanceRegistry kind {
+        options.thimbles = c21Schema.mkInstanceRegistry {
           extraModules = [
             {
               options.shirring = genMerge.mkOption {
@@ -85,7 +82,7 @@ let
               };
             }
           ];
-        };
+        } kind;
       }
       {
         config.thimbles.pewter = {

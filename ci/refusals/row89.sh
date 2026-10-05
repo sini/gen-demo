@@ -22,7 +22,7 @@ row89='let
   ends = selvage tcpLike;
   endsP = selvage posLike;
   bolt = k: (merge.evalModuleTree { } [
-    { options.r = schema.mkInstanceRegistry k { }; config.r.bolt.ends = 443; }
+    { options.r = schema.mkInstanceRegistry { } k; config.r.bolt.ends = 443; }
   ]).config.r.bolt;
   a = bolt ends;
   b = bolt endsP;

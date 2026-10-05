@@ -12,17 +12,15 @@ row108='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   schema = gen.lib.substrate.schema;
   merge = gen.lib.modules.merge;
-  kinds = schema.evalSchema {
-    modules = [
+  kinds = schema.evalSchema { } [
       {
         config.schema.aglet.options.finish = merge.mkOption { type = merge.types.str; };
         config.schema.aglet.options.gauge = merge.mkOption { type = merge.types.str; };
       }
     ];
-  };
   hashOf = identity: (merge.evalModuleTree { } [
       {
-        options.aglets = schema.mkInstanceRegistry kinds.aglet { };
+        options.aglets = schema.mkInstanceRegistry { } kinds.aglet;
         config.aglets.gilt = {
           finish = "gilded";
           gauge = "fine";

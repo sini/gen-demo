@@ -19,7 +19,7 @@ row123='let
   };
   plainTree = kinds: (merge.evalModuleTree { } [ { options.schema = schema.mkSchemaOption { }; } { config.schema = kinds; } ]).config.schema;
   gradeOf = kinds: (merge.evalModuleTree { } [
-      { options.darts = schema.mkInstanceRegistry kinds.dart { }; }
+      { options.darts = schema.mkInstanceRegistry { } kinds.dart; }
       { config.darts.chambray.bevel = "shallow"; }
     ]).config.darts.chambray.grade;
   green = gradeOf (plainTree (notch { } // dart));
