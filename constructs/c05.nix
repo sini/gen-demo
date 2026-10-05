@@ -93,6 +93,7 @@ let
   pipingEdge = ruled.reached;
 in
 {
+  pipingDeclarations = declarations;
   inherit
     pipingHead
     prog
