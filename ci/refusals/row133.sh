@@ -25,6 +25,9 @@ check "T5 row133 unplanted (an unknown _module sub-key under a freeformType is a
 check "T5 row133 planted   (an unknown _module sub-key is an option that does not exist)" \
   "${row133/BODY/unknown}" 1 \
   "The option \`_module.bogus' does not exist. Definition values:" "$tmpdir/row133-unknown.err"
+check "T5 row133 planted   (the unknown _module sub-key is offered the engine's own _module options, as nixpkgs does)" \
+  "${row133/BODY/unknown}" 1 \
+  "Did you mean \`_module.args', \`_module.check' or \`_module.specialArgs'?" "$tmpdir/row133-unknown-suggestion.err"
 check "T5 row133 unplanted (specialArgs passed at the evalModuleTree door reach a module)" \
   "${row133/BODY/doorArgs}" 0 "" "$tmpdir/row133-door-args.err" '"door"'
 check "T5 row133 planted   (a module setting _module.specialArgs is refused by name)" \
