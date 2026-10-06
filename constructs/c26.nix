@@ -64,6 +64,29 @@ let
   c26BareMkTypeGrade = (c26Instance (c26BareMkTypeNotchDart true)).grade or null;
   c26BareMkTypeInherits = (c26BareMkTypeNotchDart true).dart.inherits or null;
   c26BareMkTypeNoInheritHasGrade = (c26Instance (c26BareMkTypeNotchDart false)) ? grade;
+  # THE CALLER'S `defs` SHAPE (den-hoag-4d2zs): one caller `mkType` publishing the per-def import
+  # count of its `defs`, read off `dart` staged through `evalSchema` and on a plain tree. The twin
+  # without `inherits` gets no nested def, so its shape is the discriminator.
+  c26ShapeOption = c26Schema.mkSchemaOption {
+    mkType =
+      { defs, ... }:
+      {
+        __functor =
+          _:
+          { ... }:
+          {
+            imports = map (d: d.value) defs;
+          };
+        shape = map (d: builtins.length (d.value.imports or [ ])) defs;
+      };
+  };
+  c26DefsShapeStaged =
+    (c26Schema.evalSchema { schemaOption = c26ShapeOption; } (c26Modules true)).dart.shape;
+  c26DefsShapeBare =
+    (genMerge.evalModuleTree { } ([ { options.schema = c26ShapeOption; } ] ++ c26Modules true))
+    .config.schema.dart.shape;
+  c26DefsShapeNoInherit =
+    (c26Schema.evalSchema { schemaOption = c26ShapeOption; } (c26Modules false)).dart.shape;
 in
 {
   inherit
@@ -77,5 +100,8 @@ in
     c26BareMkTypeGrade
     c26BareMkTypeInherits
     c26BareMkTypeNoInheritHasGrade
+    c26DefsShapeStaged
+    c26DefsShapeBare
+    c26DefsShapeNoInherit
     ;
 }
