@@ -29,6 +29,7 @@ row156='let
   gaugeId = genAspects.aspectId [ ] (genAspects.graphFacts cnf aspects).nodeData.gauge;
   rel = src: genAspects.instancesFor cnf aspects {
     suppliers.${src}.loom = "jacquard";
+    containment = { };
     scopes.warp = { members = [ "frame" ]; sources.loom = src; };
   };
   vertexOf = src: builtins.head (builtins.attrValues (rel src).vertices);
