@@ -30,7 +30,7 @@ let
   ];
 in
 {
-  construct = [ "C83" ];
+  construct = [ "schema-options-introspection-redeclared" ];
   check = asserts (
     twice._kindNames == [
       "bobbin"

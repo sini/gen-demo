@@ -187,66 +187,128 @@
               name: file: callWith (corpus // { asserts = asserts name; }) "cells/${name}.nix" (import file)
             ) (nixFilesIn ./cells);
 
-            # den-hoag-bl06m — README.md's "## What v1 declares" table is the one hand-maintained
-            # index left over the construct set, and it is checked against the constructs the
-            # cells THEMSELVES attribute (each cell file's `construct`), plus T5 — the one construct
-            # with no check cell. The list of checks is no longer an index anybody maintains: it is
-            # `cells/`, read. The comparison reports how many rows it scanned against how many it
-            # expected — a comparison that passes without saying so is not an oracle over the set
-            # it claims to cover.
+            # den-hoag-nv8fd — a construct is its NAME, and its facts are one file, `index/<name>.nix`
+            # (`{ title; adr; what; }`), checked against the constructs the cells THEMSELVES attribute
+            # (each cell file's `construct`), plus the one construct with no check cell (the planted
+            # refusals). There is no committed table and no number to choose: two units adding a
+            # construct add two files and share no line, and two units choosing the same name add the
+            # same path, which git reports at the first merge. The index is rendered, never written:
+            # `nix build .#construct-index`.
             #
-            # den-hoag-v4cpr — the comparing runs at EVAL time (`readFile` + string matching)
-            # rather than in a `runCommand` shell script: a script's `exit 1` is invisible to
-            # `nix flake check --no-build`. Only the SUCCESS path builds a derivation, to keep the
-            # report.
-            readmeIndex =
+            # `legacy-ids.nix` keeps every citation that predates the names resolving. `constructs`
+            # and `rows` map each old `C<n>` / `row<n>` id to the name it became, frozen at the
+            # migration (frozen by convention: nothing here refuses a new key yet). `renamed` maps a
+            # retired name to its successor, so a rename keeps the old name, and through it the
+            # legacy id, resolving; a legacy value is never edited. Checked here: every legacy id and
+            # every `renamed` target resolves to an index entry, and no `renamed` key is still a live
+            # name (the old name must actually be retired, and a chain cannot form).
+            #
+            # den-hoag-v4cpr — the comparing runs at EVAL time rather than in a `runCommand` shell
+            # script: a script's `exit 1` is invisible to `nix flake check --no-build`. Only the
+            # SUCCESS path builds a derivation, to keep the report.
+            indexEntries = lib.mapAttrs (_: file: import file) (nixFilesIn ./index);
+            legacy = import ./legacy-ids.nix;
+
+            constructIndex =
               let
-                readmeLines = lib.splitString "\n" (builtins.readFile ./README.md);
-
-                # awk '/start/,/end/' — the inclusive line range from the first line matching
-                # `startRe` through the first LATER line matching `endRe`.
-                sectionBetween =
-                  startRe: endRe: ls:
-                  let
-                    idxs = lib.range 0 (builtins.length ls - 1);
-                    at = i: builtins.elemAt ls i;
-                    startIdx = lib.findFirst (i: builtins.match startRe (at i) != null) null idxs;
-                    endIdx = lib.findFirst (i: i >= startIdx && builtins.match endRe (at i) != null) null idxs;
-                  in
-                  lib.sublist startIdx (endIdx - startIdx + 1) ls;
-
                 sortUnique = l: lib.unique (builtins.sort (a: b: a < b) l);
-                firstMatch =
-                  re: line:
+                noCell = [ "planted-refusals" ];
+                expected = sortUnique (lib.concatMap (c: c.construct) (builtins.attrValues cells) ++ noCell);
+                have = builtins.attrNames indexEntries;
+                renamed = legacy.renamed.constructs;
+                resolve = name: renamed.${name} or name;
+                aliasesOf =
+                  name:
                   let
-                    m = builtins.match re line;
+                    formerNames = builtins.attrNames (lib.filterAttrs (_: n: n == name) renamed);
                   in
-                  if m == null then null else builtins.head m;
-
-                declares = sectionBetween ".*## What v1 declares.*" ".*### The naming rule.*" readmeLines;
-                expectedConstructs = sortUnique (
-                  lib.concatMap (c: c.construct) (builtins.attrValues cells) ++ [ "T5" ]
+                  builtins.attrNames (
+                    lib.filterAttrs (_: n: n == name || builtins.elem n formerNames) legacy.constructs
+                  )
+                  ++ formerNames;
+                dangling = lib.filterAttrs (_: name: !(indexEntries ? ${resolve name})) legacy.constructs;
+                renamedDangling = lib.filterAttrs (_: new: !(indexEntries ? ${new})) renamed;
+                renamedLive = builtins.filter (old: indexEntries ? ${old}) (builtins.attrNames renamed);
+                unindexed = lib.subtractLists have expected;
+                uncited = lib.subtractLists expected have;
+                # A cell still citing an id the migration retired gets the name it should cite.
+                legacyHint =
+                  id:
+                  lib.optionalString (legacy.constructs ? ${id})
+                    " (${id} is a legacy id: cite '${resolve legacy.constructs.${id}}')";
+                badNames = builtins.filter (n: builtins.match "[a-z0-9-]+" n == null) have;
+                idKey = id: [
+                  (lib.toInt (builtins.head (builtins.match "[A-Za-z]*([0-9]+).*" id)))
+                  id
+                ];
+                legacyFirst = builtins.sort (a: b: idKey a < idKey b) (builtins.attrNames legacy.constructs);
+                ordered = lib.unique (
+                  builtins.filter (n: indexEntries ? ${n}) (map (id: resolve legacy.constructs.${id}) legacyFirst)
+                  ++ have
                 );
-                tableRows = sortUnique (
-                  builtins.filter (n: n != null) (map (firstMatch "\\| ([A-Za-z0-9]+) -- .*") declares)
+                row =
+                  name:
+                  let
+                    e = indexEntries.${name};
+                  in
+                  "| ${name} | ${lib.concatStringsSep ", " (aliasesOf name)} | ${e.adr} | ${e.title}: ${e.what} |";
+                readmeTable = builtins.filter (l: builtins.match "\\| [A-Za-z0-9]+ -- .*" l != null) (
+                  lib.splitString "\n" (builtins.readFile ./README.md)
                 );
+                problems =
+                  lib.optional (unindexed != [ ])
+                    "a cell attributes a construct with no index entry: ${
+                      lib.concatMapStringsSep ", " (n: "${n}${legacyHint n}") unindexed
+                    }; a construct is `index/<name>.nix`, `{ title; adr; what; }`"
+                  ++
+                    lib.optional (uncited != [ ])
+                      "an index entry no cell attributes: ${
+                        lib.concatMapStringsSep ", " (n: "index/${n}.nix") uncited
+                      }; name it in a cell's `construct`, or remove the file"
+                  ++ lib.optional (
+                    dangling != { }
+                  ) "legacy-ids.nix names no construct: ${lib.concatStringsSep ", " (builtins.attrNames dangling)}"
+                  ++
+                    lib.optional (renamedDangling != { })
+                      "legacy-ids.nix renamed.constructs names no construct: ${
+                        lib.concatStringsSep ", " (lib.mapAttrsToList (old: new: "${old} -> ${new}") renamedDangling)
+                      }"
+                  ++
+                    lib.optional (renamedLive != [ ])
+                      "legacy-ids.nix renamed.constructs retires a name index/ still carries: ${lib.concatStringsSep ", " renamedLive}"
+                  ++ lib.optional (
+                    badNames != [ ]
+                  ) "an index name is not [a-z0-9-]+: ${lib.concatStringsSep ", " badNames}"
+                  ++
+                    lib.optional (readmeTable != [ ])
+                      "README.md carries a hand-written construct table; a construct is `index/<name>.nix` and the table is `nix build .#construct-index`";
               in
               {
-                agrees = tableRows == expectedConstructs;
+                agrees = problems == [ ];
+                inherit problems;
                 report = ''
                   cells/: ${toString (builtins.length (builtins.attrNames cells))} cells discovered
-                  '## What v1 declares' table: scanned ${toString (builtins.length tableRows)} rows agree with ${toString (builtins.length expectedConstructs)} expected constructs
+                  index/: ${toString (builtins.length have)} constructs agree with ${toString (builtins.length expected)} expected; ${toString (builtins.length (builtins.attrNames legacy.constructs))} legacy ids and ${toString (builtins.length (builtins.attrNames renamed))} renamed names resolve
                 '';
+                markdown = lib.concatStringsSep "\n" (
+                  [
+                    "| construct | legacy id, former name | ADR | what it is here |"
+                    "| --- | --- | --- | --- |"
+                  ]
+                  ++ map row ordered
+                  ++ [ "" ]
+                );
               };
           in
           {
             checks = lib.mapAttrs (_: cell: cell.check) cells // {
               construct-index =
-                if readmeIndex.agrees then
-                  pkgs.writeText "gen-demo-construct-index" readmeIndex.report
+                if constructIndex.agrees then
+                  pkgs.writeText "gen-demo-construct-index" constructIndex.report
                 else
-                  throw "gen-demo: check 'construct-index' failed";
+                  throw "gen-demo: check 'construct-index' failed: ${lib.concatStringsSep "; " constructIndex.problems}";
             };
+            packages.construct-index = pkgs.writeText "construct-index.md" constructIndex.markdown;
           };
       }
     );

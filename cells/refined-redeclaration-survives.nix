@@ -10,7 +10,7 @@
 # refinements of one base are `refusals` row 30.
 { asserts, genValues }:
 {
-  construct = [ "C37" ];
+  construct = [ "one-refined-type-declared-twice-survives" ];
   check = asserts (
     map (r: r.message) genValues.schema.bobbin.refinements.picks == [ "must be positive" ]
   );

@@ -22,7 +22,7 @@
 }:
 
 {
-  construct = [ "C197" ];
+  construct = [ "module-function-aspect-serves-its-closure" ];
   check = asserts (
     c197Registrations == 6
     && c197Hem.atPewter == { description = "hem-pewter"; }

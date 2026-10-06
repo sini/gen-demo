@@ -51,6 +51,33 @@ let
       arms = armsIn file;
     in
     lib.intersectLists (rowsCarrying arms "planted") (rowsCarrying arms "unplanted");
+
+  # A row is its NAME (den-hoag-nv8fd), and a name two files both use would merge their arms in the
+  # population above (one file's planted arm passing for the other's missing unplanted one), so the
+  # ids are counted per file. `idsIn` reads every labelled id, including the rows that carry no `T5`
+  # word.
+  idsIn =
+    file:
+    lib.unique (
+      map (m: builtins.elemAt m 1) (
+        builtins.filter (m: m != null) (
+          map (line: builtins.match "check \"(T5 )?([a-z0-9-]+)[ \"].*" line) (
+            lib.splitString "\n" (builtins.readFile (rowDir + "/${file}"))
+          )
+        )
+      )
+    );
+  allIds = lib.concatMap idsIn rowFiles;
+  duplicateIds = builtins.filter (id: builtins.length (builtins.filter (x: x == id) allIds) > 1) (
+    lib.unique allIds
+  );
+
+  # `legacy-ids.nix`: every pre-name `row<n>` id, and every renamed row name, resolves to a row that
+  # is labelled today, and a renamed name is retired (no longer labelled), so a citation of either
+  # is never dead and never ambiguous.
+  legacy = import ../../legacy-ids.nix;
+  renamed = legacy.renamed.rows;
+  resolve = name: renamed.${name} or name;
 in
 {
   flake.tests.refusals = {
@@ -61,6 +88,10 @@ in
         plantedOnly = lib.subtractLists unplanted planted;
         unplantedOnly = lib.subtractLists planted unplanted;
         filesWithoutAPair = builtins.filter (file: pairedIn file == [ ]) rowFiles;
+        inherit duplicateIds;
+        legacyRowsDangling = lib.subtractLists allIds (map resolve (builtins.attrValues legacy.rows));
+        renamedRowsDangling = lib.subtractLists allIds (builtins.attrValues renamed);
+        renamedRowsLive = builtins.filter (old: builtins.elem old allIds) (builtins.attrNames renamed);
       };
       expected = {
         readsRows = true;
@@ -70,11 +101,15 @@ in
         # other third arm (row24's and later) is labelled "catchable" or "control", a distinct word,
         # alongside an already-complete planted+unplanted pair, so it stays outside this population
         # instead of manufacturing a spurious one-sided row.
-        plantedOnly = [ "row17" ];
+        plantedOnly = [ "forged-registry-refuses-catchably" ];
         unplantedOnly = [ ];
         # row22/row23 (den-hoag-4kh.53.13) carry no `T5`/planted/unplanted label by design — they
         # assert an id's stability, not a refusal — so their file carries no pair.
-        filesWithoutAPair = [ "row22-23.sh" ];
+        filesWithoutAPair = [ "mintattachmentid-parseparent.sh" ];
+        duplicateIds = [ ];
+        legacyRowsDangling = [ ];
+        renamedRowsDangling = [ ];
+        renamedRowsLive = [ ];
       };
     };
   };

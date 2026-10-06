@@ -10,7 +10,7 @@
   threadingSpace,
 }:
 {
-  construct = [ "C59" ];
+  construct = [ "restricted-product-and-its-membership-index" ];
   check = asserts (
     map (c: "${c.needle}*${c.thread}") (genProduct.cells threading) == [
       "sharp*silk"

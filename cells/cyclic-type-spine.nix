@@ -43,7 +43,7 @@ let
 in
 
 {
-  construct = [ "C163" ];
+  construct = [ "type-cycled-through-containers-alone-refuses-its-spine" ];
   check = asserts (
     viaGen bobbin == defs
     && refuses (viaNixpkgs bobbin)

@@ -5,7 +5,7 @@
 # the tree's `check`, which refuses because the tree is not an option type.
 { asserts, genMerge }:
 {
-  construct = [ "C73" ];
+  construct = [ "nesting-seam-as-a-union-member" ];
   check = asserts (
     let
       at =

@@ -32,7 +32,7 @@
   genSelect,
 }:
 {
-  construct = [ "C19" ];
+  construct = [ "discrete-monotone-separation" ];
   check = asserts (
     # O1 — the cycle REFUSES when `children` is declared in flight, at BOTH seeds
     # (the refusal fires at `not`'s own site, before `acc` is ever read).

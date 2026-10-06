@@ -43,6 +43,6 @@ let
     ) genMerge.types genMerge.mkOption wrap == value lib.evalModules lib.types lib.mkOption wrap;
 in
 {
-  construct = [ "C134" ];
+  construct = [ "union-element-holding-a-wrapper-serves-nixpkgs-value" ];
   check = asserts (holds wrappers.uniq && holds wrappers.coercedTo);
 }

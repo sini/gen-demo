@@ -35,7 +35,7 @@ let
     );
 in
 {
-  construct = [ "C25" ];
+  construct = [ "graph-interrogated" ];
   check = asserts (
     builtins.all (ts: ts == [ ]) (builtins.attrValues (step "faille"))
     &&

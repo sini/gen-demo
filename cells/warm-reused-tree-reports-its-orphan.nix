@@ -13,7 +13,7 @@
 # cold re-evaluation of the same modules is the reference the report must equal.
 { asserts, genMerge }:
 {
-  construct = [ "C32" ];
+  construct = [ "warm-path-reports-a-reused-trees-orphan" ];
   check = asserts (
     let
       spoolTreeType =

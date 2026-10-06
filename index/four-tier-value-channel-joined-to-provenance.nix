@@ -1,0 +1,5 @@
+{
+  title = "the four-tier value channel, joined to provenance";
+  adr = "0029, den-hoag-zakjg";
+  what = "`four-tier-value-channel`: each contributor is its own `evalModuleTree`; gen-merge's `bandedLeaves` reads the band it resolved and gen-view's `headPositions` places the record at that band's head, so the head decides first and structure within one. Moved list and received value: k1 root `R`, k2 set `T` over a root `mkDefault`, k3 `mkDefault` `TD` over a default-only root, k4 `mkForce` `TF` over a root `R`; k5/k6 move nothing, the receiver reads `RD`; a flipped query order flips k1; a within-head tie refuses or folds in declared order; the host as receiver refuses k4. `four-tier-provenance-join`: `joinedTrace` (gen-view 47106a8) joins k1-k4 to contributor, head, priority, winner files; winner files are the contributor's own, and a mis-paired record the library joins fails that; head = own band; `loc` = the field; `unaccounted` empty over k1-k6, `[ t ]` under a walled dropped datum. `four-tier-unset-reasons`: one real record per `unset` reason, each in the `unset` half";
+}

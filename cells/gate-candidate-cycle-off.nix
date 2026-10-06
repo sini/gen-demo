@@ -2,7 +2,7 @@
 # policy edge that resolved OFF must still be refused: the gate is static, so it ranges over every
 # declared candidate (head + relata, on or off), never over what one model happened to reach.
 #
-# THE REAL CONSTRUCTS, RE-APPLIED — `constructs/c05.nix`, `c01.nix` and `c07.nix` are called here
+# THE REAL CONSTRUCTS, RE-APPLIED — `constructs/policy-program.nix`, `c01.nix` and `c07.nix` are called here
 # with exactly the names their formals read, as the flake's `callWith` does, over a planted state:
 #   · OFF: `genProgram.program` receives one extra fact, `scotched:pewter`, which C5's two
 #     conditional heads negate, so both resolve off;
@@ -13,7 +13,7 @@
 # Four conjuncts, one run: the plant really is OFF (liveness); the REACHED graph is acyclic, so the
 # cycle is carried by the candidate alone; the gate REFUSES the planted state; the same state
 # without the back-edge is ADMITTED (the control that keeps a gate refusing everything from
-# passing). The refusal's NAME is `ci/refusals/row81.sh`'s, because `tryEval` discards messages.
+# passing). The refusal's NAME is `ci/refusals/c7s-candidate-cycle.sh`'s, because `tryEval` discards messages.
 {
   asserts,
   genGraph,
@@ -47,7 +47,7 @@ let
       values = genValues // {
         declaredEdges = genValues.declaredEdges ++ extra;
       };
-      c5 = call (import ../constructs/c05.nix) {
+      c5 = call (import ../constructs/policy-program.nix) {
         genProgram = offProgram;
         inherit
           genScope
@@ -56,12 +56,12 @@ let
           seamHead
           ;
       };
-      c1 = call (import ../constructs/c01.nix) {
+      c1 = call (import ../constructs/kinds-and-nodes.nix) {
         inherit genScope;
         genValues = values;
         inherit (c5) seamPromotion;
       };
-      c7 = call (import ../constructs/c07.nix) (
+      c7 = call (import ../constructs/well-definedness-gate.nix) (
         c5
         // c1
         // {
@@ -91,6 +91,6 @@ let
   control = stateWith [ ];
 in
 {
-  construct = [ "C7" ];
+  construct = [ "well-definedness-gate" ];
   check = asserts (planted.off && !planted.reachedCyclic && !planted.admitted && control.admitted);
 }

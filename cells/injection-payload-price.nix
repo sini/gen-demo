@@ -27,7 +27,7 @@
   c24PlainAt,
 }:
 {
-  construct = [ "C24" ];
+  construct = [ "value-injection-interim-priced" ];
   check = asserts (
     !(c24PlainAt c24Payload.schema.thimble)
     && c24PlainAt c24Payload.thimbles.pewter

@@ -24,7 +24,7 @@ let
   ];
 in
 {
-  construct = [ "C90" ];
+  construct = [ "same-named-enum-redeclared-unioned" ];
   check = asserts (
     read twoSets "sateen" == {
       success = true;

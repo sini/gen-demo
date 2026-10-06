@@ -10,7 +10,7 @@
   c26DefsShapeNoInherit,
 }:
 {
-  construct = [ "C26" ];
+  construct = [ "kind-inheritance-resolves-a-value" ];
   check = asserts (
     c26DefsShapeStaged == c26DefsShapeBare && c26DefsShapeNoInherit != c26DefsShapeBare
   );

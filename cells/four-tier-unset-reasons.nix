@@ -48,7 +48,7 @@ let
   };
 in
 {
-  construct = [ "C114" ];
+  construct = [ "four-tier-value-channel-joined-to-provenance" ];
   check = asserts (
     withRoot { } == expect {
       reason = "unset: default-only";

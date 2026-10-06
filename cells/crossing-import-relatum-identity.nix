@@ -58,7 +58,7 @@ let
   nodes = builtins.map (id: anyThread.nodes.${id}) anyThread.crossings;
 in
 {
-  construct = [ "C67" ];
+  construct = [ "crossings-import-relatum-is-an-identity" ];
   check = asserts (
     anyThread.crossings != stringThread.crossings
     && anyThread.crossings == anyThreadElsewhere.crossings

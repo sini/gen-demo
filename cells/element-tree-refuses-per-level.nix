@@ -13,7 +13,7 @@
 # message is `refusals` row 37's.
 { asserts, genMerge }:
 {
-  construct = [ "C44" ];
+  construct = [ "nested-tree-as-a-container-element-refuses" ];
   check = asserts (
     let
       liningTree =

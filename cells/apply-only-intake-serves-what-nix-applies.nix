@@ -11,7 +11,7 @@
 }:
 
 {
-  construct = [ "C153" ];
+  construct = [ "apply-only-intake-serves-what-nix-can-apply" ];
   check = asserts (
     map edgeChecked [
       isSelvage

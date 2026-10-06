@@ -53,7 +53,7 @@ let
   reached = walk "reachable" declared;
 in
 {
-  construct = [ "C187" ];
+  construct = [ "reachable-answers-in-first-reach-order" ];
   check = asserts (
     reached == [
       "spool"

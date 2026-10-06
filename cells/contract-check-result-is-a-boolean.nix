@@ -6,7 +6,7 @@
 { asserts, edgeVerdict }:
 
 {
-  construct = [ "C155" ];
+  construct = [ "contracts-check-is-a-predicate" ];
   check = asserts (
     edgeVerdict (edge: edge == "selvage") == "selvage"
     && !(builtins.tryEval (edgeVerdict (_: "yes"))).success

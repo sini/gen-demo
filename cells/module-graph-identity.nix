@@ -29,7 +29,7 @@ let
   };
 in
 {
-  construct = [ "C95" ];
+  construct = [ "module-imported-twice-is-one-node" ];
   check = asserts (
     threads [
       {

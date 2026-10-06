@@ -45,7 +45,7 @@ let
   ];
 in
 {
-  construct = [ "C86" ];
+  construct = [ "aspects-declared-surface-both-planes" ];
   check = asserts (
     builtins.all (k: builtins.elem k corpusDeclared) [
       "includes"

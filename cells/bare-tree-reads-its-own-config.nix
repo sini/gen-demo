@@ -17,7 +17,7 @@
 # prior is the cold value.
 { asserts, genMerge }:
 {
-  construct = [ "C47" ];
+  construct = [ "nested-tree-typed-bare-reads-its-own-config" ];
   check = asserts (
     let
       inherit (genMerge) evalModuleTree mkOption mkIf;

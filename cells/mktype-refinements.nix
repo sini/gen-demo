@@ -9,7 +9,7 @@
 # registry enforced nothing. The instance value is read beside it (the default).
 { asserts, genValues }:
 {
-  construct = [ "C36" ];
+  construct = [ "refined-option-under-the-mktype-arm" ];
   check = asserts (
     builtins.attrNames genValues.schema.bobbin.refinements == [ "picks" ]
     && genValues.bobbins.grosgrain.picks == 1

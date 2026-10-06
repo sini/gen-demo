@@ -41,7 +41,7 @@ let
   docs = type: (type.getSubOptions [ ]).weft.default;
 in
 {
-  construct = [ "C138" ];
+  construct = [ "gen-module-tree-names-its-position-as-nixpkgs-does" ];
   check = asserts (
     mounted (ref [ ]) == "warp"
     && mounted (spool [ ]) == mounted (ref [ ])

@@ -11,7 +11,7 @@
 # engine imports it, where it used to drop it with no finding.
 { asserts, genMerge }:
 {
-  construct = [ "C43" ];
+  construct = [ "module-named-by-a-path-string-is-a-module" ];
   check = asserts (
     let
       at =

@@ -21,7 +21,7 @@
 # `head` over `fan`'s 64 letters costs 250,226,378 thunks where its own one letter costs 6,959,439.
 { asserts, genScope }:
 {
-  construct = [ "C2" ];
+  construct = [ "edges-queried" ];
   check = asserts (
     let
       r = genScope.wfl;

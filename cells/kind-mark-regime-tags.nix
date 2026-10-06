@@ -117,7 +117,7 @@ let
   tensionShared = tension null;
 in
 {
-  construct = [ "C64" ];
+  construct = [ "kind-mark-over-per-field-regime-tags" ];
   check = asserts (
     # the sealed arm: one mark, and the comparison refuses rather than merging
     ends.__mint.minted == endsPositive.__mint.minted

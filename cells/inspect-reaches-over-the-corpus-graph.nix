@@ -15,7 +15,7 @@ let
   reaches = c25Ir.query "SELECT dst FROM reaches WHERE src = 'pewter' AND via = 'tacks' ORDER BY dst";
 in
 {
-  construct = [ "C54" ];
+  construct = [ "reachability-over-the-corpus-graph" ];
   check = asserts (
     reaches == [
       { dst = "damask"; }

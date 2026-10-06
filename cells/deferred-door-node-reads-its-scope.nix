@@ -11,7 +11,7 @@
   c174Warp,
 }:
 {
-  construct = [ "C174" ];
+  construct = [ "deferred-door-node-reads-its-instances-scope" ];
   check = asserts (
     c174Selvage == {
       scoped = [

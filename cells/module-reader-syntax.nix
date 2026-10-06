@@ -12,7 +12,7 @@
 # removed, so a reader refusing every module cannot pass this cell.
 { asserts, genMerge }:
 {
-  construct = [ "C35" ];
+  construct = [ "module-reader-classifies-like-nixpkgs" ];
   check = asserts (
     let
       read =

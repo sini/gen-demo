@@ -12,6 +12,6 @@ let
   refused = v: !(builtins.tryEval (builtins.deepSeq v null)).success;
 in
 {
-  construct = [ "C87" ];
+  construct = [ "field-holding-a-declaration-written-either-way" ];
   check = asserts (refused c87Unbound.tip && refused c87Unbound.spares && refused c87Unbound.cords);
 }

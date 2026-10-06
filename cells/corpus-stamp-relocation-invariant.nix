@@ -20,7 +20,7 @@
   c21NoInheritInstance,
 }:
 {
-  construct = [ "C21" ];
+  construct = [ "relocation-its-deprecated-spelling-aliased" ];
   check = asserts (
     c21HeadKind.inherits == c21RelocatedKind.inherits
     && c21HeadKind.__mint.minted == c21RelocatedKind.__mint.minted

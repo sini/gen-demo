@@ -5,7 +5,7 @@
 # identifier: a container node's `result` is a value, not a tree.
 { asserts, genMerge }:
 {
-  construct = [ "C93" ];
+  construct = [ "container-of-trees-under-lazyattrsof-a-node" ];
   check = asserts (
     let
       cfg =

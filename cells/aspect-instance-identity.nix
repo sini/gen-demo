@@ -277,7 +277,7 @@ let
     && descs (at "warpC" "temper") == [ "temper-slack" ];
 in
 {
-  construct = [ "C136" ];
+  construct = [ "aspect-instance-is-a-node-of-its-own" ];
   # B-2's bindings first: a constructor that ignores the scope makes `suppliers` name one binding
   # twice, which aborts uncatchably, so the conjunct that reads them apart must fail before it.
   check = asserts (b2 && i1 && i2 && shapes && i4 && r3 && r7 && i9);

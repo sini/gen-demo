@@ -24,7 +24,7 @@ let
   spelt = gore { nixos.boot.loader.grub.enable = false; };
 in
 {
-  construct = [ "C111" ];
+  construct = [ "aspect-bodys-first-level-is-a-closed-vocabulary" ];
   check = asserts (
     !(builtins.tryEval (builtins.deepSeq misspelt.nixso null)).success
     && nested.placket.key == "gore/placket"

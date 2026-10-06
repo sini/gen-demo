@@ -20,7 +20,7 @@ let
 in
 
 {
-  construct = [ "C100" ];
+  construct = [ "set-union-keeps-a-strings-twins-edges" ];
   check = asserts (
     drvOnly == drvAll
     && builtins.getContext drvOnly != union

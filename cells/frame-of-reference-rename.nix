@@ -7,7 +7,7 @@ let
   r = frameOfReferenceRename;
 in
 {
-  construct = [ "C94" ];
+  construct = [ "rename-of-the-frame-of-reference" ];
   check = asserts (
     r.residue == [ ]
     && r.control != [ ]

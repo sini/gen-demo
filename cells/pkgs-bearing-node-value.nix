@@ -84,7 +84,7 @@ let
   ];
 in
 {
-  construct = [ "C72" ];
+  construct = [ "pkgs-bearing-node-value-memoised" ];
   check = asserts (
     read (warm pkgsBearing).store == [
       211

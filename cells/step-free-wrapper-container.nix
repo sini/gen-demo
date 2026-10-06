@@ -21,7 +21,7 @@ let
     )).config.o;
 in
 {
-  construct = [ "C192" ];
+  construct = [ "container-of-trees-under-a-step-free-wrapper-serves" ];
   check = asserts (
     (value (lib.types.uniq (t.lazyAttrsOf (t.attrsOf sub))) [
       {

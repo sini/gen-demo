@@ -10,7 +10,7 @@
   seamRules,
 }:
 {
-  construct = [ "C10" ];
+  construct = [ "stratified-dispatch" ];
   check = asserts (
     map (x: x.group) seamRules == [
       "basting"

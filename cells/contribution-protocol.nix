@@ -11,7 +11,7 @@
   c8Unioned,
 }:
 {
-  construct = [ "C8" ];
+  construct = [ "contribution-protocol" ];
   check = asserts (
     builtins.attrNames c8Assembled.nodes == [
       "damask"

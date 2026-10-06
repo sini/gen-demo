@@ -17,7 +17,7 @@
   warm,
 }:
 {
-  construct = [ "T2b" ];
+  construct = [ "byte-parity" ];
   check = asserts (
     builtins.toJSON cold.values == builtins.toJSON warm.values
     && builtins.toJSON cold.provenance == builtins.toJSON warm.provenance

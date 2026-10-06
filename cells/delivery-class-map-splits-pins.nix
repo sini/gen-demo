@@ -14,7 +14,7 @@ let
   };
 in
 {
-  construct = [ "C118" ];
+  construct = [ "one-projection-realizes-on-two-pins" ];
   check = asserts (
     couchingRealized == {
       couching-batiste = {

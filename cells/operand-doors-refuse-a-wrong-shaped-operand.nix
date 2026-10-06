@@ -11,7 +11,7 @@
 }:
 
 {
-  construct = [ "C184" ];
+  construct = [ "wrong-shaped-operand-of-a-gen-program-door-is-refused-by-name" ];
   check = asserts (
     c184Refused == {
       ruleEdgesNonModel = true;

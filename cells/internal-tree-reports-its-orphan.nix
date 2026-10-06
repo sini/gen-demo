@@ -14,7 +14,7 @@
 # the cell could pass on a report that was never about the nested seam.
 { asserts, genMerge }:
 {
-  construct = [ "C30" ];
+  construct = [ "internal-nested-tree-reports-its-own-orphan" ];
   check = asserts (
     let
       hemTree =

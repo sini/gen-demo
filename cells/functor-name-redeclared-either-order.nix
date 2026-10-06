@@ -88,7 +88,9 @@ let
     ];
 in
 {
-  construct = [ "C194" ];
+  construct = [
+    "nixpkgs-container-and-its-gen-twin-under-another-functor-name-serve-in-either-order"
+  ];
   check = asserts (
     every (eng: sameAsTwin eng pairs.attrs && sameAsTwin eng pairs.static)
     &&

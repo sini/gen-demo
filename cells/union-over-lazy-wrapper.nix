@@ -37,6 +37,6 @@ let
     ) genMerge.types genMerge.mkOption wrap == value lib.evalModules lib.types lib.mkOption wrap;
 in
 {
-  construct = [ "C130" ];
+  construct = [ "union-over-a-lazy-wrapper-serves-nixpkgs-value" ];
   check = asserts (holds wrappers.uniq && holds wrappers.coercedTo);
 }

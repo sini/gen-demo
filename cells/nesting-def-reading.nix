@@ -12,7 +12,7 @@
 # value, where it used to be dropped as module identity and read the default.
 { asserts, genMerge }:
 {
-  construct = [ "C39" ];
+  construct = [ "nesting-seam-reads-a-definition-as-its-reference" ];
   check = asserts (
     let
       at =

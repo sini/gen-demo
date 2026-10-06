@@ -17,7 +17,7 @@ let
   union = builtins.getContext (drvOnly + drvAll);
 in
 {
-  construct = [ "C63" ];
+  construct = [ "dedup-collapse-keeps-every-dependency-edge" ];
   check = asserts (
     drvOnly == drvAll
     && builtins.getContext drvOnly != union

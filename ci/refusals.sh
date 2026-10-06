@@ -2,14 +2,15 @@
 # T5 (ADR-0025) -- one plant per enforcer, refused BY NAME. `builtins.tryEval` cannot read a
 # refusal's message (that is a property of the builtin, not of Nix -- `den-hoag-9mo`), so the
 # by-name half runs here, out of band, rather than as a `checks` cell. Each plant mirrors the
-# construction its own C-numbered construct in `constructs/` uses -- never imports it, since a
+# construction its own named construct in `constructs/` uses -- never imports it, since a
 # standalone plant must not perturb the corpus's own declarations -- and every probe below is run
 # BOTH planted (must refuse, by name) and unplanted (must not refuse), because a construction that
 # refused unconditionally would pass the planted arm for the wrong reason. Every exit is read
 # UNPIPED: a piped `$?` reports the last stage of the pipe, not nix's.
 #
 # THE ROWS ARE FILES. Every `ci/refusals/*.sh` is one row (or one group of rows sharing a prelude),
-# sourced below in version order (`row9` before `row10`); this script holds only the `check`
+# named for the row (den-hoag-nv8fd; a pre-name `row<n>` resolves through `legacy-ids.nix`) and
+# sourced below in file-name order; this script holds only the `check`
 # function, the engines, the cross-row control and the exit. A new row lands by adding one file --
 # see README.md, "Adding a construct, a cell or a refusal row".
 #
@@ -219,7 +220,7 @@ echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/ (${#labels[@]} a
 
 # The control below reads rows' stderr by file; `grep` on a file that was never written exits 2,
 # which `if grep -q` reads as "no leak". Refuse that instead of passing it.
-for errfile in row1 row2 row5 row6 row9 row10 row11 row14 row20 row21 row24 row25 row26 row28 row29 row35 row36 row75 row76 row82 row86 row87 row89 row117; do
+for errfile in binding-relatum-minted-in-the-same-pass policy-relatum-not-in-frozen gen-aspectcnf-absent edge-decls-id-not-a-declared-member retired-lattice-key-declared-on-a-cyclic-member c7s-planted-cycle c7s-door node-declared-in-both-registries den-hoag-i546ns-thunk-authorization-guards thunkbindings-is-null spawned-key-colliding-with-an-already-registered-nodes-id attrs-as-a-nullary-container-strategy attrset-definition-the-fold-consumes kind-declaration-key-no-reader-consumes collection-name-colliding-with-gen-schemas-own-vocabulary declaration-only-read-of-a-module-with-a-surplus-key foreign-types-check-before-gen-merges-fold hand-written-attrset-where-a-gen-schema-kind-value-belongs same-minted-kind-builds-a-context-that-answers sealed-only-kind-collision kind-is-keyed-by-its-minted-identity kindfor-returning-the-kind-value-answers entity-of-a-sealed-only-kind-collision product-coordinate-of-a-sealed-only-kind-collision; do
   if [ ! -f "$tmpdir/$errfile-red.err" ]; then
     echo "FAIL control: $errfile's planted stderr was never written -- the row it names did not run"
     fail=1
@@ -261,92 +262,92 @@ done
 # `selvage` pair and the same sentence again, refused at `selectorEq` on two `entity` selectors
 # (row89) and on two `adapters.product.coord` selectors (row117), so only the parenthesised site tells
 # them apart.
-if grep -qF "unresolved relatum 'pewter'" "$tmpdir/row2-red.err"; then
-  echo "FAIL control: row1's message leaked into row2's refusal"
+if grep -qF "unresolved relatum 'pewter'" "$tmpdir/policy-relatum-not-in-frozen-red.err"; then
+  echo "FAIL control: binding-relatum-minted-in-the-same-pass's message leaked into policy-relatum-not-in-frozen's refusal"
   fail=1
-elif grep -qF "not in the frozen set" "$tmpdir/row1-red.err"; then
-  echo "FAIL control: row2's message leaked into row1's refusal"
+elif grep -qF "not in the frozen set" "$tmpdir/binding-relatum-minted-in-the-same-pass-red.err"; then
+  echo "FAIL control: policy-relatum-not-in-frozen's message leaked into binding-relatum-minted-in-the-same-pass's refusal"
   fail=1
-elif grep -qF "not a declared member" "$tmpdir/row9-red.err"; then
-  echo "FAIL control: row6's message leaked into row9's refusal"
+elif grep -qF "not a declared member" "$tmpdir/retired-lattice-key-declared-on-a-cyclic-member-red.err"; then
+  echo "FAIL control: edge-decls-id-not-a-declared-member's message leaked into retired-lattice-key-declared-on-a-cyclic-member's refusal"
   fail=1
-elif grep -qF "retired lattice key" "$tmpdir/row6-red.err"; then
-  echo "FAIL control: row9's message leaked into row6's refusal"
+elif grep -qF "retired lattice key" "$tmpdir/edge-decls-id-not-a-declared-member-red.err"; then
+  echo "FAIL control: retired-lattice-key-declared-on-a-cyclic-member's message leaked into edge-decls-id-not-a-declared-member's refusal"
   fail=1
-elif grep -qF "received an attrset that" "$tmpdir/row10-red.err"; then
-  echo "FAIL control: row11's message leaked into row10's refusal"
+elif grep -qF "received an attrset that" "$tmpdir/c7s-planted-cycle-red.err"; then
+  echo "FAIL control: c7s-door's message leaked into c7s-planted-cycle's refusal"
   fail=1
-elif grep -qF "cyclic component" "$tmpdir/row11-red.err"; then
-  echo "FAIL control: row10's message leaked into row11's refusal"
+elif grep -qF "cyclic component" "$tmpdir/c7s-door-red.err"; then
+  echo "FAIL control: c7s-planted-cycle's message leaked into c7s-door's refusal"
   fail=1
-elif grep -qF "no category source" "$tmpdir/row14-red.err"; then
-  echo "FAIL control: row5's message leaked into row14's refusal"
+elif grep -qF "no category source" "$tmpdir/node-declared-in-both-registries-red.err"; then
+  echo "FAIL control: gen-aspectcnf-absent's message leaked into node-declared-in-both-registries's refusal"
   fail=1
-elif grep -qF "has conflicting definitions" "$tmpdir/row5-red.err"; then
-  echo "FAIL control: row14's message leaked into row5's refusal"
+elif grep -qF "has conflicting definitions" "$tmpdir/gen-aspectcnf-absent-red.err"; then
+  echo "FAIL control: node-declared-in-both-registries's message leaked into gen-aspectcnf-absent's refusal"
   fail=1
-elif grep -qF "thunk-bindings-unmatched" "$tmpdir/row21-red.err"; then
-  echo "FAIL control: row20's message leaked into row21's refusal"
+elif grep -qF "thunk-bindings-unmatched" "$tmpdir/thunkbindings-is-null-red.err"; then
+  echo "FAIL control: den-hoag-i546ns-thunk-authorization-guards's message leaked into thunkbindings-is-null's refusal"
   fail=1
-elif grep -qF "adapter-malformed" "$tmpdir/row20-red.err"; then
-  echo "FAIL control: row21's message leaked into row20's refusal"
+elif grep -qF "adapter-malformed" "$tmpdir/den-hoag-i546ns-thunk-authorization-guards-red.err"; then
+  echo "FAIL control: thunkbindings-is-null's message leaked into den-hoag-i546ns-thunk-authorization-guards's refusal"
   fail=1
-elif grep -qF "already a registered node's id" "$tmpdir/row21-red.err"; then
-  echo "FAIL control: row24's message leaked into row21's refusal"
+elif grep -qF "already a registered node's id" "$tmpdir/thunkbindings-is-null-red.err"; then
+  echo "FAIL control: spawned-key-colliding-with-an-already-registered-nodes-id's message leaked into thunkbindings-is-null's refusal"
   fail=1
-elif grep -qF "adapter-malformed" "$tmpdir/row24-red.err"; then
-  echo "FAIL control: row21's message leaked into row24's refusal"
+elif grep -qF "adapter-malformed" "$tmpdir/spawned-key-colliding-with-an-already-registered-nodes-id-red.err"; then
+  echo "FAIL control: thunkbindings-is-null's message leaked into spawned-key-colliding-with-an-already-registered-nodes-id's refusal"
   fail=1
-elif grep -qF "cannot consume" "$tmpdir/row25-red.err"; then
-  echo "FAIL control: row26's message leaked into row25's refusal"
+elif grep -qF "cannot consume" "$tmpdir/attrs-as-a-nullary-container-strategy-red.err"; then
+  echo "FAIL control: attrset-definition-the-fold-consumes's message leaked into attrs-as-a-nullary-container-strategy's refusal"
   fail=1
-elif grep -qF "to different values" "$tmpdir/row26-red.err"; then
-  echo "FAIL control: row25's message leaked into row26's refusal"
+elif grep -qF "to different values" "$tmpdir/attrset-definition-the-fold-consumes-red.err"; then
+  echo "FAIL control: attrs-as-a-nullary-container-strategy's message leaked into attrset-definition-the-fold-consumes's refusal"
   fail=1
-elif grep -qF "is reserved — cannot be used as a collection key" "$tmpdir/row28-red.err"; then
-  echo "FAIL control: row29's message leaked into row28's refusal"
+elif grep -qF "is reserved — cannot be used as a collection key" "$tmpdir/kind-declaration-key-no-reader-consumes-red.err"; then
+  echo "FAIL control: collection-name-colliding-with-gen-schemas-own-vocabulary's message leaked into kind-declaration-key-no-reader-consumes's refusal"
   fail=1
-elif grep -qF "unrecognised declaration key" "$tmpdir/row29-red.err"; then
-  echo "FAIL control: row28's message leaked into row29's refusal"
+elif grep -qF "unrecognised declaration key" "$tmpdir/collection-name-colliding-with-gen-schemas-own-vocabulary-red.err"; then
+  echo "FAIL control: kind-declaration-key-no-reader-consumes's message leaked into collection-name-colliding-with-gen-schemas-own-vocabulary's refusal"
   fail=1
-elif grep -qF "is not of type" "$tmpdir/row35-red.err"; then
-  echo "FAIL control: row36's message leaked into row35's refusal"
+elif grep -qF "is not of type" "$tmpdir/declaration-only-read-of-a-module-with-a-surplus-key-red.err"; then
+  echo "FAIL control: foreign-types-check-before-gen-merges-fold's message leaked into declaration-only-read-of-a-module-with-a-surplus-key's refusal"
   fail=1
-elif grep -qF "has an unsupported attribute" "$tmpdir/row36-red.err"; then
-  echo "FAIL control: row35's message leaked into row36's refusal"
+elif grep -qF "has an unsupported attribute" "$tmpdir/foreign-types-check-before-gen-merges-fold-red.err"; then
+  echo "FAIL control: declaration-only-read-of-a-module-with-a-surplus-key's message leaked into foreign-types-check-before-gen-merges-fold's refusal"
   fail=1
-elif grep -qF "adapters.registry.mkContext" "$tmpdir/row75-red.err"; then
-  echo "FAIL control: row76's message leaked into row75's refusal"
+elif grep -qF "adapters.registry.mkContext" "$tmpdir/hand-written-attrset-where-a-gen-schema-kind-value-belongs-red.err"; then
+  echo "FAIL control: same-minted-kind-builds-a-context-that-answers's message leaked into hand-written-attrset-where-a-gen-schema-kind-value-belongs's refusal"
   fail=1
-elif grep -qF "sel.kind expects" "$tmpdir/row76-red.err"; then
-  echo "FAIL control: row75's message leaked into row76's refusal"
+elif grep -qF "sel.kind expects" "$tmpdir/same-minted-kind-builds-a-context-that-answers-red.err"; then
+  echo "FAIL control: hand-written-attrset-where-a-gen-schema-kind-value-belongs's message leaked into same-minted-kind-builds-a-context-that-answers's refusal"
   fail=1
-elif grep -qF 'returned the kind name' "$tmpdir/row76-red.err"; then
-  echo "FAIL control: row87's message leaked into row76's refusal"
+elif grep -qF 'returned the kind name' "$tmpdir/same-minted-kind-builds-a-context-that-answers-red.err"; then
+  echo "FAIL control: kindfor-returning-the-kind-value-answers's message leaked into same-minted-kind-builds-a-context-that-answers's refusal"
   fail=1
-elif grep -qF '`kind` expects a gen-schema kind value' "$tmpdir/row87-red.err"; then
-  echo "FAIL control: row76's message leaked into row87's refusal"
+elif grep -qF '`kind` expects a gen-schema kind value' "$tmpdir/kindfor-returning-the-kind-value-answers-red.err"; then
+  echo "FAIL control: same-minted-kind-builds-a-context-that-answers's message leaked into kindfor-returning-the-kind-value-answers's refusal"
   fail=1
-elif grep -qF 'returned the kind name' "$tmpdir/row86-red.err"; then
-  echo "FAIL control: row87's message leaked into row86's refusal"
+elif grep -qF 'returned the kind name' "$tmpdir/kind-is-keyed-by-its-minted-identity-red.err"; then
+  echo "FAIL control: kindfor-returning-the-kind-value-answers's message leaked into kind-is-keyed-by-its-minted-identity's refusal"
   fail=1
-elif grep -qF 'sel.kind matched against a projection' "$tmpdir/row87-red.err"; then
-  echo "FAIL control: row86's message leaked into row87's refusal"
+elif grep -qF 'sel.kind matched against a projection' "$tmpdir/kindfor-returning-the-kind-value-answers-red.err"; then
+  echo "FAIL control: kind-is-keyed-by-its-minted-identity's message leaked into kindfor-returning-the-kind-value-answers's refusal"
   fail=1
-elif grep -qF 'gen-select: selectorEq:' "$tmpdir/row82-red.err"; then
-  echo "FAIL control: row89's message leaked into row82's refusal"
+elif grep -qF 'gen-select: selectorEq:' "$tmpdir/sealed-only-kind-collision-red.err"; then
+  echo "FAIL control: entity-of-a-sealed-only-kind-collision's message leaked into sealed-only-kind-collision's refusal"
   fail=1
-elif grep -qF 'gen-schema: kindEq:' "$tmpdir/row89-red.err"; then
-  echo "FAIL control: row82's message leaked into row89's refusal"
+elif grep -qF 'gen-schema: kindEq:' "$tmpdir/entity-of-a-sealed-only-kind-collision-red.err"; then
+  echo "FAIL control: sealed-only-kind-collision's message leaked into entity-of-a-sealed-only-kind-collision's refusal"
   fail=1
-elif grep -qF 'gen-select: selectorEq (adapters.product.coord):' "$tmpdir/row89-red.err"; then
-  echo "FAIL control: row117's message leaked into row89's refusal"
+elif grep -qF 'gen-select: selectorEq (adapters.product.coord):' "$tmpdir/entity-of-a-sealed-only-kind-collision-red.err"; then
+  echo "FAIL control: product-coordinate-of-a-sealed-only-kind-collision's message leaked into entity-of-a-sealed-only-kind-collision's refusal"
   fail=1
-elif grep -qF 'gen-select: selectorEq:' "$tmpdir/row117-red.err"; then
-  echo "FAIL control: row89's message leaked into row117's refusal"
+elif grep -qF 'gen-select: selectorEq:' "$tmpdir/product-coordinate-of-a-sealed-only-kind-collision-red.err"; then
+  echo "FAIL control: entity-of-a-sealed-only-kind-collision's message leaked into product-coordinate-of-a-sealed-only-kind-collision's refusal"
   fail=1
 else
-  echo "ok   control (row1/row2, row6/row9, row10/row11, row5/row14, row20/row21, row25/row26, row28/row29, row35/row36, row75/row76, row76/row87, row86/row87, row82/row89 and row89/row117 refusals do not cross-match)"
+  echo "ok   control (binding-relatum-minted-in-the-same-pass/policy-relatum-not-in-frozen, edge-decls-id-not-a-declared-member/retired-lattice-key-declared-on-a-cyclic-member, c7s-planted-cycle/c7s-door, gen-aspectcnf-absent/node-declared-in-both-registries, den-hoag-i546ns-thunk-authorization-guards/thunkbindings-is-null, attrs-as-a-nullary-container-strategy/attrset-definition-the-fold-consumes, kind-declaration-key-no-reader-consumes/collection-name-colliding-with-gen-schemas-own-vocabulary, declaration-only-read-of-a-module-with-a-surplus-key/foreign-types-check-before-gen-merges-fold, hand-written-attrset-where-a-gen-schema-kind-value-belongs/same-minted-kind-builds-a-context-that-answers, same-minted-kind-builds-a-context-that-answers/kindfor-returning-the-kind-value-answers, kind-is-keyed-by-its-minted-identity/kindfor-returning-the-kind-value-answers, sealed-only-kind-collision/entity-of-a-sealed-only-kind-collision and entity-of-a-sealed-only-kind-collision/product-coordinate-of-a-sealed-only-kind-collision refusals do not cross-match)"
 fi
 
 exit $fail

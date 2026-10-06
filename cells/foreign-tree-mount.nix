@@ -51,7 +51,7 @@ let
   refuses = e: !(builtins.tryEval (builtins.deepSeq e null)).success;
 in
 {
-  construct = [ "C128" ];
+  construct = [ "foreign-eval-mounts-a-bare-gen-module-tree" ];
   check = asserts (
     (eval spool { spool = "sateen"; }).config.seam.spool == "sateen"
     && (eval spool { }).config.seam.spool == "none"

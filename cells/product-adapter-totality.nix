@@ -18,7 +18,7 @@
   seamSpace,
 }:
 {
-  construct = [ "C20" ];
+  construct = [ "product-adapters-totality-doors-real-data" ];
   check = asserts (
     # the working arm: real coordsOf flows through the adapter unchanged.
     (c20Ctx.data seamCell).__coords == seamSpace.product.coordsOf seamCell

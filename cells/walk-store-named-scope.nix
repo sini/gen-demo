@@ -15,7 +15,7 @@
   storeNamedWalk,
 }:
 {
-  construct = [ "C46" ];
+  construct = [ "walk-over-store-named-scopes" ];
   check = asserts (
     let
       deepest = (builtins.elemAt storeNamedPaths 2).node;

@@ -27,7 +27,7 @@ let
     ]).config.schema.selvage;
 in
 {
-  construct = [ "C85" ];
+  construct = [ "keys-crossing-between-libraries" ];
   check = asserts (
     dunder (c16Ctx.data "hemline/placket") == [ "__identity" ]
     && dunder (genAspects.keyRef "mill/stitch") == [ "__keyRef" ]

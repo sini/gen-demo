@@ -36,7 +36,7 @@ let
   refuses = e: !(builtins.tryEval (builtins.seq e null)).success;
 in
 {
-  construct = [ "C91" ];
+  construct = [ "doors-options-first-and-composed" ];
   check = asserts (
     map (h: (unwound h).neg) heads == [
       [ "unwound:selvage" ]

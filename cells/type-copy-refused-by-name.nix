@@ -28,7 +28,7 @@ let
     if r.success then r.value else "REFUSED";
 in
 {
-  construct = [ "C168" ];
+  construct = [ "copy-of-a-type-is-refused-by-name" ];
   check = asserts (
     !(decides (T.typeEq spool slack))
     && picks [ slack ] "x" == "x"

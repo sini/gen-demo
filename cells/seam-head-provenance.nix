@@ -1,7 +1,7 @@
 # `seam-head-provenance` — C12c, den-hoag-eh6x8. Owner-overridden standing guard: the other Oracle 3
 # rows guard a VALUE a cell already reads, and a value assertion cannot tell "`seamHead` computed
 # from `seamCoords`" apart from "`seamHead` restated as the same literal" — both evaluate to
-# `"seam:pewter:grosgrain"`. This cell reads no value; it reads the source of `constructs/c12.nix`
+# `"seam:pewter:grosgrain"`. This cell reads no value; it reads the source of `constructs/derived-product-graph-policy-stratum-promotion.nix`
 # for the one line binding `seamHead` and requires it to interpolate BOTH `seamCoords.thimble` and
 # `seamCoords.bobbin`. A literal has no such line and reds this cell by name while leaving every
 # value cell — including `product-promotion` — unmoved, because the literal and the derivation
@@ -50,7 +50,9 @@
   construct = [ ];
   check =
     let
-      lines = lib.splitString "\n" (builtins.readFile ../constructs/c12.nix);
+      lines = lib.splitString "\n" (
+        builtins.readFile ../constructs/derived-product-graph-policy-stratum-promotion.nix
+      );
       codeOf = line: lib.head (lib.splitString "#" line);
       isSeamHeadBinding = line: lib.hasPrefix "seamHead = " (lib.trim (codeOf line));
       seamHeadLine = lib.findFirst isSeamHeadBinding null lines;

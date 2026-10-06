@@ -25,7 +25,7 @@ let
     ];
 in
 {
-  construct = [ "C146" ];
+  construct = [ "functor-module-is-bound-as-its-lambda" ];
   check = asserts (
     (bind published).wrapped
     && x [ (bind published).module ] == served published

@@ -13,7 +13,7 @@ let
   retired = r: (r.refused or false) && r.code == "policy-body/escape-retired";
 in
 {
-  construct = [ "C159" ];
+  construct = [ "escape-is-retired-a-closure-crosses-the-door" ];
   check = asserts (
     retired c159Escape
     && retired c159FireEscape

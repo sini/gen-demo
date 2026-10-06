@@ -41,7 +41,7 @@ let
   ];
 in
 {
-  construct = [ "C145" ];
+  construct = [ "functor-definitions-merge-as-functions" ];
   check = asserts (
     builtins.isFunction (lib.mergeDefaultOption [ "heddle" ] wrapped)
     && builtins.isFunction (genMerge.mergeDefaultOption [ "heddle" ] wrapped)

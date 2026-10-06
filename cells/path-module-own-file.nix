@@ -32,7 +32,7 @@ let
       }).options.warp.definitionsWithLocations;
 in
 {
-  construct = [ "C169" ];
+  construct = [ "path-module-is-named-by-its-own-file" ];
   check = asserts (
     builtins.all (n: native (shapes named).${n} == [ "/loom/named.nix" ]) (
       builtins.attrNames (shapes named)

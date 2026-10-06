@@ -74,7 +74,7 @@ let
   nested = ty: builtins.attrNames (genMerge.mkOptionType ty).nestedTypes;
 in
 {
-  construct = [ "C99" ];
+  construct = [ "warm-walk-reads-no-raw-payload" ];
   check = asserts (
     # a moved identity under a raw nixpkgs element carrier is served warm, equal to cold
     (plain (t.listOf spool) [ silk ] [ satin ]).served

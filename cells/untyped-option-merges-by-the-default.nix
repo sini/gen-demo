@@ -27,7 +27,7 @@ let
   united = attempt (read { warp = 1; } { weft = 2; });
 in
 {
-  construct = [ "C193" ];
+  construct = [ "untyped-option-merges-by-the-default" ];
   check = asserts (
     doubled.success
     && doubled.value == "warpwarp"

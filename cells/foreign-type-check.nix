@@ -14,7 +14,7 @@
   lib,
 }:
 {
-  construct = [ "C41" ];
+  construct = [ "foreign-types-check-is-enforced" ];
   check = asserts (
     let
       read =

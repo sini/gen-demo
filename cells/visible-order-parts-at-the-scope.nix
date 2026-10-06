@@ -132,8 +132,8 @@ let
 in
 {
   construct = [
-    "C2"
-    "C4"
+    "edges-queried"
+    "movement"
   ];
   check = asserts (
     resolveArm { group = "shirring"; }

@@ -40,7 +40,7 @@ let
   root = genAspects.aspectsRoot { };
 in
 {
-  construct = [ "C65" ];
+  construct = [ "foreign-nested-role-crosses-as-carried" ];
   check = asserts (
     # the stated role crosses the boundary, and the redeclaration's drop is seen
     (bobbin lib.types.str).nestedTypes ? elemType

@@ -8,7 +8,7 @@
   seamPromotion,
 }:
 {
-  construct = [ "C25" ];
+  construct = [ "graph-interrogated" ];
   check = asserts (
     {
       node = builtins.filter (n: n.id == seamHead) c25PolicyIr.facts.nodes;

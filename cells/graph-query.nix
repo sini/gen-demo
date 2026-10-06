@@ -17,8 +17,8 @@
 }:
 {
   construct = [
-    "C1"
-    "C2"
+    "kinds-and-nodes"
+    "edges-queried"
   ];
   check = asserts (
     thimbles == [

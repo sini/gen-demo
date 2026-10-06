@@ -15,7 +15,7 @@
 # cannot pass the arithmetic.
 { asserts, c25Ir }:
 {
-  construct = [ "C25" ];
+  construct = [ "graph-interrogated" ];
   check = asserts (
     {
       nodes = builtins.length c25Ir.facts.nodes;

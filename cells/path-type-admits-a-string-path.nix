@@ -33,7 +33,7 @@ let
   nixpkgs = read lib.evalModules lib.mkOption lib.types.path;
 in
 {
-  construct = [ "C157" ];
+  construct = [ "path-option-admits-a-string-path-as-nixpkgs-does" ];
   check = asserts (
     builtins.all (n: (nixpkgs defs.${n}).success && native defs.${n} == nixpkgs defs.${n}) (
       builtins.attrNames defs

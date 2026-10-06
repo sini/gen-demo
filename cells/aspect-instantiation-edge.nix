@@ -163,6 +163,6 @@ let
     && map (i: r.vertices.${i}.entry.description) r.reaches.weft.heddle == [ "fly" ];
 in
 {
-  construct = [ "C176" ];
+  construct = [ "aspect-instance-points-at-its-declaration" ];
   check = asserts (d1 && d2 && d3);
 }

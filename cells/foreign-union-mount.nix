@@ -32,7 +32,7 @@ let
   refuses = e: !(builtins.tryEval (builtins.deepSeq e null)).success;
 in
 {
-  construct = [ "C123" ];
+  construct = [ "foreign-eval-mounts-a-gen-union-holding-a-tree" ];
   check = asserts (
     (mount union { spool = "sateen"; }).spool == "sateen"
     && mount union "selvedge" == "selvedge"

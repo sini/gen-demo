@@ -37,7 +37,7 @@ let
   forced = throw "nested-container-keyed-on-read: a sibling's element was forced";
 in
 {
-  construct = [ "C156" ];
+  construct = [ "gens-own-nested-container-is-keyed-without-its-siblings" ];
   check = asserts (
     holds (P: S: P.attrsOf (P.attrsOf S)) {
       bobbin = 5;

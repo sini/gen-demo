@@ -39,7 +39,7 @@ let
   bartackEdges = builtins.filter (e: e.from == "corpus/bartack") federated.graph.edges;
 in
 {
-  construct = [ "C16c" ];
+  construct = [ "bare-string-include-equals-its-by-value-control" ];
   check = asserts (
     bartackEdges == [
       {

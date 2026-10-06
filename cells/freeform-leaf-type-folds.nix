@@ -30,7 +30,7 @@ let
   );
 in
 {
-  construct = [ "C76" ];
+  construct = [ "leaf-freeformtype-folds-the-undeclared-plane" ];
   check = asserts (
     byStr.success
     && byStr.value == "twill"

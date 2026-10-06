@@ -9,7 +9,7 @@
   lib,
 }:
 {
-  construct = [ "C61" ];
+  construct = [ "v2-types-ad-hoc-check-override-is-refused" ];
   check = asserts (
     let
       read =

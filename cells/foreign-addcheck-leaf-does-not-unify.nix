@@ -6,7 +6,7 @@
 # everything cannot pass.
 { asserts, inputs }:
 {
-  construct = [ "C58" ];
+  construct = [ "addcheckd-nixpkgs-leaf-is-not-its-base" ];
   check = asserts (
     let
       inherit (inputs.gen.lib.modules.types) typeEq;

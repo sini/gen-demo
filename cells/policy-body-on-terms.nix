@@ -20,7 +20,7 @@ let
   strip = map (d: builtins.removeAttrs d [ "__mint" ]);
 in
 {
-  construct = [ "C140" ];
+  construct = [ "policy-body-on-terms-its-guards-as-when-terms" ];
   check = asserts (
     whenPass.adjudication.outcome == "admitted"
     && whenPass.resolve "yoke:bolt" == T false

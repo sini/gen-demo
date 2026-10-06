@@ -6,7 +6,7 @@
 # than the acyclic rebuilder, which cannot express a cycle at all.
 { asserts, solvedScc }:
 {
-  construct = [ "C15" ];
+  construct = [ "cyclic-stratum-solved" ];
   check = asserts (
     solvedScc == {
       chintz = [

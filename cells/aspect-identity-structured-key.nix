@@ -157,7 +157,7 @@ let
     && lib.hasPrefix "loom/includes/heddle@" (el { }).key;
 in
 {
-  construct = [ "C185" ];
+  construct = [ "aspects-identity-is-its-declaring-position-structured" ];
   check = asserts (k1 && k2 && k3 && k4 && k5);
   limbs = {
     inherit

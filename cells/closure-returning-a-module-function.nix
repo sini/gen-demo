@@ -12,6 +12,6 @@
 }:
 
 {
-  construct = [ "C199" ];
+  construct = [ "closure-that-returns-a-module-function" ];
   check = asserts (c198Plain == "plain-pewter-P" && c198StitchedRefused);
 }

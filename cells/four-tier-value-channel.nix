@@ -39,7 +39,7 @@ let
     }).moved;
 in
 {
-  construct = [ "C114" ];
+  construct = [ "four-tier-value-channel-joined-to-provenance" ];
   check = asserts (
     read "k1" { } == {
       moved = [ "R" ];

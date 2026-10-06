@@ -50,7 +50,7 @@ let
     };
 in
 {
-  construct = [ "C69" ];
+  construct = [ "one-function-at-a-shared-key-agrees-3" ];
   check = asserts (
     kept (pair { a = spin; } { a = spin; })
     && kept (

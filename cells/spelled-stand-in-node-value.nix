@@ -61,7 +61,7 @@ let
     }).store;
 in
 {
-  construct = [ "C124" ];
+  construct = [ "package-valued-node-value-memoised" ];
   check = asserts (
     warm.store.bobbin.spelled
     && warm.store.bobbin == cold.bobbin

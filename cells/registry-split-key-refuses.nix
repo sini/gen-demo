@@ -27,7 +27,7 @@
   splitKeyed,
 }:
 {
-  construct = [ "C4b" ];
+  construct = [ "element-identity" ];
   check = asserts (
     !(builtins.tryEval (builtins.deepSeq splitKeyed.value splitKeyed.value)).success
     && (

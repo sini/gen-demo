@@ -78,7 +78,7 @@ let
     ).nodes;
 in
 {
-  construct = [ "C51" ];
+  construct = [ "pre-order-walk-past-the-old-ceilings" ];
   check = asserts (
     len (expand (star 40001) { }).nodes == 40001
     && len (reach (star 8001)) == 8001

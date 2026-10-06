@@ -13,7 +13,7 @@
   genScope,
 }:
 {
-  construct = [ "C4" ];
+  construct = [ "movement" ];
   check = asserts (
     let
       rep = n: s: builtins.concatStringsSep "" (builtins.genList (_: s) n);

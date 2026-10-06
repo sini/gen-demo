@@ -12,7 +12,7 @@
 # empty-value cell above green.
 { asserts, c23Disjoint }:
 {
-  construct = [ "C23" ];
+  construct = [ "attrs-is-a-nullary-container-strategy" ];
   check = asserts (
     c23Disjoint == {
       warp = "flax";

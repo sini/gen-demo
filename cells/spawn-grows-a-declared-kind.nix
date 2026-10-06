@@ -8,7 +8,7 @@
 # Live control: a host declaring no picots spawns none, so the set grows off the declaration.
 { asserts, genScope }:
 {
-  construct = [ "C112" ];
+  construct = [ "spawn-grows-the-rank-below-keyed-by-identity" ];
   check = asserts (
     let
       kinds = genScope.mkKinds [

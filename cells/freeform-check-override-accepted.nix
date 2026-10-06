@@ -47,7 +47,7 @@ let
   reads = r: r.success && r.value == { picks = 1; };
 in
 {
-  construct = [ "C82" ];
+  construct = [ "check-overridden-freeformtype-merges-raw" ];
   check = asserts (
     reads (asFreeform overridden.v2)
     && reads (asFreeform overridden.plain)

@@ -8,7 +8,7 @@
 # key set, so the growth is keyed off the value rather than fixed by the declaration.
 { asserts, genScope }:
 {
-  construct = [ "C55" ];
+  construct = [ "node-set-grows-its-own-kind-off-a-value" ];
   check = asserts (
     let
       at = path: [

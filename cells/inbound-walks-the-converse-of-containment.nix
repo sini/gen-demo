@@ -87,7 +87,7 @@ let
 in
 
 {
-  construct = [ "C88" ];
+  construct = [ "inbound-movement-under-a-mark-against-neededby" ];
   check = asserts (
     walk "inbound" "creel" contained == [
       "creel"

@@ -12,7 +12,7 @@
 }:
 
 {
-  construct = [ "C203" ];
+  construct = [ "module-function-beside-a-closure-at-one-aspect-key" ];
   check = asserts (
     c203Registrations == 4
     &&

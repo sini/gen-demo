@@ -69,7 +69,7 @@ let
   refused = v: !(builtins.tryEval (builtins.deepSeq v v)).success;
 in
 {
-  construct = [ "C129" ];
+  construct = [ "copy-of-a-kind-value-is-refused-where-the-mark-decides" ];
   check = asserts (
     refused (kindEq grommet swapped)
     && refused (kindEq swapped grommet)

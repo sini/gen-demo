@@ -36,7 +36,7 @@ let
   list = T.lazyAttrsOf (T.listOf spool);
 in
 {
-  construct = [ "C125" ];
+  construct = [ "foreign-eval-mounts-a-lazy-container-of-submodules" ];
   check = asserts (
     (mount attrs { bobbin.reel.spool = "sateen"; }).bobbin.reel.spool == "sateen"
     && (builtins.head (mount list { bobbin = [ { spool = "sateen"; } ]; }).bobbin).spool == "sateen"

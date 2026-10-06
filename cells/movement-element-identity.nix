@@ -18,7 +18,7 @@
   diamondMoved,
 }:
 {
-  construct = [ "C4b" ];
+  construct = [ "element-identity" ];
   check = asserts (
     (builtins.tryEval (builtins.deepSeq diamondMoved.value diamondMoved.value)).success
     && diamondMoved.value == [ "cambric" ]

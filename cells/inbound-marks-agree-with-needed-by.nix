@@ -160,7 +160,7 @@ let
     && builtins.tail (inbound marks).value == (neededBy marks).compute self provider;
 in
 {
-  construct = [ "C88" ];
+  construct = [ "inbound-movement-under-a-mark-against-neededby" ];
   check = asserts (
     agree (sealAt requirer)
     &&

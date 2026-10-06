@@ -17,7 +17,7 @@
   notchRuleB,
 }:
 {
-  construct = [ "C27" ];
+  construct = [ "rule-identity-refuses-a-name-only-collision" ];
   check = asserts (
     notchRuleA.identity == null
     && notchRuleB.identity == null

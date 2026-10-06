@@ -17,7 +17,7 @@
   c25Refuses,
 }:
 {
-  construct = [ "C25" ];
+  construct = [ "graph-interrogated" ];
   check = asserts (
     c25Ir.query "SELECT src, dst FROM edge WHERE label = 'gathers'" == [
       {

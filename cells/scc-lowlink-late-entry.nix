@@ -41,7 +41,7 @@ let
   g = genGraph.forgetLabels lg;
 in
 {
-  construct = [ "C50" ];
+  construct = [ "scc-entered-at-its-larger-member" ];
   check = asserts (
     (genGraph.lowlink g).sccOf == {
       awl = "awl";

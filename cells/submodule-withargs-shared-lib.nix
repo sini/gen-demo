@@ -36,7 +36,7 @@ let
       ]).config.loom.seen;
 in
 {
-  construct = [ "C77" ];
+  construct = [ "one-lib-passed-through-withargs-twice-merges-3" ];
   check = asserts (
     loom (l: { lib = l; }) (l: {
       lib = l;

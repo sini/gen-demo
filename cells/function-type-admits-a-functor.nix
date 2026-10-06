@@ -33,7 +33,7 @@ let
   nixpkgs = loom lib.evalModules lib.mkOption (lib.types.functionTo lib.types.raw);
 in
 {
-  construct = [ "C149" ];
+  construct = [ "functor-is-a-function-to-the-function-type" ];
   check = asserts (
     nixpkgs wrapped == {
       success = true;

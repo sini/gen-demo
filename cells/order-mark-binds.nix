@@ -30,7 +30,7 @@
   mandateDeclined,
 }:
 {
-  construct = [ "C28" ];
+  construct = [ "order-mark-binds-a-declining-declaration" ];
   check = asserts (
     mandateBound.value == [ "fine" ]
     && mandateDeclined.value == [ "linen" ]

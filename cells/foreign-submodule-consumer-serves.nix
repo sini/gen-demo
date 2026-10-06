@@ -15,7 +15,7 @@
   lib,
 }:
 {
-  construct = [ "C126" ];
+  construct = [ "foreign-submodule-that-consumes-its-rebuild-serves" ];
   check = asserts (
     let
       seam = type: v: [

@@ -76,7 +76,7 @@ let
   } scope "hem";
 in
 {
-  construct = [ "C2" ];
+  construct = [ "edges-queried" ];
   check = asserts (
     map (a: {
       inherit (a) node value;

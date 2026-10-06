@@ -19,7 +19,7 @@
   flounceRealized,
 }:
 {
-  construct = [ "C22" ];
+  construct = [ "bounded-extent-peer-read" ];
   check = asserts (
     flounceRealized.notion.grommet == [ ]
     &&

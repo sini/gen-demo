@@ -22,7 +22,7 @@ let
   first = gore { nixso.boot.loader.grub.enable = false; };
 in
 {
-  construct = [ "C111" ];
+  construct = [ "aspect-bodys-first-level-is-a-closed-vocabulary" ];
   check = asserts (
     !(builtins.tryEval (builtins.deepSeq below.placket.nixso null)).success
     && below.placket.key == "gore/placket"

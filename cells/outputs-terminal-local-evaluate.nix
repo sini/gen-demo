@@ -12,7 +12,7 @@ let
   a = tasselTerminal.adapter;
 in
 {
-  construct = [ "C101" ];
+  construct = [ "outputs-terminal-over-a-consumers-own-evaluate" ];
   check = asserts (
     a.wrapUnit tasselBody [ ] == {
       tassel = 1;

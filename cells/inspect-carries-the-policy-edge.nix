@@ -8,7 +8,7 @@
   seamHead,
 }:
 {
-  construct = [ "C25" ];
+  construct = [ "graph-interrogated" ];
   check = asserts (
     {
       rule = map (e: "${e.label}:${e.src}:${e.dst}") (

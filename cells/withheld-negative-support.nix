@@ -20,7 +20,7 @@ let
   withheld = shirrPass1.resolve shirrHead;
 in
 {
-  construct = [ "C96" ];
+  construct = [ "growing-relation-withholds-a-negated-answer" ];
   check = asserts (
     withheld.flag == "P"
     && !(builtins.tryEval withheld.included).success

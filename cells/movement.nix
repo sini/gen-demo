@@ -7,7 +7,7 @@
   moved,
 }:
 {
-  construct = [ "C4" ];
+  construct = [ "movement" ];
   check = asserts (
     moved.value == [ "cambric" ]
     &&

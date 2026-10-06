@@ -3,7 +3,7 @@
 # encoder `mkIntensional` over a `basting` registry and `conservativeEq`.
 #
 # The five `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
-# `ci/refusals/row77-78.sh`):
+# `ci/refusals/intensional-encoders-two-throw-refusals.sh`):
 #   1. a registered construction DECIDES ONE TYPE AND KEYS NOTHING (den-hoag-6orb8 U1; den-hoag-hhki8):
 #      it carries no exact identity (no digest, so no key site keys on it), and its declared
 #      comparison subject carries the relation, not the name — one coordinate built twice is one
@@ -74,7 +74,7 @@ let
   decides = e: (builtins.tryEval e).success;
 in
 {
-  construct = [ "C56" ];
+  construct = [ "three-identity-regimes" ];
   check = asserts (
     # 1 — decided by the declared subject, keyed by nothing; the name decides nothing
     madder.name == woad.name

@@ -10,7 +10,7 @@
 # spelled-right twin is read beside it, so a reader refusing every module cannot pass.
 { asserts, genMerge }:
 {
-  construct = [ "C40" ];
+  construct = [ "declaration-read-refuses-module-syntax" ];
   check = asserts (
     let
       spoolOpt = genMerge.mkOption {

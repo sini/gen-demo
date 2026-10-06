@@ -86,7 +86,7 @@ let
   siteAspect = layered "site" (layered "consumer" frameworkAspect);
 in
 {
-  construct = [ "C166" ];
+  construct = [ "kind-inherits-a-same-named-kind-from-another-tree" ];
   check = asserts (
     opts consumerAspect == [
       "warp"

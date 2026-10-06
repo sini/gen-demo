@@ -30,7 +30,7 @@
   genValues,
 }:
 {
-  construct = [ "C16" ];
+  construct = [ "aspect-graph-assembled" ];
   check = asserts (
     # O1/O2 — the facts are a GRAPH, and they assemble; containment survives.
     #

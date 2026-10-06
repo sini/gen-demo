@@ -28,7 +28,7 @@
   thimbles,
 }:
 {
-  construct = [ "C18" ];
+  construct = [ "kinded-contribution" ];
   check = asserts (
     # O1 — WHOLE-RECORD EQUALITY, both paths, C1's own facts. Not a spot-check on one
     # field: `nodes`, `nodeOrder` and the registry itself all have to agree.

@@ -5,7 +5,7 @@
 # class-addressed crossing (none does).
 { asserts, crossingRealized }:
 {
-  construct = [ "C74" ];
+  construct = [ "addressed-class-crossing" ];
   check = asserts (
     crossingRealized.smocking.picot.extraModules == [ { adaptedFrom.stitch = "quilting"; } ]
     && crossingRealized.smocking.picot.modules == [ { stitch = "smocking"; } ]

@@ -81,7 +81,7 @@ let
   ref = read lib.evalModules;
 in
 {
-  construct = [ "C173" ];
+  construct = [ "redeclared-nesting-option-unions-its-modules-in-nixpkgs-order" ];
   check = asserts (
     lib.all (
       f:

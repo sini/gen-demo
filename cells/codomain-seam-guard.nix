@@ -101,7 +101,7 @@ let
   };
 in
 {
-  construct = [ "C81" ];
+  construct = [ "self-node-seam-guard-both-demand-paths" ];
   check = asserts (
     admitted.get "damask" "peer-ply" == 2
     && admitted.get "damask" "circular-peer-ply" == 2

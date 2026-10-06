@@ -70,7 +70,7 @@ let
   };
 in
 {
-  construct = [ "C154" ];
+  construct = [ "module-reads-its-module-view-as-nixpkgs-does" ];
   check = asserts (
     ref { } none == {
       keys = [

@@ -73,7 +73,7 @@ let
   intList = T.listOf T.int;
 in
 {
-  construct = [ "C204" ];
+  construct = [ "composite-type-is-one-type-wherever-it-is-built" ];
   check = asserts (
     # 1
     (T.listOf T.int).__mint ? minted

@@ -42,7 +42,7 @@ let
   decides = e: (builtins.tryEval (builtins.deepSeq e true)).success;
 in
 {
-  construct = [ "C79" ];
+  construct = [ "same-named-mkoptiontypes-one-construction" ];
   check = asserts (
     # two constructions: refused catchably, both orders, and with a back-edge under `description`
     !(decides (read [ slack taut ] 500))

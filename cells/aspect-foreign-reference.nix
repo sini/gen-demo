@@ -48,7 +48,7 @@
   genValues,
 }:
 {
-  construct = [ "C16b" ];
+  construct = [ "foreign-reference" ];
   check = asserts (
     # O6a — the reference is PUBLISHED, in the declaration's own shape. Structured, not
     # a rendered "mill/stitch": the qualifier is recoverable without re-splitting a

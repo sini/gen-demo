@@ -48,7 +48,7 @@ let
   };
 in
 {
-  construct = [ "C97" ];
+  construct = [ "aspect-containers-module-lists-unioned" ];
   check = asserts (
     read (stitch [
       first

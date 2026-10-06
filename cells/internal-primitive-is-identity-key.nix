@@ -12,7 +12,7 @@ let
   };
 in
 {
-  construct = [ "C60" ];
+  construct = [ "internal-primitive-is-an-identity-key" ];
   check = asserts (
     a.id_hash != (c60Brass {
       lot = "L-0418";

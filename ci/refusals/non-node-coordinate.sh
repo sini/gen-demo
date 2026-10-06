@@ -1,0 +1,33 @@
+# shellcheck shell=bash
+# ── row 91 -- a non-node coordinate is refused BY NAME, catchably, at gen-product's `fiber` and `slice`
+#    (den-hoag-qfcs3; ADR-0025 item 1) ──
+# `fiber` and `slice` checked that the DIMENSION was free but never that the fixed COORDINATE was a
+# node, so a stale or mistyped coordinate read as a clean empty fiber (`[ ]` at exit 0). They now pass
+# it through the same pointwise not-a-node door as `cell`. The unplanted arm fibers on a registry
+# entry and asserts a STDOUT VALUE, so a `fiber` that refused everything cannot pass it; the slice arm
+# fixes a real node and a non-node, and the refusal names the non-node's dim. Every addressing is
+# bound in the prelude: a `}` inside a `${row91/BODY/...}` replacement would end the expansion early.
+row_non_node_coordinate='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genProduct = gen.lib.substrate.product;
+  genGraph = gen.lib.substrate.graph;
+  factor = dim: registry: { inherit dim; graph = genGraph.fromRegistry { } (_: _: [ ]) registry; };
+  needles = { sharp = { id_hash = "sharp"; name = "sharp"; }; };
+  threads = { eye = { id_hash = "eye"; name = "eye"; }; };
+  blunt = { id_hash = "blunt"; name = "blunt"; };
+  space = genProduct.productN "cartesian" [ (factor "needle" needles) (factor "thread" threads) ];
+  sharpFiber = builtins.concatStringsSep "," (genProduct.fiber "needle" needles.sharp space).nodes;
+  bluntFiber = builtins.concatStringsSep "," (genProduct.fiber "needle" blunt space).nodes;
+  bluntSlice = builtins.concatStringsSep "," (genProduct.slice { needle = needles.sharp; thread = blunt; } space).nodes;
+  caught = if (builtins.tryEval (builtins.deepSeq bluntFiber null)).success then "ADMITTED" else "CAUGHT";
+in BODY'
+check "T5 non-node-coordinate unplanted (a registry entry fibers to its cells)" \
+  "${row_non_node_coordinate/BODY/sharpFiber}" 0 "" "$tmpdir/non-node-coordinate-green.err" '["eye"]'
+check "T5 non-node-coordinate planted   (a non-node fiber coordinate is refused by name)" \
+  "${row_non_node_coordinate/BODY/bluntFiber}" 1 \
+  "gen-product: not-a-node in dim 'needle' — blunt" "$tmpdir/non-node-coordinate-red.err"
+check "T5 non-node-coordinate slice     (a non-node slice coordinate is refused, naming its dim)" \
+  "${row_non_node_coordinate/BODY/bluntSlice}" 1 \
+  "gen-product: not-a-node in dim 'thread' — blunt" "$tmpdir/non-node-coordinate-slice.err"
+check "T5 non-node-coordinate catchable  (the refusal is caught by tryEval, not an empty fiber)" \
+  "${row_non_node_coordinate/BODY/caught}" 0 "" "$tmpdir/non-node-coordinate-catch.err" 'CAUGHT'

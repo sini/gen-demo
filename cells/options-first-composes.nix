@@ -40,7 +40,7 @@ let
   ];
 in
 {
-  construct = [ "C91" ];
+  construct = [ "doors-options-first-and-composed" ];
   check = asserts (
     walks upTo3 ends == [
       true

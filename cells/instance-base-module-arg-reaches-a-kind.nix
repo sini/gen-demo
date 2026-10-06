@@ -31,7 +31,7 @@
   c29Withheld,
 }:
 {
-  construct = [ "C29" ];
+  construct = [ "caller-supplied-base-module-arg" ];
   check = asserts (
     c29Supplied == "gimp"
     && c29Withheld == false

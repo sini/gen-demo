@@ -74,7 +74,7 @@ let
   satin.spool = "satin";
 in
 {
-  construct = [ "C108" ];
+  construct = [ "warm-walk-reads-where-a-module-set-sits" ];
   check = asserts (
     # a stock coercedTo over a container holds its instances one level below its position
     (plain (t.coercedTo t.str (s: [ { spool = s; } ]) (t.listOf spool)) "silk" "satin").served

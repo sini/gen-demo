@@ -13,7 +13,7 @@
 }:
 
 {
-  construct = [ "C151" ];
+  construct = [ "thunks-fn-is-read-as-nixpkgs-reads-a-function" ];
   check = asserts (
     hemResolved [
       hemReads

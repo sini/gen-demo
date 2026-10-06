@@ -54,7 +54,7 @@ let
       );
 in
 {
-  construct = [ "C89" ];
+  construct = [ "quotients-answer-says-what-it-is" ];
   check = asserts (
     r.getRepresentative "loom" "weave" == {
       _type = "gen-scope/quotient-representative";

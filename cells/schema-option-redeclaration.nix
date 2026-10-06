@@ -46,7 +46,7 @@ let
   facet = facetOf 0;
 in
 {
-  construct = [ "C78" ];
+  construct = [ "schema-option-redeclared-one-construction" ];
   check = asserts (
     # one value declared twice, and two calls: one construction, read through both
     builtins.elem "strict" (kinds [

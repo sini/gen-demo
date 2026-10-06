@@ -47,7 +47,7 @@ let
   ) genMerge.mkOption genMerge.mkIf genMerge.types genMerge.mkOption;
 in
 {
-  construct = [ "C127" ];
+  construct = [ "list-element-is-named-as-nixpkgs-listof-names-it" ];
   check = asserts (
     nixpkgs == [
       "[definition 1-entry 2]"

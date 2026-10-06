@@ -8,7 +8,7 @@
   c195Disagreeing,
 }:
 {
-  construct = [ "C195" ];
+  construct = [ "attrs-serves-a-key-its-definitions-agree-on" ];
   check = asserts (
     # agreeing
     c195Agreeing == {

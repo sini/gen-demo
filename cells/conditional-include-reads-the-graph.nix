@@ -12,7 +12,7 @@
 }:
 
 {
-  construct = [ "C200" ];
+  construct = [ "conditional-include-whose-condition-reads-the-graph" ];
   check = asserts (
     c200Hem == "hem-pewter" && c200Trim == [ "trimmed" ] && c200Trim == c200TrimControl
   );

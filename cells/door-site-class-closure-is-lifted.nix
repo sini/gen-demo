@@ -11,7 +11,7 @@
   c202Hem,
 }:
 {
-  construct = [ "C202" ];
+  construct = [ "class-closure-a-doors-output-writes-is-lifted" ];
   check = asserts (
     c202Seam == [ "seam-pewter-spool-P" ]
     && c202Tack == [ "tack-spool" ]

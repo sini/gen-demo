@@ -13,7 +13,7 @@
   c87TipType,
 }:
 {
-  construct = [ "C87" ];
+  construct = [ "field-holding-a-declaration-written-either-way" ];
   check = asserts (
     c87Lacets.byName.tip.id_hash == c87Aglets.gilt.id_hash
     && c87Lacets.byValue.tip.id_hash == c87Aglets.gilt.id_hash

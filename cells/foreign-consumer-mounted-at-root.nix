@@ -14,7 +14,7 @@
   lib,
 }:
 {
-  construct = [ "C144" ];
+  construct = [ "foreign-consumer-is-mounted-at-its-root-as-nixpkgs-does" ];
   check = asserts (
     let
       seam = type: v: [

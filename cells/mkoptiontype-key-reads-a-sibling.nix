@@ -51,7 +51,7 @@ let
   ];
 in
 {
-  construct = [ "C196" ];
+  construct = [ "key-reads-a-sibling-of-its-own-option" ];
   check = asserts (
     served == {
       a = 1;

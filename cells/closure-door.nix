@@ -11,7 +11,7 @@
   c142PleatDefeated,
 }:
 {
-  construct = [ "C142" ];
+  construct = [ "closure-door" ];
   check = asserts (
     (c142HemNode.__guard or false)
     && c142HemNode.body.__bodyTerm == "Ref"

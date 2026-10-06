@@ -12,7 +12,7 @@ let
   nodes = includeProjection.nodes;
 in
 {
-  construct = [ "C113" ];
+  construct = [ "node-receives-what-its-aspects-include" ];
   check = asserts (
     builtins.attrNames nodes.probe.classes == [ "nixos" ]
     && builtins.length nodes.probe.classes.nixos == 2

@@ -8,7 +8,7 @@
   shapeResetFold,
 }:
 {
-  construct = [ "C13" ];
+  construct = [ "foldlayers" ];
   check = asserts (
     dottedFold == {
       "a.b" = "literal";

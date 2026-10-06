@@ -25,7 +25,7 @@ let
   ok = v: (builtins.tryEval (builtins.deepSeq v true)).success;
 in
 {
-  construct = [ "C172" ];
+  construct = [ "guard-carrier-merges-by-the-module-law" ];
   check = asserts (
     !(ok (fire [
       (always { description = "a"; })

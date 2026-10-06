@@ -55,7 +55,7 @@ let
   docs = type: (type.getSubOptions [ "seam" ]).weft.default;
 in
 {
-  construct = [ "C143" ];
+  construct = [ "gen-submodule-names-its-position-as-nixpkgs-does" ];
   check = asserts (
     mounted (ref [ ] { }) == "warp"
     && warp (bobbin [ ] { }) == mounted (ref [ ] { })

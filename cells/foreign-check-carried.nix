@@ -23,7 +23,7 @@ let
   };
 in
 {
-  construct = [ "C110" ];
+  construct = [ "check-nixpkgs-states-over-a-gen-type-is-carried" ];
   check = asserts (
     refused short 5
     && read short 2 == 2

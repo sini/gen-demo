@@ -18,7 +18,7 @@
   selvageResolved,
 }:
 {
-  construct = [ "C14" ];
+  construct = [ "closed-body-term-algebra" ];
   check = asserts (
     selvageResolved == {
       __crossingResult = "ok";

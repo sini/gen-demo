@@ -3,7 +3,7 @@
 # C13 — `foldLayers`: all three strategies plus the default channel in one call.
 { asserts, folded }:
 {
-  construct = [ "C13" ];
+  construct = [ "foldlayers" ];
   check = asserts (
     folded == {
       gauge = "fine";

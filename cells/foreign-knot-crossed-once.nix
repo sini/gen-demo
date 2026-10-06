@@ -41,7 +41,7 @@ let
   );
 in
 {
-  construct = [ "C150" ];
+  construct = [ "foreign-knot-crosses-a-gen-door-once" ];
   check = asserts (
     native (genMerge.mkOptionType (once (x: x))) == value
     && read lib.evalModules lib.mkOption (genMerge.mkOptionType (once (x: x))) == value

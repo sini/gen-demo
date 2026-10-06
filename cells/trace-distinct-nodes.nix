@@ -15,7 +15,7 @@
   pkgs,
 }:
 {
-  construct = [ "C98" ];
+  construct = [ "distinct-nodes-stay-distinct-in-the-trace" ];
   check = asserts (
     let
       placement = genView.placement.place {

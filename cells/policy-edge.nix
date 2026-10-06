@@ -7,7 +7,7 @@
   pipingHead,
 }:
 {
-  construct = [ "C5" ];
+  construct = [ "policy-program" ];
   check = asserts (
     (mdl.resolve pipingHead).included == true
     && mdl.adjudication.outcome == "admitted"

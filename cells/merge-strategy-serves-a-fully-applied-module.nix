@@ -14,7 +14,7 @@ let
 in
 
 {
-  construct = [ "C161" ];
+  construct = [ "merge-strategy-serves-a-fully-applied-module" ];
   check = asserts (
     sw.out == "linen"
     && sw.warnings == [ "gen-bind: binding 'spool' collision — system-wins, binding value dropped" ]

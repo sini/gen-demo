@@ -93,7 +93,7 @@ let
   refuses = x: !(builtins.tryEval (builtins.deepSeq x null)).success;
 in
 {
-  construct = [ "C139" ];
+  construct = [ "gen-typed-option-renders-nixpkgs-docs-phrase" ];
   check = asserts (
     shown (shapes G genMerge.mkOption) == shown (shapes N lib.mkOption)
     && builtins.isString bobbin.description

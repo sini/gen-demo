@@ -90,7 +90,7 @@ let
     }).value;
 in
 {
-  construct = [ "C132" ];
+  construct = [ "one-crossing-id-declared-at-two-sites-refuses" ];
   check = asserts (
     outcome (ops.merge (link linen) (link wool)) == 2
     && outcome (ops.merge (link linen) (link linen)) == 1

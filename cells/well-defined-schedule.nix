@@ -8,6 +8,6 @@
   gated,
 }:
 {
-  construct = [ "C7" ];
+  construct = [ "well-definedness-gate" ];
   check = asserts (gated.equations == { } && builtins.attrNames gated == [ "equations" ]);
 }

@@ -18,7 +18,7 @@ let
   };
 in
 {
-  construct = [ "C80" ];
+  construct = [ "foreign-type-is-not-the-type-it-is-named-after" ];
   check = builtins.seq _intern (
     asserts (
       let

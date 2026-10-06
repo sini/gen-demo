@@ -12,7 +12,7 @@
 # distinct values mint apart.
 { asserts, inputs }:
 {
-  construct = [ "C53" ];
+  construct = [ "store-paths-string-mints-as-its-text" ];
   check = asserts (
     let
       mint = inputs.gen.lib.substrate.identity.hashIdentity;

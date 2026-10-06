@@ -36,7 +36,7 @@ let
       )).config.weft;
 in
 {
-  construct = [ "C188" ];
+  construct = [ "option-declared-in-many-modules-keeps-its-shadow-order-and-its-admission" ];
   check = asserts (
     many.config.weave == "twill"
     &&

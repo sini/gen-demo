@@ -6,7 +6,7 @@
 # that saw it), or folds the producers into the node record.
 { asserts, c189Minted }:
 {
-  construct = [ "C189" ];
+  construct = [ "collapsed-diamonds-producers-stay-recoverable" ];
   check = asserts (
     builtins.attrNames c189Minted.nodes == [
       "eyelet"

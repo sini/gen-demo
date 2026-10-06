@@ -28,7 +28,7 @@ let
     )).config.aspects.svc.priority;
 in
 {
-  construct = [ "C171" ];
+  construct = [ "kind-entry-def-that-is-a-function-or-a-path-lands" ];
   check = asserts (
     priorityOf [ ({ ... }: { priority = 7; }) ] == 7
     && priorityOf [ ({ ... }: { config.priority = 7; }) ] == 7

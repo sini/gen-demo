@@ -11,7 +11,7 @@
   c26BareMkTypeNoInheritHasGrade,
 }:
 {
-  construct = [ "C26" ];
+  construct = [ "kind-inheritance-resolves-a-value" ];
   check = asserts (
     c26BareMkTypeGrade == "waxed"
     && c26BareMkTypeInherits == [ "notch" ]

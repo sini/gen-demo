@@ -30,7 +30,7 @@ let
   combined = attempt (read [ "warp" ] [ "weft" ]);
 in
 {
-  construct = [ "C62" ];
+  construct = [ "check-only-mkoptiontype-merges-by-the-default" ];
   check = asserts (
     combined.success
     &&

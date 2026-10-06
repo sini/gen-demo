@@ -11,7 +11,9 @@
   sharedEvalFanOut,
 }:
 {
-  construct = [ "C186" ];
+  construct = [
+    "shared-instances-are-delivered-under-the-delivery-class-map-named-beside-their-content"
+  ];
   check = asserts (
     sharedEvalFanOut {
       t1 = "t1";

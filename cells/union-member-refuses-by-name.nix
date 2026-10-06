@@ -12,7 +12,7 @@
 # is `refusals` row 43's.
 { asserts, genMerge }:
 {
-  construct = [ "C48" ];
+  construct = [ "union-member-that-is-not-a-checker" ];
   check = asserts (
     let
       at =

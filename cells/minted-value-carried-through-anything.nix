@@ -37,7 +37,7 @@ let
   };
 in
 {
-  construct = [ "C121" ];
+  construct = [ "minted-value-is-carried-whole-through-anything" ];
   check = asserts (
     schema.kindEq k (carried T.anything k)
     && schema.kindEq k (carried (T.attrsOf T.anything) { x = k; }).x

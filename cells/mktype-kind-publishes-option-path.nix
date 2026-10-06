@@ -32,7 +32,7 @@ let
   echoesRight = selvageBy ({ kind, ... }: resultWith { inherit kind; });
 in
 {
-  construct = [ "C68" ];
+  construct = [ "mktype-kind-publishes-its-option-path" ];
   check = asserts (
     # the omitting arm publishes the option path, and the instance type admits it
     omits.kind == "selvage"

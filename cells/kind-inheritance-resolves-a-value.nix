@@ -18,7 +18,7 @@
   genValues,
 }:
 {
-  construct = [ "C26" ];
+  construct = [ "kind-inheritance-resolves-a-value" ];
   check = asserts (
     genValues.darts.chambray.grade == "waxed"
     && genValues.darts.chambray.bevel == "shallow"

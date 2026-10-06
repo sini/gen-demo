@@ -55,7 +55,7 @@
   genValues,
 }:
 {
-  construct = [ "C17" ];
+  construct = [ "option-set-closure" ];
   check = asserts (
     c17Pewter.shirring == "gathered"
     && c17Pewter.id_hash == "thimble:e97ed5398df4580d9609e406c34604d4d421bf7c5ed0d92ce6e68405c534ca80"

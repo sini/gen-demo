@@ -35,7 +35,7 @@ let
   };
 in
 {
-  construct = [ "C141" ];
+  construct = [ "gen-aspects-guard-is-a-first-order-term" ];
   check = asserts (
     (gv.applyGuard { thimble = "pewter"; } c141Tuck).description == "tuck-pewter"
     && dv.applyGuard { bobbin = "damask"; } closed.tuck == null

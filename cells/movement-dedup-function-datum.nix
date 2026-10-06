@@ -15,7 +15,7 @@
   noFalseDedup,
 }:
 {
-  construct = [ "C38" ];
+  construct = [ "function-bearing-datum-dedups-by-equality" ];
   check = asserts (
     builtins.length collisionModules.contributions == 2
     && builtins.length collisionModules.dropped == 1

@@ -13,7 +13,7 @@
   basteUnsafeChecked,
 }:
 {
-  construct = [ "C137" ];
+  construct = [ "one-first-order-term-algebra" ];
   check = asserts (
     basteChecked ? right
     && basteFired == { right.description = "baste-brass"; }

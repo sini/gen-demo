@@ -72,7 +72,7 @@ let
   gg = read "gen" gmS.union gmS.union;
 in
 {
-  construct = [ "C179" ];
+  construct = [ "mixed-union-redeclaration-has-nixpkgs-declared-type-record-in-either-order" ];
   check = asserts (
     lib.all
       (

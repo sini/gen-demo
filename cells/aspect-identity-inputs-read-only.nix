@@ -132,6 +132,6 @@ let
     && lib.hasPrefix "loom/includes/heddle@" (builtins.head hr.heddle);
 in
 {
-  construct = [ "C182" ];
+  construct = [ "aspects-identity-is-its-declared-path-not-name-or-its-chain" ];
   check = asserts (n1 && n2 && n3 && n4 && n5 && n6);
 }

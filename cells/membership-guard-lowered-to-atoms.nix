@@ -24,7 +24,7 @@ let
   dart = cyclePass.resolve "dart:bolt";
 in
 {
-  construct = [ "C105" ];
+  construct = [ "within-pass-conditional-edge-guard-as-data" ];
   check = asserts (
     settledPass.adjudication.outcome == "admitted"
     && settledAnswers settledPass

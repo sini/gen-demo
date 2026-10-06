@@ -21,7 +21,7 @@ let
   node = seamPromotion.nodes.${seamHead};
 in
 {
-  construct = [ "C5" ];
+  construct = [ "policy-program" ];
   check = asserts (
     builtins.attrNames seamPromotion.nodes == [ seamHead ]
     && node ? identity

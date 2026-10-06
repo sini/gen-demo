@@ -83,7 +83,7 @@ let
     };
 in
 {
-  construct = [ "C11" ];
+  construct = [ "federated-packaged-subgraph" ];
   check = asserts (
     (resolve (sealAt requirer)).compute self requirer == null
     &&

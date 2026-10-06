@@ -15,7 +15,7 @@ let
   };
 in
 {
-  construct = [ "C75" ];
+  construct = [ "cross-instance-nixpkgs-type-decides" ];
   check = builtins.seq _intern (
     asserts (
       let

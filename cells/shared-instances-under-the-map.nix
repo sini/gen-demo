@@ -18,7 +18,9 @@ let
   tuckOf = n: builtins.head sharedEvalRel.reaches.${n}.tuck;
 in
 {
-  construct = [ "C186" ];
+  construct = [
+    "shared-instances-are-delivered-under-the-delivery-class-map-named-beside-their-content"
+  ];
   check = asserts (
     sharedEvalRealized == {
       couching-batiste = {

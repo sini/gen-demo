@@ -80,7 +80,7 @@ let
   };
 in
 {
-  construct = [ "C148" ];
+  construct = [ "owned-module-key-re-declared-takes-nixpkgs-value" ];
   check = asserts (
     ref.leaf (_: { }) == [
       2

@@ -58,7 +58,7 @@ let
   gg = read "gen" gmS.list gmS.list;
 in
 {
-  construct = [ "C170" ];
+  construct = [ "mixed-container-redeclaration-has-nixpkgs-declared-type-record-in-either-order" ];
   check = asserts (
     lib.all
       (

@@ -3,7 +3,7 @@
 # through the SAME `rewrite.originStamp` lookup `frayed-dangling-includes-refused.nix` exercises on
 # the anonymous-`{ }` form — this cell mirrors that one's convention exactly, one shape substituted
 # for the other. `frayedBareString` links alone, never joining the mill/loom federation's sources,
-# for the same isolation reason `frayed` is kept apart (its declaration in `constructs/c11.nix`).
+# for the same isolation reason `frayed` is kept apart (its declaration in `constructs/federated-packaged-subgraph.nix`).
 {
   asserts,
   frayedBareString,

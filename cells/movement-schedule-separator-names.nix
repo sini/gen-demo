@@ -15,7 +15,7 @@
   genScope,
 }:
 {
-  construct = [ "C49" ];
+  construct = [ "schedule-over-separator-bearing-names" ];
   check = asserts (
     let
       scheduleWith =

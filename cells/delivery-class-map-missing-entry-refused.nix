@@ -11,7 +11,7 @@ let
   forces = v: (builtins.tryEval (builtins.deepSeq v v)).success;
 in
 {
-  construct = [ "C118" ];
+  construct = [ "one-projection-realizes-on-two-pins" ];
   check = asserts (
     !(forces couchingMissingRealized)
     && forces couchingRealized

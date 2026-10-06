@@ -12,7 +12,7 @@
   minted,
 }:
 {
-  construct = [ "C3" ];
+  construct = [ "binding-node" ];
   check = asserts (
     builtins.attrNames minted.nodes == [
       "basting:pewter:grosgrain"

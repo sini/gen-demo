@@ -13,7 +13,7 @@ let
 in
 
 {
-  construct = [ "C160" ];
+  construct = [ "merge-strategy-serves-the-value-its-warning-describes" ];
   check = asserts (
     sw.out == "linen"
     && sw.warnings == [ "gen-bind: binding 'spool' collision — system-wins, binding value dropped" ]

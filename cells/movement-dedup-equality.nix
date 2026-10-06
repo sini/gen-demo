@@ -27,7 +27,7 @@
   noFalseDedup,
 }:
 {
-  construct = [ "C4b" ];
+  construct = [ "element-identity" ];
   check = asserts (
     builtins.length collisionDeduped.contributions == 1
     && builtins.length collisionDeduped.dropped == 2

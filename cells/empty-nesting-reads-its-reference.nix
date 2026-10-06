@@ -13,7 +13,7 @@
 # definition.
 { asserts, genMerge }:
 {
-  construct = [ "C42" ];
+  construct = [ "discharged-nesting-option-reads-its-reference" ];
   check = asserts (
     let
       selvage = genMerge.types.submodule {

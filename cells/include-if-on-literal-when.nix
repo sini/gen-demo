@@ -40,7 +40,7 @@ let
     ];
 in
 {
-  construct = [ "C177" ];
+  construct = [ "den-v1s-includeif-on-the-literal-when-tier" ];
   check = asserts (
     includeIfPass.adjudication.outcome == "admitted"
     && settled includeIfPass

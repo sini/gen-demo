@@ -27,7 +27,7 @@
   c21NoInheritInstance,
 }:
 {
-  construct = [ "C21" ];
+  construct = [ "relocation-its-deprecated-spelling-aliased" ];
   check = asserts (
     c21NoInheritInstance._identityKeys != c21RelocatedInstance._identityKeys
     # ★ AND THE INSTRUMENT IS THE CORPUS'S, ASSERTED RATHER THAN DOCUMENTED. Strip the inheritance

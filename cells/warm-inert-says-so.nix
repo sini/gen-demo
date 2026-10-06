@@ -10,7 +10,7 @@
 # set `inert` without the reuse set agreeing could not pass.
 { asserts, fnWarm }:
 {
-  construct = [ "C33" ];
+  construct = [ "warm-run-that-reuses-nothing-says-so" ];
   check = asserts (
     (fnWarm.trace.mode or null) == "warm"
     && (fnWarm.trace.inert or null) == true

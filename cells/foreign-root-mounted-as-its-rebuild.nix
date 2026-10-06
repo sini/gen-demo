@@ -16,7 +16,7 @@
   lib,
 }:
 {
-  construct = [ "C152" ];
+  construct = [ "foreign-root-is-mounted-as-its-rebuild-before-any-read" ];
   check = asserts (
     let
       seam = type: v: [

@@ -23,7 +23,8 @@
       #
       # The ROOT flake's inputs are declared too, because `refusals` evaluates that flake and so reads
       # them: `cells/`, `constructs/`, `fixtures/` (read by cells), `gen-modules/`, `aspect-cnf.nix`,
-      # `README.md` (the `construct-index` cell) and the flake itself. An untracked cell is absent
+      # `index/`, `legacy-ids.nix` and `README.md` (the `construct-index` cell; the pairing cell reads
+      # `legacy-ids.nix` too) and the flake itself. An untracked cell is absent
       # from every `nix flake check`, so without these a failing one reads green under every command.
       readRoots = [
         ./refusals
@@ -34,6 +35,8 @@
         ../fixtures
         ../gen-modules
         ../aspect-cnf.nix
+        ../index
+        ../legacy-ids.nix
         ../README.md
         ../flake.nix
         ../flake.lock

@@ -21,7 +21,7 @@ let
   short = lib.types.addCheck genMerge.types.int (n: n < 3);
 in
 {
-  construct = [ "C117" ];
+  construct = [ "wrapped-value-declared-twice-keeps-its-check" ];
   check = asserts (
     read [ short short ] 2 == 2
     && refused [ short short ] 5

@@ -12,7 +12,7 @@
   selvageProvides,
 }:
 {
-  construct = [ "C11" ];
+  construct = [ "federated-packaged-subgraph" ];
   check = asserts (
     selvageProvides == [
       "warp"

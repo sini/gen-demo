@@ -48,7 +48,7 @@ let
   decided = e: (builtins.tryEval e).success;
 in
 {
-  construct = [ "C115" ];
+  construct = [ "twin-aspect-kinds-over-one-shared-mktype-are-one-kind" ];
   check = asserts (
     schema.kindEq (aspectKind 1) (aspectKind 2)
     && schema.kindEq (selvage shaped) (selvage shaped)

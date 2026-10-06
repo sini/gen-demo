@@ -12,7 +12,7 @@
   shareClasses,
 }:
 {
-  construct = [ "C9" ];
+  construct = [ "share-class" ];
   check = asserts (
     map (c: c.key) shareClasses == [
       "plain"

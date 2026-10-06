@@ -31,7 +31,7 @@ let
   refused = v: !(builtins.tryEval (builtins.deepSeq v true)).success;
 in
 {
-  construct = [ "C52" ];
+  construct = [ "cycle-named-by-its-walk-over-nodes-only" ];
   check = asserts (
     genGraph.cycles g == [
       "hem"

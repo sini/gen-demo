@@ -267,6 +267,6 @@ let
   f7 = (run { member = "loomTS"; }).marks == loomT.marks;
 in
 {
-  construct = [ "C198" ];
+  construct = [ "nested-include-fans-out-over-the-containment-descendants" ];
   check = asserts (f1 && f2 && f3 && f4 && f5 && f6 && f7);
 }

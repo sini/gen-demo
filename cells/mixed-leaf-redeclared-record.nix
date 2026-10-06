@@ -94,7 +94,7 @@ let
       ];
 in
 {
-  construct = [ "C183" ];
+  construct = [ "mixed-leaf-redeclaration-has-nixpkgs-declared-type-record-in-either-order" ];
   check = asserts (
     lib.all (c: lib.all (r: r == c.twin) c.mixed && !(lib.hasInfix "G" c.twin.spine)) rows
     && lib.all (c: lib.hasInfix "G" c.gg.spine) rows

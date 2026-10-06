@@ -29,7 +29,7 @@ let
   refuses = e: !(builtins.tryEval (builtins.deepSeq e null)).success;
 in
 {
-  construct = [ "C106" ];
+  construct = [ "stock-container-over-a-gen-tree-serves" ];
   check = asserts (
     linings (lib.types.listOf liningTree) [
       { weave = "twill"; }

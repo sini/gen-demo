@@ -6,7 +6,7 @@
 # with its `nestedTypes` stripped offers the element in its payload alone and is refused by name
 # (OQ1 arm (ii-a)), and one whose payload element differs from the one it states is refused by name
 # (OQ2 arm (b)); both defaulted, reversible. `tryEval` cannot read which throw it caught, so this cell
-# holds that each is CAUGHT and T5 row 119 (`ci/refusals/row119.sh`) holds each refusal's NAME, with
+# holds that each is CAUGHT and T5 row 119 (`ci/refusals/nesting-planes-two-refusals.sh`) holds each refusal's NAME, with
 # the door and the option.
 {
   asserts,
@@ -42,7 +42,7 @@ let
   wound = [ { turns = 3; } ];
 in
 {
-  construct = [ "C103" ];
+  construct = [ "nesting-plane-reads-no-payload" ];
   check = asserts (
     # the element stated at the top level is read: the container threads as gen's `listOf`
     read topOnly wound == wound

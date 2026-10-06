@@ -63,7 +63,7 @@ let
   wool = registered "weft.nix" (_: "wool");
 in
 {
-  construct = [ "C104" ];
+  construct = [ "crossings-binding-relatum-is-its-minted-key" ];
   check = asserts (
     (nodeOf linen).binding == mint "binding" [ "key" "value" ] (
       l: if l == "key" then "bobbin" else mint "thread" [ "name" ] (_: "cotton")

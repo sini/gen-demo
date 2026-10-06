@@ -21,7 +21,7 @@
 }:
 
 {
-  construct = [ "C201" ];
+  construct = [ "closure-under-a-property-wrapper" ];
   check = asserts (
     c201Registrations == 7
     && c201Hem.atPewter == { description = "hem-pewter"; }

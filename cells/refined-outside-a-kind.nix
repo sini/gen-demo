@@ -21,7 +21,7 @@ let
   refused = type: v: !(builtins.tryEval (builtins.deepSeq (read type v) null)).success;
 in
 {
-  construct = [ "C131" ];
+  construct = [ "refined-option-outside-a-kind-refuses" ];
   check = asserts (
     read spool 4 == 4
     && read (T.listOf spool) [ 4 ] == [ 4 ]

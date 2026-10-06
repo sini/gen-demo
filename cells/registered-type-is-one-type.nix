@@ -54,7 +54,7 @@ let
   };
 in
 {
-  construct = [ "C165" ];
+  construct = [ "registered-type-is-one-type" ];
   check = asserts (
     # 1 — the term keys nothing
     !(genAlgebra.isExact (genAlgebra.identityOf (stitch narrow)))

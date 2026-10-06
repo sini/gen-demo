@@ -49,7 +49,7 @@ let
   ];
 in
 {
-  construct = [ "C122" ];
+  construct = [ "redeclared-nixpkgs-submodule-completes-its-halves" ];
   check = asserts (
     gen halves == {
       warp = 2;

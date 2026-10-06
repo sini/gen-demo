@@ -36,7 +36,7 @@ let
   fileTypes = defs: map (d: builtins.typeOf d.file) defs;
 in
 {
-  construct = [ "C180" ];
+  construct = [ "path-module-is-identified-by-its-own-key" ];
   check = asserts (
     (native ab).config.warp == [ 1 ]
     && (nixpkgs ab).config.warp == [ 1 ]

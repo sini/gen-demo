@@ -37,7 +37,7 @@ let
     && read type "selvedge" == "selvedge";
 in
 {
-  construct = [ "C119" ];
+  construct = [ "unrecognised-container-threads-to-a-nested-tree" ];
   check = asserts (
     answers lib.types.uniq
     && answers (lib.types.coercedTo lib.types.bool (_: null))

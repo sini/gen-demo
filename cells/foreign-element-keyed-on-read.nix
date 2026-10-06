@@ -56,6 +56,6 @@ let
   holds = w: (gen w).k == (nixpkgs w).k && refuses (gen w) && refuses (nixpkgs w);
 in
 {
-  construct = [ "C147" ];
+  construct = [ "foreign-element-is-keyed-where-it-is-read" ];
   check = asserts (holds wrappers.coercedTo && holds wrappers.uniq);
 }

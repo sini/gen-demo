@@ -9,7 +9,7 @@
 }:
 
 {
-  construct = [ "C175" ];
+  construct = [ "refusal-value-at-an-aspect-position-is-refused-by-name" ];
   check = asserts (
     c175Refused == {
       escapeInIncludes = true;

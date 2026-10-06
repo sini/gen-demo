@@ -1,0 +1,28 @@
+# shellcheck shell=bash
+# ── row 90 -- a non-node coordinate under gen-product's DEFAULT codec is refused BY NAME, catchably,
+#    at `cell` (den-hoag-i25f; ADR-0025 item 1) ──
+# A factor spec that gives neither `key` nor `entryOf` takes gen-product's defaults: `key` reads
+# `id_hash`, `entryOf` is the graph's `nodeData`. Over gen-graph's `fromRegistry` that lookup is
+# total (`{ }` on an unknown id), so a non-node used to abort inside the default `key`
+# (`attribute 'id_hash' missing`, which `tryEval` cannot contain) instead of reaching gen-product's
+# not-a-node refusal. The unplanted arm addresses a registry entry through the same product and
+# asserts a STDOUT VALUE, so a `cell` that refused everything cannot pass it. Both addressings are
+# bound in the prelude: a `}` inside a `${row90/BODY/...}` replacement would end the expansion early.
+row_non_node_coordinate_under_gen_products_default_codec='let
+  gen = (builtins.getFlake (toString ./.)).inputs.gen;
+  genProduct = gen.lib.substrate.product;
+  genGraph = gen.lib.substrate.graph;
+  reg = { sharp = { id_hash = "sharp"; name = "sharp"; }; };
+  needle = { dim = "needle"; graph = genGraph.fromRegistry { } (_: _: [ ]) reg; };
+  space = genProduct.productN "cartesian" [ needle ];
+  sharp = genProduct.cell { needle = reg.sharp; } space;
+  blunt = genProduct.cell { needle = { id_hash = "blunt"; name = "blunt"; }; } space;
+in BODY'
+check "T5 non-node-coordinate-under-gen-products-default-codec unplanted (a registry entry addresses under the default codec)" \
+  "${row_non_node_coordinate_under_gen_products_default_codec/BODY/sharp}" 0 "" "$tmpdir/non-node-coordinate-under-gen-products-default-codec-green.err" '["sharp"]'
+check "T5 non-node-coordinate-under-gen-products-default-codec planted   (a non-node under the default codec is refused by name)" \
+  "${row_non_node_coordinate_under_gen_products_default_codec/BODY/blunt}" 1 \
+  "gen-product: not-a-node in dim 'needle' — blunt" "$tmpdir/non-node-coordinate-under-gen-products-default-codec-red.err"
+check "T5 non-node-coordinate-under-gen-products-default-codec catchable  (the refusal is caught by tryEval, not an abort)" \
+  "${row_non_node_coordinate_under_gen_products_default_codec/BODY/if (builtins.tryEval (builtins.deepSeq blunt null)).success then \"ADMITTED\" else \"CAUGHT\"}" \
+  0 "" "$tmpdir/non-node-coordinate-under-gen-products-default-codec-catch.err" 'CAUGHT'

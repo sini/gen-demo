@@ -13,7 +13,7 @@ let
   forces = v: (builtins.tryEval (builtins.deepSeq v v)).success;
 in
 {
-  construct = [ "C109" ];
+  construct = [ "declared-content-addressed-to-a-class-with-no-terminal" ];
   check = asserts (
     !(forces undeliveredRealized.crewel)
     && !(forces (undeliveredRealized.sashiko or "absent"))

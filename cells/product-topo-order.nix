@@ -32,7 +32,7 @@ let
   sorted = sort (a: b: a < b);
 in
 {
-  construct = [ "C12" ];
+  construct = [ "derived-product-graph-policy-stratum-promotion" ];
   check = asserts (
     result.ok
     # membership: the order is a permutation of the product's cells

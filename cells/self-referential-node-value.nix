@@ -90,7 +90,7 @@ let
   ];
 in
 {
-  construct = [ "C66" ];
+  construct = [ "self-referential-node-value-memoised" ];
   check = asserts (
     read (warm selfReferential).store == [
       211

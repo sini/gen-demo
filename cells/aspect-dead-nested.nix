@@ -15,7 +15,7 @@ let
   cnf = import ../aspect-cnf.nix;
 in
 {
-  construct = [ "C16" ];
+  construct = [ "aspect-graph-assembled" ];
   # `or null`: a gen-aspects that does not publish the view reds this cell, not every check.
   check = asserts (
     (c16Facts.deadNested or null) == [

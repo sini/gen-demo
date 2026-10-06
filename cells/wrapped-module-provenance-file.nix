@@ -9,7 +9,7 @@
 # threading that moved the merge itself could not pass on the provenance alone.
 { asserts, genMerge }:
 {
-  construct = [ "C34" ];
+  construct = [ "wrapped-module-keeps-its-importers-file" ];
   check = asserts (
     let
       r = genMerge.evalModuleTree { } [

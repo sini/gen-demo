@@ -17,7 +17,7 @@
   lib,
 }:
 {
-  construct = [ "C164" ];
+  construct = [ "gen-door-record-is-mounted-as-its-rebuild" ];
   check = asserts (
     let
       seam = mkOption: type: v: [

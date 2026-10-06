@@ -10,6 +10,6 @@
 # leaves the union cell below green.
 { asserts, c23Undefined }:
 {
-  construct = [ "C23" ];
+  construct = [ "attrs-is-a-nullary-container-strategy" ];
   check = asserts (c23Undefined == { });
 }

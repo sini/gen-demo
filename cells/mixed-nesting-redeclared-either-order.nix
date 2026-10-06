@@ -67,7 +67,7 @@ let
     ];
 in
 {
-  construct = [ "C167" ];
+  construct = [ "mixed-nesting-redeclaration-serves-in-either-order" ];
   check = asserts (
     lib.all
       (

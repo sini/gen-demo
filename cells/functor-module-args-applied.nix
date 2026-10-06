@@ -29,7 +29,7 @@ let
   ) genMerge.mkOption genMerge.types;
 in
 {
-  construct = [ "C135" ];
+  construct = [ "functor-module-is-applied-by-its-formals" ];
   check = asserts (
     nixpkgs (withArgs wrapped) == "from-module-args"
     && native (withArgs wrapped) == nixpkgs (withArgs wrapped)

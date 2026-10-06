@@ -1,0 +1,5 @@
+{
+  title = "an aspect instance points at its declaration";
+  adr = "0010 §4(a), 0016, den-hoag-bgeum";
+  what = "`aspect-instantiation-edge`: under `entityKinds = { loom = true; shuttle = true; }`, read through gen-aspects' `instancesFor`, each instance carries an `instantiates` edge to its declaration (van Antwerpen 2018's `I` edge) and no `aspect` field: `selvage`'s `nixos` class key reads through `reaches` and the entry while its `trim`, whose projection path is missing, refuses only at its own read; gen-scope `resolve` over `instantiates` then `includes` from `selvage`'s instance answers the declaration's resolved members `heddle`, `hem` and `pick` (control: `includes` from static `frame`); and along every nested edge the child's substitution restricts its parent's meet with the reading node, with nested edges present and `heddle`, reading the scope-supplied `shuttle` its parent does not read, minted at that meet as the one vertex the scope reaching it directly mints (den-hoag-8g2rn S3c)";
+}

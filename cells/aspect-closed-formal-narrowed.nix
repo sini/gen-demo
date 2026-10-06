@@ -35,7 +35,7 @@ let
   missing = fire { bobbin = "damask"; } tuck;
 in
 {
-  construct = [ "C116" ];
+  construct = [ "closed-formal-parametric-aspect-at-a-wider-context" ];
   check = asserts (
     wide.description == "tuck-pewter"
     && !(builtins.tryEval (builtins.deepSeq missing.description null)).success

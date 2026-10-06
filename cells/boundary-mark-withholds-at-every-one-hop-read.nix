@@ -7,7 +7,7 @@
   boundaryOneHop,
 }:
 {
-  construct = [ "C191" ];
+  construct = [ "boundary-mark-withholds-at-every-one-hop-edge-read" ];
   check = asserts (
     boundaryOneHop "shed" == {
       imports = [ ];

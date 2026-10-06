@@ -9,7 +9,7 @@
 }:
 
 {
-  construct = [ "C158" ];
+  construct = [ "merge-collision-policy-is-one-of-the-declared-three" ];
   check = asserts (
     policyAtSpoolCollision "system-wins" == [
       "gen-bind: binding 'spool' collision — system-wins, binding value dropped"

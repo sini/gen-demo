@@ -7,7 +7,7 @@
 # C45 -- den-hoag-3tsd3. Live control: movement-dedup-equality.
 { asserts, storeNamedEntries }:
 {
-  construct = [ "C45" ];
+  construct = [ "scope-named-after-a-package" ];
   check = asserts (
     builtins.length storeNamedEntries == 1
     && builtins.hasContext (builtins.head storeNamedEntries).scope

@@ -88,7 +88,7 @@ let
   };
 in
 {
-  construct = [ "C114" ];
+  construct = [ "four-tier-value-channel-joined-to-provenance" ];
   check = asserts (
     joinOf "k1" == [
       {

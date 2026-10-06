@@ -17,7 +17,7 @@
   stitchKeySet,
 }:
 {
-  construct = [ "C6" ];
+  construct = [ "delivery" ];
   check = asserts (
     builtins.attrNames config.gen.composed.nodes == [
       "damask"

@@ -18,7 +18,7 @@
   thimbles,
 }:
 {
-  construct = [ "C12" ];
+  construct = [ "derived-product-graph-policy-stratum-promotion" ];
   check = asserts (
     seamSpace.product.dims == [
       "thimble"

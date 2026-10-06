@@ -15,7 +15,7 @@ let
   both = defs: nullableHem (defs genMerge) == nullableHemNixpkgs (defs lib);
 in
 {
-  construct = [ "C162" ];
+  construct = [ "nullable-refuses-null-beside-a-value" ];
   check = asserts (
     !(nullableHem [
       null

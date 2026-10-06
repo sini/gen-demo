@@ -7,7 +7,7 @@
   boundaryWalks,
 }:
 {
-  construct = [ "C190" ];
+  construct = [ "boundary-mark-withholds-through-every-walk" ];
   check = asserts (
     boundaryWalks "selvage" == {
       inherited = null;

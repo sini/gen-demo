@@ -13,7 +13,7 @@ let
   forced = x: !(builtins.tryEval (builtins.deepSeq x x)).success;
 in
 {
-  construct = [ "C178" ];
+  construct = [ "declaration-shadows-a-throwing-ancestor-default-unforced" ];
   check = asserts (
     napDeclared "selvage" == "brushed"
     && napInherited "selvage" == "brushed"

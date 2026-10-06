@@ -18,7 +18,7 @@
   inputs,
 }:
 {
-  construct = [ "C133" ];
+  construct = [ "derived-type-keeps-its-derivation" ];
   check = asserts (
     let
       inherit (inputs.gen.lib.modules.types) typeEq;

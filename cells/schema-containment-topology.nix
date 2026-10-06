@@ -26,7 +26,7 @@ let
     ]).config.schema;
 in
 {
-  construct = [ "C84" ];
+  construct = [ "schemas-containment-read-off-gen-graph" ];
   check = asserts (
     s._roots == [
       "damask"

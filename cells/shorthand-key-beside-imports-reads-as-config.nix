@@ -14,6 +14,6 @@
   c92TwinWeft,
 }:
 {
-  construct = [ "C92" ];
+  construct = [ "shorthand-key-beside-imports-reads-as-config" ];
   check = asserts (c92ShorthandWeft == "twill" && c92TwinWeft == "twill");
 }
