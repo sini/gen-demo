@@ -21,6 +21,7 @@ let
   cnf = {
     entityKinds = D;
     keySemantics.nixos.category = "class";
+    aspectModules = [ (genRules.lambdasMount "lambdas") ];
   };
   load = genRules.defunctionalize {
     inherit cnf;
