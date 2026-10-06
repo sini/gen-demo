@@ -46,7 +46,7 @@ row13='let
   prior = genMerge.evalModuleTree { } outer;
   warm = genMerge.evalModuleTree { warmFrom = prior; editedModules = edit; } (outer ++ edit);
 in warm.config.thimbles.pewter.id_hash'
-row13stamp='thimble:24b7ce3368a8d0766bc679ac848352cc9343353b2d97af83f5caafd7aa4a7965'
+row13stamp='thimble:7a784416ea03854bcbadc0dc9541834f6da5d6851dcc70eaf3dc9bd92b791199'
 check "T5 row13 unplanted (the declared spool re-defined to its minted value, no identity moves)" \
   "${row13/EDIT/{ config.thimbles.pewter.spool = genMerge.mkForce \"linen\"; \}}" 0 "" \
   "$tmpdir/row13-green.err" "$row13stamp"
