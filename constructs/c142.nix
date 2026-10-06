@@ -23,6 +23,7 @@ let
   cnf = {
     entityKinds = D;
     keySemantics.nixos.category = "class";
+    aspectModules = [ (genRules.lambdasMount "lambdas") ];
     moduleArgs = {
       config = true;
       pkgs = true;
