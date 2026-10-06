@@ -12,10 +12,10 @@
 #      names equal again. Its negative arm (same members, same revision, different builder bodies ⇒
 #      ONE value) is undiscriminable by any builtin and is a declared residue, not a cell: asserting
 #      the merge would be asserting the defect;
-#   3. the SEALED regime decides where the producer's refusal is the `__id` accessor — and ONLY
-#      there: a refusal under an ordinary key surfaces, catchably, beside inert controls that decide
-#      both ways, so the cell separates "`__id` is excluded" from "every key is". A
-#      self-referential payload aborts the evaluator uncatchably and no cell can hold it;
+#   3. the SEALED regime compares the value whole: no type record carries a refusing field (the
+#      identity demand is gen-types' `idOf`, den-hoag-6orb8 A1), so a refusal under `__id` surfaces,
+#      catchably, exactly as one under an ordinary key does, beside inert controls that decide both
+#      ways. A self-referential payload aborts the evaluator uncatchably and no cell can hold it;
 #   4. the search runner is RETIRED (den-hoag-b7u1v): gen-algebra publishes no `search`, so no key
 #      site reads the regime outside the regime's own readers;
 #   5. the UNMIGRATED regime decides on content, not the name — one program point, one shared `fn`,
@@ -63,7 +63,7 @@ let
       ctor = "whipstitch";
     };
   };
-  # Unmigrated values: no `__mint`, no `__id`; overridden the same way, and for the same reason.
+  # Unmigrated values: no `__mint`; overridden the same way, and for the same reason.
   unmigrated = {
     name = "whipstitch";
     closure.thread = "madder";
@@ -85,11 +85,13 @@ in
     # 2 — the registry coordinate
     && madder.name == (mkR2 "whipstitch" { thread = "madder"; }).name
     && !(conservativeEq madder (mkR2 "whipstitch" { thread = "madder"; }))
-    # 3 — the sealed regime: the `__id` arm decides, an ordinary-key refusal surfaces
+    # 3 — the sealed regime compares every field: a refusal under `__id` or an ordinary key surfaces
     && regimeTagOf (identityOf sealed) == "s"
-    && sealedEq { __id = throw "identity: no mintable identity"; } {
-      __id = throw "identity: no mintable identity";
-    }
+    && !(decides (
+      sealedEq { __id = throw "identity: no mintable identity"; } {
+        __id = throw "identity: no mintable identity";
+      }
+    ))
     && !(decides (sealedEq { zz = throw "plain"; } { zz = throw "plain"; }))
     && sealedEq { zz = "v"; } { zz = "v"; }
     && !(sealedEq { zz = "v"; } { zz = "w"; })

@@ -38,18 +38,18 @@ check "T5 row30 planted   (a SECOND, different refinement of the same base on th
 # refinements of one base shared an identity WITH EACH OTHER AND WITH THE BARE BASE, and the demand
 # still ANSWERED. ADR-0034 admits migrated or not-yet, and a silently-collapsing identity that
 # answers is neither.
-# ★ THE UNPLANTED ARM DEMANDS `__id` OF THE BARE BASE, which must still answer. That is what stops
+# ★ THE UNPLANTED ARM DEMANDS THE IDENTITY (`idOf`) OF THE BARE BASE, which must still answer. That is what stops
 # this row passing because gen-schema refuses everything, and it is the same digest the defect used
 # to hand back for the REFINED type.
 row30id='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
-in SUBJECT.__id'
+in genMerge.types.idOf SUBJECT'
 check "T5 row30id unplanted (the BARE base still mints, and the digest is the assertion)" \
   "${row30id/SUBJECT/genMerge.types.int}" 0 "" \
   "$tmpdir/row30id-green.err" 'type:d56681ac4aa3f64b427f9aceaab601fa2fe1e0db2cce50349be86f3fa0d886b6'
 check "T5 row30id planted   (an identity demanded of a refinement over a caller predicate)" \
   "${row30id/SUBJECT/(genSchema.refined genMerge.types.int [ genSchema.refinements.tcpPort ])}" 1 \
-  "identity: type 'refined<int>' has sealed component(s) 'refinements.0'" \
+  "identity: type 'int' has sealed component(s) 'refinements.0'" \
   "$tmpdir/row30id-red.err"

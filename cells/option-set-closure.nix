@@ -1,7 +1,7 @@
 # `option-set-closure` — C17, and `den-hoag-9l26n`'s corpus arm in the same cell. The `thimbles`
 # registry carries an `extraModules` option (`shirring`); the cell asserts the option really landed
 # AND that `thimbles.pewter.id_hash` is byte-identical to
-# `thimble:c286677c4bce2e1032da87c5bb7e2e6f26fef1450accceb38f8bce67cbd9a159`, the stamp minted
+# `thimble:e97ed5398df4580d9609e406c34604d4d421bf7c5ed0d92ce6e68405c534ca80`, the stamp minted
 # before it existed. Equality alone would pass for a registry that dropped the caller's modules, so
 # both halves are load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
 # `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, declared
@@ -58,7 +58,7 @@
   construct = [ "C17" ];
   check = asserts (
     c17Pewter.shirring == "gathered"
-    && c17Pewter.id_hash == "thimble:04aa37657a7e678fafb07c20946ce09751d504cb058470af5a8aa9996b9674dc"
+    && c17Pewter.id_hash == "thimble:e97ed5398df4580d9609e406c34604d4d421bf7c5ed0d92ce6e68405c534ca80"
     &&
       c17Pewter._identityKeys == [
         "name"
