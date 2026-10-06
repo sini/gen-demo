@@ -1,10 +1,12 @@
 # shellcheck shell=bash
 # ── row 133 -- a module's `_module.<x>` is a value or a named refusal, never a silent drop (den-hoag-lnleu) ──
 # gen-merge read only `_module.args` and `_module.freeformType` and dropped every other `_module`
-# definition unread. Three plants, each beside the door its message names: an unknown sub-key is an
-# option that does not exist (absorbed under a `freeformType`), and `specialArgs` and `check` are set
-# by `evalModuleTree`'s caller, never by a module. Every unplanted arm asserts a STDOUT VALUE read
-# through the door the refusal points at, so a reader that refused every `_module` cannot pass it.
+# definition unread. An unknown sub-key is an option that does not exist (absorbed under a
+# `freeformType`), and `specialArgs` is set by `evalModuleTree`'s caller, never by a module: each is a
+# plant beside the door its message names. `check` is the option it is in nixpkgs, honoured at its
+# own level: a module's `false` lists the undeclared key, and a module's `true` over the caller's
+# `false` refuses it. Every unplanted arm asserts a STDOUT VALUE, so a reader that refused every
+# `_module` cannot pass it.
 row133='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   merge = gen.lib.modules.merge;
@@ -18,7 +20,8 @@ row133='let
   doorArgs = builtins.toJSON (eval [ readZ ] { specialArgs.z = "door"; }).config.r;
   moduleArgs = builtins.toJSON (builtins.attrNames (eval [ { config._module.specialArgs.z = "module"; } ] { }).config);
   doorCheck = builtins.toJSON (map (u: u.path) (eval [ { y = 1; } ] { check = false; }).undeclared);
-  moduleCheck = builtins.toJSON (builtins.attrNames (eval [ { y = 1; } { config._module.check = false; } ] { }).config);
+  checkFalseCfg = let r = eval [ { y = 1; } { config._module.check = false; } ] { }; in builtins.toJSON { und = map (u: u.path) r.undeclared; names = builtins.attrNames r.config; };
+  checkTrueCallerFalse = builtins.toJSON (builtins.attrNames (eval [ { y = 1; } { config._module.check = true; } ] { check = false; }).config);
 in BODY'
 check "T5 row133 unplanted (an unknown _module sub-key under a freeformType is absorbed and read back)" \
   "${row133/BODY/absorbed}" 0 "" "$tmpdir/row133-absorbed.err" '1'
@@ -35,6 +38,8 @@ check "T5 row133 planted   (a module setting _module.specialArgs is refused by n
   "\`_module.specialArgs' is set by the caller, never by a module" "$tmpdir/row133-module-args.err"
 check "T5 row133 unplanted (check = false at the evalModuleTree door lists the undeclared key)" \
   "${row133/BODY/doorCheck}" 0 "" "$tmpdir/row133-door-check.err" '[["y"]]'
-check "T5 row133 planted   (a module setting _module.check is refused by name)" \
-  "${row133/BODY/moduleCheck}" 1 \
-  "\`_module.check' is not read from a module" "$tmpdir/row133-module-check.err"
+check "T5 row133 unplanted (a module's _module.check = false lists the undeclared key, as nixpkgs drops it)" \
+  "${row133/BODY/checkFalseCfg}" 0 "" "$tmpdir/row133-check-false.err" '{"names":["x"],"und":[["y"]]}'
+check "T5 row133 planted   (a module's _module.check = true outranks the caller's check = false and refuses the undeclared key)" \
+  "${row133/BODY/checkTrueCallerFalse}" 1 \
+  "The option \`y' does not exist. Definition values:" "$tmpdir/row133-check-true.err"
