@@ -110,7 +110,7 @@ let
     };
 in
 {
-  c201Registrations = builtins.length (builtins.attrNames lambdas);
+  c201Registrations = builtins.length (genRules.registrations lambdas);
   c201Hem = per "hem";
   c201HemControl = per "hemControl";
   c201Pleat = per "pleat";
