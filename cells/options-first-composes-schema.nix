@@ -66,6 +66,8 @@ in
       ]
     && genClass.applyCoreFixed.__contract.optional == [ "engineArgs" ]
     && refuses (genSchema.mkInstanceRegistry { bobbin = 1; })
+    # the pre-L4 kind-first call, the kind from a closed evaluation (den-hoag-ht5ar)
+    && refuses (genSchema.mkInstanceRegistry kinds.bobbin)
     && refuses (genSchema.evalSchema { modules = [ ]; })
     && refuses (
       genClass.mkClass {
