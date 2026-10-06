@@ -4,7 +4,10 @@
 # written as module functions: `hem` holds a closure over `thimble` in `includes`, and `seam` a closure
 # over `bobbin` at the class key `nixos`. Each closure registers when gen-merge applies its function,
 # and is lowered to a door node like the same text written outside the function (`hemControl`,
-# `seamControl`). No union module is written: gen-rules' loader ships it.
+# `seamControl`). No union module is written: gen-rules' loader ships it. `seamCoordinateOnly` writes its
+# class closure over the coordinate alone (`{ bobbin, ... }`); its lift is a class value the door admits
+# whatever formals remain (den-hoag-d13lv), so it is delivered at a context with `bobbin`, as its control
+# is.
 {
   genRules,
   genAlgebra,
@@ -41,6 +44,9 @@ let
   seamBody = {
     nixos = { bobbin, pkgs, ... }: { };
   };
+  seamCoordinateOnlyBody = {
+    nixos = { bobbin, ... }: { marker = "seam-${bobbin}"; };
+  };
   tree = genMerge.evalModuleTree { } [
     { options.aspects = (genAspects.mkAspectSchema cnf).mkAspectOption { }; }
     { options.lambdas = genRules.lambdas; }
@@ -49,6 +55,8 @@ let
       aspects.seam = { config, ... }: seamBody;
       aspects.hemControl = hemBody;
       aspects.seamControl = seamBody;
+      aspects.seamCoordinateOnly = { config, ... }: seamCoordinateOnlyBody;
+      aspects.seamCoordinateOnlyControl = seamCoordinateOnlyBody;
     })
   ];
   inherit (tree.config) aspects lambdas;
@@ -77,6 +85,22 @@ let
     condition = (nodeOf a).condition;
     atPewter = fire { thimble = "pewter"; } a;
   };
+  # the delivered class value, read as its module system reads it
+  marker =
+    out:
+    (genMerge.evalModuleTree { } [
+      { options.marker = genMerge.mkOption { type = genMerge.types.str; }; }
+      out.nixos
+    ]).config.marker;
+  perDelivered = a: {
+    condition = (nodeOf a).condition;
+    atSpool = marker (
+      fire {
+        thimble = "pewter";
+        bobbin = "spool";
+      } a
+    );
+  };
 in
 {
   c197Registrations = builtins.length (builtins.attrNames lambdas);
@@ -84,5 +108,7 @@ in
   c197HemControl = per "hemControl";
   c197Seam = per "seam";
   c197SeamControl = per "seamControl";
+  c197SeamCoordinateOnly = perDelivered "seamCoordinateOnly";
+  c197SeamCoordinateOnlyControl = perDelivered "seamCoordinateOnlyControl";
   c197HasBobbin = T.term.all [ (T.term.has "bobbin") ];
 }
