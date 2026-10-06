@@ -31,9 +31,13 @@ row154='let
   entity = n: hashIdentity "entity" [ "name" ] (_: n);
   r = genAspects.instancesFor cnf aspects {
     suppliers = { ${entity "warp"}.loom = "jacquard"; ${entity "twill"}.loom = "jacquard"; ${entity "boat"}.shuttle = "boat"; };
+    containment = {
+      twill = { parent = null; key = "loom"; identity = entity "twill"; marked = false; bindings = { }; };
+      boat = { parent = "twill"; key = "shuttle"; identity = entity "boat"; marked = false; bindings = { }; };
+    };
     scopes = {
       warp = { members = [ "frame" ]; sources.loom = entity "warp"; };
-      twill = { members = [ "bobbin" ]; sources.loom = entity "twill"; descendants = [ { sources.shuttle = entity "boat"; } ]; };
+      twill = { members = [ "bobbin" ]; sources.loom = entity "twill"; };
     };
   };
   marksOf = instances: (genMerge.evalModuleTree { } (

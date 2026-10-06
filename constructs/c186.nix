@@ -8,7 +8,7 @@
 # The cold arm (design §4 cell 1, the direct-member domain): each parametric P a loom lists becomes
 # the static `P-<loom>`, P applied at that loom's tuple through gen-aspects' own `instanceOf`, named
 # in P's place. `flounce` is kept out of it: it reaches `fringe` by fan-out, one sibling per tassel
-# descendant, under its own projection.
+# its loom contains (`containment`, den-hoag-8g2rn), under its own projection.
 {
   genAlgebra,
   genAspects,
@@ -88,6 +88,7 @@ let
     ${src "organza"}.weave = "organza";
     ${src "t1"}.tassel = "tassel-1";
     ${src "t2"}.tassel = "tassel-2";
+    ${src "flounce"}.bolt = "pleat-flounce";
   };
   pins = {
     godet = "batiste";
@@ -101,7 +102,10 @@ let
       weave = src pin;
     };
   }) pins;
-  rel = genAspects.instancesFor cnf values.aspects { inherit suppliers scopes; };
+  rel = genAspects.instancesFor cnf values.aspects {
+    inherit suppliers scopes;
+    containment = { };
+  };
   projectWith =
     v: instances:
     genDelivery.project {
@@ -150,6 +154,7 @@ let
     genAspects.instancesFor cnf coldValues.aspects {
       inherit suppliers;
       scopes = { };
+      containment = { };
     }
   );
   # An instance-key merge, the defect parity exists to catch: every loom reads godet's `tuck` vertex.
@@ -163,17 +168,27 @@ in
   sharedEvalRealized = realizeOf (projectWith values rel);
   sharedEvalColdRealized = realizeOf cold;
   sharedEvalMergedRealized = realizeOf (projectWith values merged);
-  # `flounce` reaches `fringe` under its own projection, with its tassel descendants in `order`.
+  # `flounce` reaches `fringe` under its own projection; its loom contains the tassels `named` maps,
+  # each identifier to the tassel whose identity it carries, so the siblings come in identifier order.
   sharedEvalFanOut =
-    order:
+    named:
     let
       v = valuesOf { } { flounce.aspects = [ "fringe" ]; };
+      rec0 = parent: key: x: {
+        inherit parent key;
+        identity = src x;
+        marked = false;
+        bindings = { };
+      };
       r = genAspects.instancesFor cnf v.aspects {
         inherit suppliers;
+        containment = {
+          flounce = rec0 null "bolt" "flounce";
+        }
+        // builtins.mapAttrs (_: rec0 "flounce" "tassel") named;
         scopes.flounce = {
           members = [ "fringe" ];
-          sources = { };
-          descendants = map (x: { sources.tassel = src x; }) order;
+          sources.bolt = src "flounce";
         };
       };
     in

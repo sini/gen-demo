@@ -73,6 +73,7 @@ let
   src = k: inputs.gen.lib.substrate.identity.hashIdentity "entity" [ "name" ] (_: k);
   rel = genAspects.instancesFor (cnf // { ref = door; }) aspects {
     suppliers.${src "pewter"}.thimble = "pewter";
+    containment = { };
     scopes.loom = {
       members = [
         "selvage"

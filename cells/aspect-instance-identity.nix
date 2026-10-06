@@ -5,8 +5,13 @@
 # reaches. The aspects are declared in the corpus's own grammar as first-order guards reading their
 # coordinates (den-hoag-lwbb1 stage 2b: a context closure crosses the gen-rules door). Two entity kinds, `loom` (a scope's
 # own) and `shuttle` (a descendant's), and one argument, `tension`, supplied by a gen-scope
-# `argumentBinding` (K1): introduced at `loft` and inherited by `warpA` and `warpB`, overridden at
-# `warpC`. Every context is derived from `suppliers`, written as one literal entry per supplier node.
+# `argumentBinding` (K1). The entity graph's containment (den-hoag-8g2rn) is `loft` ⊃ `jacquard` ⊃
+# `fly`, `boat`, `rapier` and `loft` ⊃ `dobby`: `tension` is declared once, in `loft`'s record's
+# `bindings`, and inherited down it; `dobby` re-declares it in its own record, which SHADOWS the
+# inherited binding for `dobby` (K-c, amended: a new binding id). So `warpA` and `warpB` (on
+# `jacquard`) read the inherited binding and `warpC` (on `dobby`) the shadowing one, each node
+# binding the source its entity's coordinate carries. Every context is derived from `suppliers`,
+# written as one literal entry per supplier node.
 #
 # Each limb names the den-hoag-0cmbt spec §3a cell it carries:
 #   I-1 `gauge` at two looms is two instances, and the relation's vertex id is `instanceOf`'s;
@@ -16,10 +21,11 @@
 #       and `note`: two firing definitions that disagree on one scalar are refused, C172);
 #   R-3 `pick`, reached inside `gauge`'s body, is one nested instance, and `warpB`'s own `pick` edge
 #       is that same vertex;
-#   R-7 `heddle` fans out over a scope's shuttles, one instance each, and has no edge where there are
+#   R-7 `heddle` fans out over a loom's shuttles, one instance each, is minted at the node's own
+#       tuple where the node binds a shuttle (`warpB` binds `rapier`), and has no edge where there are
 #       none;
-#   B-2 the inherited binding is one id at both scopes that inherit it, and the override another, so
-#       `temper` is one instance across `warpA` and `warpB` and another at `warpC`;
+#   B-2 the inherited binding is one id at both scopes that inherit it, and the shadowing one another,
+#       so `temper` is one instance across `warpA` and `warpB` and another at `warpC`;
 #   I-9 (den-hoag-ehkse) a guard declared at a path is identified by origin + declared path (identity
 #       design §1), so `fringe`, `tassel`, `warpBeam.knot` and `clothBeam.knot`, one condition and one
 #       non-class body apart from their `nixos` payloads, are four instances, each delivering its own
@@ -111,31 +117,44 @@ let
     ${inherited}.tension = "taut";
     ${override}.tension = "slack";
     ${dye}.dye = "madder";
+    ${entity "loft"}.mill = "loft";
   };
-  warp = loom: tension: shuttles: extra: members: {
+  rec0 = parent: key: x: bindings: {
+    inherit parent key bindings;
+    identity = entity x;
+    marked = false;
+  };
+  containment = {
+    loft = rec0 null "mill" "loft" { tension = inherited; };
+    jacquard = rec0 "loft" "loom" "jacquard" { };
+    dobby = rec0 "loft" "loom" "dobby" { tension = override; };
+    fly = rec0 "jacquard" "shuttle" "fly" { };
+    boat = rec0 "jacquard" "shuttle" "boat" { };
+    rapier = rec0 "jacquard" "shuttle" "rapier" { };
+  };
+  warp = loom: tension: extra: members: {
     inherit members;
     sources = {
       loom = entity loom;
       inherit tension;
     }
     // extra;
-    descendants = map (s: {
-      sources = {
-        loom = entity loom;
-        shuttle = entity s;
-        inherit tension;
-      };
-    }) shuttles;
   };
   r = genAspects.instancesFor cnf aspects {
-    inherit suppliers;
+    inherit suppliers containment;
     scopes = {
-      warpA = warp "jacquard" inherited [ "fly" "boat" ] { } [ "frame" ];
-      warpB = warp "jacquard" inherited [ "rapier" ] { inherit dye; } [
-        "frame"
-        "pick"
-      ];
-      warpC = warp "dobby" override [ ] { } [ "frame" ];
+      warpA = warp "jacquard" inherited { } [ "frame" ];
+      warpB =
+        warp "jacquard" inherited
+          {
+            inherit dye;
+            shuttle = entity "rapier";
+          }
+          [
+            "frame"
+            "pick"
+          ];
+      warpC = warp "dobby" override { } [ "frame" ];
     };
   };
   at = n: a: r.reaches.${n}.${a} or [ ];
@@ -182,7 +201,7 @@ let
         tension = "taut";
       } aspects.twill
     && apart "twill";
-  nestedPick = builtins.concatMap (id: r.nested.${id}.pick or [ ]) (at "warpA" "gauge");
+  nestedPick = builtins.concatMap (id: r.nestedAt.warpA.${id}.pick or [ ]) (at "warpA" "gauge");
   r3 =
     builtins.length nestedPick == 1
     && descs nestedPick == [ "pick-jacquard" ]
@@ -192,6 +211,7 @@ let
     descs (at "warpA" "heddle") == [
       "heddle-boat"
       "heddle-fly"
+      "heddle-rapier"
     ]
     && descs (at "warpB" "heddle") == [ "heddle-rapier" ]
     && !(r.reaches.warpC ? heddle);
@@ -214,6 +234,7 @@ let
     ]).config.aspects;
   rt = genAspects.instancesFor twinCnf twins {
     inherit suppliers;
+    containment = { };
     scopes = {
       loomJ = {
         members = [

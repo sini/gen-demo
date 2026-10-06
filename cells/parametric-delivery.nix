@@ -11,8 +11,8 @@
 #      another declaration refuses, where reading the edge list alone would deliver it.
 #   D4 a FALSE condition is no edge (den-hoag-n8wb5): `bobbin` reaches `nap`, which reads `shuttle`.
 #      `plain` has no shuttle (a declared coordinate, so its absence is FALSE), the relation publishes
-#      `nap` as declined there, and `plain` receives `bobbin` alone at rc 0; `twill`, with a shuttle
-#      descendant, receives `nap`.
+#      `nap` as declined there, and `plain` receives `bobbin` alone at rc 0; `twill`, whose loom
+#      contains the shuttle `boat` (`containment`, den-hoag-8g2rn), receives `nap`.
 #   D5 an undecided reach refuses: `loose` was handed a scope without `frame`, so the relation never
 #      walked `selvage` there and neither lists nor declines it; the reach refuses rather than read as
 #      declined, while `warp` delivers.
@@ -73,12 +73,27 @@ let
       ${entity "plain"}.loom = "jacquard";
       ${entity "boat"}.shuttle = "boat";
     };
+    containment = {
+      twill = {
+        parent = null;
+        key = "loom";
+        identity = entity "twill";
+        marked = false;
+        bindings = { };
+      };
+      boat = {
+        parent = "twill";
+        key = "shuttle";
+        identity = entity "boat";
+        marked = false;
+        bindings = { };
+      };
+    };
     scopes = {
       warp = loomed "warp";
       weft = loomed "weft";
       twill = loomed "twill" // {
         members = [ "bobbin" ];
-        descendants = [ { sources.shuttle = entity "boat"; } ];
       };
       plain = loomed "plain" // {
         members = [ "bobbin" ];

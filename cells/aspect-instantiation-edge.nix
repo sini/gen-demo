@@ -12,9 +12,10 @@
 #   D2 (A8) gen-scope `resolve` over `instantiates · includes`, from `selvage`'s instance, answers the
 #      declaration's resolved members, `pick` and `hem`; `includes` from static `frame` is the control;
 #   D3 (A9, gate C3) path consistency: along every nested edge the child's substitution restricts its
-#      parent's. Live: nested edges exist, and `heddle`, which reads `shuttle` (supplied by the scope,
-#      not read by its parent `selvage`), has no nested edge at `selvage`'s narrowed tuple while the
-#      scope reaching it directly mints it.
+#      parent's MEET with the reading node (den-hoag-8g2rn S3c). Live: nested edges exist, and
+#      `heddle`, which reads `shuttle` (supplied by the scope, not read by its parent `selvage`), is a
+#      nested edge of `selvage` at `warp`, minted at the meet, and is the one vertex `weft` reaches
+#      directly.
 {
   asserts,
   genAlgebra,
@@ -73,6 +74,7 @@ let
   };
   r = genAspects.instancesFor cnf aspects {
     inherit suppliers;
+    containment = { };
     scopes = {
       warp = {
         members = [ "frame" ];
@@ -91,7 +93,11 @@ let
   d1 =
     map (i: r.vertices.${i}.entry.nixos.marks) r.reaches.warp.selvage == [ [ "selvage" ] ]
     && refuses r.vertices.${selvageI}.entry.trim
-    && builtins.attrNames r.nested.${selvageI} == [ "pick" ];
+    &&
+      builtins.attrNames r.nestedAt.warp.${selvageI} == [
+        "heddle"
+        "pick"
+      ];
 
   # The instances and the declarations as one EVALUATED SCOPE: each edge label `l` is the attribute
   # `edges-l` gen-scope's resolution calculus reads, and every node declares its marks, none.
@@ -139,19 +145,21 @@ let
       ]
     && walk "frame" (rx.lit "includes") == [ "selvage" ];
 
+  # every nested edge at `warp`, with the meet it was minted at: the node's sources under the parent's
+  # formals
   pairs = builtins.concatMap (
     p:
     map (c: {
-      pf = r.vertices.${p}.formals;
+      pf = sources // r.vertices.${p}.formals;
       cf = r.vertices.${c}.formals;
-    }) (builtins.concatLists (builtins.attrValues r.nested.${p}))
-  ) (builtins.attrNames r.nested);
+    }) (builtins.concatLists (builtins.attrValues r.nestedAt.warp.${p}))
+  ) (builtins.attrNames r.nestedAt.warp);
   d3 =
     builtins.length pairs > 0
     && builtins.all (
       x: builtins.intersectAttrs x.pf x.cf == x.cf && builtins.intersectAttrs x.cf x.pf == x.cf
     ) pairs
-    && !(r.nested.${selvageI} ? heddle)
+    && r.nestedAt.warp.${selvageI}.heddle == r.reaches.weft.heddle
     && map (i: r.vertices.${i}.entry.description) r.reaches.weft.heddle == [ "fly" ];
 in
 {
