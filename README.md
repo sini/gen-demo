@@ -98,7 +98,7 @@ how many it expected, never a bare pass.
 
 Every addition is **new files with a name you choose**; no number is drawn, and no list, table,
 index or count is edited by hand (den-hoag-nv8fd). A name is `[a-z0-9-]+`, says what the thing is
-(the kebab of its title: `addressed-class-crossing`), and is unique by construction: it is a file
+(the kebab of its title: `addressed-class-crossing`), and is unique within its kind by construction: it is a file
 name, so a second unit choosing the same one adds the same path and git reports it at the merge.
 
 - **A construct** is `index/<name>.nix`:
@@ -174,6 +174,10 @@ name, so a second unit choosing the same one adds the same path and git reports 
   adds a cross-match control, the same names in `ci/refusals.sh`). A row that edits an EXISTING row
   file finds it under its name: `legacy-ids.nix` maps `row133` to it. Its new ids get no number and
   no `legacy-ids.nix` entry; prose citing its old number is left alone.
+  A plain `git rebase` of such a branch stops on `modify/delete` (the file was renamed, and the migration
+  rewrote too many tokens for git to follow it). Re-apply the edit instead: take the branch's diff,
+  rename `row<n>` in its ADDED lines to the name's four forms (the name in the path, the variable
+  `row_<name_>`, the label `T5 <name>`, the errfile `$tmpdir/<name>-`), and `git apply` it onto this tree.
 
 T5's refusals are not among these cells: `builtins.tryEval` yields `success` and nothing
 else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
