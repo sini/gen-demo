@@ -6,6 +6,9 @@
 #    is already a met record over a foreign carrier; 7 and 9 refused, 8 served.
 #  - `wrapped`: gen `listOf int`, the same wrapped by `addCheck` (rejecting 9), and a nixpkgs `listOf`
 #    partner (rejecting 7), in that order; [7] and [9] refused, [8] served.
+#  - `moduleSet`: nixpkgs' `addCheck` over a nixpkgs submodule (rejecting `a = 7`) beside a gen submodule, the
+#    module set nixpkgs' own rebuild erases the wrapper over (den-hoag-8ip0d); { a = 7; } refused, { a = 8; }
+#    served with both declarations' options.
 # Red where any step serves a value one declaration rejects (gen-merge before the meet refused these pairs
 # outright, so its `8`s read REFUSED and red too).
 {
@@ -68,6 +71,30 @@ let
         "8" = [ 8 ];
       };
       lift = x: [ x ];
+    };
+    moduleSet = {
+      ts = [
+        (lib.types.addCheck (lib.types.submodule {
+          options.a = lib.mkOption {
+            type = lib.types.int;
+            default = 0;
+          };
+        }) (v: (v.a or 0) != 7))
+        (genMerge.types.submodule {
+          options.c = genMerge.mkOption {
+            type = genMerge.types.int;
+            default = 0;
+          };
+        })
+      ];
+      v = {
+        "7" = "REFUSED";
+        "8" = {
+          a = 8;
+          c = 0;
+        };
+      };
+      lift = x: { a = x; };
     };
   };
   val = k: if k == "s" then "s" else lib.toInt k;
