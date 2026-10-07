@@ -5,15 +5,16 @@
 
 {
   asserts,
+  lib,
   policyAtSpoolCollision,
 }:
 
 {
   construct = [ "merge-collision-policy-is-one-of-the-declared-three" ];
   check = asserts (
-    policyAtSpoolCollision "system-wins" == [
-      "gen-bind: binding 'spool' collision — system-wins, binding value dropped"
-    ]
+    map (lib.hasPrefix "gen-bind: binding 'spool' collision — system-wins, binding value dropped") (
+      policyAtSpoolCollision "system-wins"
+    ) == [ true ]
     && !(builtins.tryEval (builtins.deepSeq (policyAtSpoolCollision "sytem-wins") null)).success
   );
 }

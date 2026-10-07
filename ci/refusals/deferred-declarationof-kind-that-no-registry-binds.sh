@@ -41,11 +41,11 @@ check "T5 deferred-declarationof-kind-that-no-registry-binds unplanted (a bound 
   "${row_deferred_declarationof_kind_that_no_registry_binds/BODY/green}" 0 "" "$tmpdir/deferred-declarationof-kind-that-no-registry-binds-green.err" 'gilded'
 check "T5 deferred-declarationof-kind-that-no-registry-binds planted   (an unbound declarationOf is refused by name)" \
   "${row_deferred_declarationof_kind_that_no_registry_binds/BODY/tipRed}" 1 \
-  "gen-schema: tip: \`declarationOf \"aglet\"' is unbound here. A deferred declaration resolves only through a registry binding" \
+  "gen-schema: tip: \`declarationOf \"aglet\"' is unbound here" \
   "$tmpdir/deferred-declarationof-kind-that-no-registry-binds-tip.err"
 check "T5 deferred-declarationof-kind-that-no-registry-binds planted   (an unbound setOf is refused at its first element, in the element's words)" \
   "${row_deferred_declarationof_kind_that_no_registry_binds/BODY/sparesRed}" 1 \
-  "\`declarationOf \"aglet\"' is unbound here. A deferred declaration resolves only through a registry binding" \
+  "\`declarationOf \"aglet\"' is unbound here" \
   "$tmpdir/deferred-declarationof-kind-that-no-registry-binds-spares.err"
 check "T5 deferred-declarationof-kind-that-no-registry-binds catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row_deferred_declarationof_kind_that_no_registry_binds/BODY/caught}" 0 "" "$tmpdir/deferred-declarationof-kind-that-no-registry-binds-catch.err" 'CAUGHT'

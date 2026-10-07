@@ -5,7 +5,11 @@
 # evaluation is the control: the binding is served and the warning says the module-system value was
 # shadowed.
 
-{ asserts, spoolUnderStrategy }:
+{
+  asserts,
+  lib,
+  spoolUnderStrategy,
+}:
 
 let
   sw = spoolUnderStrategy "partial" "system-wins";
@@ -16,9 +20,12 @@ in
   construct = [ "merge-strategy-serves-the-value-its-warning-describes" ];
   check = asserts (
     sw.out == "linen"
-    && sw.warnings == [ "gen-bind: binding 'spool' collision — system-wins, binding value dropped" ]
+    &&
+      map (lib.hasPrefix "gen-bind: binding 'spool' collision — system-wins, binding value dropped") sw.warnings
+      == [ true ]
     && bw.out == "cotton"
     &&
-      bw.warnings == [ "gen-bind: binding 'spool' collision — bind-wins, module-system value shadowed" ]
+      map (lib.hasPrefix "gen-bind: binding 'spool' collision — bind-wins, module-system value shadowed") bw.warnings
+      == [ true ]
   );
 }

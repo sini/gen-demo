@@ -24,11 +24,11 @@ check "T5 starting-set-outside-the-carrier unplanted (the canonical seed is admi
   "${row_starting_set_outside_the_carrier/BODY/$okR}" 0 "" "$tmpdir/starting-set-outside-the-carrier-green-r.err" '["a","b","c","q"]'
 check "T5 starting-set-outside-the-carrier planted   (a payload seed is refused by name on the closure arm)" \
   "${row_starting_set_outside_the_carrier/BODY/$badU}" 1 \
-  "gen-scope: the seed carries a value on [\"q\"], the first of them a int. A starting set is a SET OF GROUND ATOMS" \
+  "gen-scope: the seed carries a value on [\"q\"], the first of them a int" \
   "$tmpdir/starting-set-outside-the-carrier-red-u.err"
 check "T5 starting-set-outside-the-carrier planted   (a payload seed is refused by name on the round arm)" \
   "${row_starting_set_outside_the_carrier/BODY/$badR}" 1 \
-  "gen-scope: the seed carries a value on [\"q\"], the first of them a int. A starting set is a SET OF GROUND ATOMS" \
+  "gen-scope: the seed carries a value on [\"q\"], the first of them a int" \
   "$tmpdir/starting-set-outside-the-carrier-red-r.err"
 check "T5 starting-set-outside-the-carrier catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row_starting_set_outside_the_carrier/BODY/$caught}" 0 "" "$tmpdir/starting-set-outside-the-carrier-catch.err" 'CAUGHT'

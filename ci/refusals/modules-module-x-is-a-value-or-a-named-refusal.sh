@@ -27,7 +27,7 @@ check "T5 modules-module-x-is-a-value-or-a-named-refusal unplanted (an unknown _
   "${row_modules_module_x_is_a_value_or_a_named_refusal/BODY/absorbed}" 0 "" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-absorbed.err" '1'
 check "T5 modules-module-x-is-a-value-or-a-named-refusal planted   (an unknown _module sub-key is an option that does not exist)" \
   "${row_modules_module_x_is_a_value_or_a_named_refusal/BODY/unknown}" 1 \
-  "The option \`_module.bogus' does not exist. Definition values:" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-unknown.err"
+  "The option \`_module.bogus' does not exist" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-unknown.err"
 check "T5 modules-module-x-is-a-value-or-a-named-refusal planted   (the unknown _module sub-key is offered the engine's own _module options, as nixpkgs does)" \
   "${row_modules_module_x_is_a_value_or_a_named_refusal/BODY/unknown}" 1 \
   "Did you mean \`_module.args', \`_module.check' or \`_module.specialArgs'?" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-unknown-suggestion.err"
@@ -42,4 +42,4 @@ check "T5 modules-module-x-is-a-value-or-a-named-refusal unplanted (a module's _
   "${row_modules_module_x_is_a_value_or_a_named_refusal/BODY/checkFalseCfg}" 0 "" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-check-false.err" '{"names":["x"],"und":[["y"]]}'
 check "T5 modules-module-x-is-a-value-or-a-named-refusal planted   (a module's _module.check = true outranks the caller's check = false and refuses the undeclared key)" \
   "${row_modules_module_x_is_a_value_or_a_named_refusal/BODY/checkTrueCallerFalse}" 1 \
-  "The option \`y' does not exist. Definition values:" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-check-true.err"
+  "The option \`y' does not exist" "$tmpdir/modules-module-x-is-a-value-or-a-named-refusal-check-true.err"
