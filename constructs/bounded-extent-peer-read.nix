@@ -81,10 +81,7 @@ let
       a = flounceAdapterOf carriage.name;
     in
     a.wrapUnit (a.bindFormals carriage.bindings carriage.modules) [ ];
-  flounceRealized = genDelivery.realize {
-    projected = flounceProjected;
-    terminals.notion = flounceTerminal;
-  };
+  flounceRealized = genDelivery.realize { } { notion = flounceTerminal; } flounceProjected;
 in
 {
   inherit

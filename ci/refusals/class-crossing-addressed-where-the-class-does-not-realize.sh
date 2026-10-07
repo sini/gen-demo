@@ -15,7 +15,7 @@ row_class_crossing_addressed_where_the_class_does_not_realize='let
     ruche = { bindings = { }; classes.quilting = [ { stitch = "quilting"; } ]; };
   };
   terminals = { smocking = a: a; quilting = a: a; };
-  crossTo = node: genDelivery.realize { inherit projected terminals; extraModules.smocking.${node} = [ { adaptedFrom.stitch = "quilting"; } ]; };
+  crossTo = node: genDelivery.realize { extraModules = { smocking.${node} = [ { adaptedFrom.stitch = "quilting"; } ]; }; } terminals projected;
   arrived = builtins.toJSON (crossTo "picot").smocking.picot.extraModules;
   dropped = builtins.toJSON (builtins.attrNames (crossTo "ruche").smocking);
 in BODY'

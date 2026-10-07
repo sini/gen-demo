@@ -109,17 +109,11 @@ let
   projectWith =
     v: instances:
     genDelivery.project {
-      values = v;
-      inherit cnf instances;
       selectNodes = x: x.looms;
       deliveryClasses = couchingPinMap;
-    };
-  realizeOf =
-    p:
-    genDelivery.realize {
-      projected = p;
-      terminals = couchingTerminals;
-    };
+      inherit instances;
+    } cnf v;
+  realizeOf = p: genDelivery.realize { } couchingTerminals p;
 
   facts = genAspects.graphFacts cnf values.aspects;
   params = [
@@ -196,11 +190,11 @@ in
     in
     (realizeOf (
       genDelivery.project {
-        values = v;
-        inherit cnf;
-        instances = r;
         selectNodes = x: x.looms;
-        deliveryClasses.flounce.couching = "couching-organza";
-      }
+        deliveryClasses = {
+          flounce.couching = "couching-organza";
+        };
+        instances = r;
+      } cnf v
     )).couching-organza.flounce.stitches;
 }

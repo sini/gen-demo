@@ -107,8 +107,13 @@ let
       };
   projectWith =
     instances:
-    genDelivery.project {
-      values = {
+    genDelivery.project
+      {
+        selectNodes = v: v.hosts;
+        inherit instances;
+      }
+      cnf
+      {
         inherit aspects;
         hosts = {
           warp.aspects = [ "frame" ];
@@ -119,9 +124,6 @@ let
           loose.aspects = [ "frame" ];
         };
       };
-      inherit cnf instances;
-      selectNodes = v: v.hosts;
-    };
   marksOf =
     p: n:
     (genMerge.evalModuleTree { } (

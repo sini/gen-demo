@@ -27,15 +27,13 @@
   genValues,
 }:
 let
-  federated = genLink.link {
-    sources = [
-      {
-        registry = genValues.aspects;
-        keySemantics = c16Cnf.keySemantics;
-        origin = [ "corpus" ];
-      }
-    ];
-  };
+  federated = genLink.link { } [
+    {
+      registry = genValues.aspects;
+      keySemantics = c16Cnf.keySemantics;
+      origin = [ "corpus" ];
+    }
+  ];
   bartackEdges = builtins.filter (e: e.from == "corpus/bartack") federated.graph.edges;
 in
 {

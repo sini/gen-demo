@@ -15,12 +15,7 @@ let
   };
   # Every terminal reflects its carriage, so what arrived is readable without forcing a module.
   undeliveredTerminals.crewel = a: a;
-  realizeOver =
-    terminals:
-    genDelivery.realize {
-      projected = undeliveredProjected;
-      inherit terminals;
-    };
+  realizeOver = terminals: genDelivery.realize { } terminals undeliveredProjected;
 in
 {
   inherit undeliveredProjected undeliveredTerminals;

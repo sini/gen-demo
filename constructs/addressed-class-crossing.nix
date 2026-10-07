@@ -31,10 +31,10 @@ let
   quiltingToSmocking =
     node: map (m: { adaptedFrom = m; }) crossingProjected.nodes.${node}.classes.quilting;
   crossingRealized = genDelivery.realize {
-    projected = crossingProjected;
-    terminals = crossingTerminals;
-    extraModules.smocking.picot = quiltingToSmocking "picot";
-  };
+    extraModules = {
+      smocking.picot = quiltingToSmocking "picot";
+    };
+  } crossingTerminals crossingProjected;
 in
 {
   inherit

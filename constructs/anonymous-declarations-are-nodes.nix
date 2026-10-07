@@ -108,10 +108,9 @@ let
         }) values.hosts
       );
   projection = genDelivery.project {
-    inherit values cnf;
-    instances = rel;
     selectNodes = _: values.hosts;
-  };
+    instances = rel;
+  } cnf values;
   # a class key's content is a deferred module: its stitches are read through each `imports` layer
   stitchesIn =
     m:

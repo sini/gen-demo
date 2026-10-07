@@ -12,10 +12,8 @@ row_required_facet_left_unwired='let
     genMerge.evalModuleTree { } ([ { options.schema = schema.schemaOption; } (schema.mkAspectModule { }) ] ++ modules);
   mill = mkReg [ { config.aspects.stitch.selvageCap = { provides = [ "warp" "weft" ]; }; } ];
   loom = mkReg [ { config.aspects.braid = { selvageReq = { requires = [ "warp" ]; }; includes = [ (genAspects.keyRef "mill/stitch") ]; }; } ];
-  mkFederated = wired: genLink.link {
-    sources = [ { registry = mill.config.aspects; keySemantics = selvageFacets; origin = [ "mill" ]; }
+  mkFederated = wired: genLink.link { wire = if wired then { "loom/braid".selvageReq = "mill/stitch"; } else { }; } [ { registry = mill.config.aspects; keySemantics = selvageFacets; origin = [ "mill" ]; }
                  { registry = loom.config.aspects; keySemantics = selvageFacets; origin = [ "loom" ]; } ];
-    wire = if wired then { "loom/braid".selvageReq = "mill/stitch"; } else { }; };
 in builtins.toJSON (mkFederated WIRED).resolved'
 check "T5 required-facet-left-unwired unplanted (braid's capability requirement wired to the mill)" "${row_required_facet_left_unwired/WIRED/true}" 0 "" \
   "$tmpdir/required-facet-left-unwired-green.err" '{"loom/braid":["warp","weft"]}'

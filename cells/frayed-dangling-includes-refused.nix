@@ -23,15 +23,13 @@
   check = asserts (
     !(builtins.tryEval (
       builtins.deepSeq
-        (genLink.link {
-          sources = [
-            {
-              registry = frayed.config.aspects;
-              keySemantics = selvageFacets;
-              origin = [ "frayed" ];
-            }
-          ];
-        }).manifest
+        (genLink.link { } [
+          {
+            registry = frayed.config.aspects;
+            keySemantics = selvageFacets;
+            origin = [ "frayed" ];
+          }
+        ]).manifest
         true
     )).success
   );

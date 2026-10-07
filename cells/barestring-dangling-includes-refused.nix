@@ -15,15 +15,13 @@
   check = asserts (
     !(builtins.tryEval (
       builtins.deepSeq
-        (genLink.link {
-          sources = [
-            {
-              registry = frayedBareString.config.aspects;
-              keySemantics = selvageFacets;
-              origin = [ "frayedBareString" ];
-            }
-          ];
-        }).manifest
+        (genLink.link { } [
+          {
+            registry = frayedBareString.config.aspects;
+            keySemantics = selvageFacets;
+            origin = [ "frayedBareString" ];
+          }
+        ]).manifest
         true
     )).success
   );

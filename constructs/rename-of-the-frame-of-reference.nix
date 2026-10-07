@@ -99,13 +99,7 @@ let
     in
     map (builtins.concatStringsSep ".") (walk [ ] v);
 
-  arm =
-    v: c:
-    genDelivery.project {
-      values = v;
-      cnf = c;
-      inherit selectNodes;
-    };
+  arm = v: c: genDelivery.project { inherit selectNodes; } c v;
   identity = arm values cnf2;
   preserving = arm (rho values) (rhoCnf "class");
   changing = arm (rho values) (rhoCnf "channel");

@@ -21,10 +21,8 @@ let
   # testing it. Taken instead: one extra check calling `project` directly with `selectNodes`,
   # so gen-delivery's own selector stays exercised beside the hub's option.
   bobbinProjection = genDelivery.project {
-    values = genValues;
-    cnf = import ../aspect-cnf.nix;
     selectNodes = v: v.bobbins or { };
-  };
+  } (import ../aspect-cnf.nix) genValues;
   bobbinProjectedNodes = builtins.attrNames bobbinProjection.nodes;
 in
 {

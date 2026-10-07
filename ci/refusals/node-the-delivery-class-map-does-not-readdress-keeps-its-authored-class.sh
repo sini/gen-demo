@@ -15,13 +15,7 @@ row_node_the_delivery_class_map_does_not_readdress_keeps_its_authored_class='let
       ((genAspects.mkAspectSchema cnf).mkAspectModule { })
       { aspects.braid.couching.stitches = [ "braid" ]; }
     ]).config;
-  realizeWith = deliveryClasses: genDelivery.realize {
-    projected = genDelivery.project {
-      inherit values cnf deliveryClasses;
-      selectNodes = _: { godet.aspects = [ "braid" ]; ruffle.aspects = [ "braid" ]; };
-    };
-    terminals = { couching-batiste = c: c.name; couching-organza = c: c.name; };
-  };
+  realizeWith = deliveryClasses: genDelivery.realize { } { couching-batiste = c: c.name; couching-organza = c: c.name; } (genDelivery.project { selectNodes = _: { godet.aspects = [ "braid" ]; ruffle.aspects = [ "braid" ]; }; inherit deliveryClasses; } cnf values);
   arrived = builtins.toJSON (realizeWith { godet.couching = "couching-batiste"; ruffle.couching = "couching-organza"; }).couching-organza;
   dropped = builtins.toJSON (realizeWith { godet.couching = "couching-batiste"; });
 in BODY'

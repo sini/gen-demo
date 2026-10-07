@@ -38,11 +38,7 @@ row_over_listed_instance_relation_meets_the_projection_parity_door='let
     };
   marksOf = instances: (genMerge.evalModuleTree { } (
     [ { freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything; } ]
-    ++ (genDelivery.project {
-      values = { inherit aspects; hosts = { warp.aspects = [ "frame" ]; twill.aspects = [ "bobbin" ]; }; };
-      inherit cnf instances;
-      selectNodes = v: v.hosts;
-    }).nodes.warp.classes.nixos
+    ++ (genDelivery.project { selectNodes = v: v.hosts; inherit instances; } cnf { inherit aspects; hosts = { warp.aspects = [ "frame" ]; twill.aspects = [ "bobbin" ]; }; }).nodes.warp.classes.nixos
   )).config.marks;
   overlisted = r // { reaches = r.reaches // { warp = r.reaches.warp // { inherit (r.reaches.twill) nap; }; }; };
   green = builtins.toJSON (builtins.sort builtins.lessThan (marksOf r));

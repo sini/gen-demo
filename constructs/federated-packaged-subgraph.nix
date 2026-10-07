@@ -1,5 +1,5 @@
 # ── C11 — a packaged subgraph, federated (ADR-0011 §4, ADR-0027). gen-link ships no
-# adapter/lens surface (measured, OPEN 2) — `link { sources; wire; }` with a per-origin
+# adapter/lens surface (measured, OPEN 2) — `link { wire; } sources` with a per-origin
 # `keySemantics` is what it ships, and that is what this declares.
 {
   genAspects,
@@ -55,21 +55,25 @@ let
       };
     }
   ];
-  federated = genLink.link {
-    sources = [
+  federated =
+    genLink.link
       {
-        registry = mill.config.aspects;
-        keySemantics = selvageFacets;
-        origin = [ "mill" ];
+        wire = {
+          "loom/braid".selvageReq = "mill/stitch";
+        };
       }
-      {
-        registry = loom.config.aspects;
-        keySemantics = selvageFacets;
-        origin = [ "loom" ];
-      }
-    ];
-    wire."loom/braid".selvageReq = "mill/stitch";
-  };
+      [
+        {
+          registry = mill.config.aspects;
+          keySemantics = selvageFacets;
+          origin = [ "mill" ];
+        }
+        {
+          registry = loom.config.aspects;
+          keySemantics = selvageFacets;
+          origin = [ "loom" ];
+        }
+      ];
   selvageProvides = genLink.providesOf selvageFacets mill.config.aspects.stitch;
 
   # `frayed` is deliberately never added to `federated`'s `sources` below — the dangling entry

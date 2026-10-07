@@ -33,11 +33,9 @@ let
   couchingProjectionOf =
     deliveryClasses:
     genDelivery.project {
-      values = couchingValues;
-      cnf = couchingCnf;
       selectNodes = _: couchingNodes;
       inherit deliveryClasses;
-    };
+    } couchingCnf couchingValues;
 
   # The pin enters the evaluation as the terminal's own module; the peer set is what
   # `mkHostedTerminal` hands the target as `nodes`, so `peers` is read inside the target.
@@ -87,13 +85,9 @@ let
 in
 {
   inherit couchingPinMap couchingProjectionOf couchingTerminals;
-  couchingRealized = genDelivery.realize {
-    projected = couchingProjectionOf couchingPinMap;
-    terminals = couchingTerminals;
-  };
+  couchingRealized = genDelivery.realize { } couchingTerminals (couchingProjectionOf couchingPinMap);
   # `ruffle` has no entry, so its content stays under `couching`, which has no terminal.
-  couchingMissingRealized = genDelivery.realize {
-    projected = couchingProjectionOf (builtins.removeAttrs couchingPinMap [ "ruffle" ]);
-    terminals = couchingTerminals;
-  };
+  couchingMissingRealized = genDelivery.realize { } couchingTerminals (
+    couchingProjectionOf (builtins.removeAttrs couchingPinMap [ "ruffle" ])
+  );
 }

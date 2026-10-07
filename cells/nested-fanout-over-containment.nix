@@ -172,20 +172,22 @@ let
               }) nodes
             )
           );
-      p = genDelivery.project {
-        values = {
-          inherit aspects;
-          hosts = builtins.listToAttrs (
-            map (n: {
-              name = n;
-              value.aspects = [ member ];
-            }) nodes
-          );
-        };
-        inherit cnf;
-        instances = r;
-        selectNodes = v: v.hosts;
-      };
+      p =
+        genDelivery.project
+          {
+            selectNodes = v: v.hosts;
+            instances = r;
+          }
+          cnf
+          {
+            inherit aspects;
+            hosts = builtins.listToAttrs (
+              map (n: {
+                name = n;
+                value.aspects = [ member ];
+              }) nodes
+            );
+          };
     in
     {
       rel = r;

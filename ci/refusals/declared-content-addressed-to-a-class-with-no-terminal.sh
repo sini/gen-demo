@@ -10,7 +10,7 @@ row_declared_content_addressed_to_a_class_with_no_terminal='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genDelivery = gen.lib.framework.delivery;
   projected.nodes.bobbinet = { bindings = { }; classes = { crewel = [ { stitch = "crewel"; } ]; sashiko = [ { stitch = "sashiko"; } ]; }; };
-  realizeOver = terminals: genDelivery.realize { inherit projected terminals; };
+  realizeOver = terminals: genDelivery.realize { } terminals projected;
   arrived = builtins.toJSON (realizeOver { crewel = a: a; sashiko = a: a; }).sashiko.bobbinet.modules;
   dropped = builtins.toJSON ((realizeOver { crewel = a: a; }).sashiko or "absent");
 in BODY'

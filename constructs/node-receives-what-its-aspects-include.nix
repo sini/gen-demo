@@ -6,13 +6,11 @@
 { genDelivery, genValues }:
 let
   includeProjection = genDelivery.project {
-    values = genValues;
-    cnf = import ../aspect-cnf.nix;
     selectNodes = _: {
       probe.aspects = [ "interfacing" ];
       control.aspects = [ "selvage" ];
     };
-  };
+  } (import ../aspect-cnf.nix) genValues;
 in
 {
   inherit includeProjection;
