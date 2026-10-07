@@ -34,6 +34,7 @@ in
     &&
       dunder kind == [
         "__functor"
+        "__keyEq"
         "__kindAncestors"
         "__kindCycleParents"
         "__kindImports"
