@@ -1,8 +1,9 @@
 # `wrapped-check-redeclared` — C117, den-hoag-lsmnv. An option declared twice with one wrapped value,
 # nixpkgs `addCheck` over gen-merge's `int`, keeps the added check: it refuses `5` and reads `2`, where
 # gen-merge used to merge to bare `int` and serve `5`. Declared beside plain `int`, in either order,
-# the merge would drop the check, so it is refused; that message is `refusals` row 129's. The shared
-# value reading `2` is the passing twin, so a fold refusing every redeclaration cannot pass.
+# the merge is MET (den-hoag-l1j4q, owner-ruled 2026-10-06): it reads `2` and refuses `5`, which the
+# added check rejects; that refusal is `refusals` row 129's. The `2`s are the passing twins, so a fold
+# refusing every redeclaration cannot pass.
 {
   asserts,
   genMerge,
@@ -25,7 +26,9 @@ in
   check = asserts (
     read [ short short ] 2 == 2
     && refused [ short short ] 5
-    && refused [ genMerge.types.int short ] 2
-    && refused [ short genMerge.types.int ] 2
+    && read [ genMerge.types.int short ] 2 == 2
+    && refused [ genMerge.types.int short ] 5
+    && read [ short genMerge.types.int ] 2 == 2
+    && refused [ short genMerge.types.int ] 5
   );
 }
