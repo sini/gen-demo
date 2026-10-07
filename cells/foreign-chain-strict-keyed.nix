@@ -86,7 +86,11 @@ in
   check = asserts (
     (cfg s1 (inner [ "foo" ])).foo.j.k.a == 1
     && (cfg s7 (inner [ "foo" ])).foo.j.k.a == 1
-    && (cfg s6 (inner [ "y" "foo" ])).y.foo.j.k.a == 1
+    &&
+      (cfg s6 (inner [
+        "y"
+        "foo"
+      ])).y.foo.j.k.a == 1
     # `nullOr` over the lazy step, with a key set reading the read tree
     &&
       (cfg (np.uniq (np.nullOr (np.lazyAttrsOf (np.attrsOf el)))) [
