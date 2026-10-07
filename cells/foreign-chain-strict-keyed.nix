@@ -1,4 +1,4 @@
-# `foreign-chain-strict-keyed` — foreign-chain-through-a-nullOr-or-a-strict-step-is-keyed-without-its-siblings,
+# `foreign-chain-strict-keyed` — foreign-chain-through-a-null-or-or-a-strict-step-is-keyed-without-its-siblings,
 # den-hoag-i01nx (ADR-0039, the serve half; ADR-0025 item 1). A foreign chain whose step is a strict
 # `attrsWith` (at the option's own level, under `uniq`, or below a lazy step), or whose lazy step
 # sits under a `nullOr`, is keyed by its stated steps: `nullOr` is a step-free wrapper and every
@@ -82,7 +82,7 @@ let
   refused = v: !(builtins.tryEval (builtins.deepSeq v null)).success;
 in
 {
-  construct = [ "foreign-chain-through-a-nullOr-or-a-strict-step-is-keyed-without-its-siblings" ];
+  construct = [ "foreign-chain-through-a-null-or-or-a-strict-step-is-keyed-without-its-siblings" ];
   check = asserts (
     (cfg s1 (inner [ "foo" ])).foo.j.k.a == 1
     && (cfg s7 (inner [ "foo" ])).foo.j.k.a == 1
