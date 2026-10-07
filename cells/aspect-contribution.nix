@@ -29,6 +29,27 @@
   genSelect,
   genValues,
 }:
+let
+  # den-hoag-8hlo3: `interfacing`'s function definition (`gen-modules/interfacing.nix`) is inline content,
+  # so it is a node of its own, `interfacing/includes/<address>`, its parent `interfacing`. Its address
+  # starts with its path module's anchor, the corpus source's store path, so it is read by structure:
+  # one such node, its anchor naming the module file, then the option path.
+  anon = builtins.filter (n: builtins.match "interfacing/includes/.*" n != null) c16Facts.nodes;
+  anonAddress = builtins.fromJSON (
+    builtins.head (builtins.match "interfacing/includes/(.*)" (builtins.head anon))
+  );
+  anonIsDeclared =
+    builtins.length anon == 1
+    && c16Facts.parentOf.${builtins.head anon} == "interfacing"
+    && builtins.match "k.*%2Fgen-modules%2Finterfacing.nix" (builtins.head anonAddress) != null
+    &&
+      builtins.tail anonAddress == [
+        "aspects"
+        "interfacing"
+        "includes"
+        0
+      ];
+in
 {
   construct = [ "aspect-graph-assembled" ];
   check = asserts (
@@ -41,17 +62,22 @@
     # `__guard` and is therefore NOT a guard leaf — so the node would be silently
     # ABSENT from this list rather than present. The membership assertion below
     # discriminates the fix from the defect on its own, without reading the value.
-    c16Facts.nodes == [
-      "bartack"
-      "hemline"
-      "hemline/facing"
-      "hemline/placket"
-      "hemline/placket/eyelet"
-      "interfacing"
-      "selvage"
-      "stitch"
-      "stitch/trim"
-    ]
+    anonIsDeclared
+    &&
+      c16Facts.nodes == [
+        "bartack"
+        "hemline"
+        "hemline/facing"
+        "hemline/placket"
+        "hemline/placket/eyelet"
+        "interfacing"
+      ]
+      ++ anon
+      ++ [
+        "selvage"
+        "stitch"
+        "stitch/trim"
+      ]
     &&
       c16Assembled.nodeOrder == [
         "bartack"
@@ -60,6 +86,9 @@
         "hemline/placket"
         "hemline/placket/eyelet"
         "interfacing"
+      ]
+      ++ anon
+      ++ [
         "selvage"
         "stitch"
         "stitch/trim"
@@ -109,6 +138,10 @@
         {
           from = "hemline/placket/eyelet";
           to = "hemline/placket";
+        }
+        {
+          from = builtins.head anon;
+          to = "interfacing";
         }
         {
           from = "stitch/trim";
@@ -189,6 +222,9 @@
         "grosgrain"
         "hemline/facing"
         "hemline/placket/eyelet"
+      ]
+      ++ anon
+      ++ [
         "selvage"
         "stitch/trim"
       ]

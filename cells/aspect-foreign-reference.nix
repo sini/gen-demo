@@ -9,7 +9,8 @@
 # edges (den-hoag-zxgan: the by-value first position and the bare-string fourth resolve to the SAME
 # node, `hemline/placket`, and the algebraic graph layer keeps a duplicate rather than deduping it —
 # `gen-scope/lib/graph.nix`'s own documented tolerance), one inline body, one foreign reference —
-# over nine vertices and three `declares` edges (C113's `interfacing` includes `selvage`), with the
+# over ten vertices and four `declares` edges (C113's `interfacing` includes `selvage` and its own
+# inline content, a node since den-hoag-8hlo3), with the
 # totality control that a node declaring no
 # foreign reference is PRESENT with an empty list rather than absent. The declaration was
 # UNDECLARABLE before gen-aspects `3b6d41d`: the reference entered
@@ -86,8 +87,12 @@
     # CARDINALITY, all four figures from this corpus's own evaluation. `bartack`'s four
     # declared positions are accounted for EXACTLY ONCE across the three relations, so
     # neither clause above can pass by a position having been dropped.
-    && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 3
-    && builtins.length c16AspectGraph.vertices == 9
+    && builtins.length (builtins.head c16AspectGraph.edgeGraphs).graph.edges == 4
+    && builtins.length c16AspectGraph.vertices == 10
+    # den-hoag-8hlo3: the fourth edge is `interfacing`'s to its own inline content, now a node
+    && builtins.any (
+      e: e.from == "interfacing" && builtins.match "interfacing/includes/.*" e.to != null
+    ) (builtins.head c16AspectGraph.edgeGraphs).graph.edges
     && builtins.length (builtins.concatLists (builtins.attrValues c16Facts.foreignIncludesOf)) == 1
     && builtins.length genValues.aspects.bartack.includes == 4
     &&
