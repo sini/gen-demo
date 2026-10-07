@@ -90,19 +90,23 @@ let
     )
   ];
   src = n: "entity:${builtins.hashString "sha256" n}";
-  rel = genAspects.instancesFor cnf values.aspects {
-    suppliers = builtins.listToAttrs (
-      map (h: {
-        name = src h;
-        value.loom = "loom-${h}";
-      }) (builtins.attrNames values.hosts)
-    );
-    containment = { };
-    scopes = builtins.mapAttrs (h: v: {
-      members = v.aspects;
-      sources.loom = src h;
-    }) values.hosts;
-  };
+  rel =
+    genAspects.instancesFor cnf values.aspects
+      {
+        suppliers = builtins.listToAttrs (
+          map (h: {
+            name = src h;
+            value.loom = "loom-${h}";
+          }) (builtins.attrNames values.hosts)
+        );
+        containment = { };
+      }
+      (
+        builtins.mapAttrs (h: v: {
+          members = v.aspects;
+          sources.loom = src h;
+        }) values.hosts
+      );
   projection = genDelivery.project {
     inherit values cnf;
     instances = rel;

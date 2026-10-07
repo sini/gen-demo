@@ -27,11 +27,7 @@ row_instance_relations_source_door_decides_by_graph_membership='let
   ]).config.aspects;
   facet = hashIdentity "aspect" [ "name" ] (_: "jacquard");
   gaugeId = genAspects.aspectId [ ] (genAspects.graphFacts cnf aspects).nodeData.gauge;
-  rel = src: genAspects.instancesFor cnf aspects {
-    suppliers.${src}.loom = "jacquard";
-    containment = { };
-    scopes.warp = { members = [ "frame" ]; sources.loom = src; };
-  };
+  rel = src: genAspects.instancesFor cnf aspects { suppliers = { ${src}.loom = "jacquard"; }; containment = { }; } { warp = { members = [ "frame" ]; sources.loom = src; }; };
   vertexOf = src: builtins.head (builtins.attrValues (rel src).vertices);
   green = builtins.toJSON {
     tags = map (s: builtins.head (builtins.split ":" s)) [ facet gaugeId ];

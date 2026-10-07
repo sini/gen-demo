@@ -23,12 +23,15 @@ let
   caught = e: (builtins.tryEval (builtins.deepSeq e true)).success;
   closed = c141Place c141Cnf { tuck = c141Tuck; };
   firedOuter = gv.applyGuard { class = "darwin"; } c141Pleat;
-  instance = genAspects.instanceOf c141Cnf {
+  instance = genAspects.instanceOf c141Cnf { } {
     aspect = "gusset";
-    value = c141DoorNode;
-    context.thimble = "pewter";
-    sources.thimble = c141Source "pewter";
-  };
+    context = {
+      thimble = "pewter";
+    };
+    sources = {
+      thimble = c141Source "pewter";
+    };
+  } c141DoorNode;
   placed = c141Place { } {
     a = c141Tuck;
     b = c141Tuck;

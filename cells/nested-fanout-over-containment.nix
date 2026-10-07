@@ -155,18 +155,23 @@ let
     let
       cnf = cnfOf declared;
       aspects = aspectsOf cnf;
-      r = genAspects.instancesFor cnf aspects {
-        inherit suppliers containment;
-        scopes = builtins.listToAttrs (
-          map (n: {
-            name = n;
-            value = {
-              members = [ member ];
-              sources = nodeSources.${n};
-            };
-          }) nodes
-        );
-      };
+      r =
+        genAspects.instancesFor cnf aspects
+          {
+            inherit suppliers;
+            inherit containment;
+          }
+          (
+            builtins.listToAttrs (
+              map (n: {
+                name = n;
+                value = {
+                  members = [ member ];
+                  sources = nodeSources.${n};
+                };
+              }) nodes
+            )
+          );
       p = genDelivery.project {
         values = {
           inherit aspects;

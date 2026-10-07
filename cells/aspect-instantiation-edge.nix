@@ -72,20 +72,22 @@ let
     loom = entity "jacquard";
     shuttle = entity "fly";
   };
-  r = genAspects.instancesFor cnf aspects {
-    inherit suppliers;
-    containment = { };
-    scopes = {
-      warp = {
-        members = [ "frame" ];
-        inherit sources;
+  r =
+    genAspects.instancesFor cnf aspects
+      {
+        inherit suppliers;
+        containment = { };
+      }
+      {
+        warp = {
+          members = [ "frame" ];
+          inherit sources;
+        };
+        weft = {
+          members = [ "heddle" ];
+          inherit sources;
+        };
       };
-      weft = {
-        members = [ "heddle" ];
-        inherit sources;
-      };
-    };
-  };
   facts = genAspects.graphFacts cnf aspects;
   refuses = v: !(builtins.tryEval (builtins.deepSeq v v)).success;
   selvageI = builtins.head r.reaches.warp.selvage;

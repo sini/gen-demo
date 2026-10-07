@@ -72,17 +72,23 @@ let
     ) lambdas
   );
   src = k: inputs.gen.lib.substrate.identity.hashIdentity "entity" [ "name" ] (_: k);
-  rel = genAspects.instancesFor (cnf // { ref = door; }) aspects {
-    suppliers.${src "pewter"}.thimble = "pewter";
-    containment = { };
-    scopes.loom = {
-      members = [
-        "selvage"
-        "warp"
-      ];
-      sources.thimble = src "pewter";
-    };
-  };
+  rel =
+    genAspects.instancesFor (cnf // { ref = door; }) aspects
+      {
+        suppliers = {
+          ${src "pewter"}.thimble = "pewter";
+        };
+        containment = { };
+      }
+      {
+        loom = {
+          members = [
+            "selvage"
+            "warp"
+          ];
+          sources.thimble = src "pewter";
+        };
+      };
   vertexOf = a: rel.vertices.${builtins.head rel.reaches.loom.${a}};
   # the deferred bobbin node: the outer's include at depth 1, the middle's at depth 2
   deferred = {
@@ -91,9 +97,8 @@ let
   };
   fireAt =
     a: scope: bobbin:
-    (genAspects.instanceOf (cnf // { ref = poisoned; }) {
+    (genAspects.instanceOf (cnf // { ref = poisoned; }) { inherit scope; } {
       aspect = "c174-${a}-deferred";
-      value = deferred.${a};
       context = {
         thimble = "pewter";
         inherit bobbin;
@@ -102,8 +107,7 @@ let
         thimble = src "pewter";
         bobbin = src bobbin;
       };
-      inherit scope;
-    }).entry;
+    } (deferred.${a})).entry;
   bobbins = [
     "linen"
     "silk"

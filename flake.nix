@@ -65,6 +65,8 @@
         genMerge = inputs.gen.lib.modules.merge;
         # gen-rules, the one closure door (C142), at the `framework` bucket like gen-program.
         genRules = inputs.gen.lib.framework.rules;
+        # gen-settings, at the `framework` bucket like gen-rules (den-hoag-7gp66 P2 L5's cell).
+        genSettings = inputs.gen.lib.framework.settings;
       in
       {
         imports = [
@@ -158,6 +160,7 @@
                 genAssemble
                 genMerge
                 genRules
+                genSettings
                 ;
             };
 

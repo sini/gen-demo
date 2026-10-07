@@ -140,23 +140,26 @@ let
     }
     // extra;
   };
-  r = genAspects.instancesFor cnf aspects {
-    inherit suppliers containment;
-    scopes = {
-      warpA = warp "jacquard" inherited { } [ "frame" ];
-      warpB =
-        warp "jacquard" inherited
-          {
-            inherit dye;
-            shuttle = entity "rapier";
-          }
-          [
-            "frame"
-            "pick"
-          ];
-      warpC = warp "dobby" override { } [ "frame" ];
-    };
-  };
+  r =
+    genAspects.instancesFor cnf aspects
+      {
+        inherit suppliers;
+        inherit containment;
+      }
+      {
+        warpA = warp "jacquard" inherited { } [ "frame" ];
+        warpB =
+          warp "jacquard" inherited
+            {
+              inherit dye;
+              shuttle = entity "rapier";
+            }
+            [
+              "frame"
+              "pick"
+            ];
+        warpC = warp "dobby" override { } [ "frame" ];
+      };
   at = n: a: r.reaches.${n}.${a} or [ ];
   descs = ids: builtins.sort (x: y: x < y) (map (id: r.vertices.${id}.entry.description) ids);
   one = a: at "warpA" a == at "warpB" a && builtins.length (at "warpA" a) == 1;
@@ -171,17 +174,16 @@ let
     apart "gauge"
     && descs (at "warpC" "gauge") == [ "gauge-dobby" ]
     &&
-      (genAspects.instanceOf cnf {
+      (genAspects.instanceOf cnf { } {
         # the mint's relatum is the aspect's identity (`cnf.providerPrefix` is unset, so `[ ]`); a
         # vertex's `aspect` is its facts id
         aspect = genAspects.aspectId [ ] aspects.gauge;
-        value = aspects.gauge;
         context = wide;
         sources = {
           loom = entity "jacquard";
           inherit dye;
         };
-      }).id == gaugeA;
+      } aspects.gauge).id == gaugeA;
   i2 = one "gauge" && r.vertices.${gaugeA}.formals == { loom = entity "jacquard"; };
   shapes =
     one "closed"
@@ -232,32 +234,34 @@ let
         };
       }
     ]).config.aspects;
-  rt = genAspects.instancesFor twinCnf twins {
-    inherit suppliers;
-    containment = { };
-    scopes = {
-      loomJ = {
-        members = [
-          "fringe"
-          "tassel"
-          "warpBeam/knot"
-          "clothBeam/knot"
-        ];
-        sources.loom = entity "jacquard";
-      };
-      loomK = {
-        members = [ "fringe" ];
-        sources.loom = entity "jacquard";
-      };
-      shuttleF = {
-        members = [ "tassel" ];
-        sources = {
-          loom = entity "jacquard";
-          shuttle = entity "fly";
+  rt =
+    genAspects.instancesFor twinCnf twins
+      {
+        inherit suppliers;
+        containment = { };
+      }
+      {
+        loomJ = {
+          members = [
+            "fringe"
+            "tassel"
+            "warpBeam/knot"
+            "clothBeam/knot"
+          ];
+          sources.loom = entity "jacquard";
+        };
+        loomK = {
+          members = [ "fringe" ];
+          sources.loom = entity "jacquard";
+        };
+        shuttleF = {
+          members = [ "tassel" ];
+          sources = {
+            loom = entity "jacquard";
+            shuttle = entity "fly";
+          };
         };
       };
-    };
-  };
   marksAt = n: a: map (id: rt.vertices.${id}.entry.nixos.marks) rt.reaches.${n}.${a};
   i9 =
     builtins.length (builtins.attrNames rt.vertices) == 4

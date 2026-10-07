@@ -65,44 +65,46 @@ let
     members = [ "frame" ];
     sources.loom = entity n;
   };
-  r = genAspects.instancesFor cnf aspects {
-    suppliers = {
-      ${entity "warp"}.loom = "jacquard";
-      ${entity "weft"}.loom = "dobby";
-      ${entity "twill"}.loom = "jacquard";
-      ${entity "plain"}.loom = "jacquard";
-      ${entity "boat"}.shuttle = "boat";
-    };
-    containment = {
-      twill = {
-        parent = null;
-        key = "loom";
-        identity = entity "twill";
-        marked = false;
-        bindings = { };
+  r =
+    genAspects.instancesFor cnf aspects
+      {
+        suppliers = {
+          ${entity "warp"}.loom = "jacquard";
+          ${entity "weft"}.loom = "dobby";
+          ${entity "twill"}.loom = "jacquard";
+          ${entity "plain"}.loom = "jacquard";
+          ${entity "boat"}.shuttle = "boat";
+        };
+        containment = {
+          twill = {
+            parent = null;
+            key = "loom";
+            identity = entity "twill";
+            marked = false;
+            bindings = { };
+          };
+          boat = {
+            parent = "twill";
+            key = "shuttle";
+            identity = entity "boat";
+            marked = false;
+            bindings = { };
+          };
+        };
+      }
+      {
+        warp = loomed "warp";
+        weft = loomed "weft";
+        twill = loomed "twill" // {
+          members = [ "bobbin" ];
+        };
+        plain = loomed "plain" // {
+          members = [ "bobbin" ];
+        };
+        loose = loomed "warp" // {
+          members = [ ];
+        };
       };
-      boat = {
-        parent = "twill";
-        key = "shuttle";
-        identity = entity "boat";
-        marked = false;
-        bindings = { };
-      };
-    };
-    scopes = {
-      warp = loomed "warp";
-      weft = loomed "weft";
-      twill = loomed "twill" // {
-        members = [ "bobbin" ];
-      };
-      plain = loomed "plain" // {
-        members = [ "bobbin" ];
-      };
-      loose = loomed "warp" // {
-        members = [ ];
-      };
-    };
-  };
   projectWith =
     instances:
     genDelivery.project {

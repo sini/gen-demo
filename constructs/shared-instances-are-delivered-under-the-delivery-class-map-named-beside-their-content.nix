@@ -103,9 +103,9 @@ let
     };
   }) pins;
   rel = genAspects.instancesFor cnf values.aspects {
-    inherit suppliers scopes;
+    inherit suppliers;
     containment = { };
-  };
+  } scopes;
   projectWith =
     v: instances:
     genDelivery.project {
@@ -128,12 +128,11 @@ let
   ];
   applied =
     n: p:
-    (genAspects.instanceOf cnf {
+    (genAspects.instanceOf cnf { } {
       aspect = p;
-      value = facts.nodeData.${p};
       context = builtins.mapAttrs (k: s: suppliers.${s}.${k}) scopes.${n}.sources;
-      inherit (scopes.${n}) sources;
-    }).entry;
+      sources = (scopes.${n}).sources;
+    } (facts.nodeData.${p})).entry;
   coldValues =
     valuesOf
       (builtins.listToAttrs (
@@ -153,9 +152,8 @@ let
   cold = projectWith coldValues (
     genAspects.instancesFor cnf coldValues.aspects {
       inherit suppliers;
-      scopes = { };
       containment = { };
-    }
+    } { }
   );
   # An instance-key merge, the defect parity exists to catch: every loom reads godet's `tuck` vertex.
   merged = rel // {
@@ -180,17 +178,21 @@ in
         marked = false;
         bindings = { };
       };
-      r = genAspects.instancesFor cnf v.aspects {
-        inherit suppliers;
-        containment = {
-          flounce = rec0 null "bolt" "flounce";
-        }
-        // builtins.mapAttrs (_: rec0 "flounce" "tassel") named;
-        scopes.flounce = {
-          members = [ "fringe" ];
-          sources.bolt = src "flounce";
-        };
-      };
+      r =
+        genAspects.instancesFor cnf v.aspects
+          {
+            inherit suppliers;
+            containment = {
+              flounce = rec0 null "bolt" "flounce";
+            }
+            // builtins.mapAttrs (_: rec0 "flounce" "tassel") named;
+          }
+          {
+            flounce = {
+              members = [ "fringe" ];
+              sources.bolt = src "flounce";
+            };
+          };
     in
     (realizeOf (
       genDelivery.project {
