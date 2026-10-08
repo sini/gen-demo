@@ -4,7 +4,7 @@
 # the wrapped value arrived with: declared alone, twice, and beside plain `int` in either order it
 # reads `2` and refuses `5`, and `typeEq` never takes it for `int`.
 # Re-completion used to vouch for the copy with its base's witnesses: `5` was served in seven of the
-# eight declaration lists, and the copy compared equal to `int`. The `2`s are the passing twins, so a
+# eight declaration lists, and `typeEq` took the `defineType` copy for `int`. The `2`s are the passing twins, so a
 # fold refusing every declaration list cannot pass.
 {
   asserts,
