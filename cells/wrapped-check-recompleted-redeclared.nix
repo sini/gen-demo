@@ -2,7 +2,7 @@
 # `addCheck` over gen-merge's `int` admitting `n < 3`, re-completed through gen-merge's two doors that
 # take a caller's record, `types.defineType` and `mkOptionType`. Each re-completion keeps the witnesses
 # the wrapped value arrived with: declared alone, twice, and beside plain `int` in either order it
-# reads `2` and refuses `5`, and `typeEq` refuses it by name beside `int`, as it refuses the raw copy.
+# reads `2` and refuses `5`, and `typeEq` never takes it for `int`.
 # Re-completion used to vouch for the copy with its base's witnesses: `5` was served in seven of the
 # eight declaration lists, and the copy compared equal to `int`. The `2`s are the passing twins, so a
 # fold refusing every declaration list cannot pass.
@@ -21,6 +21,14 @@ let
       ]
     )).config.spool;
   refused = v: !(builtins.tryEval (builtins.deepSeq v null)).success;
+  # `typeEq` answers `true` for the copy only if re-completion vouched for it with `int`'s witnesses;
+  # it refuses it by name or answers `false`
+  sameAsInt =
+    d:
+    builtins.tryEval (genMerge.types.typeEq int d) == {
+      success = true;
+      value = true;
+    };
   int = genMerge.types.int;
   short = lib.types.addCheck int (n: n < 3);
   keepsItsCheck =
@@ -40,7 +48,7 @@ let
         int
       ]
     ]
-    && refused (genMerge.types.typeEq int d);
+    && !(sameAsInt d);
 in
 {
   construct = [ "a-recompleted-wrapped-value-keeps-its-check" ];
