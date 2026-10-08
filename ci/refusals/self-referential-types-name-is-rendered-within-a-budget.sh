@@ -6,13 +6,13 @@
 # option ACCEPTED a well-typed tree but aborted with `infinite recursion` (uncatchable) on an
 # ill-typed one. A composite name is now rendered within a byte budget handed down to its members,
 # so the refusal names `union<int,listOf<union<int,listOf<…`. The constructors are gen-types'
-# checkers (`modules.types`), not gen-merge's structural `listOf`, which is not a checker and would
-# refuse `r` on both arms. The arms differ by DEF only; the unplanted arm asserts the value.
+# checkers (`modules.types`; the list checker is `checkedListOf`), not gen-merge's structural
+# `listOf`, which is not a checker and would refuse `r` on both arms. The arms differ by DEF only; the unplanted arm asserts the value.
 row_self_referential_types_name_is_rendered_within_a_budget='let
   modules = (builtins.getFlake (toString ./.)).inputs.gen.lib.modules;
   genMerge = modules.merge;
   t = modules.types;
-  r = t.union [ t.int (t.listOf r) ];
+  r = t.union [ t.int (t.checkedListOf r) ];
 in builtins.toJSON (genMerge.evalModuleTree { } [
     { options.tree = genMerge.mkOption { type = r; }; }
     { config.tree = DEF; }

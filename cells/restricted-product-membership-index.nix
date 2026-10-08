@@ -12,18 +12,18 @@
 {
   construct = [ "restricted-product-and-its-membership-index" ];
   check = asserts (
-    map (c: "${c.needle}*${c.thread}") (genProduct.cells threading) == [
+    map (c: "${c.needle}*${c.thread}") (genProduct.nodeCoordinates threading) == [
       "sharp*silk"
       "betweens*linen"
     ]
     && (builtins.tryEval (
-      genProduct.cell {
+      genProduct.nodeAt {
         needle = "sharp";
         thread = "silk";
       } threading
     )).success
     && !(builtins.tryEval (
-      genProduct.cell {
+      genProduct.nodeAt {
         needle = "sharp";
         thread = "linen";
       } threading
@@ -44,9 +44,11 @@
       ]
     # den-hoag-4kh.53.53: a fiber of the restricted product keeps its members and its refusal, and
     # no published record carries an undeclared `__` key (`__cells` is gen-product's one stated one).
-    && map (c: c.thread) (genProduct.cells (genProduct.fiber "needle" "sharp" threading)) == [ "silk" ]
+    &&
+      map (c: c.thread) (genProduct.nodeCoordinates (genProduct.fiber "needle" "sharp" threading))
+      == [ "silk" ]
     && !(builtins.tryEval (
-      genProduct.cell { thread = "linen"; } (genProduct.fiber "needle" "sharp" threading)
+      genProduct.nodeAt { thread = "linen"; } (genProduct.fiber "needle" "sharp" threading)
     )).success
     &&
       map (pg: builtins.filter (k: builtins.substring 0 2 k == "__") (builtins.attrNames pg)) [

@@ -7,15 +7,15 @@
 # `infinite recursion`. gen-types now bounds type nesting for identity with a step-indexed guard
 # (128 levels), so `r` is unmintable and the relation refuses by name. The arms differ by TYPE
 # only: the unplanted arm is the flat `union [ int (listOf int) ]`, which mints and merges. `union`
-# is `modules.merge.types`' (it carries the relation); `listOf` is gen-types' checker, not
+# is `modules.merge.types`' (it carries the relation); `checkedListOf` is gen-types' checker, not
 # gen-merge's structural `listOf` (row 51's trap).
 row_self_referential_type_has_no_identity='let
   modules = (builtins.getFlake (toString ./.)).inputs.gen.lib.modules;
   genMerge = modules.merge;
   M = genMerge.types;
   t = modules.types;
-  r = M.union [ M.int (t.listOf r) ];
-  flat = M.union [ M.int (t.listOf M.int) ];
+  r = M.union [ M.int (t.checkedListOf r) ];
+  flat = M.union [ M.int (t.checkedListOf M.int) ];
   ty = TYPE;
 in builtins.toJSON (genMerge.evalModuleTree { } [
     { options.tree = genMerge.mkOption { type = ty; }; }

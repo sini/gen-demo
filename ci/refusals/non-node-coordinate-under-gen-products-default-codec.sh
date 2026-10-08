@@ -15,8 +15,8 @@ row_non_node_coordinate_under_gen_products_default_codec='let
   reg = { sharp = { id_hash = "sharp"; name = "sharp"; }; };
   needle = { dim = "needle"; graph = genGraph.fromRegistry { } (_: _: [ ]) reg; };
   space = genProduct.productN "cartesian" [ needle ];
-  sharp = genProduct.cell { needle = reg.sharp; } space;
-  blunt = genProduct.cell { needle = { id_hash = "blunt"; name = "blunt"; }; } space;
+  sharp = genProduct.nodeAt { needle = reg.sharp; } space;
+  blunt = genProduct.nodeAt { needle = { id_hash = "blunt"; name = "blunt"; }; } space;
 in BODY'
 check "T5 non-node-coordinate-under-gen-products-default-codec unplanted (a registry entry addresses under the default codec)" \
   "${row_non_node_coordinate_under_gen_products_default_codec/BODY/sharp}" 0 "" "$tmpdir/non-node-coordinate-under-gen-products-default-codec-green.err" '["sharp"]'

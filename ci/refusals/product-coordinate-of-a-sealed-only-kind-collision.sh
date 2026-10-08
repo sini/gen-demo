@@ -34,7 +34,7 @@ row_product_coordinate_of_a_sealed_only_kind_collision='let
   space = product.productN "cartesian" [
     { dim = "bolt"; graph = { nodes = [ b.id_hash ]; edges = _: [ ]; parent = _: null; nodeData = _: b; }; }
   ];
-  ctx = P.mkContext { cellIds = space.nodes; coordsFor = c: product.coordsOf c space; kinds.bolt = endsP; };
+  ctx = P.mkContext { nodeIds = space.nodes; coordsFor = c: product.coordsOf c space; kinds.bolt = endsP; };
   cellB = builtins.head space.nodes;
   stampsEqual = a.id_hash == b.id_hash;
   unplanted = sel.selectorEq (P.coord "bolt" ends a) (P.coord "bolt" ends a);
