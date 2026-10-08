@@ -1,8 +1,8 @@
 # ── C159 — the escape is retired; a closure crosses the door (den-hoag-lwbb1 unit 3, U3r; design
 # Section 5, "retirements last"). One rule closure, written three ways. As gen-program's declared
 # escape it is refused by name, `policy-body/escape-retired`, and so is the escape's firing path;
-# handed to `admit` as a hand-rolled escape record it is refused the same way, never checked and
-# admitted. Written at a rule position of a framework surface and lowered by gen-rules'
+# handed to `admit` as a hand-rolled record it is not the normal form and is refused
+# `policy-body/skeleton-malformed`, never checked and admitted. Written at a rule position of a framework surface and lowered by gen-rules'
 # `defunctionalize`, the same closure becomes a door rule over `ref`, and gen-program's
 # `groundInstances` fires it through the door within the contract the escape used to declare.
 {
@@ -27,9 +27,6 @@ let
       }
     ];
   escapeRecord = contract // {
-    refused = false;
-    __isPolicy = true;
-    opaque = true;
     name = "tack";
     fn = tack;
   };
@@ -72,13 +69,7 @@ let
   };
 in
 {
-  c159Escape = genProgram.escape (
-    builtins.removeAttrs escapeRecord [
-      "refused"
-      "__isPolicy"
-      "opaque"
-    ]
-  );
+  c159Escape = genProgram.escape escapeRecord;
   c159FireEscape = genProgram.fireEscape escapeRecord { thimble = "brass"; };
   c159Admitted = genProgram.admit escapeRecord;
   c159DoorFired =

@@ -87,7 +87,7 @@ in
     && count (chain 20000) == 20000
     &&
       len (
-        genGraph.ancestorsOf { } {
+        genGraph.ancestorsOf {
           parent = id: if idx id == 0 then null else nm (idx id - 1);
         } (nm 19999)
       ) == 19999

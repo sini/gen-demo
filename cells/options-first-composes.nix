@@ -3,11 +3,11 @@
 # gen-graph's `pathsBetween` with its depth cap stated once, then mapped over three ends with one
 # accessor record: the walk to `heddle` returns and the walk to `reed`, one hop past the cap, is
 # refused. The same door under `{ }` walks to `reed` too, so the cap is carried by the partial
-# application, not dropped. `ancestorsOf { }`, mapped the same way, is the composition over a door
-# whose one option is retired; its published contract is read AS DATA (`__contract`), and names
-# `maxDepth` (accepted only to be refused as retired) and the accessor record's `parent`. The record
-# step is also published WITHOUT application, nested in the first step's contract (`__contract.next`,
-# den-hoag-ak8va; OQ16 "nest"), and that nest is the contract the applied step answers with.
+# application, not dropped. The published contracts are read AS DATA (`__contract`): `pathsBetween`'s
+# names `maxDepth`, and its record step is also published WITHOUT application, nested in the first
+# step's contract (`__contract.next`, den-hoag-ak8va; OQ16 "nest"), and that nest is the contract the
+# applied step answers with. `ancestorsOf` takes no options, so it has no options step: its first
+# step is the accessor record, whose contract names `parent`, and it maps over the same record.
 {
   asserts,
   genGraph,
@@ -54,7 +54,7 @@ in
         true
       ]
     &&
-      map (genGraph.ancestorsOf { } parents) [
+      map (genGraph.ancestorsOf parents) [
         "twill"
         "spool"
       ] == [
@@ -64,10 +64,8 @@ in
           "awl"
         ]
       ]
-    && genGraph.ancestorsOf.__contract.optional == [ "maxDepth" ]
-    && (genGraph.ancestorsOf { }).__contract.required == [ "parent" ]
+    && genGraph.ancestorsOf.__contract.required == [ "parent" ]
     && genGraph.pathsBetween.__contract.optional == [ "maxDepth" ]
-    && genGraph.ancestorsOf.__contract.next or null == (genGraph.ancestorsOf { }).__contract
     && genGraph.pathsBetween.__contract.next or null == (genGraph.pathsBetween { }).__contract
   );
 }

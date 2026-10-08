@@ -68,7 +68,6 @@ let
       project = n: n.decls.provided;
       inherit marks;
       localShadowsImport = true;
-      importShadowsParent = true;
       transitiveImports = false;
     };
   neededBy =

@@ -221,7 +221,6 @@
     row6 = "edge-decls-id-not-a-declared-member";
     row7 = "required-facet-left-unwired";
     row8 = "bare-kind-name-string-passed-where-a-kind-value-belongs";
-    row9 = "retired-lattice-key-declared-on-a-cyclic-member";
     row10 = "c7s-planted-cycle";
     row11 = "c7s-door";
     row12 = "aspect-includes-contribution-offered-under-the-reserved-label-i";

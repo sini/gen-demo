@@ -220,7 +220,7 @@ echo "rows: ${#rowfiles[@]} row files sourced from ci/refusals/ (${#labels[@]} a
 
 # The control below reads rows' stderr by file; `grep` on a file that was never written exits 2,
 # which `if grep -q` reads as "no leak". Refuse that instead of passing it.
-for errfile in binding-relatum-minted-in-the-same-pass policy-relatum-not-in-frozen gen-aspectcnf-absent edge-decls-id-not-a-declared-member retired-lattice-key-declared-on-a-cyclic-member c7s-planted-cycle c7s-door node-declared-in-both-registries den-hoag-i546ns-thunk-authorization-guards thunkbindings-is-null spawned-key-colliding-with-an-already-registered-nodes-id attrs-as-a-nullary-container-strategy attrset-definition-the-fold-consumes kind-declaration-key-no-reader-consumes collection-name-colliding-with-gen-schemas-own-vocabulary declaration-only-read-of-a-module-with-a-surplus-key foreign-types-check-before-gen-merges-fold hand-written-attrset-where-a-gen-schema-kind-value-belongs same-minted-kind-builds-a-context-that-answers sealed-only-kind-collision kind-is-keyed-by-its-minted-identity kindfor-returning-the-kind-value-answers entity-of-a-sealed-only-kind-collision product-coordinate-of-a-sealed-only-kind-collision; do
+for errfile in binding-relatum-minted-in-the-same-pass policy-relatum-not-in-frozen gen-aspectcnf-absent edge-decls-id-not-a-declared-member c7s-planted-cycle c7s-door node-declared-in-both-registries den-hoag-i546ns-thunk-authorization-guards thunkbindings-is-null spawned-key-colliding-with-an-already-registered-nodes-id attrs-as-a-nullary-container-strategy attrset-definition-the-fold-consumes kind-declaration-key-no-reader-consumes collection-name-colliding-with-gen-schemas-own-vocabulary declaration-only-read-of-a-module-with-a-surplus-key foreign-types-check-before-gen-merges-fold hand-written-attrset-where-a-gen-schema-kind-value-belongs same-minted-kind-builds-a-context-that-answers sealed-only-kind-collision kind-is-keyed-by-its-minted-identity kindfor-returning-the-kind-value-answers entity-of-a-sealed-only-kind-collision product-coordinate-of-a-sealed-only-kind-collision; do
   if [ ! -f "$tmpdir/$errfile-red.err" ]; then
     echo "FAIL control: $errfile's planted stderr was never written -- the row it names did not run"
     fail=1
@@ -230,9 +230,7 @@ done
 # ── control: the per-row grep must DISCRIMINATE, not just match anything red. Row 2's refusal
 # must not appear in row 1's, and row 1's must not appear in row 2's -- if either did, the check
 # function above would pass a mismatched row/message pairing and the by-name half would be
-# measuring nothing. Extended to the v1.1 rows: row6's `bobbins` message against row9's
-# `retired lattice key` message, the two new rows furthest apart in both library and shape.
-# Further extended to rows 10/11: both gate the same construct through the same door prefix
+# measuring nothing. Extended to rows 10/11: both gate the same construct through the same door prefix
 # (`gen-view.boundedWellDefinedSchedule:`), so this is the pair most likely to cross-match by
 # accident -- row 10 refuses a cyclic component, row 11 refuses a non-minted attrset, and
 # neither message may appear in the other's stderr. Extended again to row 14 against row 5, its
@@ -267,12 +265,6 @@ if grep -qF "unresolved relatum 'pewter'" "$tmpdir/policy-relatum-not-in-frozen-
   fail=1
 elif grep -qF "not in the frozen set" "$tmpdir/binding-relatum-minted-in-the-same-pass-red.err"; then
   echo "FAIL control: policy-relatum-not-in-frozen's message leaked into binding-relatum-minted-in-the-same-pass's refusal"
-  fail=1
-elif grep -qF "not a declared member" "$tmpdir/retired-lattice-key-declared-on-a-cyclic-member-red.err"; then
-  echo "FAIL control: edge-decls-id-not-a-declared-member's message leaked into retired-lattice-key-declared-on-a-cyclic-member's refusal"
-  fail=1
-elif grep -qF "retired lattice key" "$tmpdir/edge-decls-id-not-a-declared-member-red.err"; then
-  echo "FAIL control: retired-lattice-key-declared-on-a-cyclic-member's message leaked into edge-decls-id-not-a-declared-member's refusal"
   fail=1
 elif grep -qF "received an attrset that" "$tmpdir/c7s-planted-cycle-red.err"; then
   echo "FAIL control: c7s-door's message leaked into c7s-planted-cycle's refusal"
@@ -347,7 +339,7 @@ elif grep -qF 'gen-select: selectorEq:' "$tmpdir/product-coordinate-of-a-sealed-
   echo "FAIL control: entity-of-a-sealed-only-kind-collision's message leaked into product-coordinate-of-a-sealed-only-kind-collision's refusal"
   fail=1
 else
-  echo "ok   control (binding-relatum-minted-in-the-same-pass/policy-relatum-not-in-frozen, edge-decls-id-not-a-declared-member/retired-lattice-key-declared-on-a-cyclic-member, c7s-planted-cycle/c7s-door, gen-aspectcnf-absent/node-declared-in-both-registries, den-hoag-i546ns-thunk-authorization-guards/thunkbindings-is-null, attrs-as-a-nullary-container-strategy/attrset-definition-the-fold-consumes, kind-declaration-key-no-reader-consumes/collection-name-colliding-with-gen-schemas-own-vocabulary, declaration-only-read-of-a-module-with-a-surplus-key/foreign-types-check-before-gen-merges-fold, hand-written-attrset-where-a-gen-schema-kind-value-belongs/same-minted-kind-builds-a-context-that-answers, same-minted-kind-builds-a-context-that-answers/kindfor-returning-the-kind-value-answers, kind-is-keyed-by-its-minted-identity/kindfor-returning-the-kind-value-answers, sealed-only-kind-collision/entity-of-a-sealed-only-kind-collision and entity-of-a-sealed-only-kind-collision/product-coordinate-of-a-sealed-only-kind-collision refusals do not cross-match)"
+  echo "ok   control (binding-relatum-minted-in-the-same-pass/policy-relatum-not-in-frozen, c7s-planted-cycle/c7s-door, gen-aspectcnf-absent/node-declared-in-both-registries, den-hoag-i546ns-thunk-authorization-guards/thunkbindings-is-null, attrs-as-a-nullary-container-strategy/attrset-definition-the-fold-consumes, kind-declaration-key-no-reader-consumes/collection-name-colliding-with-gen-schemas-own-vocabulary, declaration-only-read-of-a-module-with-a-surplus-key/foreign-types-check-before-gen-merges-fold, hand-written-attrset-where-a-gen-schema-kind-value-belongs/same-minted-kind-builds-a-context-that-answers, same-minted-kind-builds-a-context-that-answers/kindfor-returning-the-kind-value-answers, kind-is-keyed-by-its-minted-identity/kindfor-returning-the-kind-value-answers, sealed-only-kind-collision/entity-of-a-sealed-only-kind-collision and entity-of-a-sealed-only-kind-collision/product-coordinate-of-a-sealed-only-kind-collision refusals do not cross-match)"
 fi
 
 exit $fail
