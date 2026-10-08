@@ -5,9 +5,10 @@
 # refuses it (E2). `addressed` is `renderAddress { field; }` mapped over two aspects. `minted` is
 # gen-aspects' `instanceOf` with its `scope` option stated once, then applied to two shuttles: each
 # instance carries the handed scope, where `{ }` carries none. Each door's contract is read AS DATA
-# (`__contract`, the `cnf` step's retired `classes` among it), and four refusals are caught at the
-# options application: an unknown option, the unmigrated one-record calls of `resolveOne` and
-# `instanceOf` (`layers`, `aspect` are no options), and the retired `cnf` key `classes`.
+# (`__contract`, which carries no retired list), and four refusals are caught at the options
+# application: an unknown option, the unmigrated one-record calls of `resolveOne` and `instanceOf`
+# (`layers`, `aspect` are no options), and `classes`, a `cnf` key the library no longer reads (a class
+# is a `keySemantics` entry), refused as any unknown key (den-hoag-c54n4).
 {
   asserts,
   genSettings,
@@ -97,7 +98,7 @@ in
         "aspect"
         "settings"
       ]
-    && genAspects.instanceOf.__contract.retired ? classes
+    && !(genAspects.instanceOf.__contract ? retired)
     && (genAspects.instanceOf { }).__contract.optional == [ "scope" ]
     && refuses (genSettings.resolveOne { weft = 1; })
     && refuses (

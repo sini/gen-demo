@@ -25,7 +25,7 @@
       "bobbin"
     ]
     &&
-      map (c: "${c.thimble}*${c.bobbin}") (genProduct.cells seamSpace) == [
+      map (c: "${c.thimble}*${c.bobbin}") (genProduct.nodeCoordinates seamSpace) == [
         "damask*faille"
         "damask*grosgrain"
         "pewter*faille"

@@ -12,11 +12,11 @@
 }:
 let
   c20Ctx = genSelect.adapters.product.mkContext {
-    cellIds = [ seamCell ];
+    nodeIds = [ seamCell ];
     coordsFor = cell: seamSpace.product.coordsOf cell;
   };
   c20ArmedCtx = genSelect.adapters.product.mkContext {
-    cellIds = [ seamCell ];
+    nodeIds = [ seamCell ];
     coordsFor = _cell: seamSpace.product.coordsOf; # under-applied: returns a function, not coords
   };
 in

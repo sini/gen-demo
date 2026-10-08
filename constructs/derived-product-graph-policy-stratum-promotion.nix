@@ -34,7 +34,7 @@ let
       entryOf = i: i;
     }
   ];
-  seamCell = genProduct.cell {
+  seamCell = genProduct.nodeAt {
     thimble = "pewter";
     bobbin = "grosgrain";
   } seamSpace;
