@@ -1,9 +1,9 @@
-# `foreign-verify-copy` — a nixpkgs base carrying a `// { verify = …; }` copy keeps the base's own
-# `check` over each definition, as nixpkgs' `checkedAndMerged` does: the copy's `verify` judges the
-# merged value and cannot stand in for it. `5` given to such a copy of `attrs`, `submodule`, `lines`
-# or `attrTag` used to abort uncatchably in the base's raw merge (`{ } // 5`, `concatStringsSep`); it
-# is now refused catchably at both doors, beside the same copy serving a value its base admits, so
-# a fold refusing everything cannot pass. The message is `refusals` row
+# `foreign-verify-copy` — den-hoag-bm1s5. A nixpkgs base carrying a `// { verify = …; }` copy keeps
+# the base's own `check` over each definition, as nixpkgs' `checkedAndMerged` does: the copy's
+# `verify` judges the merged value and cannot stand in for it. `5` given to such a copy of `attrs`,
+# `submodule`, `lines` or `attrTag` used to abort uncatchably in the base's raw merge (`{ } // 5`,
+# `concatStringsSep`); it is now refused catchably at both doors, beside the same copy serving a
+# value its base admits, so a fold refusing everything cannot pass. The message is `refusals` row
 # `a-verify-copy-of-a-foreign-base`'s.
 {
   asserts,
