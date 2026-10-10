@@ -369,6 +369,8 @@
   };
   renamed = {
     constructs = { };
-    rows = { };
+    rows = {
+      a-swapped-key-below-a-foreign-chain-node-is-refused-at-the-key-read = "a-value-reading-merge-below-a-foreign-chain-node-is-refused-where-it-reads";
+    };
   };
 }

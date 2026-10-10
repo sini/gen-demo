@@ -5,8 +5,8 @@
 # `attrsWith` a step, so each key is read only where it is read. A key below the lazy step `mkIf`
 # on the read tree, where it aborted uncatchably, and a sibling of another type, where it was
 # refused, read nixpkgs' value. A stock-named strict step whose merge was overridden to swap two
-# keys' trees, or to add a key to each tree, is refused by name (the stated price), never served a
-# wrong value.
+# keys' trees serves nixpkgs' value (den-hoag-lif3n); one overridden to add a key to each tree is
+# refused by name (the stated price), never served a wrong value.
 
 {
   asserts,
@@ -131,7 +131,7 @@ in
         { config.o.bar = null; }
         { config.o.bar.j.k.a = 2; }
       ]).foo.j.k.a == 1
-    && refused (cfg (reshaped swap s1) two).foo.j.k.a
+    && (cfg (reshaped swap s1) two).foo.j.k.a == 2
     && refused (cfg (reshaped addExtra s1) two)
   );
 }

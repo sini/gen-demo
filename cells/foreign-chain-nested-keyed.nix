@@ -5,8 +5,10 @@
 # record's, read off the merge's result at that key only. A sibling whose key set reads the read
 # tree, an inner `mkIf` below the node, and siblings that add keys or are `mkIf` on another key's
 # tree all read nixpkgs' value, where they aborted uncatchably. A merge overridden to swap two
-# keys' trees is refused by name (the message is gen-merge's
-# `testsError.nesting-keys-foreign-chain-nested`), never served a wrong value.
+# keys' trees serves nixpkgs' value (den-hoag-lif3n), where it was refused. One that decides the
+# swap on an element's value is refused, catchably, where it read an element the fold over the
+# definitions placed otherwise, never served a wrong value (the T5 row
+# `a-value-reading-merge-below-a-foreign-chain-node-is-refused-where-it-reads` says where).
 
 {
   asserts,
@@ -64,6 +66,21 @@ let
           r = lazy.substSubModules m;
         in
         r // { merge = loc: defs: swap (r.merge loc defs); };
+    }
+  );
+  # the same chain whose merge decides the swap on `baz`'s value: the fold over the definitions'
+  # sites, which are records, swaps, and the fold over the values does not
+  bySwap = v: if (v.baz.j.k.a or 0) == 3 then v else swap v;
+  valueSwapped = np.uniq (
+    lazy
+    // {
+      merge = loc: defs: bySwap (lazy.merge loc defs);
+      substSubModules =
+        m:
+        let
+          r = lazy.substSubModules m;
+        in
+        r // { merge = loc: defs: bySwap (r.merge loc defs); };
     }
   );
 in
@@ -149,13 +166,23 @@ in
           b = 0;
         };
       }
+    &&
+      (cfg swapped [
+        {
+          config.o = {
+            foo.j.k.a = 1;
+            bar.j.k.a = 2;
+          };
+        }
+      ]).foo.j.k.a == 2
     && !(builtins.tryEval (
       builtins.deepSeq
-        (cfg swapped [
+        (cfg valueSwapped [
           {
             config.o = {
               foo.j.k.a = 1;
               bar.j.k.a = 2;
+              baz.j.k.a = 3;
             };
           }
         ]).foo.j.k.a

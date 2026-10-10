@@ -3,8 +3,8 @@
 # (`unique`, `coercedTo`) over one lazy `attrsWith`, above a gen element that may nest, is keyed by
 # the step its functors state: a sibling whose key set reads the read tree, or an alias of it, is no
 # longer forced to key it, so the read serves nixpkgs' value where it aborted uncatchably. A merge
-# overridden to move a key's tree to another key is refused by name (the message is gen-merge's
-# `testsError.nesting-keys-foreign-chain`), never served a wrong value.
+# overridden to move a key's tree to another key serves nixpkgs' value: the moved tree is the
+# evaluation's own child, read where the merge put it (den-hoag-lif3n).
 
 {
   asserts,
@@ -87,6 +87,6 @@ in
         foo.k.x = 1;
         bar.k.x = 2;
       }
-    && !(builtins.tryEval (builtins.deepSeq (cfg swapped two).foo.k.x null)).success
+    && (cfg swapped two).foo.k.x == 2
   );
 }
