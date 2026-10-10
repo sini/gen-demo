@@ -3,7 +3,8 @@
 #    `foreign-v2-check-override`, den-hoag-v2-check-override-accepted-ku5dt) ──
 # Row 79: nixpkgs refuses a v2 type whose `check` is replaced by `//` (its merge computes the verdict
 # from the check it shipped), and gen-merge used to accept it. Row 80: on a submodule-bearing v2 type
-# nixpkgs erases the override without a word when it rebuilds the type; gen-merge refuses it by name.
+# nixpkgs erases the override without a word when it rebuilds the type; gen-merge enforces it as a
+# check, so a value the override rejects is refused by name (den-hoag-ukitj).
 # Each unplanted arm is the same option with the plant removed and prints the value.
 row_ad_hoc_check_override_of_a_nixpkgs_v2_type='let
   flake = builtins.getFlake (toString ./.);
@@ -24,10 +25,10 @@ check "T5 ad-hoc-check-override-of-a-nixpkgs-v2-type planted   (an ad-hoc check 
   "$tmpdir/ad-hoc-check-override-of-a-nixpkgs-v2-type-red.err"
 row_stock_submodulebolt='lib.types.submodule { options.warp = lib.mkOption { type = lib.types.str; }; }'
 row_stock_submoduleunplanted="${row_ad_hoc_check_override_of_a_nixpkgs_v2_type/TYPE/$row_stock_submodulebolt}"
-row_stock_submoduleplant="$row_stock_submodulebolt // { check = builtins.isAttrs; }"
+row_stock_submoduleplant="$row_stock_submodulebolt // { check = v: if builtins.isAttrs v then v.warp != \"sateen\" else false; }"
 row_stock_submoduleplanted="${row_ad_hoc_check_override_of_a_nixpkgs_v2_type/TYPE/$row_stock_submoduleplant}"
 check "T5 stock-submodule unplanted (the stock submodule)" "$row_stock_submoduleunplanted" 0 "" \
   "$tmpdir/stock-submodule-green.err" 'sateen'
-check "T5 stock-submodule planted   (an ad-hoc check override of a submodule-bearing v2 type)" "$row_stock_submoduleplanted" 1 \
-  "which the foreign engine erases without a word when it rebuilds a submodule-bearing type" \
+check "T5 stock-submodule planted   (an ad-hoc check override of a submodule-bearing v2 type, rejecting the value)" "$row_stock_submoduleplanted" 1 \
+  "gen-merge: a definition for option \`spool' is not of type \`submodule'" \
   "$tmpdir/stock-submodule-red.err"
