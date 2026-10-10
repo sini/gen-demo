@@ -6,7 +6,8 @@
 # on the read tree, where it aborted uncatchably, and a sibling of another type, where it was
 # refused, read nixpkgs' value. A stock-named strict step whose merge was overridden to swap two
 # keys' trees serves nixpkgs' value (den-hoag-lif3n); one overridden to add a key to each tree is
-# refused by name (the stated price), never served a wrong value.
+# refused by name where nixpkgs serves it, an open defect (the parity-defect rule), never served a
+# wrong value.
 
 {
   asserts,
