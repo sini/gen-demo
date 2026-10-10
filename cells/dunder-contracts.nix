@@ -5,7 +5,8 @@
 # gen-select) carries gen-algebra's `__mint` and gen-schema's `__sealed`, `__kindImports` (its parent
 # kind values), `__kindCycleParents` and `__kindWitness` (the inheritance-cycle walk's parents as
 # written and witness), `__kindAncestors` (its transitive ancestors, kind values keyed by mark) and
-# `__kindSelf` (its completion stamp, den-hoag-1a4f6) beside Nix's own `__functor`;
+# `__kindSelf` (its completion stamp, den-hoag-1a4f6) with `__witness` (the stamp's declaration gen-algebra's
+# `conservativeEq` reads) beside Nix's own `__functor`;
 # a gen-select selector (read by gen-dispatch) carries `__sel`. Red when any of them grows ANY new `__`
 # key, declared or not, or loses one. This is the corpus declaration of those crossings; whether each
 # key has its contract line is the census's to say, not this cell's.
@@ -42,6 +43,7 @@ in
         "__kindWitness"
         "__mint"
         "__sealed"
+        "__witness"
       ]
     && dunder (genSelect.kind kind) == [ "__sel" ]
   );
