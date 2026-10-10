@@ -3,8 +3,8 @@
 # mark while admitting every value, so comparing it with the type it was copied from is refused by
 # name, never answered `true`; declared as an option it is still served, and declaring the true type
 # beside it still refuses "x". Types a module declares are completed at gen-merge's boundary, so they
-# decide as before. The price, stated: a description-only `//` is a copy too, and is refused the same
-# way at `typeEq`.
+# decide as before. A description-only `//` is a copy too, and is refused the same way at `typeEq`
+# where nixpkgs serves it: an open defect (the parity-defect rule), not a price.
 {
   asserts,
   genMerge,

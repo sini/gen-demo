@@ -20,7 +20,7 @@ check "T5 module-function-whose-result-is-not-a-module unplanted (a module funct
   "${row_module_function_whose_result_is_not_a_module/BODY/builtins.toJSON (spool goodM)}" 0 "" "$tmpdir/module-function-whose-result-is-not-a-module-green.err" '5'
 check "T5 module-function-whose-result-is-not-a-module planted   (a module function returning a function is refused by name)" \
   "${row_module_function_whose_result_is_not_a_module/BODY/builtins.toJSON (spool (_: selfM))}" 1 \
-  "gen-merge: module \`<gen-merge>' is a function whose result is lambda, not an attribute set" \
+  "gen-merge: module \`<unknown-file>' is a function whose result is lambda, not an attribute set" \
   "$tmpdir/module-function-whose-result-is-not-a-module-red.err"
 check "T5 module-function-whose-result-is-not-a-module catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row_module_function_whose_result_is_not_a_module/BODY/if (builtins.tryEval (builtins.deepSeq (spool (_: selfM)) null)).success then \"ADMITTED\" else \"CAUGHT\"}" \

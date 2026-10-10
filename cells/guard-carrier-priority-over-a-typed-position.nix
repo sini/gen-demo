@@ -2,8 +2,8 @@
 # definition beside a guard record puts a priority over a nested value holding an `includes` list, a typed
 # position. The typed half is folded when the carrier is built and keeps the priority that selected it, so
 # the priority ranges over the fired record's content as the module system ranges it: `mkForce` beats the
-# record at `sleeve`, `mkDefault` loses to it at `collar`. Before, gen-aspects refused both by name (a
-# stated shortfall). Control: a plain nested `includes` beside the record's own nested content.
+# record at `sleeve`, `mkDefault` loses to it at `collar`. Before, gen-aspects refused both by name where
+# the module system serves them, an open defect (the parity-defect rule), now closed. Control: a plain nested `includes` beside the record's own nested content.
 {
   asserts,
   genAspects,
