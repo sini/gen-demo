@@ -44,7 +44,7 @@ check "T5 inert-args unplanted (inert args: two constructions of one term are on
   "$tmpdir/inert-args-green.err" 'true'
 check "T5 inert-args planted   (a lambda in args: two constructions are refused by name, never decided)" \
   "${row_inert_argsplanted/BODY/builtins.toJSON twice}" 1 \
-  "gen-types: typeEq: two declarations of 'stitched' mint one identity and are unequal only at sealed component(s) 'pred'" \
+  "conservativeEq: two declarations of 'stitched' mint one identity and are unequal only at sealed component(s) 'pred'" \
   "$tmpdir/inert-args-red.err"
 check "T5 inert-args catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row_inert_argsplanted/BODY/if (builtins.tryEval twice).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
