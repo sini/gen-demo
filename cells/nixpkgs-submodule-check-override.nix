@@ -5,6 +5,9 @@
 # and a value it rejects is refused by name. nixpkgs serves the first and silently serves the second;
 # gen-merge used to refuse both. Each refusal stands beside its passing twin, so a fold refusing
 # everything cannot pass, and neither can one serving everything.
+# Through `mkOptionType` too, and for nixpkgs' `addCheck` as for the override (den-hoag-aux3h): the door
+# completes the record with a gen relation, and its check still rides on every rebuild of its module set,
+# redeclared beside the plain submodule, beside the plain one through the same door, or twice.
 {
   asserts,
   genMerge,
@@ -30,13 +33,21 @@ let
   override = plain // {
     check = v: plain.check v && v.warp != 5;
   };
+  added = ft.addCheck plain (v: v.warp != 5);
   ok = {
     warp = 2;
   };
   bad = {
     warp = 5;
   };
-  positions = o: [
+  positions = door: o: [
+    {
+      types = [
+        (door plain)
+        o
+      ];
+      inherit ok bad;
+    }
     {
       types = [ o ];
       inherit ok bad;
@@ -73,14 +84,15 @@ let
       bad.k = bad;
     }
   ];
-  enforced = o: lib.all (p: served p.types p.ok && refused p.types p.bad) (positions o);
+  enforced = door: o: lib.all (p: served p.types p.ok && refused p.types p.bad) (positions door o);
 in
 {
   construct = [ "a-nixpkgs-submodule-check-override-is-enforced" ];
   check = asserts (
-    lib.all (door: enforced (door override)) [
+    lib.all (door: enforced door (door override) && enforced door (door added)) [
       (d: d)
       gt.defineType
+      genMerge.mkOptionType
     ]
   );
 }
