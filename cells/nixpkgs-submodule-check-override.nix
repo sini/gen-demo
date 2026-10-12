@@ -10,7 +10,9 @@
 # redeclared beside the plain submodule, beside the plain one through the same door, or twice.
 # And as a member of gen's `either` and `oneOf` at every one of those positions (den-hoag-78k2m): a
 # union's members merge pairwise, and each member's join is met as a declaration's is. And as the
-# `freeformType` of two modules, a plane no declaration list's fixup runs on.
+# `freeformType` of two modules, a plane no declaration list's fixup runs on. And nixpkgs' `addCheck` with
+# its module set nulled, through `mkOptionType` beside the plain submodule in either order and as a
+# `gt.attrsOf` element: its join is the submodule's, and its check is carried on it.
 {
   asserts,
   genMerge,
@@ -107,6 +109,28 @@ let
       ]
     )
   ];
+  # nixpkgs' addCheck with its module set nulled: it states none, while its functor, merge and rebuild are the
+  # submodule's, so the join beside the plain submodule is the submodule's
+  nulled = added // {
+    getSubModules = null;
+  };
+  nulledHolds =
+    lib.all (types: served types ok && refused types bad) [
+      [
+        plain
+        (genMerge.mkOptionType nulled)
+      ]
+      [
+        (genMerge.mkOptionType nulled)
+        plain
+      ]
+    ]
+    && lib.all (types: served types { k = ok; } && refused types { k = bad; }) [
+      [
+        (gt.attrsOf plain)
+        (gt.attrsOf nulled)
+      ]
+    ];
   enforced =
     door: o:
     lib.all (
@@ -123,5 +147,6 @@ in
       gt.defineType
       genMerge.mkOptionType
     ]
+    && nulledHolds
   );
 }

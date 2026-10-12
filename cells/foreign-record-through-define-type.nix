@@ -3,8 +3,10 @@
 # `types.defineType` keeps its own check: `addCheck` over nixpkgs' `int`, `enum`, `listOf`, `attrsOf` and
 # `submodule` refuses what its added check refuses and reads what it admits, declared alone and beside
 # its plain base in both orders, and plain nixpkgs `int` still refuses a string. gen-merge used to
-# re-complete the record as a gen type with no domain and serve every value. Each refusal stands beside
-# its passing twin, so a door refusing everything cannot pass.
+# re-complete the record as a gen type with no domain and serve every value. A checked nixpkgs submodule,
+# and one copied with a `// { verify }`, keep their checks declared as an option INSIDE a nixpkgs submodule,
+# once or twice: the door returns the module set closed under the rebuilds nixpkgs' own evaluation runs.
+# Each refusal stands beside its passing twin, so a door refusing everything cannot pass.
 {
   asserts,
   genMerge,
@@ -70,6 +72,21 @@ let
     && refused [ x r.t ] r.bad
     && served [ r.t x ] r.ok
     && served [ x r.t ] r.ok;
+  # the record declared as an option INSIDE a nixpkgs submodule, whose own evaluation rebuilds it
+  host =
+    n: x:
+    ft.submodule {
+      imports = builtins.genList (_: { options.weft = lib.mkOption { type = x; }; }) n;
+    };
+  nests =
+    x: bad: ok:
+    builtins.all (n: refused [ (host n x) ] { weft = bad; } && served [ (host n x) ] { weft = ok; }) [
+      1
+      2
+    ];
+  verified = sub // {
+    verify = v: if (v.warp or 0) == 5 then "warp is 5" else null;
+  };
 in
 {
   construct = [ "a-foreign-record-through-define-type-keeps-its-check" ];
@@ -77,5 +94,7 @@ in
     builtins.all holds rows
     && refused [ (genMerge.types.defineType ft.int) ] "sateen"
     && served [ (genMerge.types.defineType ft.int) ] 2
+    && nests (genMerge.types.defineType (ft.addCheck sub (v: v.warp != 5))) { warp = 5; } { warp = 2; }
+    && nests (genMerge.types.defineType verified) { warp = 5; } { warp = 2; }
   );
 }
