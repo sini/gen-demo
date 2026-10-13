@@ -4,9 +4,11 @@
 # the foreign side and carry it through the door once. Through `mkOptionType` that serves nixpkgs'
 # value, under gen-merge's `evalModuleTree` and under nixpkgs' own `lib.evalModules`. Through
 # `deriveType` it serves the same value, but only because the re-homing walk answers "may nest" at its
-# fuel's exhaustion and so re-homes a cyclic container; an acyclic foreign container there is the
-# vocabulary's named refusal. The control: the same knot under `uniq`, a container outside the six,
-# is the walk's named refusal at its fuel, and `tryEval` catches it.
+# fuel's exhaustion and so re-homes a cyclic container; an acyclic foreign container there is
+# `deriveType`'s named refusal, which names `defineType` as the door that serves it (`refusals` row
+# `derive-type-over-a-foreign-container-names-define-type`). The control: the same knot under
+# `uniq`, a container outside the six, is the walk's named refusal at its fuel, and `tryEval` catches
+# it.
 {
   asserts,
   genMerge,
