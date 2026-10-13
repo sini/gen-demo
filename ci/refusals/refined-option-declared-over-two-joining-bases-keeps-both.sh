@@ -8,14 +8,15 @@
 # ★ NOT A REFUSAL ROW. The unplanted arms assert a stdout VALUE, both option names, so a library that
 # refused every redeclaration cannot pass them -- row 30's reason. The bare pair is the live control:
 # it is what the refined pair must answer. The planted arm differs by one refinement record on the
-# second declaration, and must refuse, so a library that merged every refined pair cannot pass it.
+# second declaration, which forbids the defined `weft = 1`: the pair meets (den-hoag-rmxbx, G11) and
+# the value is refused by that refinement's message, so a library that dropped it cannot pass.
 row_refined_option_declared_over_two_joining_bases_keeps_both='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genSchema = gen.lib.substrate.schema;
   genMerge = gen.lib.modules.merge;
   t = genMerge.types;
   woven = { check = _: true; message = "must be woven"; };
-  felted = { check = _: true; message = "must be felted"; };
+  felted = { check = v: (v.weft or 0) != 1; message = "must be felted"; };
   warp = t.submodule { options.warp = genMerge.mkOption { type = t.str; default = "tabby"; }; };
   weft = t.submodule { options.weft = genMerge.mkOption { type = t.int; default = 0; }; };
   bolt = b: r: genMerge.mkOption { type = WRAP; };
@@ -41,7 +42,7 @@ check "T5 refined-option-declared-over-two-joining-bases-keeps-both unplanted (t
 check "T5 refined-option-declared-over-two-joining-bases-keeps-both unplanted (the other presentation order keeps both declarations)" \
   "${row_refined_option_declared_over_two_joining_bases_keeps_bothrev/SECONDREFINEMENT/woven}" 0 "" \
   "$tmpdir/refined-option-declared-over-two-joining-bases-keeps-both-green-rev.err" 'warp,weft'
-check "T5 refined-option-declared-over-two-joining-bases-keeps-both planted   (a SECOND, different refinement on the same joining pair)" \
+check "T5 refined-option-declared-over-two-joining-bases-keeps-both planted   (a SECOND, different refinement on the same joining pair, forbidding the defined value)" \
   "${row_refined_option_declared_over_two_joining_bases_keeps_bothfwd/SECONDREFINEMENT/felted}" 1 \
-  "does not reconcile" \
+  "is not of the expected type: must be felted" \
   "$tmpdir/refined-option-declared-over-two-joining-bases-keeps-both-red.err"
