@@ -8,8 +8,9 @@
 # KEYS, and a merge decision keys. The pair was then refused; under the meet (ADR-0039) it merges to
 # the base refined by BOTH, so the value either refinement forbids is refused by that refinement.
 # ★ THE UNPLANTED ARMS ASSERT A STDOUT VALUE, the surviving refinements' own messages: one for the
-# SAME refinement declared twice, both for two different ones, so a library that refused every
-# redeclaration, or dropped a refinement, cannot pass them. The planted arm defines a value only the
+# SAME refinement declared twice, both for two different ones (the deciding, later declaration's
+# first), so a library that refused every redeclaration, or dropped a refinement, cannot pass them.
+# The planted arm defines a value only the
 # SECOND refinement forbids, and is refused naming that refinement's message, which a library
 # dropping it cannot produce.
 row_two_different_refinements_of_one_base='let
@@ -40,7 +41,7 @@ check "T5 two-different-refinements-of-one-base unplanted (the SAME refinement d
   "$tmpdir/two-different-refinements-of-one-base-green.err" 'must be a valid gauge (1-65535)'
 check "T5 two-different-refinements-of-one-base unplanted (two DIFFERENT refinements of the same base meet, and both survivors are the assertion)" \
   "${row_two_different_refinements_of_one_base/SECONDREFINEMENT/slack}" 0 "" \
-  "$tmpdir/two-different-refinements-of-one-base-green-meet.err" 'must be a valid gauge (1-65535),must be slack'
+  "$tmpdir/two-different-refinements-of-one-base-green-meet.err" 'must be slack,must be a valid gauge (1-65535)'
 check "T5 two-different-refinements-of-one-base planted   (a value only the SECOND, different refinement forbids, refused by its message)" \
   "$row_two_different_refinements_of_one_basevalue" 1 \
   "is not of the expected type: must be slack" \
