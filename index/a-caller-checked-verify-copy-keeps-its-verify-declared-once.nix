@@ -1,0 +1,5 @@
+{
+  title = "a caller-checked verify copy keeps its verify declared once";
+  adr = "0025 item 1, 0039, fzbap";
+  what = "`caller-checked-verify-copy-keeps-its-verify`: `defineType` and `mkOptionType` over `addCheck (mkOptionType (addCheck int below10) // { verify = notFour; }) notFive`, `defineType` over the same copy with `notFive` laid by `// { check }`, and `mkOptionType` over `addCheck (nullOr int // { verify = notFour; }) notFive`, each declared once in nixpkgs' `lib.evalModules`, refuse `4`, which only the copy's `verify` rejects, beside `5` and `20`, and serve `3`; below nixpkgs' `listOf` it refuses `[ 4 ]`, and at a union its member is picked as nixpkgs' `addCheck` twin picks it: `either spindle str` and `either sley str` refuse `4`, `either spindle (coercedTo int toString str)` and the same over `sley` serve `4` as `\"4\"`, and the overlapping `either spindle int` serves `4` through `int`. gen-merge served `4`, because a copy the door cannot return as itself was re-completed as a check rewrite, and the rewrite's check was published as the caller wrote it, so no field nixpkgs reads stated the copy's `verify`";
+}
