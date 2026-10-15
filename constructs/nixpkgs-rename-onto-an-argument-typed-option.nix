@@ -4,7 +4,7 @@
 # leaf copies a type that reads an argument (NixOS `systemd.nix` under `with utils;`). gen-merge's
 # declaration guard resolves the alias in a staged pass whose earlier pass's declarations carry the
 # arguments their own modules define. The chain `selvage` → `fringe` → `braid` resolves one link per
-# pass and keeps the passes running to the one where `spool` is readable.
+# pass beside it.
 {
   genMerge,
   lib,
