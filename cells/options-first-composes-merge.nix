@@ -69,6 +69,7 @@ in
         "coreShortCircuit"
         "warmFrom"
         "editedModules"
+        "class"
       ]
     && (genMerge.mergeTypes t.str t.str).name == t.str.name
     && (genMerge.mergeTypes heddle t.int).name == t.str.name
