@@ -71,6 +71,22 @@ let
       };
     in
     self;
+  # an author named `int` whose admission lives in its MERGE (its check is `isInt`, its merge refuses an odd value),
+  # whose stated relation answers gen's `int` beside an `int`: a join that keeps every name, so only the author's own
+  # fold refuses 3
+  evenMerge = genMerge.mkOptionType {
+    name = "int";
+    check = builtins.isInt;
+    merge =
+      loc: defs:
+      let
+        v = lib.options.mergeEqualOption loc defs;
+      in
+      if lib.mod v 2 == 0 then v else throw "odd";
+    typeMergeRel =
+      o:
+      if (o.name or null) == "int" then { merged = genMerge.types.int; } else { refused = "not an int"; };
+  };
   notNum = n: {
     check = v: v != n;
     message = "must not be ${toString n}";
@@ -157,6 +173,23 @@ let
           np.int
         ]
       ];
+      engines = [ meetRead ];
+      v = {
+        "4" = 4;
+        "3" = "REFUSED";
+      };
+      val = lib.toInt;
+    };
+    mergeHeld = {
+      tss =
+        both [
+          evenMerge
+          np.int
+        ]
+        ++ both [
+          evenMerge
+          genMerge.types.int
+        ];
       engines = [ meetRead ];
       v = {
         "4" = 4;
