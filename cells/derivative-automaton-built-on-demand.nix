@@ -5,8 +5,9 @@
 # so the one answer is n21 and the walk visits 22 nodes. `(a b)*` from `x` over `x -a-> y -b-> x`
 # returns to its own key after two letters and answers `x`; `(a b)* a` answers `y`.
 #
-# ★ THE RED IS A TIME-OUT, NOT A VALUE: an eager construction answers the same values after
-# building every state, which does not finish. A per-visit re-derivation passes this cell; that
+# ★ THE RED IS NOT A VALUE: an eager construction would answer the same values after building
+# every state, which does not finish, so it reds as a time-out or as the evaluator's call-depth
+# limit, whichever it reaches first. A per-visit re-derivation passes this cell; that
 # cost is gen-scope's bench (`resolve-visible-fanout`).
 { asserts, genScope }:
 let
