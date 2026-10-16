@@ -23,8 +23,6 @@ plane's byte-parity cell (T2b), and five planted-violation refusals (T5), agains
 6-11), against `gen-specs/gen-demo/2026-09-09-v1.1-coverage-spec.md` in den-ag-design. C7 rode
 gen-view's own unlanded work (W1) and landed once that work reached the hub; see `## v1.1` below.
 
-Bead: `den-hoag-gen-demo-constructs-0k3ix`.
-
 ## What v1 declares
 
 Four nodes across two kinds, three declared edges, one policy program admitting a fourth (dynamic)
@@ -34,14 +32,14 @@ incremental plane's decision crossing.
 Every construct is a NAME with one file, `index/<name>.nix` (`{ title; adr; what; }`). The index of
 them is generated, never written here: `nix build .#construct-index` renders it (`result` is the
 Markdown table: name, legacy id and former names, ADR, what it is). A `C<n>` or `row<n>` id from
-before the names (den-hoag-nv8fd) resolves through `legacy-ids.nix`, as does a renamed name.
+before the names resolves through `legacy-ids.nix`, as does a renamed name.
 
 **Retired: C70, C71 and `refusals` row 93.** They drove gen-merge over a foreign leaf vocabulary
-(nixpkgs' `lib.types`, whole or in part) passed as its `types` formal. That mode is withdrawn
-(den-hoag-ydro3, OQ-D arm V): `types` is the gen-types library, and gen-merge refuses a `types`
+(nixpkgs' `lib.types`, whole or in part) passed as its `types` formal. That mode is withdrawn:
+`types` is the gen-types library, and gen-merge refuses a `types`
 without its check-witness protocol by name. nixpkgs types stay supported as foreign VALUES (C41,
 C58, C61, C65, C75, C80). Their guarantee (a foreign vocabulary publishes its own names and a
-collision refuses per name, catchably) re-arms on den-hoag-k6m8t when a dedicated
+collision refuses per name, catchably) re-arms when a dedicated
 foreign-vocabulary parameter exists.
 
 `gen-modules/corpus.nix` holds the C1-C6 declarations plus C16's own tree growth; `aspect-cnf.nix`
@@ -72,7 +70,7 @@ This repository has **two check planes**, and `nix flake check` covers the one i
 and no other: the **root** flake's checks, one per file in `cells/`, and **`ci/`**'s six harness
 cells (`default` — the batch asserter over `ci/tests` — plus `treefmt-tree-root`,
 `mdformat-plugins`, `agents-md-citations`, `ci-plane-coverage`, `ci-self-input`). `check-lock` and
-`check-hub-main` each run **both**, which is `den-hoag-dq6mw`: while they ran the root form alone,
+`check-hub-main` each run **both**: while they ran the root form alone,
 a seeded red in the `ci/` plane left `check-lock` exiting 0 and printing *"all checks passed!"*, so
 its green read as suite cover and was not.
 
@@ -89,7 +87,7 @@ The root checks are the acceptance criteria. **`cells/` is their index**: each f
 named after the file, and its header comment says what the cell asserts and why. The one check with
 no file is `construct-index`, declared in `flake.nix`: it reads the constructs every cell attributes
 itself to (the `construct` field) and requires them to equal the names in `index/`, plus
-`planted-refusals` (T5) — the one construct with no check cell (`den-hoag-bl06m`). It also requires
+`planted-refusals` (T5) — the one construct with no check cell. It also requires
 every `legacy-ids.nix` id and `renamed` entry to resolve, every name to be `[a-z0-9-]+`, and this
 README to carry no hand-written construct table. It reports how many constructs it compared against
 how many it expected, never a bare pass.
@@ -97,7 +95,7 @@ how many it expected, never a bare pass.
 ### Adding a construct, a cell or a refusal row
 
 Every addition is **new files with a name you choose**; no number is drawn, and no list, table,
-index or count is edited by hand (den-hoag-nv8fd). A name is `[a-z0-9-]+`, says what the thing is
+index or count is edited by hand. A name is `[a-z0-9-]+`, says what the thing is
 (the kebab of its title: `addressed-class-crossing`), and is unique within its kind by construction: it is a file
 name, so a second unit choosing the same one adds the same path and git reports it at the merge.
 
@@ -135,7 +133,7 @@ name, so a second unit choosing the same one adds the same path and git reports 
   `{ construct; check; }`. `asserts` is already bound to the cell's own name, so a red names the cell.
 
   ```nix
-  # `hem-walk` — hem-walk-reaches-every-node, den-hoag-xxxxx. What the cell asserts, and what
+  # `hem-walk` — hem-walk-reaches-every-node, <tracker id>. What the cell asserts, and what
   # would turn it red.
   { asserts, hemGraph }:
   {
@@ -166,7 +164,7 @@ name, so a second unit choosing the same one adds the same path and git reports 
   the pairing cell (rows). `legacy-ids.nix` gains no other key: frozen by convention, not yet by a
   check.
 
-- **Rebasing a unit written against numbers** (a branch drawn before den-hoag-nv8fd): rebase onto
+- **Rebasing a unit written against numbers** (a branch drawn before the names): rebase onto
   this tree; then turn its README table row into `index/<name>.nix` (the row's three cells become
   `title`, `adr`, `what`), write that name into its cells' `construct = [ … ]`, rename
   `constructs/c<n>.nix` to `constructs/<name>.nix`, and move a `ci/refusals/row<n>.sh` to
@@ -180,7 +178,7 @@ name, so a second unit choosing the same one adds the same path and git reports 
   `row_<name_>`, the label `T5 <name>`, the errfile `$tmpdir/<name>-`), and `git apply` it onto this tree.
 
 T5's refusals are not among these cells: `builtins.tryEval` yields `success` and nothing
-else, so a refusal's message is unreadable to any `checks.default` cell (`den-hoag-9mo`). They run by
+else, so a refusal's message is unreadable to any `checks.default` cell. They run by
 name through `refusals` instead (below).
 
 **T5's standing gate is the workflow, not a check cell.** Neither `check-lock` nor `check-hub-main`
@@ -248,11 +246,11 @@ relock, as v0 predicted.
 `genDelivery.project` with no `selectNodes` and exposed no option for one, so a consumer's node
 registry had to be named literally `hosts`, and a wrong name failed **silently** — an empty
 projection, not an error. It was the same family as the two defects that module's own header records
-as carried unfixed (`den-hoag-es9g`): the class-name hardcode and the witness-2 gap. Fixed under
-ADR-0035 (`den-hoag-hub-hardcodes-hosts-mxpd5`): the hub takes the attribute path from the consumer,
+as carried unfixed: the class-name hardcode and the witness-2 gap. Fixed under
+ADR-0035: the hub takes the attribute path from the consumer,
 and this corpus declares `gen.nodeRegistryPath = [ "thimbles" ]`. The sibling output key
 `gen.composed.hosts` was the same finding at another site, repaired the same way: the handle
-publishes `gen.composed.nodes` (`den-hoag-erp1m`).
+publishes `gen.composed.nodes`.
 
 **3. Two stale docs, met while building, still stale at the v1 pin.** gen-scope's README documents
 `eval { roots = …; }`; the formal argument is `scope`, and `buildNodes` is a tombstone that refuses
@@ -276,8 +274,8 @@ registry carries the `below` relation every kind is ranked in, so it is one per 
 landing stops the fold minting `{ }` from an absence, for both content families. C18 declares the
 same facts by both paths — the direct `buildRoots` call C1 already makes, and `assemble` with a
 `kinds` registry — and asserts the records are IDENTICAL, with a negative control that changes one
-node's kind and reads false on the same comparator. The design question this finding reported to
-`den-hoag-9wj6` is answered there and specified in
+node's kind and reads false on the same comparator. The design question this finding reported is
+answered and specified in
 `specs/2026-09-11-gen-assemble-types-protocol-gap-spec.md`. C16 still declares no `types` and carries
 its per-node data through `decls` alone; it no longer has to.
 
@@ -311,10 +309,10 @@ ADR-0008 §3), unreachable until the hub relocked to carry it; the relock is the
 this one. C7 gates `config.declaredEdges` plus every CANDIDATE C5's program declares, on or off
 (`policyCandidates`, over C1's `registered` set) -- not C2's `edges`, which carries only the
 candidates that resolved on -- so the corpus makes one graph claim and two doors read different
-sets from it (`den-hoag-6s1t` (iii)). The gate returns its equations and no order: its relation
+sets from it. The gate returns its equations and no order: its relation
 carries edges that may resolve off. Its Check reads fields of the returned
 `gated` record, never of its argument: a cell over the argument would force gen-graph alone (already
-reached) and add nothing for gen-view (gate v0's CONSTRUCTION-1, `den-hoag-xgu75`). `refusals`
+reached) and add nothing for gen-view (gate v0's CONSTRUCTION-1). `refusals`
 row 10 plants the cycle `pewter -> grosgrain -> damask -> pewter`; row 11 hands the gate a
 hand-assembled attrset carrying the same `index`/`dependencies` fields `mkDeclaredEdges` builds, no
 `_type` tag -- `genGraph.isDeclaredEdges` is purely nominal, so this door is the only
@@ -402,7 +400,7 @@ and hands two maps of coordinate to minted identity to the incremental plane, wh
 empty moved set or throws naming the coordinate, the kind, both identities and the contributing
 declarations.
 
-**`den-hoag-9l26n` closes on C17's cell.** On a kind declared through gen-aspects' `schemaOption` —
+**The kind recompute's disagreement with the stamp closes on C17's cell.** On a kind declared through gen-aspects' `schemaOption` —
 the shape this corpus uses — the kind value's declarations live in the module its `__functor` imports,
 and the sole recompute path used to answer over `[ "name" ]` alone and disagree with the stamp on every instance of it. Measured
 at this landing's two pins, same probe, same corpus shape:
