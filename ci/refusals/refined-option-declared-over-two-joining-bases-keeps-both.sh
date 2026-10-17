@@ -12,8 +12,8 @@
 # the value is refused, so a library that dropped the refinement cannot pass. The pin is the refusal's
 # CLASS, rc 1 and `is not of type `submodule'`, not its line (the file label is not pinned): nixpkgs'
 # twin (`addCheck` over `submodule`) does not refuse this value at all, gen's refusal names the base type
-# in nixpkgs' own form (den-hoag-k4f4g, gen-merge 4666f1e), and the refinement's own message is tracked
-# as a separate quality row.
+# in nixpkgs' own form (since gen-merge 4666f1e, den-hoag-k4f4g), and the refinement's own message is
+# tracked as den-hoag-pu0cm.
 row_refined_option_declared_over_two_joining_bases_keeps_both='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genSchema = gen.lib.substrate.schema;
