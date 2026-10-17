@@ -6,9 +6,9 @@
 # uncatchably (`attribute 'kind' missing`), and the echoing kind published the echo.
 #
 # Admission is read through a USE of the type: an instance of it in an evaluation reads its field.
-# A `deepSeq` of the type record is not an admission test, and since den-hoag-n6dh7 Unit 2.4 it
-# reaches a submodule's called `whenEmpty.value`, which refuses by name (item 1; OQ2 α). gen-schema's
-# `mktype-kind-value` admission cell took the same re-pin (Unit 2 landing gate, C2).
+# A `deepSeq` of the type record is not an admission test: it reaches a submodule's `whenEmpty.value`,
+# the empty value nixpkgs' deep force also reads (den-hoag-n6dh7 item 1, narrowed by den-hoag-8qenh).
+# gen-schema's `mktype-kind-value` admission cell reads admission the same way (Unit 2 landing gate, C2).
 {
   asserts,
   genMerge,
