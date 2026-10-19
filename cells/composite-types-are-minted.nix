@@ -35,7 +35,7 @@ let
     lo = 1;
     hi = 10;
   };
-  stitched = args: T.listOf (T.typedef "stitched" (stitch args));
+  stitched = args: T.listOf (T.typedef { } "stitched" (stitch args));
   spoolOf = e: genMerge.deriveType { } "spoolOf" (T.listOf e);
   value =
     e:
