@@ -29,7 +29,7 @@ let
     lo = 1;
     hi = 9;
   };
-  stitched = term: T.typedef "stitched" term;
+  stitched = term: T.typedef { } "stitched" term;
   declaredTwice =
     a: b: v:
     let
