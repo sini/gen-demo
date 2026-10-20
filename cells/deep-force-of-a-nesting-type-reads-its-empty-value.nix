@@ -3,7 +3,8 @@
 # is the bridge's one root evaluation: nixpkgs' `base.config`, the module set over no definitions.
 # Each row names its subject and is read on gen-merge and on nixpkgs' `submoduleWith`, so the cell
 # compares the two engines rather than a success bit: the throwing twin is false on both sides.
-# An evaluation's own type (`(evalModuleTree …).type`) is a held type and is not read here.
+# An evaluation's own type (`(evalModuleTree …).type`) is a held type, read by
+# `deep-force-of-an-evaluations-own-type-reads-its-empty-value`.
 {
   asserts,
   genMerge,
