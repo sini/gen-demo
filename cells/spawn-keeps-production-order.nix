@@ -55,16 +55,18 @@
       "picot:tatting@lace"
       "picot:ruche@lace"
     ]
-    && ev.allNodeIds == [
-      "lace"
-      "picot:tatting@lace"
-      "picot:ruche@lace"
-      "fringe"
-    ]
+    &&
+      ev.allNodeIds == [
+        "lace"
+        "picot:tatting@lace"
+        "picot:ruche@lace"
+        "fringe"
+      ]
     && genScope.childrenIds ev "fringe" == [ ]
-    && genScope.childrenIds (evWith builtins.listToAttrs) "lace" == [
-      "picot:ruche@lace"
-      "picot:tatting@lace"
-    ]
+    &&
+      genScope.childrenIds (evWith builtins.listToAttrs) "lace" == [
+        "picot:ruche@lace"
+        "picot:tatting@lace"
+      ]
   );
 }
