@@ -35,7 +35,7 @@ row_inert_args='let
   genAlgebra = gen.lib.substrate.algebra;
   T = gen.lib.modules.merge.types;
   mk = genAlgebra.mkIntensional gen.lib.substrate.identity.hashIdentity { revision = "r1"; members.whipstitch = args: (x: x); };
-  twice = T.typeEq (T.typedef "stitched" (mk "whipstitch" { thread = THREAD; })) (T.typedef "stitched" (mk "whipstitch" { thread = THREAD; }));
+  twice = T.typeEq (T.typedef { } "stitched" (mk "whipstitch" { thread = THREAD; })) (T.typedef { } "stitched" (mk "whipstitch" { thread = THREAD; }));
 in BODY'
 row_inert_argsunplanted="${row_inert_args//THREAD/\"madder\"}"
 row_inert_argsplanted="${row_inert_args//THREAD/x: x}"
