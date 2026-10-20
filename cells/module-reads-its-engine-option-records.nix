@@ -4,8 +4,8 @@
 # `check`, `freeformType` (two `attrsOf` freeform definitions, merged) and `specialArgs`; an untyped
 # option's record states `unspecified`; a gen `submodule` child reads its own. Each must equal the same
 # construction over nixpkgs' `evalModules`, where gen-merge's module aborted on `attribute '_module'
-# missing` and the untyped record on `attribute 'type' missing`. `args` is compared on every name but
-# `moduleType`, the engine argument gen-merge does not yet serve (den-hoag-d2o0g, den-hoag-8qenh).
+# missing` and the untyped record on `attribute 'type' missing`. `args` is compared on every name,
+# `moduleType` among them (den-hoag-d2o0g).
 
 {
   asserts,
@@ -103,7 +103,6 @@ in
     && (ref caller).child == "unspecified"
     && (ref caller).freeform == "attrsOf"
     && (ref caller).loose == 3
-    && gen caller == removeAttrs (ref caller) [ "argNames" ] // { argNames = (gen caller).argNames; }
-    && builtins.filter (n: n != "moduleType") (ref caller).argNames == (gen caller).argNames
+    && gen caller == ref caller
   );
 }
