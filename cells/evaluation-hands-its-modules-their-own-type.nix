@@ -5,6 +5,12 @@
 # submodule element `foo`, the empty value's `name`, which the position names. Each must equal the
 # same construction over nixpkgs' `evalModules`, where gen-merge's module was refused by name
 # (`module argument `moduleType' is not defined`).
+#
+# den-hoag-1k5mi: the positioned type publishes nixpkgs' module list, read as a class string per module
+# (`P` the `‹name›` placeholder, `N` the position's `name`, `M` any other): the held type's own
+# `getSubModules`, the `_module.args` record read through the type reused at a second position (`again`),
+# and `extendModules { prefix; }`'s set. gen-merge put the position's `name` after the definitions, with no
+# placeholder, and its `extendModules` rebuilt its own list.
 {
   asserts,
   genMerge,
@@ -51,6 +57,47 @@ let
         config.bolt.foo = { };
       };
       posHeld = (ev [ bolt ]).config.bolt.foo.held null;
+      cls =
+        m:
+        let
+          n = m._module.args.name;
+        in
+        if !(builtins.isAttrs m && m ? _module.args.name) then
+          "M"
+        else if builtins.isAttrs n && n._type or null == "override" then
+          "P"
+        else
+          "N";
+      classes = ms: builtins.concatStringsSep "" (map cls ms);
+      shuttle =
+        {
+          options,
+          moduleType,
+          extendModules,
+          ...
+        }:
+        {
+          options.record = opt (map (d: d.file) options._module.args.definitionsWithLocations);
+          options.again = L.mkOption {
+            type = moduleType;
+            default = { };
+          };
+          options.extended = opt (classes (extendModules { prefix = [ "elsewhere" ]; }).type.getSubModules);
+        };
+      reed =
+        (ev [
+          {
+            _file = "decl.nix";
+            options.reed = L.mkOption {
+              type = L.types.attrsOf (sub [ shuttle ]);
+              default = { };
+            };
+          }
+          {
+            _file = "cfg.nix";
+            config.reed.foo = { };
+          }
+        ]).config.reed.foo;
     in
     {
       args = tries (ev loom).config.args;
@@ -60,6 +107,9 @@ let
       threeHopsWarp = tries (emptyOf (hop (hop (hop held)))).warp;
       positionedForces = forces posHeld;
       positionedName = tries (emptyOf posHeld).nm;
+      positionedSubModules = tries (classes posHeld.getSubModules);
+      reusedRecord = tries reed.again.record;
+      extendedSubModules = tries reed.extended;
     };
   gen = rows {
     L = genMerge;
@@ -88,6 +138,15 @@ in
       threeHopsWarp = "x";
       positionedForces = true;
       positionedName = "foo";
+      positionedSubModules = "PMMNM";
+      reusedRecord = [
+        "decl.nix"
+        "decl.nix"
+        "lib/modules.nix"
+        "<unknown-file>"
+        "<unknown-file>"
+      ];
+      extendedSubModules = "PMNM";
     }
     && gen == ref
   );
