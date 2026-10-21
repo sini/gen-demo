@@ -37,7 +37,7 @@ let
       ];
   nodeLines = builtins.filter (m: m != null) (
     map (builtins.match "  ([^ ]+)\\[\"([^\"]*)\"]") (
-      builtins.filter builtins.isString (builtins.split "\n" (c25PolicyIr.render.mermaid facts))
+      builtins.filter builtins.isString (builtins.split "\n" (c25PolicyIr.render.mermaid { } facts))
     )
   );
   idOf = label: decode (builtins.head (builtins.split "<br/>" label));
