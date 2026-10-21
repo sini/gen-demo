@@ -2,7 +2,7 @@
 # composed with the hub's ONE mint (`substrate.identity.hashIdentity`) rather than a stub: the
 # encoder `mkIntensional` over a `basting` registry and `conservativeEq`.
 #
-# The five `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
+# The six `checks` items (the two throw-refusals, `revision` required and a lambda in `args`, are
 # `ci/refusals/intensional-encoders-two-throw-refusals.sh`):
 #   1. a registered construction DECIDES ONE TYPE AND KEYS NOTHING (den-hoag-6orb8 U1; den-hoag-hhki8):
 #      it carries no exact identity (no digest, so no key site keys on it), and its declared
@@ -21,7 +21,9 @@
 #   5. the UNMIGRATED regime decides on content, not the name — one program point, one shared `fn`,
 #      differing inert `closure` ⇒ unequal, while an equal closure still identifies. It is the
 #      witness of ADR-0034's deleted name arm: a gen-algebra that still decides an unmigrated pair on
-#      `name` alone calls this pair equal.
+#      `name` alone calls this pair equal;
+#   6. a `//` copy of a registered construction (an extension, another construction's subject carried
+#      over, an operand rewritten) is refused by name: its declared subject no longer states it.
 {
   asserts,
   genAlgebra,
@@ -72,6 +74,14 @@ let
   };
   sealedEq = a: b: conservativeEq (sealed // a) (sealed // b);
   decides = e: (builtins.tryEval e).success;
+  # `//` copies of a construction: an extension, another construction's subject carried over, and an
+  # operand rewritten in place. Each keeps the declared subject while changing the value.
+  hemmed = madder // {
+    hem = "blind";
+  };
+  rolled = madder // {
+    hem = "rolled";
+  };
 in
 {
   construct = [ "three-identity-regimes" ];
@@ -101,5 +111,10 @@ in
     && regimeTagOf (identityOf unmigrated) == "u"
     && !(conservativeEq unmigrated (unmigrated // { closure.thread = "woad"; }))
     && conservativeEq unmigrated (unmigrated // { closure.thread = "madder"; })
+    # 6 — a `//` copy of a construction is not the value its producer completed: refused by name,
+    # never decided by the subject it carried over
+    && !(decides (conservativeEq hemmed rolled))
+    && !(decides (conservativeEq madder (woad // { inherit (madder) __mint; })))
+    && !(decides (conservativeEq madder (madder // { args.thread = "woad"; })))
   );
 }
