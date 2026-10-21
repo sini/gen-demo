@@ -11,6 +11,11 @@
 # `getSubModules`, the `_module.args` record read through the type reused at a second position (`again`),
 # and `extendModules { prefix; }`'s set. gen-merge put the position's `name` after the definitions, with no
 # placeholder, and its `extendModules` rebuilt its own list.
+#
+# den-hoag-47pw5: the type's documentation evaluation (`getSubOptions`) is nixpkgs', which lists nixpkgs'
+# `noCheckForDocsModule` last: a module there reads the evaluation's `getSubModules` labels (`_file`) and its
+# `_module.check`, `false`. gen-merge evaluated the docs over the type's modules and its placeholder alone, so the
+# labels lacked the module and the check read `true`.
 {
   asserts,
   genMerge,
@@ -98,6 +103,24 @@ let
             config.reed.foo = { };
           }
         ]).config.reed.foo;
+      reader =
+        { config, moduleType, ... }:
+        {
+          options.subModules = opt (map (m: m._file or "-") moduleType.getSubModules);
+          options.check = opt config._module.check;
+        };
+      docsType =
+        (ev [
+          {
+            options.docs = L.mkOption {
+              type = sub [
+                heddle
+                reader
+              ];
+            };
+          }
+        ]).options.docs.type;
+      docs = docsType.getSubOptions [ "p" ];
     in
     {
       args = tries (ev loom).config.args;
@@ -110,6 +133,8 @@ let
       positionedSubModules = tries (classes posHeld.getSubModules);
       reusedRecord = tries reed.again.record;
       extendedSubModules = tries reed.extended;
+      docsSubModules = tries docs.subModules.default;
+      docsCheck = tries docs.check.default;
     };
   gen = rows {
     L = genMerge;
@@ -147,6 +172,13 @@ in
         "<unknown-file>"
       ];
       extendedSubModules = "PMNM";
+      docsSubModules = [
+        "-"
+        "<unknown-file>"
+        "<unknown-file>"
+        "<built-in module that disables checks for the purpose of documentation generation>"
+      ];
+      docsCheck = false;
     }
     && gen == ref
   );
