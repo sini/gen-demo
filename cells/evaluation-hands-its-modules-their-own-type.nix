@@ -5,6 +5,11 @@
 # submodule element `foo`, the empty value's `name`, which the position names. Each must equal the
 # same construction over nixpkgs' `evalModules`, where gen-merge's module was refused by name
 # (`module argument `moduleType' is not defined`).
+#
+# den-hoag-47pw5: the type's documentation evaluation (`getSubOptions`) is nixpkgs', which lists nixpkgs'
+# `noCheckForDocsModule` last: a module there reads the evaluation's `getSubModules` labels (`_file`) and its
+# `_module.check`, `false`. gen-merge evaluated the docs over the type's modules and its placeholder alone, so the
+# labels lacked the module and the check read `true`.
 {
   asserts,
   genMerge,
@@ -51,6 +56,24 @@ let
         config.bolt.foo = { };
       };
       posHeld = (ev [ bolt ]).config.bolt.foo.held null;
+      reader =
+        { config, moduleType, ... }:
+        {
+          options.subModules = opt (map (m: m._file or "-") moduleType.getSubModules);
+          options.check = opt config._module.check;
+        };
+      docsType =
+        (ev [
+          {
+            options.docs = L.mkOption {
+              type = sub [
+                heddle
+                reader
+              ];
+            };
+          }
+        ]).options.docs.type;
+      docs = docsType.getSubOptions [ "p" ];
     in
     {
       args = tries (ev loom).config.args;
@@ -60,6 +83,8 @@ let
       threeHopsWarp = tries (emptyOf (hop (hop (hop held)))).warp;
       positionedForces = forces posHeld;
       positionedName = tries (emptyOf posHeld).nm;
+      docsSubModules = tries docs.subModules.default;
+      docsCheck = tries docs.check.default;
     };
   gen = rows {
     L = genMerge;
@@ -88,6 +113,13 @@ in
       threeHopsWarp = "x";
       positionedForces = true;
       positionedName = "foo";
+      docsSubModules = [
+        "-"
+        "<unknown-file>"
+        "<unknown-file>"
+        "<built-in module that disables checks for the purpose of documentation generation>"
+      ];
+      docsCheck = false;
     }
     && gen == ref
   );
