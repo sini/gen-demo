@@ -3,7 +3,9 @@
 # result's `class`, `_type` and `graph`; it is extended once by its own `extendModules` at a stated
 # prefix, with the `shuttle` carried rather than restated, and the extension reads its `_class`, its
 # `shuttle`, its class and its option's location. Each must equal the same construction over nixpkgs'
-# `evalModules`, where gen-merge's door refused `class` by name.
+# `evalModules`, where gen-merge's door refused `class` by name. The result's `_module` reads its `check` and
+# argument names, and a loom with one undeclared definition refuses both its `options` and its `_module`, as
+# nixpkgs reads them through the same refusal as `config`.
 {
   asserts,
   genMerge,
@@ -23,8 +25,19 @@ let
       imports = [ { key = "reed"; } ];
     }
   ];
+  # the loom with a definition no option declares
+  frayed =
+    L:
+    loom L
+    ++ [
+      {
+        _file = "fray";
+        config.selvage = 1;
+      }
+    ];
+  served = v: (builtins.tryEval (builtins.deepSeq v v)).success;
   read =
-    ev:
+    ev: fray:
     let
       ext = ev.extendModules {
         prefix = [ "bolt" ];
@@ -39,13 +52,23 @@ let
         inherit (ext.config) weft warp;
         loc = ext.options.warp.loc;
       };
+      module = {
+        inherit (ev._module) check;
+        args = builtins.attrNames ev._module.args;
+      };
+      frayedOptions = served (builtins.attrNames fray.options);
+      frayedModule = served fray._module.check;
     };
   request = {
     class = "nixos";
     specialArgs.shuttle = "S";
   };
-  gen = read (genMerge.evalModuleTree request (loom genMerge));
-  ref = read (lib.evalModules (request // { modules = loom lib; }));
+  gen = read (genMerge.evalModuleTree request (loom genMerge)) (
+    genMerge.evalModuleTree request (frayed genMerge)
+  );
+  ref = read (lib.evalModules (request // { modules = loom lib; })) (
+    lib.evalModules (request // { modules = frayed lib; })
+  );
 in
 {
   construct = [ "an-evaluation-answers-its-request-surface-as-nixpkgs-does" ];
