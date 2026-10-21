@@ -1,4 +1,4 @@
-# `inspect-nests-the-aspect-containment` — C25. gen-inspect's renderer options over this
+# `inspect-nests-the-aspect-containment` — C25, den-hoag-o28nu. gen-inspect's renderer options over this
 # corpus's own containment: C16's parent graph (child -> parent, `hemline/placket/eyelet` three deep) is
 # handed to `fromGraph` as the label `parent`, which is containment in gen-inspect, and drawn with every
 # view option: `nest`, `direction`, `shapeOf` and `labelOf`. The picture reads back as the containment —
