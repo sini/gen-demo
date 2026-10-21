@@ -2,7 +2,8 @@
 # node keyed by its declaration: `yoke`'s literal, the literal nested in it, and the let-bound `shared`
 # at `yoke` and at `cuff` (two nodes); `welt`'s edited copy of `placard`'s literal, re-declared at
 # `welt`; and `gore`'s applied-body literal once per instance. `elementIds` names each at its slot;
-# the named `piping` stays a position (`null`, unresolved at its literal). What each host receives
+# the named `piping` is its class's node (den-hoag-qxip5, asserted by shape: its id carries the
+# `name` position, a store path). What each host receives
 # equals the previous pin's. The two path modules give `seam` the same ids in both orders, asserted
 # by their structure, never by a literal id: a path module's anchor is its store path, which moves
 # with the corpus source. Red where inline content is no node: the content ids read `null`.
@@ -29,6 +30,10 @@ let
       )
     }";
   instanceOf = h: builtins.head anonNodesRel.reaches.${h}.gore;
+  piping = builtins.head (
+    builtins.filter (n: builtins.match "@/includes/piping@.*" n != null) anonNodesFacts.nodes
+    ++ [ "<none>" ]
+  );
   yokeInl = id "yoke" [ 0 ];
   yokeInn = id "yoke" [
     0
@@ -72,6 +77,7 @@ in
   construct = [ "anonymous-declarations-are-nodes" ];
   check = asserts (
     anonNodesFacts.nodes == [
+      piping
       "cuff"
       (id "cuff" [ 0 ])
       "gore"
@@ -87,7 +93,12 @@ in
     && anonNodesFacts.parentOf.${yokeInn} == yokeInl
     && anonNodesFacts.parentOf.${yokeInl} == "yoke"
     && anonNodesFacts.parentOf.${welt} == "welt"
-    && anonNodesFacts.unresolvedIncludesOf.${yokeInl} == [ 1 ]
+    && anonNodesFacts.unresolvedIncludesOf.${yokeInl} == [ ]
+    &&
+      anonNodesFacts.includesOf.${yokeInl} == [
+        yokeInn
+        piping
+      ]
     &&
       anonNodesIds "bodice" == [
         "yoke"
@@ -96,7 +107,7 @@ in
         (id "yoke" [ 1 ])
         "${instanceOf "bodice"}/includes/0"
         yokeInn
-        null
+        piping
       ]
     &&
       anonNodesIds "sleeve" == [
