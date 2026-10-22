@@ -46,10 +46,27 @@ in
         c25Ir.query "SELECT src, dst FROM reaches WHERE via = '*'"
       ) == [ ]
     &&
-      map (d: d.rule.pos) (c25Ir.why "reaches:tacks:pewter:damask").derivations == [
+      map (d: d.rule.pos)
+        (c25Ir.why (
+          builtins.toJSON [
+            "reaches"
+            "tacks"
+            "pewter"
+            "damask"
+          ]
+        )).derivations == [
         [
-          "reaches:tacks:pewter:grosgrain"
-          "tacks:grosgrain:damask"
+          (builtins.toJSON [
+            "reaches"
+            "tacks"
+            "pewter"
+            "grosgrain"
+          ])
+          (builtins.toJSON [
+            "tacks"
+            "grosgrain"
+            "damask"
+          ])
         ]
       ]
   );

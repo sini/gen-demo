@@ -14,7 +14,15 @@
       rule = map (e: "${e.label}:${e.src}:${e.dst}") (
         builtins.filter (e: e.origin.kind == "rule") c25PolicyIr.facts.edges
       );
-      heads = map (d: d.rule.head) c25PolicyIr.facts.origins."piping:grosgrain:faille".derivations;
+      heads =
+        map (d: d.rule.head)
+          c25PolicyIr.facts.origins.${
+            builtins.toJSON [
+              "piping"
+              "grosgrain"
+              "faille"
+            ]
+          }.derivations;
     } == {
       rule = [
         "piping:grosgrain:faille"

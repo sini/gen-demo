@@ -15,7 +15,15 @@
       edges = map (e: "${e.label}:${e.src}:${e.dst}:${e.origin.kind}") (
         builtins.filter (e: e.src == seamHead) c25PolicyIr.facts.edges
       );
-      heads = map (d: d.rule.head) c25PolicyIr.facts.origins."thimble:${seamHead}:pewter".derivations;
+      heads =
+        map (d: d.rule.head)
+          c25PolicyIr.facts.origins.${
+            builtins.toJSON [
+              "thimble"
+              seamHead
+              "pewter"
+            ]
+          }.derivations;
     } == {
       node = [
         {
