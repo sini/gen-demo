@@ -20,20 +20,27 @@
         (twin "izo7a-a")
         (twin "izo7a-b")
       ];
+      # Each fragment is a contributor edge, `{ site; value; }` (gen-scope's fold contract).
+      edges =
+        vs:
+        builtins.genList (i: {
+          site = "fragment ${toString i}";
+          value = builtins.elemAt vs i;
+        }) (builtins.length vs);
       contexts = map (s: builtins.length (builtins.attrNames (builtins.getContext s)));
     in
-    folds.set "k" [
+    folds.set "k" (edges [
       "b"
       "a"
       "b"
       "c"
       "a"
-    ] == [
+    ]) == [
       "b"
       "a"
       "c"
     ]
-    && contexts (folds.set "k" twins) == [ 2 ]
+    && contexts (folds.set "k" (edges twins)) == [ 2 ]
     && contexts (lib.unique twins) == [ 1 ]
   );
 }

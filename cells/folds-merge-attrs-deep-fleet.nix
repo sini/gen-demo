@@ -24,8 +24,15 @@
         }
         { deploy.nodes.h1.hostname = "a"; }
       ];
+      # Each fragment is a contributor edge, `{ site; value; }` (gen-scope's fold contract).
+      edges =
+        vs:
+        builtins.genList (i: {
+          site = "fragment ${toString i}";
+          value = builtins.elemAt vs i;
+        }) (builtins.length vs);
     in
-    folds.mergeAttrsDeep "k" fleet == {
+    folds.mergeAttrsDeep "k" (edges fleet) == {
       colmena = {
         h1 = "c1";
         h2 = "c2";
@@ -41,14 +48,14 @@
     }
     &&
       builtins.attrNames (
-        folds.mergeAttrsDeep "k" [
+        folds.mergeAttrsDeep "k" (edges [
           { a.x = throw "never forced"; }
           { b = 1; }
-        ]
+        ])
       ) == [
         "a"
         "b"
       ]
-    && !(builtins.tryEval (builtins.deepSeq (folds.mergeAttrs "k" fleet) null)).success
+    && !(builtins.tryEval (builtins.deepSeq (folds.mergeAttrs "k" (edges fleet)) null)).success
   );
 }
