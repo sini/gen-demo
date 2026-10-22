@@ -67,7 +67,15 @@ let
         else if builtins.match " *end" l != null && acc.stack != [ ] then
           acc // { stack = lib.init acc.stack; }
         else if n != null then
-          acc // { at = acc.at ++ [ { text = decode (builtins.head n); around = acc.stack; } ]; }
+          acc
+          // {
+            at = acc.at ++ [
+              {
+                text = decode (builtins.head n);
+                around = acc.stack;
+              }
+            ];
+          }
         else
           acc
       )
@@ -78,9 +86,18 @@ let
       lines
     ).at;
   # Every ancestor chain the parent graph states, as the segments its clusters are titled with.
-  chain = id: let p = up id; in if p == [ ] then [ ] else chain (builtins.head p) ++ [ (segment (builtins.head p)) ];
-  self = id: if builtins.any (e: e.to == id) c16Union.parentGraph.edges then [ (segment id) ] else [ ];
-  expected = map (id: { text = segment id; around = chain id ++ self id; }) ids;
+  chain =
+    id:
+    let
+      p = up id;
+    in
+    if p == [ ] then [ ] else chain (builtins.head p) ++ [ (segment (builtins.head p)) ];
+  self =
+    id: if builtins.any (e: e.to == id) c16Union.parentGraph.edges then [ (segment id) ] else [ ];
+  expected = map (id: {
+    text = segment id;
+    around = chain id ++ self id;
+  }) ids;
   bySeg = xs: lib.sort (a: b: builtins.toJSON a < builtins.toJSON b) xs;
 in
 {
