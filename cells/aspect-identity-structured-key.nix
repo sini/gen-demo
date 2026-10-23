@@ -6,6 +6,10 @@
 #   K-2 two elements of `loom.includes` both named `heddle`, at two positions: two keys and two ids, and
 #       swapping the two modules that write `shuttle.includes` moves neither (the declaring position,
 #       never the merged one);
+#   K-2b K-2's shape one level down: a `pirn` named inside an unnamed `shuttle.includes` element, written
+#       by two keyed modules, read in both orders and behind a module writing an empty `includes` first.
+#       Neither id moves, and each key extends its enclosing element's key (the enclosing element's
+#       declared position, never its merge one);
 #   K-3 one caller write of `meta.loc`, `key` or `id_hash` is refused where it is read, and a `meta.loc`
 #       written at `mkForce` is refused at `key` and at `aspectId` alike; a write equal to the type's own
 #       value mints nothing and is accepted; the untouched `bobbin` keys as declared (the refusal is the
@@ -88,6 +92,60 @@ let
     front
     back
   ];
+  nested = desc: {
+    key = "nested-${desc}";
+    aspects.shuttle.includes = [
+      {
+        description = "outer-${desc}";
+        includes = [
+          {
+            name = "pirn";
+            description = desc;
+          }
+        ];
+      }
+    ];
+  };
+  empty = {
+    key = "empty";
+    aspects.shuttle.includes = [ ];
+  };
+  below =
+    mods:
+    builtins.listToAttrs (
+      map (
+        e:
+        let
+          c = builtins.head e.includes;
+        in
+        {
+          name = c.description;
+          value = {
+            id = id c;
+            extends = lib.hasPrefix (key e + "/includes/") (key c);
+          };
+        }
+      ) (tree { imports = mods; }).shuttle.includes
+    );
+  nb = below [
+    (nested "front")
+    (nested "back")
+  ];
+  k2b =
+    nb.front.id != nb.back.id
+    && nb.front.extends
+    && nb.back.extends
+    &&
+      nb == below [
+        (nested "back")
+        (nested "front")
+      ]
+    &&
+      nb == below [
+        empty
+        (nested "front")
+        (nested "back")
+      ];
   k2 =
     apart (builtins.elemAt one.loom.includes 0) (builtins.elemAt one.loom.includes 1)
     && fb.front != fb.back
@@ -158,11 +216,12 @@ let
 in
 {
   construct = [ "aspects-identity-is-its-declaring-position-structured" ];
-  check = asserts (k1 && k2 && k3 && k4 && k5);
+  check = asserts (k1 && k2 && k2b && k3 && k4 && k5);
   limbs = {
     inherit
       k1
       k2
+      k2b
       k3
       k4
       k5
