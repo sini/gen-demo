@@ -61,7 +61,15 @@ in
   c141Place =
     cnf: defs:
     let
-      s = genAspects.mkAspectSchema (cnf // { keySemantics.nixos.category = "class"; });
+      s = genAspects.mkAspectSchema (
+        cnf
+        // {
+          keySemantics = {
+            nixos.category = "class";
+          }
+          // (cnf.keySemantics or { });
+        }
+      );
     in
     (genMerge.evalModuleTree { } [
       { options.schema = s.schemaOption; }
