@@ -312,7 +312,6 @@
     row102 = "two-minted-registries-merged";
     row103 = "raw-get-on-a-quotient-converged-instance";
     row104 = "gen-graphs-keying-doors-refuse-a-non-string-node-identifier-by-name";
-    row105 = "caller-key-the-engine-writes";
     row106 = "non-scalar-edge-target";
     row107 = "declaration-value-that-is-not-the-registrys-member";
     row108 = "identity-is-a-closed-record";
