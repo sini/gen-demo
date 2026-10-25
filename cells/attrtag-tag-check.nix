@@ -99,13 +99,11 @@ let
 in
 {
   construct = [ "an-attrtag-tags-check-is-enforced" ];
-  # the leaf form is read raw and through `defineType`: through `mkOptionType`, a leaf check held at a nixpkgs
-  # container's element is served redeclared at the tag as at `listOf`'s element, a separate row
   check = asserts (
     lib.all (enforced forms) [
       (d: d)
       gt.defineType
+      genMerge.mkOptionType
     ]
-    && enforced (lib.take 2 forms) genMerge.mkOptionType
   );
 }
