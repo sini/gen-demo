@@ -1,10 +1,9 @@
-# `adhoc-check-in-a-stock-host` — den-hoag-spb8r (G6 group H). In gen-merge's own evaluation, a stock nixpkgs submodule's
-# option typed by an ad-hoc `either // { check }` is judged as gen judges the same option at its root: over a nixpkgs
-# submodule the override is refused by name (`foreign-v2-check-override` holds the root's half), and over a gen
-# submodule, which may nest, it is enforced, so `{ warp = 5; }` is refused and `{ warp = 2; }` and `"sateen"` are served.
-# The host's option is folded again by the `either`'s own merge, which reads no override, so a guard that skipped the
-# option-level judgement would serve `{ warp = 5; }` on both. Each refusal stands beside a served twin, so a fold
-# refusing everything cannot pass.
+# `adhoc-check-in-a-stock-host` — den-hoag-spb8r (G6 group H), den-hoag-vjxra. In gen-merge's own evaluation, a stock
+# nixpkgs submodule's option typed by an ad-hoc `either // { check }` is judged as gen judges the same option at its root:
+# refused by name, over a nixpkgs submodule and over a gen one alike, the admitted value too, as nixpkgs refuses it
+# (`foreign-v2-check-override` holds the root's half). The host's option is folded again by the `either`'s own merge,
+# which reads no override, so a guard that skipped the option-level judgement would serve `{ warp = 5; }`. Each refusal
+# stands beside a served twin, the same `either` with no override, so a fold refusing everything cannot pass.
 {
   asserts,
   genMerge,
@@ -49,7 +48,9 @@ in
     && refused (adHoc (t.either stockBolt t.str)) { warp = 2; }
     && served (t.either stockBolt t.str) { warp = 2; } { warp = 2; }
     && refused (adHoc (t.either genBolt t.str)) { warp = 5; }
-    && served (adHoc (t.either genBolt t.str)) { warp = 2; } { warp = 2; }
-    && served (adHoc (t.either genBolt t.str)) "sateen" "sateen"
+    && refused (adHoc (t.either genBolt t.str)) { warp = 2; }
+    && refused (adHoc (t.either genBolt t.str)) "sateen"
+    && served (t.either genBolt t.str) { warp = 2; } { warp = 2; }
+    && served (t.either genBolt t.str) "sateen" "sateen"
   );
 }
