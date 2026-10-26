@@ -1,5 +1,5 @@
 {
   title = "a nesting type's empty value is its module set over no definitions";
-  adr = "0008";
-  what = "a deep force of a free-standing `submodule`, which no gen evaluation holds, reads its empty value off the bridge's one root evaluation, nixpkgs' `base.config`; it refused by name (den-hoag-n6dh7 item 1) before den-hoag-8qenh narrowed that item; an evaluation's own type, which that evaluation holds, reads the same value off its on-demand `type` child (den-hoag-8qenh OQ6 (c′))";
+  adr = "0008, 0039, d2myd";
+  what = "a deep force of a free-standing `submodule`, which no gen evaluation holds, reads its empty value off the bridge's one root evaluation, nixpkgs' `base.config`; it refused by name (den-hoag-n6dh7 item 1) before den-hoag-8qenh narrowed that item; an evaluation's own type, which that evaluation holds, reads the same value off its on-demand `type` child (den-hoag-8qenh OQ6 (c′)); and `a-restated-fold-folds-by-its-records-completion`: a `//` copy that restates a record's fold and keeps its `merge` folds by the fold of the record it was completed with, as nixpkgs' `evalModules` runs the `merge`: a copy of gen's `submodule` over no definitions is its module set's value and refuses a nested option's rejected value, and a copy of `listOf int` with its fold replaced concatenates and refuses a rejected element, at the option and as a container's element, raw and through `types.defineType`; gen-merge ran the restated fold and served `{ }`, the last definition, or the rejected value";
 }
