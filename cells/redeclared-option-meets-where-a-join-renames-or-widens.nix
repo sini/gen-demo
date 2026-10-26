@@ -20,6 +20,13 @@
 #    answer: 4 served (every declaration accepts it), 3 refused (the author rejects it). nixpkgs asks only
 #    the later `int`, which refuses the pair, so its engine refuses both (`authorFirstNixpkgs`): gen serves
 #    beyond nixpkgs here, bounded by the meet (ADR-0039).
+#  - `foreignCarrierFold`: a nixpkgs-built `listOf int` stating no gen relation whose `check` admits at most one
+#    element and whose plain fold never judges one (`shortLegacy`), beside gen's `listOf int`, both orders
+#    (den-hoag-a6690). The partner is the carrier, so gen's container is held by its own fold: `[ "s" ]` refused,
+#    `[ 2 ]` served. Gen's engine.
+#  - `adHocV2Join`: nixpkgs' `listOf int` with an ad-hoc `check` (at most one element, not stated coherent with its
+#    v2 merge: `shortList`) declared after gen's `listOf int`, so it is the join and owes its own check
+#    (den-hoag-a6690): `[ 2 3 ]` refused, `[ 2 ]` served. Gen's engine.
 # Red where any accepted value is refused (each form refused outright before G11) or any rejected value is
 # served.
 {
@@ -91,6 +98,45 @@ let
     check = v: v != n;
     message = "must not be ${toString n}";
   };
+  short = v: builtins.isList v && builtins.length v < 2;
+  # nixpkgs' `listOf int` functor rebuilding only into the partner itself
+  listFunctor = self: {
+    name = "listOf";
+    wrapped = null;
+    payload.elemType = np.int;
+    type = _: self;
+    binOp =
+      a: b:
+      let
+        m = a.elemType.typeMerge b.elemType.functor;
+      in
+      if m == null then null else { elemType = m; };
+  };
+  shortLegacy = lib.mkOptionType {
+    name = "listOf";
+    check = short;
+    merge = _loc: defs: builtins.concatLists (map (d: d.value) defs);
+    functor = listFunctor shortLegacy;
+    nestedTypes.elemType = np.int;
+  };
+  shortList = lib.mkOptionType {
+    name = "listOf";
+    check = short;
+    inherit ((np.listOf np.int)) merge;
+    functor = listFunctor shortList;
+    nestedTypes.elemType = np.int;
+  };
+  listVal =
+    k:
+    if k == "s" then
+      [ "s" ]
+    else if k == "two" then
+      [ 2 ]
+    else
+      [
+        2
+        3
+      ];
   forms = {
     enum = {
       tss = both [
@@ -196,6 +242,32 @@ let
         "3" = "REFUSED";
       };
       val = lib.toInt;
+    };
+    foreignCarrierFold = {
+      tss = both [
+        shortLegacy
+        (genMerge.types.listOf np.int)
+      ];
+      engines = [ meetRead ];
+      v = {
+        s = "REFUSED";
+        two = [ 2 ];
+      };
+      val = listVal;
+    };
+    adHocV2Join = {
+      tss = [
+        [
+          (genMerge.types.listOf np.int)
+          shortList
+        ]
+      ];
+      engines = [ meetRead ];
+      v = {
+        long = "REFUSED";
+        two = [ 2 ];
+      };
+      val = listVal;
     };
     authorFirstNixpkgs = {
       inherit (forms.authorFirst) tss val;
