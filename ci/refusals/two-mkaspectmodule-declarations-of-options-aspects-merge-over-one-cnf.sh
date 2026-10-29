@@ -1,17 +1,16 @@
 # shellcheck shell=bash
-# ── row 112 -- two `mkAspectModule` declarations of `options.aspects` merge over one cnf, mirroring
-#    `gen-modules/aspects-redeclaration.nix`'s own construction; over a genuinely differing cnf they
-#    are refused by name (gen-aspects `aspectsRoot`'s functor, den-hoag-a0gc; ADR-0008 one engine,
-#    ADR-0025 item 1) ──
-# `aspects-redeclaration.nix` declares `options.aspects` a second time, through a second
-# `mkAspectModule` over the SAME cnf as `corpus.nix`'s, and the two merge — that is the corpus's own
-# green arm, and this row's unplanted control reproduces it standalone. The refusal arm a0gc's own
-# report left owed: the identical construction over a cnf that genuinely differs is refused BY NAME,
-# because `aspectsRootWith`'s functor (this bead's own fix) decides the two elements do not reconcile
-# rather than merging on the container's name alone. Both arms use `mkAspectModule` on both sides
-# (never mixed with `mkAspectOption`): mixing the two construction methods trips an unrelated
-# ADR-0033 stratum refusal and is not this construct — the reason `aspects-redeclaration.nix` itself
-# states for using `mkAspectModule` twice.
+# ── row 112 -- two `mkAspectModule` declarations of `options.aspects` over one cnf are one
+#    construction, one module; over a genuinely differing cnf they are two, both declaring the
+#    container with its `default`, and refused by name (nixpkgs' `bothHave`; den-hoag-a0gc,
+#    den-hoag-xh14j K3; ADR-0008 one engine, ADR-0025 item 1) ──
+# `mkAspectModule` is a keyed record: two of them over the SAME cnf are one construction, so the
+# container is declared once and the evaluation serves (this row's unplanted control). Over a cnf that
+# genuinely differs they are two constructions, both kept, and both declarations state the
+# container's `default`, which is refused by name as nixpkgs refuses two declarations stating it, ahead
+# of `aspectsRootWith`'s functor. The federated shape (the record applied to a module's own arguments
+# beside the corpus's record) is the cell `aspect-container-declared-twice-stating-its-default-is-refused`.
+# Both arms use `mkAspectModule` on both sides (never mixed with `mkAspectOption`): mixing the two
+# construction methods trips an unrelated ADR-0033 stratum refusal and is not this construct.
 row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnf='let
   flake = builtins.getFlake (toString ./.);
   genAspects = flake.inputs.gen.lib.aspects.aspects;
@@ -32,11 +31,11 @@ row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfred="${
 row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfred="${row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfred/BODY/builtins.toJSON (builtins.attrNames tree.config.aspects)}"
 row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfcatch="${row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnf/SECOND/cnf2}"
 row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfcatch="${row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfcatch/BODY/if (builtins.tryEval (builtins.deepSeq (builtins.attrNames tree.config.aspects) true)).success then \"ADMITTED\" else \"CAUGHT\"}"
-check "T5 two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf unplanted (mkAspectModule declared twice over one cnf still merges, mirroring aspects-redeclaration.nix)" \
+check "T5 two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf unplanted (mkAspectModule declared twice over one cnf is one construction, one module)" \
   "$row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfok" 0 "" "$tmpdir/two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf-green.err" '["probe"]'
 check "T5 two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf planted   (mkAspectModule declared twice over a genuinely differing cnf is refused by name, den-hoag-a0gc)" \
   "$row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfred" 1 \
-  "gen-merge: option \`aspects' is declared with types that do not merge (\`aspectsRoot' and \`aspectsRoot'" \
+  "gen-merge: The option \`aspects' in" \
   "$tmpdir/two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf-red.err"
 check "T5 two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf catchable  (the refusal is caught by tryEval, not an abort)" \
   "$row_two_mkaspectmodule_declarations_of_options_aspects_merge_over_one_cnfcatch" 0 "" "$tmpdir/two-mkaspectmodule-declarations-of-options-aspects-merge-over-one-cnf-catch.err" 'CAUGHT'

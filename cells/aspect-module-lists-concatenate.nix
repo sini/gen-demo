@@ -7,7 +7,9 @@
 # at an inert key (`closedKeys`) is still refused, catchably. The differing declaration flips
 # whatever `aspect-cnf.nix` states, so it differs under both states of the corpus's own cnf; the
 # `or false` restates gen-aspects' default for `closedKeys` at this consumer. If that default ever
-# flips to `true` and the corpus drops its own `closedKeys = true`, this cell reds, loudly.
+# flips to `true` and the corpus drops its own `closedKeys = true`, this cell reds, loudly. A later
+# declaration states the container's TYPE only: two both stating its `default` are refused, as
+# nixpkgs refuses them (`bothHave`; the last row).
 {
   asserts,
   genAspects,
@@ -28,14 +30,18 @@ let
   second = cnf // {
     aspectModules = [ { options.chenille = str "piled"; } ];
   };
-  stitch =
-    cnfs:
+  optionOf = c: (genAspects.mkAspectSchema c).mkAspectOption { };
+  # the first declaration as written, every later one its type alone
+  stitchWith =
+    later: cnfs:
     (genMerge.evalModuleTree { } (
-      map (c: { options.aspects = (genAspects.mkAspectSchema c).mkAspectOption { }; }) cnfs
+      [ { options.aspects = optionOf (builtins.head cnfs); } ]
+      ++ map (c: { options.aspects = later (optionOf c); }) (builtins.tail cnfs)
       ++ [
         { aspects.stitch = { }; }
       ]
     )).config.aspects.stitch;
+  stitch = stitchWith (o: genMerge.mkOption { inherit (o) type; });
   read = s: {
     baize = s.baize or null;
     chenille = s.chenille or null;
@@ -65,6 +71,14 @@ in
         first
         (second // { closedKeys = !(cnf.closedKeys or false); })
       ])) null
+    )).success
+    && !(builtins.tryEval (
+      builtins.deepSeq (read (
+        stitchWith (o: o) [
+          first
+          second
+        ]
+      )) null
     )).success
   );
 }
