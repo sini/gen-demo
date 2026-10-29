@@ -46,12 +46,8 @@ let
     "a"
     "b"
   ];
-  gSub = gt.submodule {
-    options.a = genMerge.mkOption {
-      type = gt.int;
-      default = 0;
-    };
-  };
+  # no `default`: the two declarations' module sets merge, and two copies of one option both stating `default` are refused (nixpkgs' `bothHave`)
+  gSub = gt.submodule { options.a = genMerge.mkOption { type = gt.int; }; };
   forms = {
     gtEnum = {
       tss = both [

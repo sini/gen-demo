@@ -1,6 +1,7 @@
 # `redeclared-many-modules` — C188, den-hoag-f010k. One option `weave` is declared, typed, in eight
 # modules with distinct files: it reads its value, and its shadow provenance `overridden` names
-# `decl-0` … `decl-6` in authored order. An option `weft` whose declared type is a `_module.args`
+# `decl-0` … `decl-6` in authored order. Two of them both stating `description` are refused, as
+# nixpkgs refuses two declarations both stating `default`, `example`, `description` or `apply`. An option `weft` whose declared type is a `_module.args`
 # argument, declared in three modules, is admitted, as the same declaration made once always was:
 # gen-merge's declaration guard decides each declaring module's key set and never merges the
 # redeclared descriptor, so which declarations are admitted does not depend on how many modules make
@@ -16,13 +17,22 @@ let
   many = genMerge.evalModuleTree { } (
     builtins.genList (i: {
       _file = "decl-${toString i}";
-      options.weave = mk {
-        type = T.str;
-        description = "declaration ${toString i}";
-      };
+      options.weave = mk { type = T.str; };
     }) n
     ++ [ { config.weave = "twill"; } ]
   );
+  described =
+    builtins.tryEval
+      (genMerge.evalModuleTree { } (
+        builtins.genList (i: {
+          _file = "desc-${toString i}";
+          options.weave = mk {
+            type = T.str;
+            description = "declaration ${toString i}";
+          };
+        }) 2
+        ++ [ { config.weave = "twill"; } ]
+      )).config.weave;
   argTyped =
     builtins.tryEval
       (genMerge.evalModuleTree { } (
@@ -46,5 +56,6 @@ in
         success = true;
         value = "linen";
       }
+    && !described.success
   );
 }

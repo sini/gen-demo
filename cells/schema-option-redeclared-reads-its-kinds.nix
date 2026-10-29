@@ -5,7 +5,8 @@
 # one option and the introspection module is imported once. C78 reads the kinds through the same
 # redeclaration; this cell reads the schema-level views over them. Before, the two declarations
 # unioned their module sets, the introspection module was imported twice, and `_kindNames` refused
-# "read-only, but it is defined 2 times".
+# "read-only, but it is defined 2 times". The second declaration states the TYPE only: two
+# declarations both stating the option's `default` are refused, as nixpkgs refuses them (`bothHave`).
 {
   asserts,
   genMerge,
@@ -26,8 +27,16 @@ let
   once = read [ { options.schema = registry; } ];
   twice = read [
     { options.schema = registry; }
-    { options.schema = registry; }
+    { options.schema = genMerge.mkOption { inherit (registry) type; }; }
   ];
+  bothDefault = builtins.tryEval (
+    builtins.deepSeq
+      (read [
+        { options.schema = registry; }
+        { options.schema = registry; }
+      ])._kindNames
+      true
+  );
 in
 {
   construct = [ "schema-options-introspection-redeclared" ];
@@ -40,5 +49,6 @@ in
     && twice._kindNames == once._kindNames
     && twice._topology == once._topology
     && twice._edges == once._edges
+    && !bothDefault.success
   );
 }

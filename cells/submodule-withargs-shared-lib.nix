@@ -11,13 +11,12 @@
 }:
 let
   t = genMerge.types;
+  # the read as a definition: the two declarations' module sets merge, and two copies of one option both stating `default` are refused (nixpkgs' `bothHave`)
   reads =
     { lib, ... }:
     {
-      options.seen = genMerge.mkOption {
-        type = t.str;
-        default = if lib ? version then "LIB-ARRIVED" else "NOT-A-LIB";
-      };
+      options.seen = genMerge.mkOption { type = t.str; };
+      config.seen = if lib ? version then "LIB-ARRIVED" else "NOT-A-LIB";
     };
   declare =
     file: argsOf:

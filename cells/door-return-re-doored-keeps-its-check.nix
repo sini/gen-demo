@@ -28,11 +28,9 @@ let
       success = true;
       value = want;
     };
+  # no `default`: the two declarations' module sets merge, and two copies of one option both stating `default` are refused (nixpkgs' `bothHave`)
   bolt = genMerge.types.submodule {
-    options.warp = genMerge.mkOption {
-      type = genMerge.types.int;
-      default = 0;
-    };
+    options.warp = genMerge.mkOption { type = genMerge.types.int; };
   };
   notFive = v: !(builtins.isAttrs v) || v.warp or 0 != 5;
   short = v: !(builtins.isList v) || builtins.length v < 3;
