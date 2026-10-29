@@ -12,12 +12,8 @@
 }:
 let
   gt = genMerge.types;
-  sm = gt.submodule {
-    options.a = genMerge.mkOption {
-      type = gt.int;
-      default = 1;
-    };
-  };
+  # no `default`: the two declarations' module sets merge, and two copies of one option both stating `default` are refused (nixpkgs' `bothHave`)
+  sm = gt.submodule { options.a = genMerge.mkOption { type = gt.int; }; };
   wrapped = lib.types.addCheck sm (v: (v.a or 1) != 3);
   other = lib.types.addCheck sm (v: (v.a or 1) != 4);
   decl =

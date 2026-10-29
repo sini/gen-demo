@@ -6,6 +6,8 @@
 # separate `mkSchemaOption { }` calls. Two declarations differing in `strict` are two constructions and
 # are refused catchably, where before either the later one decided the kind's `strict` in silence or
 # (under gen-merge's same-named refusal alone) every redeclaration was refused, the twin included.
+# The later declarations state the option's TYPE only: the schema option states its `default`, and
+# two declarations both stating it are refused, as nixpkgs refuses them (`bothHave`; the last row).
 {
   asserts,
   genMerge,
@@ -14,12 +16,15 @@
 let
   schema = inputs.gen.lib.substrate.schema;
   loom = schema.mkSchemaOption { };
-  kinds =
+  # the first declaration as written, every later one its type alone
+  typeOnly = o: genMerge.mkOption { inherit (o) type; };
+  kindsOf =
     decls:
     builtins.attrNames
       (genMerge.evalModuleTree { } (
         map (o: { options.schema = o; }) decls ++ [ { config.schema.selvage = { }; } ]
       )).config.schema.selvage;
+  kinds = decls: kindsOf ([ (builtins.head decls) ] ++ map typeOnly (builtins.tail decls));
   decides = e: (builtins.tryEval (builtins.deepSeq e true)).success;
   # a facet whose option is typed by a check-only `mkOptionType`: the one position the
   # `keySemantics` grammar places a type record, and a cyclic one. Its back-edge sits under
@@ -78,5 +83,10 @@ in
     ])
     # control: declared once
     && decides (kinds [ loom ])
+    # both declarations stating the option's `default` are refused, one construction or not
+    && !(decides (kindsOf [
+      loom
+      loom
+    ]))
   );
 }
