@@ -20,6 +20,15 @@
 #    answer: 4 served (every declaration accepts it), 3 refused (the author rejects it). nixpkgs asks only
 #    the later `int`, which refuses the pair, so its engine refuses both (`authorFirstNixpkgs`): gen serves
 #    beyond nixpkgs here, bounded by the meet (ADR-0039).
+#  - `foreignOwnParameters`: an author record named `listOf` over `enum [a]` that states no v2 merge (check "fewer
+#    than two items", plain merge), whose functor returns itself at its own payload and nixpkgs' `listOf` elsewhere,
+#    imported through `mkOptionType` beside gen's `listOf (enum [b])`. Rebuilt by its own functor it is the record
+#    whose check is the debt, so its own parameters are judged by gen's `listOf` at its payload (nixpkgs names a
+#    constructor by its functor name): ["a"] and ["a","b"] served, ["a","a"] refused, inside its parameters and
+#    rejected by its check, where nixpkgs' twin serves it. Both engines.
+#  - `laxV2Own`: the same partner returning, away from its own payload, a lax `listOf` in nixpkgs' v2 protocol whose
+#    `isList` check is marked coherent: the lax record admits every list, and never stands in for the partner's
+#    domain. The same values, both engines.
 # Red where any accepted value is refused (each form refused outright before G11) or any rejected value is
 # served.
 {
@@ -86,6 +95,78 @@ let
     typeMergeRel =
       o:
       if (o.name or null) == "int" then { merged = genMerge.types.int; } else { refused = "not an int"; };
+  };
+  short = v: builtins.isList v && builtins.length v < 2;
+  plain = _loc: defs: builtins.concatLists (map (d: d.value) defs);
+  laxV2 =
+    elem:
+    lib.mkOptionType {
+      name = "listOf";
+      check = {
+        __functor = _: builtins.isList;
+        isV2MergeCoherent = true;
+      };
+      merge = {
+        __functor =
+          self: loc: defs:
+          (self.v2 { inherit loc defs; }).value;
+        v2 =
+          { loc, defs }:
+          {
+            headError =
+              if builtins.all (d: builtins.isList d.value) defs then null else { message = "not a list"; };
+            value = plain loc defs;
+            valueMeta = { };
+          };
+      };
+      functor = (np.listOf elem).functor // {
+        type = p: laxV2 p.elemType;
+      };
+      nestedTypes.elemType = elem;
+    };
+  # itself at its own payload, `away`'s record at any other
+  ownListOf =
+    away:
+    let
+      mk =
+        elem:
+        lib.mkOptionType {
+          name = "listOf";
+          check = short;
+          merge = plain;
+          functor = (np.listOf elem).functor // {
+            type =
+              p:
+              if (p.elemType.functor.payload.values or null) == [ "a" ] then mk p.elemType else away p.elemType;
+          };
+          nestedTypes.elemType = elem;
+        };
+    in
+    mk (np.enum [ "a" ]);
+  ownVals = {
+    a = [ "a" ];
+    ab = [
+      "a"
+      "b"
+    ];
+    aa = [
+      "a"
+      "a"
+    ];
+  };
+  ownForm = away: {
+    tss = both [
+      (genMerge.mkOptionType (ownListOf away))
+      (genMerge.types.listOf (np.enum [ "b" ]))
+    ];
+    engines = [
+      meetRead
+      npRead
+    ];
+    v = ownVals // {
+      aa = "REFUSED";
+    };
+    val = k: ownVals.${k};
   };
   notNum = n: {
     check = v: v != n;
@@ -197,6 +278,8 @@ let
       };
       val = lib.toInt;
     };
+    foreignOwnParameters = ownForm np.listOf;
+    laxV2Own = ownForm laxV2;
     authorFirstNixpkgs = {
       inherit (forms.authorFirst) tss val;
       engines = [ npRead ];
