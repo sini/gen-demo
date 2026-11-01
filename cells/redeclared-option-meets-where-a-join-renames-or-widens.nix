@@ -179,7 +179,6 @@ let
     check = v: v != n;
     message = "must not be ${toString n}";
   };
-  short = v: builtins.isList v && builtins.length v < 2;
   # nixpkgs' `listOf int` functor rebuilding only into the partner itself
   listFunctor = self: {
     name = "listOf";
