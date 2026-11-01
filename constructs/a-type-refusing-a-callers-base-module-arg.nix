@@ -7,7 +7,7 @@
 # states nothing, and the two mint apart.
 { genMerge }:
 let
-  refusingTypeOf = genMerge.refusingSubmodule [ "config" ] (
+  refusingTypeOf = genMerge.refusingSubmodule null [ "config" ] (
     { argand, ... }:
     {
       options.a = genMerge.mkOption {
