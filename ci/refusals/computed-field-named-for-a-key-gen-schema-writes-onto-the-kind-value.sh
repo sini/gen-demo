@@ -22,7 +22,7 @@ check "T5 computed-field-named-for-a-key-gen-schema-writes-onto-the-kind-value u
   "$tmpdir/computed-field-named-for-a-key-gen-schema-writes-onto-the-kind-value-green.err" '["sateen",["ends"]]'
 check "T5 computed-field-named-for-a-key-gen-schema-writes-onto-the-kind-value planted   (a computed field named options, refused by name)" \
   "${row_computed_field_named_for_a_key_gen_schema_writes_onto_the_kind_valueopts/BODY/builtins.toJSON (builtins.attrNames selvage.options)}" 1 \
-  "gen-schema: computed field 'options' is reserved — it is part of the kind-value contract; reserved computed-field names: __functor, kind, mixins, strict, keySemantics, options, refs, refinements, __mint, __sealed" \
+  "gen-schema: computed field 'options' is reserved — it is part of the kind-value contract; reserved computed-field names: __functor, kind, mixins, strict, keySemantics, options, refs, refinements, __mint, __okAt, __sealed" \
   "$tmpdir/computed-field-named-for-a-key-gen-schema-writes-onto-the-kind-value-red.err"
 check "T5 computed-field-named-for-a-key-gen-schema-writes-onto-the-kind-value catchable  (the refusal is caught by tryEval, not an abort)" \
   "${row_computed_field_named_for_a_key_gen_schema_writes_onto_the_kind_valueopts/BODY/if (builtins.tryEval (builtins.deepSeq selvage.options true)).success then \"ADMITTED\" else \"CAUGHT\"}" 0 "" \
