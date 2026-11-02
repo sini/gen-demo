@@ -24,6 +24,8 @@ let
       default = { };
     };
   };
+  # the second declaration of a pair states no `default`: two declarations both stating it are refused (`bothHave`)
+  optNoDefault = t: { options.h = genMerge.mkOption { type = t; }; };
   refused = e: !(builtins.tryEval (builtins.deepSeq e e)).success;
   callerConfig = {
     config = { };
@@ -38,17 +40,17 @@ in
     withArgsRefused = refused (at [ (opt (refusingTypeOf.withArgs callerConfig)) ]);
     redeclarationRefused = refused (at [
       (opt refusingTypeOf)
-      (opt (plainTwin.withArgs callerConfig))
+      (optNoDefault (plainTwin.withArgs callerConfig))
     ]);
     redeclarationReversedRefused = refused (at [
       (opt (plainTwin.withArgs callerConfig))
-      (opt refusingTypeOf)
+      (optNoDefault refusingTypeOf)
     ]);
     withArgsServesArgand = (at [ (opt (refusingTypeOf.withArgs { argand = 2; })) ]).a;
     redeclarationServesArgand =
       (at [
         (opt refusingTypeOf)
-        (opt (plainTwin.withArgs { argand = 2; }))
+        (optNoDefault (plainTwin.withArgs { argand = 2; }))
       ]).a;
   };
 }
