@@ -5,7 +5,8 @@
 # gen-select) carries gen-algebra's `__mint` and gen-schema's `__sealed`, `__kindImports` (its parent
 # kind values), `__kindCycleParents` and `__kindWitness` (the inheritance-cycle walk's parents as
 # written and witness), `__kindAncestors` (its transitive ancestors, kind values keyed by mark) and
-# `__kindSelf` (its completion stamp, den-hoag-1a4f6) with `__witness` (the stamp's declaration gen-algebra's
+# `__kindContextFree` (whether its introspection is layered) and `__kindLineage` (its ancestors by name, each
+# with its first path; den-hoag-f1iza), `__kindSelf` (its completion stamp, den-hoag-1a4f6) with `__witness` (the stamp's declaration gen-algebra's
 # `conservativeEq` reads) and gen-types' `__okAt` (the type-identity index the kind steps, den-hoag-dwln8)
 # beside Nix's own `__functor`;
 # a gen-select selector (read by gen-dispatch) carries `__sel`. Red when any of them grows ANY new `__`
@@ -38,8 +39,10 @@ in
         "__functor"
         "__keyEq"
         "__kindAncestors"
+        "__kindContextFree"
         "__kindCycleParents"
         "__kindImports"
+        "__kindLineage"
         "__kindSelf"
         "__kindWitness"
         "__mint"
