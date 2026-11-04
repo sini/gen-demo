@@ -12,11 +12,12 @@
   lib,
 }:
 let
-  free =
-    L: T: sub: file: opts: {
-      _file = file;
-      config._module.freeformType = T.attrsOf (sub { options = opts; });
-    };
+  free = L: T: sub: file: opts: {
+    _file = file;
+    config._module.freeformType = T.attrsOf (sub {
+      options = opts;
+    });
+  };
   loom = L: T: sub: [
     (free L T sub "warp" { shed = L.mkOption { }; })
     (free L T sub "weft" {
@@ -48,10 +49,11 @@ in
   check = asserts (
     ref.pick == [ "weft" ]
     && ref.reed == [ "selvage" ]
-    && builtins.sort builtins.lessThan ref.shed == [
-      "warp"
-      "weft"
-    ]
+    &&
+      builtins.sort builtins.lessThan ref.shed == [
+        "warp"
+        "weft"
+      ]
     && ref.one == [ "<unknown-file>" ]
     && gen == ref
   );

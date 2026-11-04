@@ -34,7 +34,8 @@ let
       modules = [ decl ] ++ modules;
       inherit specialArgs;
     }).config.seen;
-  rewrap = m: (genBind.wrap { bindings.host = "h"; } (genBind.wrap { bindings.user = "u"; } m).module).module;
+  rewrap =
+    m: (genBind.wrap { bindings.host = "h"; } (genBind.wrap { bindings.user = "u"; } m).module).module;
 in
 {
   construct = [ "a-rewrapped-partial-output-reads-the-module-arguments" ];

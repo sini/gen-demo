@@ -20,7 +20,16 @@ let
     scope = hub.gen-scope.lib;
     inherit lib;
   };
-  tag = l: l.marker or (if l ? evalModuleTree then "gen" else if l ? evalModules then "instance" else "other");
+  tag =
+    l:
+    l.marker or (
+      if l ? evalModuleTree then
+        "gen"
+      else if l ? evalModules then
+        "instance"
+      else
+        "other"
+    );
   schemaImport =
     { lib, ... }:
     {
@@ -29,14 +38,21 @@ let
         default = tag lib;
       };
     };
-  eval = E: r: if E ? evalModuleTree then E.evalModuleTree (removeAttrs r [ "modules" ]) r.modules else E.evalModules r;
+  eval =
+    E: r:
+    if E ? evalModuleTree then
+      E.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
+    else
+      E.evalModules r;
   sub = E: {
     options.loom = E.mkOption {
       type = E.types.submodule [ schemaImport ];
       default = { };
     };
   };
-  at = E: specialArgs: modules: (eval E { inherit specialArgs modules; }).config;
+  at =
+    E: specialArgs: modules:
+    (eval E { inherit specialArgs modules; }).config;
   reads = E: {
     root = (at E { } [ schemaImport ]).weft;
     loom = (at E { } [ (sub E) ]).loom.weft;
@@ -47,11 +63,25 @@ let
       ]).bolt.warp.weft;
     extended = ((eval E { modules = [ ]; }).extendModules { modules = [ schemaImport ]; }).config.weft;
     mounted = (lib.evalModules { modules = [ (sub E) ]; }).config.loom.weft;
-    callerAtRoot = (at E { lib = lib // { marker = "caller"; }; } [ schemaImport ]).weft;
-    callerNotInLoom = (at E { lib = lib // { marker = "caller"; }; } [ (sub E) ]).loom.weft;
+    callerAtRoot =
+      (at E {
+        lib = lib // {
+          marker = "caller";
+        };
+      } [ schemaImport ]).weft;
+    callerNotInLoom =
+      (at E {
+        lib = lib // {
+          marker = "caller";
+        };
+      } [ (sub E) ]).loom.weft;
     moduleArgsShadowed =
       (at E { } [
-        { _module.args.lib = lib // { marker = "module-args"; }; }
+        {
+          _module.args.lib = lib // {
+            marker = "module-args";
+          };
+        }
         { options.x = E.mkOption { type = E.types.str; }; }
         ({ lib, ... }: { x = tag lib; })
       ]).x;
