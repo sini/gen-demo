@@ -59,7 +59,7 @@ in
     && !(builtins.tryEval (
       builtins.deepSeq (read (stitch [
         first
-        (second // { closedKeys = true; })
+        (second // { closedKeys = !(cnf.closedKeys or false); })
       ])) null
     )).success
   );

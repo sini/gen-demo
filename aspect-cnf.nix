@@ -17,6 +17,8 @@
 #              "never a class"; `gusset`'s category says "a class", but its content says "nothing here".
 {
   keySemantics.nixos.category = "class";
+  closedKeys = true;
+  freeformKeys = [ "binding" "trim" "placket" "facing" ];
   keySemantics.welt.category = "channel";
   keySemantics.gusset.category = "class";
 }
