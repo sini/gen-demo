@@ -101,11 +101,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793878236,
-        "narHash": "sha256-noYiBV6R/ed4iIGSwuqthgnvuisflI8KsilJUr/hFE0=",
+        "lastModified": 1793915016,
+        "narHash": "sha256-1jUlo/FxKeYOUqdqI/hkGxQ6Kcg2ePY41aXa0YmqDxc=",
         "owner": "sini",
         "repo": "gen-aspects",
-        "rev": "b44f37b27f1eec75d032681c6b45b683d3c9a254",
+        "rev": "85e21b1f8b17351323774d3b6c74962496083f74",
         "type": "github"
       },
       "original": {
