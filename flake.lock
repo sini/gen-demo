@@ -48,12 +48,10 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1790691510,
-        "narHash": "sha256-b7mCgQDln0PV54QyR3U4NfH2rH4S7J4m81dG+gHyA7A=",
-        "owner": "sini",
-        "repo": "gen",
-        "rev": "cc7512c3d2795b17bcaad4e6aa34f18554f63049",
-        "type": "github"
+        "lastModified": 1790699623,
+        "narHash": "sha256-491khQt06P4eVA6DSRRwgipmYEWplYBhxvv5B8/SRKQ=",
+        "path": "/home/sini/Documents/repos/sini/.worktrees/xtrxn-hub",
+        "type": "path"
       },
       "original": {
         "owner": "sini",
@@ -204,12 +202,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1790691231,
-        "narHash": "sha256-HvIIYo5CS1P1E9MoDryMFRYKZR6d7vm6KSAmSZdx+Y8=",
-        "owner": "sini",
-        "repo": "gen-delivery",
-        "rev": "a2bf0d0281a34ec71e6d89d41edcfb24743e7394",
-        "type": "github"
+        "lastModified": 1790699608,
+        "narHash": "sha256-TqPH3NzWIOaPs3ayyCgJsVioVV7cZDOZc+fW1gmY6DQ=",
+        "path": "/home/sini/Documents/repos/sini/.worktrees/xtrxn-delivery",
+        "type": "path"
       },
       "original": {
         "owner": "sini",
