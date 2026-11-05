@@ -3744,6 +3744,62 @@
                     (at spoolTree ({ ... }: { spool = "sateen"; })).spool == "sateen"
                     && (at keyed { key = "sateen"; }).key == "sateen"
                   );
+
+                  # (51) C40 — den-hoag-4kw63: gen-merge refuses a module's syntax on its first read, so
+                  # a DECLARATION-only read of C35's typo module refuses by name, as a config read does,
+                  # where `declaredOptions` used to answer `[ "spool" ]` and drop `weft` unread. The
+                  # spelled-right twin is read beside it, so a reader refusing every module cannot pass.
+                  declaration-read-syntax = asserts "declaration-read-syntax" (
+                    let
+                      spoolOpt = genMerge.mkOption {
+                        type = genMerge.types.str;
+                        default = "none";
+                      };
+                      declared = m: builtins.attrNames (genMerge.declaredOptions { modules = [ m ]; });
+                      typo = {
+                        _file = "/demo/typo.nix";
+                        options.spool = spoolOpt;
+                        option.weft = spoolOpt;
+                      };
+                    in
+                    !(builtins.tryEval (declared typo)).success
+                    &&
+                      declared (
+                        removeAttrs typo [ "option" ]
+                        // {
+                          options = {
+                            spool = spoolOpt;
+                            weft = spoolOpt;
+                          };
+                        }
+                      ) == [
+                        "spool"
+                        "weft"
+                      ]
+                  );
+
+                  # (52) C41 — den-hoag-foreign-leaf-check-unenforced-v4h7k: a foreign type's `check`
+                  # is applied before gen-merge's own fold, as nixpkgs' `checkedAndMerged` does.
+                  # `lib.types.str` used to accept `1` at every position gen-merge folds; it now
+                  # refuses it (by name in `refusals` row 36). The refusal is read beside its control,
+                  # the same option given a string, so a fold refusing everything cannot pass.
+                  foreign-type-check = asserts "foreign-type-check" (
+                    let
+                      read =
+                        m:
+                        (genMerge.evalModuleTree {
+                          modules = [
+                            { options.spool = genMerge.mkOption { type = lib.types.str; }; }
+                            m
+                          ];
+                        }).config.spool;
+                    in
+                    !(builtins.tryEval (read {
+                      _file = "/demo/spool.nix";
+                      spool = 1;
+                    })).success
+                    && read { spool = "sateen"; } == "sateen"
+                  );
                 };
               in
               constructChecks
