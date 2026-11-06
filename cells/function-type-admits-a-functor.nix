@@ -7,6 +7,9 @@
 # whose `__functor` is itself a functor, which nixpkgs #574597 serves again. A functor whose
 # `__functor` is not a function is refused on both engines, which is the control. A self-returning
 # functor is refused natively by name; nixpkgs overflows on it, so its nixpkgs arm is not evaluated.
+# The same two values, each defined twice under a type stated as `mkOptionType { name; }`, meet the
+# default merge (`mergeDefaultOption`), whose function arm is chosen by gen-prelude's `isFunction`:
+# both engines merge them pointwise, and the self-returning functor is refused there by name.
 {
   asserts,
   genMerge,
@@ -40,6 +43,32 @@ let
           shuttle = "weft";
         }
     );
+  # Two definitions of one option whose type takes the default merge, applied to one argument.
+  twice =
+    eval: mkOptionType: v:
+    builtins.tryEval (
+      (eval {
+        modules = [
+          { options.loom = mkOptionType { name = "loom"; }; }
+          { loom = v; }
+          { loom = v; }
+        ];
+      }).config.loom
+        {
+          shuttle = "weft";
+        }
+    );
+  nativeTwice = twice (r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules) (
+    t: genMerge.mkOption { type = genMerge.mkOptionType t; }
+  );
+  nixpkgsTwice = twice lib.evalModules (t: lib.mkOption { type = lib.mkOptionType t; });
+  pointwise =
+    v:
+    nixpkgsTwice v == {
+      success = true;
+      value = "weftweft";
+    }
+    && nativeTwice v == nixpkgsTwice v;
   native = loom (
     r: genMerge.evalModuleTree (removeAttrs r [ "modules" ]) r.modules
   ) genMerge.mkOption genMerge.types.function;
@@ -61,5 +90,8 @@ in
     && !(nixpkgs notCallable).success
     && !(native notCallable).success
     && !(native selfReturning).success
+    && pointwise doubleWrapped
+    && pointwise nested
+    && !(nativeTwice selfReturning).success
   );
 }
