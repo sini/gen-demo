@@ -3,7 +3,7 @@
 # with `b` carrying the `needle` kind's value. Every read of `a` — `node`, `get … children`, gen-select's
 # `sel.kind` match over its scope adapter, and `evalDebug`'s `node` — answers what it answers on the coherent twin.
 #
-# Red before the move: the scope door scanned every node at the evaluator's entry, so each of the four read of
+# Red before the move: the scope door scanned every node at the evaluator's entry, so each of the four reads of
 # `a` refused naming `b`. The refusal of `b` itself, by name, through `eval` and `evalDebug`, is the refusal row
 # of the same name.
 {
