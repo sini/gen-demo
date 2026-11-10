@@ -30,7 +30,6 @@
         ./refusals
         ./refusals.sh
         ./worktree-precommit-check.sh
-        ./evaluator-interface.py
         ../cells
         ../constructs
         ../fixtures
