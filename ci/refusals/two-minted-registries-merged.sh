@@ -21,21 +21,21 @@ row102Registry='let
     thread
     (genScope.mkKind {
       below = [ "thread" ];
-      spawns.thread = spawnOf;
+      spawns.thread.produced = "thread"; spawns.thread.builder = spawnOf;
     } "bolt")
   ];
   upside = genScope.mkKinds [
     (genScope.mkKind { } "bolt")
     (genScope.mkKind {
       below = [ "bolt" ];
-      spawns.bolt = spawnOf;
+      spawns.bolt.produced = "bolt"; spawns.bolt.builder = spawnOf;
     } "thread")
   ];
   spool = genScope.mkKinds [
     thread
     (genScope.mkKind {
       below = [ "thread" ];
-      spawns.thread = spawnOf;
+      spawns.thread.produced = "thread"; spawns.thread.builder = spawnOf;
     } "spool")
   ];
   merged = minted // { kinds = minted.kinds // { inherit (upside.kinds) thread; }; };

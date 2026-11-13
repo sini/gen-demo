@@ -21,12 +21,12 @@ registry='let
     (genScope.mkKind { } "thread")
     (genScope.mkKind {
       below = [ "thread" ];
-      spawns.thread = spawnOf;
+      spawns.thread.produced = "thread"; spawns.thread.builder = spawnOf;
     } "bolt")
   ];
   selfNaming = genScope.mkKind {
     below = [ "bolt" ];
-    spawns.bolt = spawnOf;
+    spawns.bolt.produced = "bolt"; spawns.bolt.builder = spawnOf;
   } "bolt";
   forged = { kinds = { bolt = selfNaming; }; };
 in '

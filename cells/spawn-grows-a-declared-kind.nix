@@ -2,7 +2,8 @@
 # one rank of the declared kind order: a `selvage` host's `picot` spawn reads the host's own
 # declarations through the spawn handle (`self.node`, never an evaluated attribute) and returns
 # children keyed by identity with no `id`, `type` or `parent` — the substrate stamps all three, the
-# `id` from the key. Each child is then an ordinary node whose attributes evaluate.
+# `id` from the key, and the entry's label `picot` as `containedAs`. Each child is then an ordinary
+# node whose attributes evaluate.
 #
 # Red before gen-scope stamped the `id`: an id-less child aborted `attribute 'id' missing`, uncatchably.
 # Live control: a host declaring no picots spawns none, so the set grows off the declaration.
@@ -15,7 +16,8 @@
         (genScope.mkKind { } "picot")
         (genScope.mkKind {
           below = [ "picot" ];
-          spawns.picot =
+          spawns.picot.produced = "picot";
+          spawns.picot.builder =
             self: id:
             builtins.listToAttrs (
               map (p: {
@@ -66,7 +68,7 @@
       let
         n = ev.node k;
       in
-      n.id == k && n.type == "picot" && n.parent == "lace"
+      n.id == k && n.type == "picot" && n.parent == "lace" && n.containedAs == "picot"
     ) grown
     && ev.get "picot:tatting@lace" "shade" == "tatting-madder"
   );

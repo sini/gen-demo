@@ -27,7 +27,8 @@
                   "hem"
                   "picot"
                 ];
-                spawns.picot =
+                spawns.picot.produced = "picot";
+                spawns.picot.builder =
                   _: id:
                   form (
                     map

@@ -10,7 +10,7 @@ row24Base='let
     (genScope.mkKind { } "thread")
     (genScope.mkKind {
       below = [ "thread" ];
-      spawns.thread = spawnOf;
+      spawns.thread.produced = "thread"; spawns.thread.builder = spawnOf;
     } "bolt")
   ];
 in builtins.toJSON (genScope.eval { } {
@@ -35,7 +35,7 @@ row_spawned_key_colliding_with_an_already_registered_nodes_idcatch='let
     (genScope.mkKind { } "thread")
     (genScope.mkKind {
       below = [ "thread" ];
-      spawns.thread = spawnOf;
+      spawns.thread.produced = "thread"; spawns.thread.builder = spawnOf;
     } "bolt")
   ];
 in if (builtins.tryEval (builtins.deepSeq (genScope.eval { } {

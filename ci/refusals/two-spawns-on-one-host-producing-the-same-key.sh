@@ -19,8 +19,8 @@ row_two_spawns_on_one_host_producing_the_same_key='let
       (genScope.mkKind { } "leafTwo")
       (genScope.mkKind {
         below = [ "leafOne" "leafTwo" ];
-        spawns.leafOne = spawnOf "warp";
-        spawns.leafTwo = spawnOf "SECOND";
+        spawns.leafOne.produced = "leafOne"; spawns.leafOne.builder = spawnOf "warp";
+        spawns.leafTwo.produced = "leafTwo"; spawns.leafTwo.builder = spawnOf "SECOND";
       } "host")
     ];
   })).allNodeIds;

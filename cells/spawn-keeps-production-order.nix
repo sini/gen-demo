@@ -22,7 +22,8 @@
                 (genScope.mkKind { } "picot")
                 (genScope.mkKind {
                   below = [ "picot" ];
-                  spawns.picot =
+                  spawns.picot.produced = "picot";
+                  spawns.picot.builder =
                     self: id:
                     form (
                       map (p: {
