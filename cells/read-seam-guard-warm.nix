@@ -72,7 +72,7 @@ let
   reason = genScope.seamAcquisitionDefect {
     reader = "kiln";
     target = "quarry";
-    attribute = "clay";
+    attrName = "clay";
     through = "self.get";
     declared = [ ];
   };
