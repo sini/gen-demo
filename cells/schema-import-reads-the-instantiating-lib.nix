@@ -5,6 +5,9 @@
 # `evalModules` mounts the gen `submodule`, exactly as under nixpkgs' `lib.evalModules`; a caller's
 # `specialArgs.lib` wins at the root and does not reach the submodule, and `_module.args.lib` is
 # shadowed, as there. The published engine, built with none, still refuses the read by name.
+# The engine is the hub's lib door, `inputs.gen.lib.instantiate { inherit lib; }`, reached through the
+# published surface: its gen-schema registry, its `compose` and the standalone entry's door
+# (`import <gen> { inherit lib; }`) read the same lib.
 {
   asserts,
   inputs,
@@ -12,14 +15,9 @@
   genMerge,
 }:
 let
-  hub = inputs.gen.inputs;
-  built = import "${hub.gen-merge}/lib" {
-    prelude = hub.gen-prelude.lib;
-    types = hub.gen-types.lib;
-    memo = hub.gen-memo.lib;
-    scope = hub.gen-scope.lib;
-    inherit lib;
-  };
+  door = inputs.gen.lib.instantiate { inherit lib; };
+  built = door.modules.merge;
+  roster = door.mkGenLibs { };
   tag =
     l:
     l.marker or (
@@ -86,11 +84,28 @@ let
         ({ lib, ... }: { x = tag lib; })
       ]).x;
   };
+  # den #766's shape through the door's gen-schema: an instance registry whose kind module reads `lib`
+  registryRead =
+    R:
+    let
+      s = R.schema.evalSchema { } [
+        { config.schema.node.options.addr = R.merge.mkOption { type = R.merge.types.str; }; }
+      ];
+    in
+    (R.merge.evalModuleTree { } [
+      {
+        options.nodes = R.schema.mkInstanceRegistry { extraModules = [ schemaImport ]; } s.node;
+        config.nodes.n1.addr = "10.0.0.1";
+      }
+    ]).config.nodes.n1.weft;
 in
 {
   construct = [ "a-schema-import-module-reads-the-lib-its-engine-is-built-with-3" ];
   check = asserts (
     reads built == reads lib
+    && registryRead roster == "instance"
+    && registryRead (import inputs.gen.outPath { inherit lib; }) == "instance"
+    && (door.compose { modules = [ schemaImport ]; }).values.weft == "instance"
     && (reads lib).loom == "instance"
     && !(builtins.tryEval (at genMerge { } [ (sub genMerge) ]).loom.weft).success
   );
