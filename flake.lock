@@ -49,11 +49,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1794934949,
-        "narHash": "sha256-ub0ihEIKHR/fv7tz32+9RC59wnIj9RG2q0oqfsDpcJ4=",
+        "lastModified": 1794962334,
+        "narHash": "sha256-7M2hwyRWp20oaroJfNkjJzMzF/y0s11BtCYiuRW2OJw=",
         "owner": "sini",
         "repo": "gen",
-        "rev": "4d89886d5b8832020b734f2efb10ef16b5cd3dc3",
+        "rev": "7ed54cbe98fe27e942173ca31fdc6ce81872d038",
         "type": "github"
       },
       "original": {
