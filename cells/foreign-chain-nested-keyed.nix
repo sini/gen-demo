@@ -83,6 +83,14 @@ let
         r // { merge = loc: defs: bySwap (r.merge loc defs); };
     }
   );
+  # the same value read as a post-fold reshape: `bySwap` runs after `lazy` folds, at any position
+  viaPostFold = t.postFold bySwap lazy;
+  swapDefs = baz: {
+    foo.j.k.a = 1;
+    bar.j.k.a = 2;
+    baz.j.k.a = baz;
+  };
+  addKey = v: v // { added.j.k.a = 7; };
 in
 {
   construct = [ "foreign-chain-with-a-step-below-its-lazy-attrswith-is-keyed-without-its-siblings" ];
@@ -188,5 +196,29 @@ in
         ]).foo.j.k.a
         null
     )).success
+    # through `types.postFold`, nested and at the root, both `baz` arms: `bySwap` keeps, then swaps
+    &&
+      map (baz: (cfg (np.attrsOf (np.uniq viaPostFold)) [ { config.o.x = swapDefs baz; } ]).x.foo.j.k.a) [
+        3
+        4
+      ] == [
+        1
+        2
+      ]
+    &&
+      map (baz: (cfg (np.uniq viaPostFold) [ { config.o = swapDefs baz; } ]).foo.j.k.a) [
+        3
+        4
+      ] == [
+        1
+        2
+      ]
+    # a key whose every definition is discharged folds nothing: `g` of the element's empty value
+    &&
+      cfg (np.lazyAttrsOf (t.postFold addKey lazy)) [
+        { config.o.x = genMerge.mkIf false (swapDefs 3); }
+      ] == {
+        x.added.j.k.a = 7;
+      }
   );
 }
