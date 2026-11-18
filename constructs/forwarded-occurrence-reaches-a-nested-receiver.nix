@@ -64,7 +64,10 @@ let
     };
   };
   spoolTerminals = {
-    weft = { modules, ... }: builtins.mapAttrs (_: s: { inherit (s) thread spindle; }) (lib.evalModules { modules = [ spoolRecv ] ++ modules; }).config.spools;
+    weft =
+      { modules, ... }:
+      builtins.mapAttrs (_: s: { inherit (s) thread spindle; })
+        (lib.evalModules { modules = [ spoolRecv ] ++ modules; }).config.spools;
     # damask's source class has a terminal that realizes nothing it is handed, so no content is stripped
     sett = _: null;
   };
@@ -84,23 +87,30 @@ let
   mB = {
     thread = "B";
   };
-  toPewter = select: route {
-    name = "to-pewter";
-    producer = "damask";
-    order = [ 0 ];
-    class = "sett";
-    node = "damask";
-    inherit select;
-    path = [
-      "spools"
-      { dest = "name"; }
-    ];
-  };
+  toPewter =
+    select:
+    route {
+      name = "to-pewter";
+      producer = "damask";
+      order = [ 0 ];
+      class = "sett";
+      node = "damask";
+      inherit select;
+      path = [
+        "spools"
+        { dest = "name"; }
+      ];
+    };
   nestedRun =
     damaskCell: routes:
     let
       f = genDelivery.forward { routes.weft.pewter = routes; } spoolTerminals (projectedOf {
-        pewter.weft = [ [ "own" pewterOwn ] ];
+        pewter.weft = [
+          [
+            "own"
+            pewterOwn
+          ]
+        ];
         damask.sett = damaskCell;
       });
     in
@@ -110,35 +120,70 @@ let
     };
   forwardNested = {
     # one occurrence, group [ mA mB ]
-    oneOccurrence = nestedRun [
-      [ "o1" mA ]
-      [ "o1" mB ]
-    ] [ (toPewter "declared") ];
+    oneOccurrence =
+      nestedRun
+        [
+          [
+            "o1"
+            mA
+          ]
+          [
+            "o1"
+            mB
+          ]
+        ]
+        [ (toPewter "declared") ];
     # two occurrences, declared o1 then o2
-    twoOccurrences = nestedRun [
-      [ "o1" mA ]
-      [ "o2" mB ]
-    ] [ (toPewter "declared") ];
+    twoOccurrences =
+      nestedRun
+        [
+          [
+            "o1"
+            mA
+          ]
+          [
+            "o2"
+            mB
+          ]
+        ]
+        [ (toPewter "declared") ];
     # equal content, distinct occurrences: both delivered
-    equalContent = nestedRun [
-      [ "o1" mA ]
-      [ "o3" mA' ]
-    ] [ (toPewter "declared") ];
+    equalContent =
+      nestedRun
+        [
+          [
+            "o1"
+            mA
+          ]
+          [
+            "o3"
+            mA'
+          ]
+        ]
+        [ (toPewter "declared") ];
     # the group forwarded alone (pewter's own spindle absent)
     alone =
       let
-        f = genDelivery.forward { routes.weft.pewter = [ (toPewter "declared") ]; } spoolTerminals (projectedOf {
-          pewter.weft = [
-            [
-              "own"
-              { spools.pewter.thread = "R"; }
-            ]
-          ];
-          damask.sett = [
-            [ "o1" mA ]
-            [ "o1" mB ]
-          ];
-        });
+        f =
+          genDelivery.forward { routes.weft.pewter = [ (toPewter "declared") ]; } spoolTerminals
+            (projectedOf {
+              pewter.weft = [
+                [
+                  "own"
+                  { spools.pewter.thread = "R"; }
+                ]
+              ];
+              damask.sett = [
+                [
+                  "o1"
+                  mA
+                ]
+                [
+                  "o1"
+                  mB
+                ]
+              ];
+            });
       in
       (genDelivery.realize { } spoolTerminals f.projected).weft.pewter;
   };
@@ -184,20 +229,23 @@ let
   };
   heddleOf =
     heddle: pirns:
-    map (p: route {
-      name = "seat-${p}";
-      producer = p;
-      order = [ (lib.lists.findFirstIndex (x: x == p) 0 pirns) ];
-      class = "pirn";
-      node = p;
-      path = [
-        "pirns"
-        {
-          captured = "node";
-          path = [ "name" ];
-        }
-      ];
-    }) pirns;
+    map (
+      p:
+      route {
+        name = "seat-${p}";
+        producer = p;
+        order = [ (lib.lists.findFirstIndex (x: x == p) 0 pirns) ];
+        class = "pirn";
+        node = p;
+        path = [
+          "pirns"
+          {
+            captured = "node";
+            path = [ "name" ];
+          }
+        ];
+      }
+    ) pirns;
   embed =
     heddle: order:
     route {
@@ -218,11 +266,36 @@ let
   containedCells = {
     selvage.warp = [ ];
     fringe.warp = [ ];
-    tabby.heddle = [ [ "tabby" { reed = 12; } ] ];
-    ottoman.heddle = [ [ "ottoman" { reed = 8; } ] ];
-    quill.pirn = [ [ "quill" { ply = "two"; } ] ];
-    cop.pirn = [ [ "cop" { ply = "three"; } ] ];
-    spool.pirn = [ [ "spool" { ply = "single"; } ] ];
+    tabby.heddle = [
+      [
+        "tabby"
+        { reed = 12; }
+      ]
+    ];
+    ottoman.heddle = [
+      [
+        "ottoman"
+        { reed = 8; }
+      ]
+    ];
+    quill.pirn = [
+      [
+        "quill"
+        { ply = "two"; }
+      ]
+    ];
+    cop.pirn = [
+      [
+        "cop"
+        { ply = "three"; }
+      ]
+    ];
+    spool.pirn = [
+      [
+        "spool"
+        { ply = "single"; }
+      ]
+    ];
   };
   containedForward = genDelivery.forward {
     routes = {

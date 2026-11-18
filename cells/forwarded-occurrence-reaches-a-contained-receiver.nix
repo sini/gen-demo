@@ -24,7 +24,11 @@ in
         pirns.spool.ply = "single";
       };
     }
-    && builtins.attrNames realized.warp == [ "fringe" "selvage" ]
+    &&
+      builtins.attrNames realized.warp == [
+        "fringe"
+        "selvage"
+      ]
     && !fringe.success
     && builtins.elem "warp.fringe" forwardContained.diagnostics.refusing
   );
