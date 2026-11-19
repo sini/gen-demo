@@ -20,6 +20,13 @@
 # fold answers, because the warm cone dirties `kiln` and `ladle` on the declared path. `pit`, which
 # `kiln` did not declare, is refused through the handed reader, cold and warm; live control: `pit`
 # answers `5`. Under the empty relation both reads are refused.
+#
+# The marker arm (the armed-reader marker): the body that reads `self.allNodeIds` also reads
+# `self ? reader`, `true` on its armed reader and `false` on an unarmed twin of the same scope
+# evaluated through `genScope.eval` with no relation. gen-scope's `children` and `nodesByType` branch
+# on that marker: armed, `kiln`'s children and the `kiln`-kind nodes answer through the guarded
+# `node` reads, each a declared read, and under the empty relation they are refused; unarmed, the
+# same helpers answer the same ids through the substrate walk.
 {
   asserts,
   lib,
@@ -218,11 +225,64 @@ let
   };
   handCold = handFold 1 handed;
   handWarm = (genMemo.warmOverride engine handCold "quarry" { clay = 9; }).eval;
+  # the marker arm: one body reads the marker beside the enumeration, two call the query helpers
+  markEquations = equations // {
+    marked = equation "marked" "resolution" "synthesized" (
+      self: id:
+      if id == "quarry" then
+        {
+          reader = self ? reader;
+          count = builtins.length self.allNodeIds;
+        }
+      else
+        { }
+    );
+    kids = equation "kids" "resolution" "synthesized" (
+      self: id: if id == "quarry" then builtins.attrNames (genScope.children self "kiln") else [ ]
+    );
+    kin = equation "kin" "resolution" "synthesized" (
+      self: id: if id == "quarry" then builtins.attrNames (genScope.nodesByType self "kiln") else [ ]
+    );
+  };
+  markFold =
+    rel:
+    (genScope.foldEquations { } {
+      scope = scopeAt 1;
+      schedule.equations = markEquations;
+      declaredDependencies = genGraph.mkDeclaredEdges (
+        builtins.mapAttrs (_: map (genGraph.mkNodeRef (_: true))) rel
+      );
+      parseParent = _: null;
+    }).eval;
+  marking.quarry = [
+    "kiln"
+    pot
+  ];
+  unarmed = genScope.eval { parseParent = _: null; } (builtins.mapAttrs (
+    _: e: e.compute
+  ) markEquations) (scopeAt 1);
+  marks = ev: {
+    marked = ev.get "quarry" "marked";
+    kids = ev.get "quarry" "kids";
+    kin = ev.get "quarry" "kin";
+  };
+  marksAs = reader: {
+    marked = {
+      inherit reader;
+      count = 3;
+    };
+    kids = [ pot ];
+    kin = lib.sort (a: b: a < b) [
+      "kiln"
+      pot
+    ];
+  };
 in
 {
   construct = [
     "closed-body-reader-cold-and-warm"
     "a-handed-reader-reads-through-its-producers-relation"
+    "an-armed-reader-carries-its-marker-and-the-queries-branch-on-it"
   ];
   check = asserts (
     fired (fold 1 declared).eval == 101
@@ -256,5 +316,10 @@ in
     && refuses (handWarm.get "mould" "stray")
     && handCold.eval.get "pit" "clay" == 5
     && refuses (reads (handFold 1 { }).eval)
+    && marks (markFold marking) == marksAs true
+    && marks unarmed == marksAs false
+    && (markFold { }).get "quarry" "marked" == (marksAs true).marked
+    && refuses ((markFold { }).get "quarry" "kids")
+    && refuses ((markFold { }).get "quarry" "kin")
   );
 }
