@@ -12,6 +12,14 @@
 # `self.getHostAt "nta-children"` receives its own authored record, with no `_eval` cache on it.
 # Live control: a body reading `self.allNodeIds` answers under the empty relation, because the
 # enumeration is kept.
+#
+# The delegated arm (producer-bounded delegation): a reader is a value, bound to the node whose body
+# it was handed to. `kiln`, declaring `quarry`, returns its own reader as `tongs`; `ladle` forwards
+# it as `pour`. `mould`, declaring only `kiln`, and `cast`, declaring only `ladle`, each read
+# `quarry`'s `clay` through it: `1` cold, and `9` warm after an edit to `quarry`, what a fresh cold
+# fold answers, because the warm cone dirties `kiln` and `ladle` on the declared path. `pit`, which
+# `kiln` did not declare, is refused through the handed reader, cold and warm; live control: `pit`
+# answers `5`. Under the empty relation both reads are refused.
 {
   asserts,
   lib,
@@ -141,9 +149,81 @@ let
     declared = [ ];
     through = "facade";
   };
+  # the delegated arm: `kiln` hands out its own reader as `tongs`, and `ladle` forwards it as `pour`
+  hosts = [
+    "quarry"
+    "pit"
+    "kiln"
+    "ladle"
+    "mould"
+    "cast"
+  ];
+  handScopeAt =
+    clay:
+    genScope.buildRoots {
+      kinds = genScope.mkKinds [ (genScope.mkKind { } "host") ];
+      decls = lib.genAttrs hosts (_: { }) // {
+        quarry = { inherit clay; };
+        pit.clay = 5;
+      };
+      types = lib.genAttrs hosts (_: "host");
+    };
+  # `mould` holds the producer's reader directly, `cast` through the forwarder
+  held =
+    self: id:
+    if id == "mould" then
+      self.get "kiln" "tongs"
+    else if id == "cast" then
+      self.get "ladle" "pour"
+    else
+      null;
+  handEquations = {
+    children = equation "children" "structural" "nta" (_: _: { });
+    imports = equation "imports" "structural" "synthesized" (_: _: [ ]);
+    clay = equation "clay" "resolution" "synthesized" (self: id: (self.node id).decls.clay or 0);
+    tongs = equation "tongs" "resolution" "synthesized" (self: id: if id == "kiln" then self else null);
+    pour = equation "pour" "resolution" "synthesized" (
+      self: id: if id == "ladle" then self.get "kiln" "tongs" else null
+    );
+    read = equation "read" "resolution" "synthesized" (
+      self: id: if held self id == null then 0 else (held self id).get "quarry" "clay"
+    );
+    stray = equation "stray" "resolution" "synthesized" (
+      self: id: if id == "mould" then (self.get "kiln" "tongs").get "pit" "clay" else 0
+    );
+  };
+  handFold =
+    clay: rel:
+    let
+      scope = handScopeAt clay;
+    in
+    genScope.foldEquations { } {
+      inherit scope;
+      schedule.equations = handEquations;
+      declaredDependencies = genGraph.mkDeclaredEdges (
+        builtins.mapAttrs (_: map (genGraph.mkNodeRef (id: scope.nodes ? ${id}))) rel
+      );
+      parseParent = _: null;
+    };
+  # neither consumer declares `quarry`, and `cast` does not declare `kiln`
+  handed = {
+    kiln = [ "quarry" ];
+    ladle = [ "kiln" ];
+    mould = [ "kiln" ];
+    cast = [ "ladle" ];
+  };
+  reads = ev: {
+    mould = ev.get "mould" "read";
+    cast = ev.get "cast" "read";
+  };
+  handCold = handFold 1 handed;
+  handWarm = (genMemo.warmOverride engine handCold "quarry" { clay = 9; }).eval;
 in
 {
-  construct = [ "closed-body-reader-cold-and-warm" ];
+  construct = [
+    "closed-body-reader-cold-and-warm"
+    "a-handed-reader-reads-through-its-producers-relation"
+  ];
   check = asserts (
     fired (fold 1 declared).eval == 101
     && fired (warm (fold 1 declared)) == 109
@@ -161,5 +241,20 @@ in
         cache = false;
       }
     && (fold 1 { }).eval.get "quarry" "count" == 3
+    &&
+      reads handCold.eval == {
+        mould = 1;
+        cast = 1;
+      }
+    &&
+      reads handWarm == {
+        mould = 9;
+        cast = 9;
+      }
+    && reads handWarm == reads (handFold 9 handed).eval
+    && refuses (handCold.eval.get "mould" "stray")
+    && refuses (handWarm.get "mould" "stray")
+    && handCold.eval.get "pit" "clay" == 5
+    && refuses (reads (handFold 1 { }).eval)
   );
 }
