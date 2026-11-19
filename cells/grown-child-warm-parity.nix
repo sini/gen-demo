@@ -4,7 +4,7 @@
 # `nta` host whose child `bolt` is seeded from `loom`'s own `defs`, and `loom` reads `bolt` back
 # through `self.getNta`, declaring it; `wheel` is a `spawns` host whose child `wheel-skein` copies
 # `wheel`'s `defs`. The scope is folded through `genScope.foldEquations` and warmed through
-# `genMemo.warmOverride`, whose engine is gen-scope's own `evalWarm`. After an edit to `loom`, the
+# `genMemo.warmOverride`, whose engine is gen-scope's own `foldEquations`. After an edit to `loom`, the
 # child's `defs` and `loom`'s read of it are `[2]` warm, what a fresh cold fold answers; after an edit
 # to `wheel`, the spawned child's `defs` is `[2]` warm, what a fresh cold fold answers. Before the
 # reuse relation carried growth, no grown child was in its host's cone and the warm pass served the
@@ -17,7 +17,7 @@
   asserts,
 }:
 let
-  engine = { inherit (genScope) evalWarm; };
+  engine = { inherit (genScope) foldEquations; };
   bolt = genScope.mintNtaId {
     host = "loom";
     name = "weave";

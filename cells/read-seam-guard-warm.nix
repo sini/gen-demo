@@ -2,7 +2,7 @@
 # an edge its node did not declare, and the warm pass refuses what the cold fold refuses (gen-scope's
 # codomain contract, R§2.4; ADR-0008 item 2). Two hosts: `kiln` reads `quarry`'s `clay` through
 # `self.get`. The scope is folded through `genScope.foldEquations` and warmed through
-# `genMemo.warmOverride`, whose engine is gen-scope's own `evalWarm`. Under a relation declaring the
+# `genMemo.warmOverride`, whose engine is gen-scope's own `foldEquations`. Under a relation declaring the
 # edge, the cold read is `101` and the warm read after an edit to `quarry` is `109`, what a fresh cold
 # fold of the edited scope answers. Under the empty relation the cold read is refused, and so is the
 # warm read, with `kiln` edited and with `quarry` edited: an undeclared reader is not left outside the
@@ -17,7 +17,7 @@
   genMemo,
 }:
 let
-  engine = { inherit (genScope) evalWarm; };
+  engine = { inherit (genScope) foldEquations; };
   scopeAt =
     clay:
     genScope.buildRoots {

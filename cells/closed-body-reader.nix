@@ -4,7 +4,7 @@
 # ADR-0008 item 2). Two hosts: `kiln` is an `nta` host whose child `pot` reads `kiln`'s `heat` at its
 # own coordinates through `self.getHostAt`, and `quarry` is a plain root. The scope is folded through
 # `genScope.foldEquations` and warmed through `genMemo.warmOverride`, whose engine is gen-scope's own
-# `evalWarm`. Under a relation declaring `pot` → `kiln`, the cold read is `101`, and the warm read
+# `foldEquations`. Under a relation declaring `pot` → `kiln`, the cold read is `101`, and the warm read
 # after an edit to `kiln` is `109`, what a fresh cold fold of the edited scope answers. Under the
 # empty relation the read is refused cold and warm: before the reader closed, `getHostAt` answered
 # undeclared and the warm pass served its stale prior. A body touching `self.facade` is refused
@@ -35,7 +35,7 @@
   genMemo,
 }:
 let
-  engine = { inherit (genScope) evalWarm; };
+  engine = { inherit (genScope) foldEquations; };
   pot = genScope.mintNtaId {
     host = "kiln";
     name = "batch";
