@@ -161,6 +161,16 @@ let
           ]
         ]
         [ (toPewter "declared") ];
+    # the route carrying an undeclared key (a closure guard): refused by name, never delivered unconditionally
+    guarded =
+      nestedRun
+        [
+          [
+            "o1"
+            mA
+          ]
+        ]
+        [ (toPewter "declared" // { guard = _: false; }) ];
     # the group forwarded alone (pewter's own spindle absent)
     alone =
       let
