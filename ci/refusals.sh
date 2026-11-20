@@ -171,9 +171,11 @@ if [ "${#nej[@]}" -gt 0 ]; then
   # den v1's evaluator-death rule: a non-zero nix-eval-jobs exit is a dead evaluator, not a set of
   # verdicts, and whatever it did reach is never tallied.
   nejrc=0
+  nej_t0="${EPOCHREALTIME:-?}"
   nix-eval-jobs --impure --no-instantiate --workers "$workers" --max-memory-size 2048 \
     --apply 'd: { v = d.refusalValue; }' "$tmpdir/jobs.nix" \
     >"$tmpdir/jobs.json" 2>"$tmpdir/jobs.err" || nejrc=$?
+  nej_t1="${EPOCHREALTIME:-?}"
   if [ "$nejrc" -ne 0 ]; then
     echo "FAIL engine: EVALUATOR FAILED (nix-eval-jobs exit $nejrc) -- no arm is tallied"
     # An arm that aborts past `catch` (a stack overflow) is `fatal` and takes the run's exit with
@@ -208,8 +210,11 @@ for i in "${proc[@]}"; do
   while [ "$(jobs -rp | wc -l)" -ge "$workers" ]; do wait -n; done
   (
     ec=0
+    t0="${EPOCHREALTIME:-?}"
     # shellcheck disable=SC2086 -- the options are a space-joined word list, split on purpose
     nix eval ${arm_opts[$i]} --impure --raw --expr "${exprs[$i]}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
+    # REFUSALS_TIMINGS only: the arm's start and end, read back after every verdict.
+    if [ -n "${REFUSALS_TIMINGS:-}" ]; then echo "$t0 ${EPOCHREALTIME:-?}" >"$tmpdir/arm$i.t"; fi
     echo "$ec" >"$tmpdir/arm$i.ec"
   ) &
 done
@@ -340,6 +345,29 @@ elif grep -qF 'gen-select: selectorEq:' "$tmpdir/product-coordinate-of-a-sealed-
   fail=1
 else
   echo "ok   control (binding-relatum-minted-in-the-same-pass/policy-relatum-not-in-frozen, c7s-planted-cycle/c7s-door, gen-aspectcnf-absent/node-declared-in-both-registries, den-hoag-i546ns-thunk-authorization-guards/thunkbindings-is-null, attrs-as-a-nullary-container-strategy/attrset-definition-the-fold-consumes, kind-declaration-key-no-reader-consumes/collection-name-colliding-with-gen-schemas-own-vocabulary, declaration-only-read-of-a-module-with-a-surplus-key/foreign-types-check-before-gen-merges-fold, hand-written-attrset-where-a-gen-schema-kind-value-belongs/same-minted-kind-builds-a-context-that-answers, same-minted-kind-builds-a-context-that-answers/kindfor-returning-the-kind-value-answers, kind-is-keyed-by-its-minted-identity/kindfor-returning-the-kind-value-answers, sealed-only-kind-collision/entity-of-a-sealed-only-kind-collision and entity-of-a-sealed-only-kind-collision/product-coordinate-of-a-sealed-only-kind-collision refusals do not cross-match)"
+fi
+
+# ── opt-in timings (REFUSALS_TIMINGS=<file>): one `index start end rc lockwaits` row per process arm,
+# and one `nej` row for the whole nix-eval-jobs run, appended after every verdict and the control, so
+# no comparison above reads them. Epoch seconds and counts only, never a path; a value that could not
+# be read is `?`, never 0. Unset, nothing here runs and the output is the script's without it.
+if [ -n "${REFUSALS_TIMINGS:-}" ]; then
+  lockwait='waiting for another Nix process to finish fetching input'
+  rows=0 waits=0 waited=0 unread=0
+  timing_row() { # $1 index, $2 start, $3 end, $4 rc, $5 the stderr file its lock waits are counted in
+    local n
+    n="$(grep -cF "$lockwait" "$5" 2>/dev/null)" || [ -n "$n" ] || n='?'
+    echo "$1 $2 $3 $4 $n" >>"$REFUSALS_TIMINGS"
+    rows=$((rows + 1))
+    if [ "$n" = '?' ]; then unread=$((unread + 1)); elif [ "$n" -gt 0 ]; then waits=$((waits + n)) waited=$((waited + 1)); fi
+  }
+  if [ "${#nej[@]}" -gt 0 ]; then timing_row nej "$nej_t0" "$nej_t1" "$nejrc" "$tmpdir/jobs.err"; fi
+  for i in "${proc[@]}"; do
+    t0='?' t1='?'
+    [ -f "$tmpdir/arm$i.t" ] && read -r t0 t1 <"$tmpdir/arm$i.t"
+    timing_row "$i" "$t0" "$t1" "$(cat "$tmpdir/arm$i.ec" 2>/dev/null || echo '?')" "${errfiles[$i]}"
+  done
+  echo "refusal timings: $rows rows appended, $waits lock waits in $waited of them, $unread unreadable" >&2
 fi
 
 exit $fail
