@@ -199,6 +199,21 @@ the core count, at most 8). A dead nix-eval-jobs run reports `EVALUATOR FAILED` 
 a row whose planted arm aborts past `catch` (a stack overflow) kills that run, and runs under
 `REFUSALS_ENGINE=process`.
 
+**What the arms read is mixed.** The rows (`ci/refusals/*.sh`) are sourced from the working tree,
+and a row's relative path literal (`./aspect-cnf.nix`, a fixture) resolves there too, so a new row
+runs, and a fixture it reads directly is read, whether or not Git knows the file. The corpus flake an
+arm reaches through `builtins.getFlake (toString ./.)` is read differently. The script resolves the
+checkout once with the evaluator's own resolver (`nix flake metadata`, the rule `nix flake check`
+and `nix develop ./ci` use), and every arm, under either engine, reads that one reference. On a Git
+checkout it is `git+file:` (with `shallow=1` on a shallow clone): the tracked files with their
+uncommitted and staged edits, never HEAD, and never an untracked or ignored file. With no `.git` it
+is `path:`, the whole directory. The run's `source:` line names the kind, never the path. So the
+flake's inputs, and anything read through the flake, are the Git-visible set, while the rows and
+their direct fixtures are live. `refusals` runs no read-roots guard of its own: run `ci` first, whose
+guard refuses the untracked file the flake source would skip. A resolution that fails reports
+`FAIL engine` and evaluates no arm. Each process arm reads the tree again, so do not edit it while
+`refusals` runs.
+
 ### Two arms, plus the by-name half
 
 These are devshell commands. `ci` is gen-harness's; the other three are declared in `ci/flake.nix`

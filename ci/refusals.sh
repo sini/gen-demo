@@ -32,9 +32,9 @@
 # to a cell so a row that loses an arm reds `nix flake check ./ci` rather than passing quietly.
 set -u
 
-# Run from the repository root. Every probe below evaluates `builtins.getFlake (toString ./.)`,
-# which resolves against the CWD; `just` supplied that by running recipes from the justfile's
-# directory, and as a devshell command the script supplies it itself.
+# Run from the repository root. Every probe below is written `builtins.getFlake (toString ./.)`,
+# which an arm run by hand resolves against the CWD; both engines replace it with the one source
+# resolved below ("the corpus source"), and a row's relative path literal still resolves here.
 cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
 root="$PWD"
 fail=0
@@ -127,6 +127,39 @@ process) echo "engine: process (evaluator: $(nix --version); $workers at a time)
   ;;
 esac
 
+# ── the corpus source ──
+# Every arm reads the corpus flake by the rule every other plane of this checkout uses: the
+# evaluator's own CLI resolution of the root (`git+file:`, with `shallow=1` on a shallow clone;
+# `path:` with no `.git`), made once here and substituted for each arm's `getFlake (toString ./.)`.
+# That string alone parses to `path:`, which copies the whole directory, `.git` and untracked files
+# included, once per arm. The ref carries no `rev`, so it reads the working tree, never HEAD: dirty
+# and staged edits are read, untracked and ignored files are not. The tree is read again per process
+# arm, so it must not be edited mid-run. No arm runs against a source that did not resolve.
+srcrc=0
+nix flake metadata --json --no-update-lock-file "$root" >"$tmpdir/source.json" 2>"$tmpdir/source.err" || srcrc=$?
+if [ "$srcrc" -ne 0 ]; then
+  echo "FAIL engine: could not resolve the corpus flake (nix flake metadata exit $srcrc) -- no arm is evaluated"
+  cat "$tmpdir/source.err"
+  exit 1
+fi
+src="$(jq -r '.resolvedUrl // ""' "$tmpdir/source.json")" || src=""
+case "$src" in
+*'"'* | *\\* | *'${'*) src="" ;; # it is spliced into a Nix string below
+git+file:/* | path:/*) ;;
+*) src="" ;;
+esac
+if [ -z "$src" ]; then
+  echo "FAIL engine: the corpus flake did not resolve to a git+file: or path: reference -- no arm is evaluated"
+  cat "$tmpdir/source.err"
+  exit 1
+fi
+# The evaluator's own warnings (a dirty tree's among them) are passed on, not hidden. The line below
+# names the source's kind only, never its path.
+cat "$tmpdir/source.err" >&2
+case "$src" in *[?\&]shallow=1*) shallow=1 ;; *) shallow=0 ;; esac
+echo "source: ${src%%:*} shallow=$shallow"
+getsrc="builtins.getFlake \"$src\""
+
 nej=() proc=()
 if [ "$engine" = nej ]; then
   # An arm reaches the one run by two rewrites of its text: the flake it reads becomes one binding
@@ -141,7 +174,7 @@ if [ "$engine" = nej ]; then
   esac
   {
     echo "let"
-    echo "  __refusalsFlake = builtins.getFlake \"$root\";"
+    echo "  __refusalsFlake = $getsrc;"
     # nix-eval-jobs reports derivations only, and drops any other value from its stream without a
     # word, so each arm is carried on a derivation it never instantiates. \"\${v}\" is the coercion
     # `nix eval --raw` applies.
@@ -212,7 +245,7 @@ for i in "${proc[@]}"; do
     ec=0
     t0="${EPOCHREALTIME:-?}"
     # shellcheck disable=SC2086 -- the options are a space-joined word list, split on purpose
-    nix eval ${arm_opts[$i]} --impure --raw --expr "${exprs[$i]}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
+    nix eval ${arm_opts[$i]} --impure --raw --expr "${exprs[$i]//"builtins.getFlake (toString ./.)"/"$getsrc"}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
     # REFUSALS_TIMINGS only: the arm's start and end, read back after every verdict.
     if [ -n "${REFUSALS_TIMINGS:-}" ]; then echo "$t0 ${EPOCHREALTIME:-?}" >"$tmpdir/arm$i.t"; fi
     echo "$ec" >"$tmpdir/arm$i.ec"
