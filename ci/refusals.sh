@@ -127,6 +127,39 @@ process) echo "engine: process (evaluator: $(nix --version); $workers at a time)
   ;;
 esac
 
+# ── opt-in timings, the clock (REFUSALS_TIMINGS only). Monotonic where the shell can read one without a fork
+# (/proc/uptime, 10 ms steps); bash's wall-clock EPOCHREALTIME where it cannot; every row names which (`clk`).
+tclk=
+if [ -n "${REFUSALS_TIMINGS:-}" ]; then
+  if { read -r tclk _ </proc/uptime; } 2>/dev/null && [[ $tclk == +([0-9]).[0-9][0-9] ]]; then
+    tclk=mono
+  elif [[ ${EPOCHREALTIME:-} == +([0-9])[.,][0-9][0-9][0-9]* ]]; then
+    tclk=wall
+  else
+    tclk=none
+  fi
+fi
+# $1 <- now, in ms on that clock; `?` where it cannot be read.
+tnow() {
+  local u _ f
+  case "$tclk" in
+  mono)
+    if { read -r u _ </proc/uptime; } 2>/dev/null && [[ $u == +([0-9]).[0-9][0-9] ]]; then
+      printf -v "$1" '%s' "$((10#${u/./} * 10))" && return
+    fi
+    ;;
+  wall)
+    u="${EPOCHREALTIME:-}" f="${EPOCHREALTIME:-}" f="${f#*[.,]}"
+    if [[ $u == +([0-9])[.,][0-9][0-9][0-9]* ]]; then
+      printf -v "$1" '%s' "$((10#${u%[.,]*} * 1000 + 10#${f:0:3}))" && return
+    fi
+    ;;
+  esac
+  printf -v "$1" '?'
+}
+tstart='?'
+if [ -n "${REFUSALS_TIMINGS:-}" ]; then tnow tstart; fi
+
 # ── the corpus source ──
 # Every arm reads the corpus flake by the rule every other plane of this checkout uses: the
 # evaluator's own CLI resolution of the root (`git+file:`, with `shallow=1` on a shallow clone;
@@ -204,11 +237,12 @@ if [ "${#nej[@]}" -gt 0 ]; then
   # den v1's evaluator-death rule: a non-zero nix-eval-jobs exit is a dead evaluator, not a set of
   # verdicts, and whatever it did reach is never tallied.
   nejrc=0
-  nej_t0="${EPOCHREALTIME:-?}"
+  nej_t0='?' nej_t1='?'
+  if [ -n "${REFUSALS_TIMINGS:-}" ]; then tnow nej_t0; fi
   nix-eval-jobs --impure --no-instantiate --workers "$workers" --max-memory-size 2048 \
     --apply 'd: { v = d.refusalValue; }' "$tmpdir/jobs.nix" \
     >"$tmpdir/jobs.json" 2>"$tmpdir/jobs.err" || nejrc=$?
-  nej_t1="${EPOCHREALTIME:-?}"
+  if [ -n "${REFUSALS_TIMINGS:-}" ]; then tnow nej_t1; fi
   if [ "$nejrc" -ne 0 ]; then
     echo "FAIL engine: EVALUATOR FAILED (nix-eval-jobs exit $nejrc) -- no arm is tallied"
     # An arm that aborts past `catch` (a stack overflow) is `fatal` and takes the run's exit with
@@ -243,11 +277,11 @@ for i in "${proc[@]}"; do
   while [ "$(jobs -rp | wc -l)" -ge "$workers" ]; do wait -n; done
   (
     ec=0
-    t0="${EPOCHREALTIME:-?}"
+    if [ -n "${REFUSALS_TIMINGS:-}" ]; then tnow t0; fi
     # shellcheck disable=SC2086 -- the options are a space-joined word list, split on purpose
     nix eval ${arm_opts[$i]} --impure --raw --expr "${exprs[$i]//"builtins.getFlake (toString ./.)"/"$getsrc"}" >"$tmpdir/arm$i.out" 2>"${errfiles[$i]}" || ec=$?
-    # REFUSALS_TIMINGS only: the arm's start and end, read back after every verdict.
-    if [ -n "${REFUSALS_TIMINGS:-}" ]; then echo "$t0 ${EPOCHREALTIME:-?}" >"$tmpdir/arm$i.t"; fi
+    # REFUSALS_TIMINGS only: the arm's start and end, read back after every verdict. A failed write is a `?`.
+    if [ -n "${REFUSALS_TIMINGS:-}" ]; then tnow t1 && { echo "$t0 $t1" >"$tmpdir/arm$i.t"; } 2>/dev/null; fi
     echo "$ec" >"$tmpdir/arm$i.ec"
   ) &
 done
@@ -380,27 +414,77 @@ else
   echo "ok   control (binding-relatum-minted-in-the-same-pass/policy-relatum-not-in-frozen, c7s-planted-cycle/c7s-door, gen-aspectcnf-absent/node-declared-in-both-registries, den-hoag-i546ns-thunk-authorization-guards/thunkbindings-is-null, attrs-as-a-nullary-container-strategy/attrset-definition-the-fold-consumes, kind-declaration-key-no-reader-consumes/collection-name-colliding-with-gen-schemas-own-vocabulary, declaration-only-read-of-a-module-with-a-surplus-key/foreign-types-check-before-gen-merges-fold, hand-written-attrset-where-a-gen-schema-kind-value-belongs/same-minted-kind-builds-a-context-that-answers, same-minted-kind-builds-a-context-that-answers/kindfor-returning-the-kind-value-answers, kind-is-keyed-by-its-minted-identity/kindfor-returning-the-kind-value-answers, sealed-only-kind-collision/entity-of-a-sealed-only-kind-collision and entity-of-a-sealed-only-kind-collision/product-coordinate-of-a-sealed-only-kind-collision refusals do not cross-match)"
 fi
 
-# ── opt-in timings (REFUSALS_TIMINGS=<file>): one `index start end rc lockwaits` row per process arm,
-# and one `nej` row for the whole nix-eval-jobs run, appended after every verdict and the control, so
-# no comparison above reads them. Epoch seconds and counts only, never a path; a value that could not
-# be read is `?`, never 0. Unset, nothing here runs and the output is the script's without it.
+# ── opt-in timings (REFUSALS_TIMINGS=<file>): one bounded row per process arm and one `i=all ph=nej` row for the
+# whole nix-eval-jobs run, appended after every verdict and the control, so no comparison above reads them:
+#   v2 i=<index> ph=<process|nej> t0=<ms from the run's start> ms=<elapsed> rc=<exit>
+#      fetch-lock=<n> store-lock=<n> gc-lock=<n> db-busy=<n> unknown=<n> wait-ms=? clk=<mono|wall|none>
+# The classes are COUNTS of the arm's stderr lines Nix 2.35.6 prints when a wait begins (src/libfetchers/fetchers.cc
+# "waiting for another Nix process to finish fetching input"; src/libstore/local-store.cc "waiting for the big Nix
+# store lock" and "waiting for exclusive access to the Nix store", build/derivation-building-goal.cc and profiles.cc
+# "waiting for lock on"; gc.cc and local-store.cc "waiting for the big garbage collector lock"; sqlite.cc "SQLite
+# database '…' is busy", warned at most once per 10 s of retries); `unknown` is any other line saying "waiting".
+# `wait-ms` is the time, kept apart from the counts, and is `?`: Nix prints no line when a wait ends. Numbers and
+# fixed words only: no ref, path, message, env or label. A value that could not be read is `?`, never 0. All of it
+# runs in a subshell whose stdout is the file, so a failure here can move neither stdout, nor `fail`, nor the exit:
+# it degrades to one stderr marker. Unset, nothing here runs and the output is the script's without it.
 if [ -n "${REFUSALS_TIMINGS:-}" ]; then
-  lockwait='waiting for another Nix process to finish fetching input'
-  rows=0 waits=0 waited=0 unread=0
-  timing_row() { # $1 index, $2 start, $3 end, $4 rc, $5 the stderr file its lock waits are counted in
-    local n
-    n="$(grep -cF "$lockwait" "$5" 2>/dev/null)" || [ -n "$n" ] || n='?'
-    echo "$1 $2 $3 $4 $n" >>"$REFUSALS_TIMINGS"
-    rows=$((rows + 1))
-    if [ "$n" = '?' ]; then unread=$((unread + 1)); elif [ "$n" -gt 0 ]; then waits=$((waits + n)) waited=$((waited + 1)); fi
-  }
-  if [ "${#nej[@]}" -gt 0 ]; then timing_row nej "$nej_t0" "$nej_t1" "$nejrc" "$tmpdir/jobs.err"; fi
-  for i in "${proc[@]}"; do
-    t0='?' t1='?'
-    [ -f "$tmpdir/arm$i.t" ] && read -r t0 t1 <"$tmpdir/arm$i.t"
-    timing_row "$i" "$t0" "$t1" "$(cat "$tmpdir/arm$i.ec" 2>/dev/null || echo '?')" "${errfiles[$i]}"
-  done
-  echo "refusal timings: $rows rows appended, $waits lock waits in $waited of them, $unread unreadable" >&2
+  if ! { : >>"$REFUSALS_TIMINGS"; } 2>/dev/null; then
+    echo "refusal timings: UNWRITTEN -- the timings file cannot be appended to; no row written, verdicts unaffected" >&2
+  else
+    trc=0
+    (
+      rows=0 waits=0 waited=0 unread=0 sl=0 gl=0 db=0 uk=0
+      # ONE grep over every readable stderr file, so only the lines saying "waiting" or "is busy" reach the classifier. Its
+      # exit 2 is an unmeasured classification, every class `?`; exit 1 is a measured zero.
+      declare -A n_fl n_sl n_gl n_db n_uk
+      files=()
+      if [ "${#nej[@]}" -gt 0 ] && [ -r "$tmpdir/jobs.err" ]; then files+=("$tmpdir/jobs.err"); fi
+      for i in "${proc[@]}"; do if [ -r "${errfiles[$i]}" ]; then files+=("${errfiles[$i]}"); fi; done
+      grc=1
+      if [ "${#files[@]}" -gt 0 ]; then
+        grc=0
+        grep -HZF -e waiting -e Waiting -e "' is busy" -- "${files[@]}" >"$tmpdir/waits" 2>/dev/null || grc=$?
+      fi
+      if [ "$grc" -le 1 ] && [ -s "$tmpdir/waits" ]; then
+        while IFS= read -r -d '' f && IFS= read -r ln; do
+          case "$ln" in
+          *'waiting for another Nix process to finish fetching input'*) n_fl[$f]=$((${n_fl[$f]:-0} + 1)) ;;
+          *'waiting for the big garbage collector lock'*) n_gl[$f]=$((${n_gl[$f]:-0} + 1)) ;;
+          *'waiting for the big Nix store lock'* | *'waiting for exclusive access to the Nix store'* | *'waiting for lock on '*) n_sl[$f]=$((${n_sl[$f]:-0} + 1)) ;;
+          *'SQLite database '*' is busy'*) n_db[$f]=$((${n_db[$f]:-0} + 1)) ;;
+          *[Ww]aiting*) n_uk[$f]=$((${n_uk[$f]:-0} + 1)) ;;
+          esac
+        done <"$tmpdir/waits"
+      fi
+      row() { # $1 index, $2 phase, $3 start ms, $4 end ms, $5 rc, $6 the stderr file its waits are counted in
+        local off='?' ms='?' rc="$5" c_fl='?' c_sl='?' c_gl='?' c_db='?' c_uk='?'
+        case "$tstart$3$4" in *'?'*) ;; *) off=$(($3 - tstart)) ms=$(($4 - $3)) ;; esac
+        [[ $rc =~ ^[0-9]{1,3}$ ]] || rc='?'
+        if [ "$grc" -le 1 ] && [ -r "$6" ]; then
+          c_fl="${n_fl[$6]:-0}" c_sl="${n_sl[$6]:-0}" c_gl="${n_gl[$6]:-0}" c_db="${n_db[$6]:-0}" c_uk="${n_uk[$6]:-0}"
+        fi
+        echo "v2 i=$1 ph=$2 t0=$off ms=$ms rc=$rc fetch-lock=$c_fl store-lock=$c_sl gc-lock=$c_gl db-busy=$c_db unknown=$c_uk wait-ms=? clk=$tclk" 2>/dev/null || exit 74 # a write that failed ends the rows, one marker below
+        rows=$((rows + 1))
+        if [ "$c_fl" = '?' ] || [ "$ms" = '?' ]; then unread=$((unread + 1)); fi
+        if [ "$c_fl" != '?' ]; then
+          [ "$c_fl" -gt 0 ] && waits=$((waits + c_fl)) waited=$((waited + 1))
+          sl=$((sl + c_sl)) gl=$((gl + c_gl)) db=$((db + c_db)) uk=$((uk + c_uk))
+        fi
+        return 0
+      }
+      if [ "${#nej[@]}" -gt 0 ]; then row all nej "$nej_t0" "$nej_t1" "$nejrc" "$tmpdir/jobs.err"; fi
+      for i in "${proc[@]}"; do
+        t0='?' t1='?' ec='?'
+        { read -r t0 t1 <"$tmpdir/arm$i.t"; } 2>/dev/null
+        { read -r ec <"$tmpdir/arm$i.ec"; } 2>/dev/null
+        row "$i" process "${t0:-?}" "${t1:-?}" "${ec:-?}" "${errfiles[$i]}"
+      done
+      echo "refusal timings: $rows rows appended (clock $tclk), $waits fetch-lock waits in $waited of them, store-lock $sl, gc-lock $gl, db-busy $db, unknown $uk, $unread unreadable" >&2
+    ) >>"$REFUSALS_TIMINGS" || trc=$?
+    if [ "$trc" -ne 0 ]; then
+      echo "refusal timings: INCOMPLETE (exit $trc) -- rows before the failure are kept, verdicts unaffected" >&2
+    fi
+  fi
 fi
 
 exit $fail
