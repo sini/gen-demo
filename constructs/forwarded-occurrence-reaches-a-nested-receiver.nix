@@ -11,7 +11,9 @@
 # pirn's own settings go to its heddle's cell at `pirns.<pirn>` (a declared item, the pirn's name read from its
 # captured binding), and each heddle's WHOLE cell (declared plus received) is embedded in its warp at
 # `heddles.<heddle>` (W1, the heddle's name read from the hop's scope). Two warps: `fringe` also receives a
-# route declared twice, which refuses fringe by name while `selvage` stays usable.
+# route declared twice, which refuses fringe by name while `selvage` stays usable. A second forward adds an empty
+# warp `twill` whose one route carries a malformed `order`: heddle and pirn have no terminal, so their cells are
+# stripped, and the sibling's fault reaches neither selvage nor the diagnostics.
 { genDelivery, lib }:
 let
   inherit (lib) mkOption types mkDefault;
@@ -307,28 +309,40 @@ let
       ]
     ];
   };
-  containedForward = genDelivery.forward {
-    routes = {
-      heddle.tabby = heddleOf "tabby" [
-        "quill"
-        "cop"
-      ];
-      heddle.ottoman = heddleOf "ottoman" [ "spool" ];
-      warp.selvage = [
-        (embed "tabby" [ 0 ])
-        (embed "ottoman" [ 1 ])
-      ];
-      warp.fringe = [
-        (embed "ottoman" [ 0 ])
-        (embed "ottoman" [ 1 ])
-      ];
-    };
-  } warpTerminals (projectedOf containedCells);
-  forwardContained = {
-    realized = genDelivery.realize { } warpTerminals containedForward.projected;
-    inherit (containedForward) diagnostics;
+  containedRoutes = {
+    heddle.tabby = heddleOf "tabby" [
+      "quill"
+      "cop"
+    ];
+    heddle.ottoman = heddleOf "ottoman" [ "spool" ];
+    warp.selvage = [
+      (embed "tabby" [ 0 ])
+      (embed "ottoman" [ 1 ])
+    ];
+    warp.fringe = [
+      (embed "ottoman" [ 0 ])
+      (embed "ottoman" [ 1 ])
+    ];
   };
+  containedOf =
+    routes: cells:
+    let
+      f = genDelivery.forward { inherit routes; } warpTerminals (projectedOf cells);
+    in
+    {
+      realized = genDelivery.realize { } warpTerminals f.projected;
+      inherit (f) diagnostics;
+    };
+  forwardContained = containedOf containedRoutes containedCells;
+  forwardContainedBesideMalformed = containedOf (
+    containedRoutes
+    // {
+      warp = containedRoutes.warp // {
+        twill = [ ((embed "tabby" [ 0 ]) // { order = "late"; }) ];
+      };
+    }
+  ) (containedCells // { twill.warp = [ ]; });
 in
 {
-  inherit forwardNested forwardContained;
+  inherit forwardNested forwardContained forwardContainedBesideMalformed;
 }
