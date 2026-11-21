@@ -4,6 +4,8 @@
 # one more. The default is resolved alone, as an option's default is, and is the fold's seed, so
 # each element and key resolves and the definitions follow it. A default with a property at its
 # top (`mkIf true [ "x" ]`) is refused by name, a catchable refusal, where its raw record was served.
+# Its `rank` collection declares the scalar `default = 0` and no `merge`: that default is one
+# definition too, at `mkOptionDefault`, so the kind's `rank = 7` outranks it, as an option's is.
 { genMerge, inputs }:
 let
   kcdSchema = inputs.gen.lib.substrate.schema;
@@ -29,19 +31,26 @@ let
           (genMerge.mkDefault "darwin")
         ];
         metadata.default.region = genMerge.mkIf true "eu";
+        rank.default = 0;
       }
       [
         (kcdSchema.mkMixin { } (_: {
           classes = [ "mixin" ];
         }))
       ]
-      [ { classes = [ "kind" ]; } ];
+      [
+        {
+          classes = [ "kind" ];
+          rank = 7;
+        }
+      ];
   kcdTop = (kcdUser { classes.default = genMerge.mkIf true [ "x" ]; } [ ] [ ]).classes;
 in
 {
   kcdRead = {
     classes = kcdKind.classes;
     metadata = kcdKind.metadata;
+    rank = kcdKind.rank;
     topServed = (builtins.tryEval (builtins.deepSeq kcdTop kcdTop)).success;
   };
 }
