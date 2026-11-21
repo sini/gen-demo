@@ -2,7 +2,9 @@
 # A `user` kind's `classes` collection declares `type = listOf str` and its `env` collection
 # `type = attrsOf (attrsOf int)` (gen-schema's opt-in `type` field). The type merges the definitions,
 # so an element `mkIf false` discharges is not counted, a property two levels down is resolved, and an
-# element the type's check rejects is refused. Omitted, a collection keeps the inferred lazy container
+# element the type's check rejects is refused. A collection declaring a type and no default, which the kind
+# never defines, reads its type's empty value (`[ ]`, `null`) and is refused by name where the type
+# states none (`str`), as an option of the type with no definition is. Omitted, a collection keeps the inferred lazy container
 # (`kind-collection-element-resolves-as-nixpkgs`). A field outside the closed set and `type` beside `merge` are
 # each refused by name (`ci/refusals/collection-declaring-a-field-outside-its-closed-set.sh`,
 # `ci/refusals/collection-declaring-both-type-and-merge.sh`).
@@ -24,6 +26,10 @@ let
               default = { };
               type = T.attrsOf (T.attrsOf T.int);
             };
+            # declaring a type and no default, and never defined by the kind
+            collections.aliases.type = T.listOf T.str;
+            collections.owner.type = T.nullOr T.str;
+            collections.title.type = T.str;
           };
         }
       ]
@@ -50,5 +56,8 @@ in
     env = kcdtKind.env;
     wrongElementServed =
       (builtins.tryEval (builtins.deepSeq kcdtWrongElement kcdtWrongElement)).success;
+    aliases = kcdtKind.aliases;
+    owner = kcdtKind.owner;
+    titleServed = (builtins.tryEval (builtins.deepSeq kcdtKind.title kcdtKind.title)).success;
   };
 }
