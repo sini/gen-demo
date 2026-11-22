@@ -16,6 +16,10 @@
 }:
 let
   door = inputs.gen.lib.instantiate { inherit lib; };
+  # The standalone entry's `src` seam, answered from this flake's lock: a hub lock path is the same
+  # walk through the locked inputs, so no evaluation fetches (its default is an eval-time
+  # `builtins.fetchTarball`, which a GitHub 403 failed; den-hoag-7h4ev).
+  src = segs: (builtins.foldl' (i: s: i.inputs.${s}) inputs.gen segs).outPath;
   built = door.modules.merge;
   roster = door.mkGenLibs { };
   tag =
@@ -104,7 +108,7 @@ in
   check = asserts (
     reads built == reads lib
     && registryRead roster == "instance"
-    && registryRead (import inputs.gen.outPath { inherit lib; }) == "instance"
+    && registryRead (import inputs.gen.outPath { inherit lib src; }) == "instance"
     && (door.compose { modules = [ schemaImport ]; }).values.weft == "instance"
     && (reads lib).loom == "instance"
     && !(builtins.tryEval (at genMerge { } [ (sub genMerge) ]).loom.weft).success
