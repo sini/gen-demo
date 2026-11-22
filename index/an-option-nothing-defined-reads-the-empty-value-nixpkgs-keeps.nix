@@ -1,0 +1,5 @@
+{
+  title = "an option nothing defined reads the empty value nixpkgs keeps";
+  adr = "0039, omf1j";
+  what = "with no surviving definition an option reads the `emptyValue` of the record nixpkgs keeps at its position: a `//` over `emptyValue` is honoured on a record nixpkgs keeps (`listOf str // { emptyValue = { }; }` refuses, `str // { emptyValue.value = \"EV\"; }` serves \"EV\"), dropped where `fixupOptionType` rebuilds a record stating a module set or a second declaration joins it, and a `//` over gen's own `whenEmpty` is no nixpkgs field and moves nothing; nixpkgs' own `nonEmptyListOf (submodule …)` (services.mtr-exporter.jobs' type) refuses undefined and with every definition discharged, as nixpkgs refuses it; gen-merge read `whenEmpty` before `emptyValue`, and rebuilt a foreign container by its functor without the record's own empty value, so it served `[ ]` where nixpkgs refuses and refused where nixpkgs serves";
+}
