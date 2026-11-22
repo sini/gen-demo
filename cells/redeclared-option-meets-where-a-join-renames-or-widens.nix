@@ -33,6 +33,12 @@
 #    whose check is the debt, so its own parameters are judged by gen's `listOf` at its payload (nixpkgs names a
 #    constructor by its functor name): ["a"] and ["a","b"] served, ["a","a"] refused, inside its parameters and
 #    rejected by its check, where nixpkgs' twin serves it. Both engines.
+#  - `coherentOwnParameters`: nixpkgs' own `addCheck (listOf (enum [a])) short`, a v2 stock whose `isList` check is
+#    marked coherent, imported through `mkOptionType` beside gen's `listOf (enum [b])`, both orders, and at three
+#    declarations after gen's `listOf` (the stock twice, or the door over the unchecked stock between). The coherent
+#    mark certifies the head test, not membership: its own parameters are judged by gen's `listOf` at its payload, so
+#    ["a"], ["a","b"] and ["b","b"] are served as nixpkgs' twin serves them, and ["a","a"], inside its parameters and
+#    rejected by its check, is refused. Gen's engine.
 #  - `laxV2Own`: the same partner returning, away from its own payload, a lax `listOf` in nixpkgs' v2 protocol whose
 #    `isList` check is marked coherent: the lax record admits every list, and never stands in for the partner's
 #    domain. The same values, both engines.
@@ -350,6 +356,55 @@ let
       val = listVal;
     };
     foreignOwnParameters = ownForm np.listOf;
+    coherentOwnParameters =
+      let
+        P = genMerge.mkOptionType (np.addCheck (np.listOf (np.enum [ "a" ])) short);
+        T = genMerge.types.listOf (np.enum [ "b" ]);
+        R = genMerge.mkOptionType (np.listOf (np.enum [ "a" ]));
+      in
+      {
+        tss =
+          both [
+            P
+            T
+          ]
+          ++ [
+            [
+              T
+              P
+              P
+            ]
+            [
+              T
+              R
+              P
+            ]
+          ];
+        engines = [ meetRead ];
+        v = {
+          a = [ "a" ];
+          ab = [
+            "a"
+            "b"
+          ];
+          bb = [
+            "b"
+            "b"
+          ];
+          aa = "REFUSED";
+        };
+        val =
+          k:
+          (
+            ownVals
+            // {
+              bb = [
+                "b"
+                "b"
+              ];
+            }
+          ).${k};
+      };
     laxV2Own = ownForm laxV2;
     authorFirstNixpkgs = {
       inherit (forms.authorFirst) tss val;
