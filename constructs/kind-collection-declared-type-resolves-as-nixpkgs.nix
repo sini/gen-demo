@@ -3,7 +3,9 @@
 # `type = attrsOf (attrsOf int)` (gen-schema's opt-in `type` field). The type merges the definitions,
 # so an element `mkIf false` discharges is not counted, a property two levels down is resolved, and an
 # element the type's check rejects is refused. Its `shell` collection, `type = nullOr str` with
-# `default = null`, is served its definition, as an option of that type with that default is.
+# `default = null`, is served its definition, as an option of that type with that default is. Its
+# `hosts` collection, `type = nonEmptyListOf str` with `default = [ "localhost" ]`, whose only definition
+# `mkIf false` discharges, is its default alone, as an option of that type with that default is.
 # A collection declaring a type and no default, which the kind never defines, reads its type's empty
 # value (`[ ]`, `null`) and is refused by name where the type states none (`str`), as an option of the
 # type with no definition is. Omitted, a collection keeps the inferred lazy container
@@ -14,6 +16,7 @@
 let
   kcdtSchema = inputs.gen.lib.substrate.schema;
   T = genMerge.types;
+  NT = inputs.nixpkgs.lib.types;
   kcdtUser =
     defs:
     (genMerge.evalModuleTree { } (
@@ -31,6 +34,10 @@ let
             collections.shell = {
               default = null;
               type = T.nullOr T.str;
+            };
+            collections.hosts = {
+              default = [ "localhost" ];
+              type = NT.nonEmptyListOf NT.str;
             };
             # declaring a type and no default, and never defined by the kind
             collections.aliases.type = T.listOf T.str;
@@ -52,6 +59,7 @@ let
         shards = 2;
       };
       shell = "zsh";
+      hosts = genMerge.mkIf false [ "db" ];
     }
   ];
   kcdtWrongElement = (kcdtUser [ { classes = [ 1 ]; } ]).classes;
@@ -62,6 +70,7 @@ in
     classes = kcdtKind.classes;
     env = kcdtKind.env;
     shell = kcdtKind.shell;
+    hosts = kcdtKind.hosts;
     wrongElementServed =
       (builtins.tryEval (builtins.deepSeq kcdtWrongElement kcdtWrongElement)).success;
     aliases = kcdtKind.aliases;
