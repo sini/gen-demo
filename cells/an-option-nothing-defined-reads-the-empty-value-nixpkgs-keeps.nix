@@ -10,7 +10,10 @@
 # diverged before that landing, and tagControl guards the record no `//` touched. The freeform rows read a key of the
 # freeform plane, which nixpkgs merges by its `freeformType` and never fixes up, so one declaration keeps the record
 # written (den-hoag-6dxwr); every freeform row but the two controls (one joined by a second declaration, one no `//`
-# touched) diverged before that landing.
+# touched) diverged before that landing. The nulled and erased tag rows hold nixpkgs records throughout, tag `b` a
+# copy stating no module set, under gen's fix-up of the foreign root, whose re-mint of the container over its re-carried
+# element keeps the record's own `emptyValue` (den-hoag-f5twc): they diverged before that landing, the erased row where
+# the root's own rebuild drops the tag's check (den-hoag-ofo98).
 {
   asserts,
   genMerge,
@@ -78,6 +81,28 @@ let
           a = lib.mkOption { type = sub; };
           b = lib.mkOption { type = T.either (T.lazyAttrsOf R) T.int; };
         };
+      # nixpkgs records throughout; tag `b` a nulled copy, kept as written by nixpkgs' rebuild
+      np = lib.types;
+      npSub = np.submodule {
+        options.a = lib.mkOption {
+          type = np.str;
+          default = "x";
+        };
+      };
+      nulledOf = ov: np.lazyAttrsOf (np.listOf npSub // ov) // { getSubModules = null; };
+      npTagged =
+        a: b:
+        np.attrTag {
+          a = lib.mkOption { type = a; };
+          b = lib.mkOption { type = b; };
+        };
+      # the root's own rebuild hands tag `b` back without the check it was declared with
+      erasing =
+        ov:
+        let
+          r = npTagged npSub (np.addCheck (nulledOf ov) (v: !(v ? bad)));
+        in
+        r // { substSubModules = m: npTagged (r.substSubModules m).nestedTypes.a.type (nulledOf ov); };
     in
     {
       keptNone = at 1 (T.listOf T.str // { emptyValue = { }; });
@@ -99,6 +124,19 @@ let
       freeformSubValue = atFF false 1 (T.lazyAttrsOf (sub // { emptyValue.value = "EV"; }));
       freeformJoinedValue = atFF false 2 (T.lazyAttrsOf (T.listOf sub // { emptyValue.value = "EV"; }));
       freeformControl = atFF false 1 (T.lazyAttrsOf (T.listOf sub));
+      tagNulledValue = atTag 1 (
+        npTagged npSub (nulledOf {
+          emptyValue.value = "EV";
+        })
+      );
+      tagNulledNone = atTag 1 (
+        npTagged npSub (nulledOf {
+          emptyValue = { };
+        })
+      );
+      tagErasedValue = atTag 1 (erasing {
+        emptyValue.value = "EV";
+      });
     };
   gen = rows {
     L = genMerge;
@@ -132,6 +170,9 @@ in
         freeformSubValue = "EV";
         freeformJoinedValue = [ ];
         freeformControl = [ ];
+        tagNulledValue = "EV";
+        tagNulledNone = false;
+        tagErasedValue = "EV";
       }
   );
 }
