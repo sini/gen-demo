@@ -4,7 +4,10 @@
 # stating a module set) or a second declaration joins it; a `//` over gen's own `whenEmpty` is no nixpkgs field.
 # Each row is read on gen-merge and on nixpkgs' `evalModules`, so the cell compares the two engines; a refusal reads
 # false. Rows 1-3 and the last diverged before this landing; rows 4-5 guard the rebuild and the join, and the
-# undefined foreign row guards the rebuild's own empty value (services.mtr-exporter.jobs).
+# undefined foreign row guards the rebuild's own empty value (services.mtr-exporter.jobs). The tag rows read a gen
+# record folded by nixpkgs' `attrTag` through gen-merge's exported merge, below a tag stating no module set, which
+# nixpkgs' rebuild does not reach: the record written is read there (den-hoag-ubinn); tagKeptValue and tagKeptNone
+# diverged before that landing, and tagControl guards the record no `//` touched.
 {
   asserts,
   genMerge,
@@ -16,6 +19,13 @@ let
     let
       T = L.types;
       at = atWith [ { config.o = L.mkIf false [ ]; } ];
+      # the tag rows read the discharged key `b.k` (a refusal anywhere in the value reads false)
+      atTag =
+        n: type:
+        let
+          r = atWith [ { config.o.b.k = L.mkIf false [ ]; } ] n type;
+        in
+        if r == false then false else r.b.k;
       atWith =
         defs: n: type:
         let
@@ -41,6 +51,13 @@ let
       nel = lib.types.nonEmptyListOf (
         lib.types.submodule { options.a = lib.mkOption { type = lib.types.str; }; }
       );
+      # nixpkgs' `attrTag` (gen-merge has none) over this engine's records; tag `b` states no module set
+      tagged =
+        R:
+        lib.types.attrTag {
+          a = lib.mkOption { type = sub; };
+          b = lib.mkOption { type = T.either (T.lazyAttrsOf R) T.int; };
+        };
     in
     {
       keptNone = at 1 (T.listOf T.str // { emptyValue = { }; });
@@ -51,6 +68,9 @@ let
       control = at 1 (T.listOf T.str);
       foreignNonEmptyUndefined = atWith [ ] 1 nel;
       foreignNonEmptyDischarged = at 1 nel;
+      tagKeptValue = atTag 1 (tagged (T.listOf sub // { emptyValue.value = "EV"; }));
+      tagKeptNone = atTag 1 (tagged (T.listOf sub // { emptyValue = { }; }));
+      tagControl = atTag 1 (tagged (T.listOf sub));
     };
   gen = rows {
     L = genMerge;
@@ -75,6 +95,9 @@ in
         control = [ ];
         foreignNonEmptyUndefined = false;
         foreignNonEmptyDischarged = false;
+        tagKeptValue = "EV";
+        tagKeptNone = false;
+        tagControl = [ ];
       }
   );
 }
