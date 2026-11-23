@@ -4,7 +4,10 @@
 # stating a module set) or a second declaration joins it; a `//` over gen's own `whenEmpty` is no nixpkgs field.
 # Each row is read on gen-merge and on nixpkgs' `evalModules`, so the cell compares the two engines; a refusal reads
 # false. Rows 1-3 and the last diverged before this landing; rows 4-5 guard the rebuild and the join, and the
-# undefined foreign row guards the rebuild's own empty value (services.mtr-exporter.jobs).
+# undefined foreign row guards the rebuild's own empty value (services.mtr-exporter.jobs). The freeform rows read
+# a key of the freeform plane, which nixpkgs merges by its `freeformType` and never fixes up, so one declaration
+# keeps the record written (den-hoag-6dxwr); every freeform row but the two controls (one joined by a second
+# declaration, one no `//` touched) diverged before that landing.
 {
   asserts,
   genMerge,
@@ -22,6 +25,23 @@ let
           r = builtins.tryEval (
             let
               v = (ev (builtins.genList (_: { options.o = L.mkOption { inherit type; }; }) n ++ defs)).config.o;
+            in
+            builtins.deepSeq v v
+          );
+        in
+        if r.success then r.value else false;
+      # `n` declarations of the freeform type (at `_module.freeformType` when `mod`), the key `k` defined only by
+      # `mkIf false`
+      atFF =
+        mod: n: type:
+        let
+          r = builtins.tryEval (
+            let
+              v =
+                (ev (
+                  builtins.genList (_: if mod then { _module.freeformType = type; } else { freeformType = type; }) n
+                  ++ [ { config.k = L.mkIf false [ ]; } ]
+                )).config.k;
             in
             builtins.deepSeq v v
           );
@@ -51,6 +71,14 @@ let
       control = at 1 (T.listOf T.str);
       foreignNonEmptyUndefined = atWith [ ] 1 nel;
       foreignNonEmptyDischarged = at 1 nel;
+      freeformKeptValue = atFF false 1 (T.lazyAttrsOf (T.listOf sub // { emptyValue.value = "EV"; }));
+      freeformKeptNone = atFF false 1 (T.lazyAttrsOf (T.listOf sub // { emptyValue = { }; }));
+      freeformModuleDoorValue = atFF true 1 (
+        T.lazyAttrsOf (T.listOf sub // { emptyValue.value = "EV"; })
+      );
+      freeformSubValue = atFF false 1 (T.lazyAttrsOf (sub // { emptyValue.value = "EV"; }));
+      freeformJoinedValue = atFF false 2 (T.lazyAttrsOf (T.listOf sub // { emptyValue.value = "EV"; }));
+      freeformControl = atFF false 1 (T.lazyAttrsOf (T.listOf sub));
     };
   gen = rows {
     L = genMerge;
@@ -75,6 +103,12 @@ in
         control = [ ];
         foreignNonEmptyUndefined = false;
         foreignNonEmptyDischarged = false;
+        freeformKeptValue = "EV";
+        freeformKeptNone = false;
+        freeformModuleDoorValue = "EV";
+        freeformSubValue = "EV";
+        freeformJoinedValue = [ ];
+        freeformControl = [ ];
       }
   );
 }
