@@ -159,6 +159,9 @@ tnow() {
 }
 tstart='?'
 if [ -n "${REFUSALS_TIMINGS:-}" ]; then tnow tstart; fi
+# Schema v3 rows (below) only when REFUSALS_TIMINGS is set AND REFUSALS_TIMINGS_SCHEMA is exactly 3; else v2, unchanged.
+tv3=0
+if [ -n "${REFUSALS_TIMINGS:-}" ] && [ "${REFUSALS_TIMINGS_SCHEMA:-}" = 3 ]; then tv3=1; fi
 
 # ── the corpus source ──
 # Every arm reads the corpus flake by the rule every other plane of this checkout uses: the
@@ -427,23 +430,34 @@ fi
 # fixed words only: no ref, path, message, env or label. A value that could not be read is `?`, never 0. All of it
 # runs in a subshell whose stdout is the file, so a failure here can move neither stdout, nor `fail`, nor the exit:
 # it degrades to one stderr marker. Unset, nothing here runs and the output is the script's without it.
+# Under REFUSALS_TIMINGS_SCHEMA=3 the row is `v3`: the v2 row's keys, then five more line counts and the run's origin,
+#   … clk=<mono|wall|none> copy-from=<n> unpack=<n> fetch-input=<n> download=<n> sqlite=<n> org=<ms|?>
+# `org` is the run's start on the row's clock (t0 is an offset from it). Each line is counted once, by the first match: the
+# five v2 classes first, then "copying path '…' from '…'" (all three families, at the arms' info level), "unpacking '…'
+# into the …" (Nix's Git cache, Determinate's tarball cache), "fetching <type> input '…'" (Lix; its unlocked root prints
+# one per arm), "downloading '…'" (a talkative-level line, so a no-signal control), and any other line naming SQLite or a
+# .sqlite path. Counts only, as for v2.
 if [ -n "${REFUSALS_TIMINGS:-}" ]; then
   if ! { : >>"$REFUSALS_TIMINGS"; } 2>/dev/null; then
     echo "refusal timings: UNWRITTEN -- the timings file cannot be appended to; no row written, verdicts unaffected" >&2
   else
     trc=0
     (
-      rows=0 waits=0 waited=0 unread=0 sl=0 gl=0 db=0 uk=0
+      tc0='?'
+      if [ "$tv3" = 1 ]; then tnow tc0; fi
+      rows=0 waits=0 waited=0 unread=0 sl=0 gl=0 db=0 uk=0 cf=0 up=0 fin=0 dl=0 sq=0
       # ONE grep over every readable stderr file, so only the lines saying "waiting" or "is busy" reach the classifier. Its
       # exit 2 is an unmeasured classification, every class `?`; exit 1 is a measured zero.
-      declare -A n_fl n_sl n_gl n_db n_uk
+      declare -A n_fl n_sl n_gl n_db n_uk n_cf n_up n_fi n_dl n_sq
       files=()
       if [ "${#nej[@]}" -gt 0 ] && [ -r "$tmpdir/jobs.err" ]; then files+=("$tmpdir/jobs.err"); fi
       for i in "${proc[@]}"; do if [ -r "${errfiles[$i]}" ]; then files+=("${errfiles[$i]}"); fi; done
       grc=1
       if [ "${#files[@]}" -gt 0 ]; then
         grc=0
-        grep -HZF -e waiting -e Waiting -e "' is busy" -- "${files[@]}" >"$tmpdir/waits" 2>/dev/null || grc=$?
+        v3pre=()
+        if [ "$tv3" = 1 ]; then v3pre=(-e SQLite -e .sqlite -e "copying path '" -e "downloading '" -e "unpacking '" -e "fetching "); fi
+        grep -HZF -e waiting -e Waiting -e "' is busy" "${v3pre[@]}" -- "${files[@]}" >"$tmpdir/waits" 2>/dev/null || grc=$?
       fi
       if [ "$grc" -le 1 ] && [ -s "$tmpdir/waits" ]; then
         while IFS= read -r -d '' f && IFS= read -r ln; do
@@ -453,17 +467,34 @@ if [ -n "${REFUSALS_TIMINGS:-}" ]; then
           *'waiting for the big Nix store lock'* | *'waiting for exclusive access to the Nix store'* | *'waiting for lock on '*) n_sl[$f]=$((${n_sl[$f]:-0} + 1)) ;;
           *'SQLite database '*' is busy'*) n_db[$f]=$((${n_db[$f]:-0} + 1)) ;;
           *[Ww]aiting*) n_uk[$f]=$((${n_uk[$f]:-0} + 1)) ;;
+          *)
+            if [ "$tv3" = 1 ]; then
+              case "$ln" in
+              *"copying path '"*"' from '"*) n_cf[$f]=$((${n_cf[$f]:-0} + 1)) ;;
+              *"unpacking '"*"' into the "*) n_up[$f]=$((${n_up[$f]:-0} + 1)) ;;
+              *"fetching "*" input '"*) n_fi[$f]=$((${n_fi[$f]:-0} + 1)) ;;
+              *"downloading '"*) n_dl[$f]=$((${n_dl[$f]:-0} + 1)) ;;
+              *SQLite* | *.sqlite*) n_sq[$f]=$((${n_sq[$f]:-0} + 1)) ;;
+              esac
+            fi
+            ;;
           esac
         done <"$tmpdir/waits"
       fi
       row() { # $1 index, $2 phase, $3 start ms, $4 end ms, $5 rc, $6 the stderr file its waits are counted in
-        local off='?' ms='?' rc="$5" c_fl='?' c_sl='?' c_gl='?' c_db='?' c_uk='?'
+        local off='?' ms='?' rc="$5" c_fl='?' c_sl='?' c_gl='?' c_db='?' c_uk='?' c_cf='?' c_up='?' c_fi='?' c_dl='?' c_sq='?'
         case "$tstart$3$4" in *'?'*) ;; *) off=$(($3 - tstart)) ms=$(($4 - $3)) ;; esac
         [[ $rc =~ ^[0-9]{1,3}$ ]] || rc='?'
         if [ "$grc" -le 1 ] && [ -r "$6" ]; then
           c_fl="${n_fl[$6]:-0}" c_sl="${n_sl[$6]:-0}" c_gl="${n_gl[$6]:-0}" c_db="${n_db[$6]:-0}" c_uk="${n_uk[$6]:-0}"
+          c_cf="${n_cf[$6]:-0}" c_up="${n_up[$6]:-0}" c_fi="${n_fi[$6]:-0}" c_dl="${n_dl[$6]:-0}" c_sq="${n_sq[$6]:-0}"
         fi
-        echo "v2 i=$1 ph=$2 t0=$off ms=$ms rc=$rc fetch-lock=$c_fl store-lock=$c_sl gc-lock=$c_gl db-busy=$c_db unknown=$c_uk wait-ms=? clk=$tclk" 2>/dev/null || exit 74 # a write that failed ends the rows, one marker below
+        if [ "$tv3" = 1 ]; then
+          echo "v3 i=$1 ph=$2 t0=$off ms=$ms rc=$rc fetch-lock=$c_fl store-lock=$c_sl gc-lock=$c_gl db-busy=$c_db unknown=$c_uk wait-ms=? clk=$tclk copy-from=$c_cf unpack=$c_up fetch-input=$c_fi download=$c_dl sqlite=$c_sq org=$tstart" 2>/dev/null || exit 74
+          if [ "$c_cf" != '?' ]; then cf=$((cf + c_cf)) up=$((up + c_up)) fin=$((fin + c_fi)) dl=$((dl + c_dl)) sq=$((sq + c_sq)); fi
+        else
+          echo "v2 i=$1 ph=$2 t0=$off ms=$ms rc=$rc fetch-lock=$c_fl store-lock=$c_sl gc-lock=$c_gl db-busy=$c_db unknown=$c_uk wait-ms=? clk=$tclk" 2>/dev/null || exit 74 # a write that failed ends the rows, one marker below
+        fi
         rows=$((rows + 1))
         if [ "$c_fl" = '?' ] || [ "$ms" = '?' ]; then unread=$((unread + 1)); fi
         if [ "$c_fl" != '?' ]; then
@@ -479,7 +510,14 @@ if [ -n "${REFUSALS_TIMINGS:-}" ]; then
         { read -r ec <"$tmpdir/arm$i.ec"; } 2>/dev/null
         row "$i" process "${t0:-?}" "${t1:-?}" "${ec:-?}" "${errfiles[$i]}"
       done
-      echo "refusal timings: $rows rows appended (clock $tclk), $waits fetch-lock waits in $waited of them, store-lock $sl, gc-lock $gl, db-busy $db, unknown $uk, $unread unreadable" >&2
+      if [ "$tv3" = 1 ]; then
+        tc1='?' tcm='?'
+        tnow tc1
+        case "$tc0$tc1" in *'?'*) ;; *) tcm=$((tc1 - tc0)) ;; esac
+        echo "refusal timings: $rows rows appended (clock $tclk), $waits fetch-lock waits in $waited of them, store-lock $sl, gc-lock $gl, db-busy $db, unknown $uk, $unread unreadable, copy-from $cf, unpack $up, fetch-input $fin, download $dl, sqlite $sq, classified in $tcm ms" >&2
+      else
+        echo "refusal timings: $rows rows appended (clock $tclk), $waits fetch-lock waits in $waited of them, store-lock $sl, gc-lock $gl, db-busy $db, unknown $uk, $unread unreadable" >&2
+      fi
     ) >>"$REFUSALS_TIMINGS" || trc=$?
     if [ "$trc" -ne 0 ]; then
       echo "refusal timings: INCOMPLETE (exit $trc) -- rows before the failure are kept, verdicts unaffected" >&2
