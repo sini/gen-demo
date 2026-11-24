@@ -206,7 +206,10 @@ let
 
   # The root's evaluation under each of U1's reasons for moving nothing, the default-only one
   # aside (k3, k5 and k6 carry it): `x` declared with no default and defined by nobody, and `x`
-  # undeclared, so a definition of it lands on the freeform plane, which has no priority pass.
+  # undeclared, so a definition of it lands on a freeform plane whose fold is opaque. gen observes a
+  # freeform key's priority only through its own key-local folds (`attrsOf`, `lazyAttrsOf`, `anything`
+  # below a declared group); an opaque fold's selection is its own, so the key is UNOBSERVABLE, not
+  # empty, and moves nothing.
   unsetEvals = {
     noDefinition = gm.evalModuleTree { } [
       {
@@ -217,7 +220,10 @@ let
     freeform = gm.evalModuleTree { } [
       {
         _file = "r.nix";
-        freeformType = gm.types.attrsOf gm.types.str;
+        freeformType = gm.types.mkType {
+          name = "opaque";
+          mergeDefs = _loc: defs: builtins.foldl' (a: d: a // d.value) { } defs;
+        };
       }
       {
         _file = "r.nix";

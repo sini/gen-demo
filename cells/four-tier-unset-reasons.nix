@@ -5,8 +5,8 @@
 #   · default-only, from the declared default (k6: `defaulted = true`) and from `mkOptionDefault`
 #     (k5: `defaulted = false`), both at priority 1500;
 #   · no definition: `x` declared with no default and defined by nobody;
-#   · freeform: `x` undeclared, defined on the freeform plane, so it does not move although it has a
-#     value.
+#   · freeform: `x` undeclared, defined on a freeform plane whose fold is opaque, so gen cannot observe
+#     its priority (unobservable, not empty) and it does not move although it has a value.
 #
 # Red: an `innerOf` that answers `null` for the root (a contributor whose record was dropped) reads
 # an empty `unset` half.
