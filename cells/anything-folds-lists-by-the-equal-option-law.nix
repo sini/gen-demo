@@ -2,8 +2,8 @@
 # folds list definitions as nixpkgs' `anything` does: nixpkgs' has no list arm, so lists reach its
 # equality fold (`mergeEqualOption`), where equal lists give one copy and unequal lists are refused by
 # name. Before, gen concatenated them: `[ 1 ]` beside `[ 1 ]` read `[ 1 1 ]` where nixpkgs serves
-# `[ 1 ]`, and `[ 1 ]` beside `[ 2 ]` read `[ 2 1 ]` where nixpkgs refuses. A guard carrier's lists keep
-# their own law, T4's (gen-aspects): an `includes` both of a carrier's firing definitions write
+# `[ 1 ]`, and `[ 1 ]` beside `[ 2 ]` read `[ 2 1 ]` where nixpkgs refuses. A guard carrier's top-level
+# lists keep their own law, T4's (gen-aspects): an `includes` both of a carrier's firing definitions write
 # concatenates, as the declared `listOf` does. Control: `raw`, which already folds by equality.
 {
   asserts,
