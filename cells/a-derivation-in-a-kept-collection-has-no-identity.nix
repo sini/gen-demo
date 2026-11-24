@@ -3,11 +3,12 @@
 # The hub's one mint refuses it by name, directly and inside a list, without forcing `outPath`. A kind holding it in
 # a kept collection, at the collection's seed and away from it, still has a mark (the refused value is sealed in
 # it, not walked), and away from the seed its foreign key lets nixpkgs' `lib.evalModules` keep one of a twin. Before,
-# the mint walked the value, forced `outPath`, and every arm here aborted uncatchably: pure evaluation refuses
-# `builtins.storePath`.
+# the mint walked the value, forced its `name` and so `builtins.storePath`, which pure evaluation refuses, and every
+# arm here aborted uncatchably.
 #
-# Not read: the key at the seed. It decides "at the seed" by `==`, which forces `outPath`, so it aborts under pure
-# evaluation on main and under this gate alike.
+# Not read: the key at the seed (den-hoag-1gb0t). It decides "at the seed" by `==`, which forces `outPath`, so it
+# aborts under pure evaluation on main, and under this gate for two distinct values on every evaluator.
+# (For this cell's one shared value, Lix under this gate does not abort; Nix and Determinate do.)
 {
   asserts,
   genMerge,
