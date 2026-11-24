@@ -6,6 +6,8 @@
 # `twill`'s `nap` instance, which `warp`'s include sites never reach: the walk alone ignores it and
 # delivers `warp` unchanged at rc 0, so only the query's first arm refuses it. The unplanted arm reads
 # the true relation, so a door that refused every relation cannot pass it.
+# The realizer declares the `marks` the delivered modules accumulate a `listOf`, as a class declares a list it
+# accumulates; an undeclared list folds by `anything`'s equality fold, nixpkgs'.
 row_over_listed_instance_relation_meets_the_projection_parity_door='let
   gen = (builtins.getFlake (toString ./.)).inputs.gen;
   genAspects = gen.lib.aspects.aspects;
@@ -37,7 +39,7 @@ row_over_listed_instance_relation_meets_the_projection_parity_door='let
       twill = { members = [ "bobbin" ]; sources.loom = entity "twill"; };
     };
   marksOf = instances: (genMerge.evalModuleTree { } (
-    [ { freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything; } ]
+    [ { freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything; options.marks = genMerge.mkOption { type = genMerge.types.listOf genMerge.types.str; default = [ ]; }; } ]
     ++ (genDelivery.project { selectNodes = v: v.hosts; inherit instances; } cnf { inherit aspects; hosts = { warp.aspects = [ "frame" ]; twill.aspects = [ "bobbin" ]; }; }).nodes.warp.classes.nixos
   )).config.marks;
   overlisted = r // { reaches = r.reaches // { warp = r.reaches.warp // { inherit (r.reaches.twill) nap; }; }; };
