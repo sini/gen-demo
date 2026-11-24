@@ -25,6 +25,15 @@
   inputs,
 }:
 let
+  # The realizer's module: the delivered modules' `marks` accumulate, so it is declared a `listOf`, as a
+  # class declares a list it accumulates; an undeclared list folds by `anything`'s equality fold, nixpkgs'.
+  realizerModule = {
+    freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything;
+    options.marks = genMerge.mkOption {
+      type = genMerge.types.listOf genMerge.types.str;
+      default = [ ];
+    };
+  };
   cnf = import ../aspect-cnf.nix // {
     entityKinds = {
       loom = true;
@@ -125,13 +134,7 @@ let
         };
       };
   marksOf =
-    p: n:
-    (genMerge.evalModuleTree { } (
-      [
-        { freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything; }
-      ]
-      ++ p.nodes.${n}.classes.nixos
-    )).config.marks;
+    p: n: (genMerge.evalModuleTree { } ([ realizerModule ] ++ p.nodes.${n}.classes.nixos)).config.marks;
   refuses = v: !(builtins.tryEval (builtins.deepSeq v v)).success;
   p = projectWith r;
   sort = builtins.sort builtins.lessThan;

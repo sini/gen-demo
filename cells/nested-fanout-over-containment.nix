@@ -28,6 +28,15 @@
   inputs,
 }:
 let
+  # The realizer's module: the delivered modules' `marks` accumulate, so it is declared a `listOf`, as a
+  # class declares a list it accumulates; an undeclared list folds by `anything`'s equality fold, nixpkgs'.
+  realizerModule = {
+    freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything;
+    options.marks = genMerge.mkOption {
+      type = genMerge.types.listOf genMerge.types.str;
+      default = [ ];
+    };
+  };
   hashIdentity = inputs.gen.lib.substrate.identity.hashIdentity;
   t = (genAlgebra.term hashIdentity).term;
   inherit (genAspects) guard pred;
@@ -195,10 +204,8 @@ let
         map (n: {
           name = n;
           value =
-            (genMerge.evalModuleTree { } (
-              [ { freeformType = genMerge.types.lazyAttrsOf genMerge.types.anything; } ]
-              ++ p.nodes.${n}.classes.nixos or [ ]
-            )).config.marks or [ ];
+            (genMerge.evalModuleTree { } ([ realizerModule ] ++ p.nodes.${n}.classes.nixos or [ ])).config.marks
+              or [ ];
         }) nodes
       );
     };
