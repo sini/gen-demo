@@ -6,9 +6,7 @@
 # the mint walked the value, forced its `name` and so `builtins.storePath`, which pure evaluation refuses, and every
 # arm here aborted uncatchably.
 #
-# Not read: the key at the seed (den-hoag-1gb0t). It decides "at the seed" by `==`, which forces `outPath`, so it
-# aborts under pure evaluation on main, and under this gate for two distinct values on every evaluator.
-# (For this cell's one shared value, Lix under this gate does not abort; Nix and Determinate do.)
+# Not read here: the key at the seed, which `a-store-derivation-at-a-collections-seed-has-a-key` reads.
 {
   asserts,
   genMerge,
