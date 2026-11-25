@@ -2,9 +2,9 @@
 # `mkInstanceType`'s options and kind and returns `{ type; evaluate; }` from one construction (gen-merge
 # `refusingSubmodulePaired`). `evaluate loc defs` is one evaluation of that construction, returned as
 # `{ config; provenance; }`, so the caller keeps where each value came from without a second evaluation. Its
-# `config` is the typed merge's, the same as `mkInstanceType` on the same inputs; its provenance names the
-# definitions' files; a definition outside the domain is refused on either projection; and a type derived from
-# `type` carries no evaluator.
+# `config` is the typed merge's, the same as `mkInstanceType` on the same inputs (a definition replaces the list's
+# default, as in nixpkgs); its provenance names the default and each definition's file; a definition outside the
+# domain is refused on either projection; and a type derived from `type` carries no evaluator.
 {
   asserts,
   genMerge,
@@ -71,10 +71,7 @@ in
     &&
       own r.config == {
         loom = "dobby";
-        threads = [
-          "warp"
-          "weft"
-        ];
+        threads = [ "weft" ];
       }
     && own r.config == own (pair.type.merge loc defs)
     && own r.config == own (legacy.merge loc defs)
