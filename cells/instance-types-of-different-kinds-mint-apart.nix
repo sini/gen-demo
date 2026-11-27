@@ -44,6 +44,6 @@ in
     && twins.value
     &&
       (fichu (T.submodule { })).__mint.minted
-      == "schemakind:cf6cf7874fc6f9d4a62a6b8adbae2953c2fb2a62ec540eb75904fdc643b0510d"
+      == "schemakind:1ca1326aaa733734e0b240f66642645c451741dd50b2f556b01ecdadbfddd70a"
   );
 }
