@@ -43,12 +43,12 @@ in
 {
   construct = [ "scc-entered-at-its-larger-member" ];
   check = asserts (
-    (genGraph.lowlink g).sccOf == {
+    (genGraph.lowlink { } g).sccOf == {
       awl = "awl";
       spool = "spool";
       twill = "spool";
     }
-    && genGraph.lowlink g == genGraph.fbNode g
+    && genGraph.lowlink { } g == genGraph.fbNode g
     &&
       genGraph.cyclicEdgesWhere (l: l == "neg") lg == [
         {
