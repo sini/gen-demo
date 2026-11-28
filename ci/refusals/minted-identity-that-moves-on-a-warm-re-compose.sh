@@ -46,7 +46,7 @@ row_minted_identity_that_moves_on_a_warm_re_compose='let
   prior = genMerge.evalModuleTree { } outer;
   warm = genMerge.evalModuleTree { warmFrom = prior; editedModules = edit; } (outer ++ edit);
 in warm.config.thimbles.pewter.id_hash'
-row_minted_identity_that_moves_on_a_warm_re_composestamp='thimble:7a784416ea03854bcbadc0dc9541834f6da5d6851dcc70eaf3dc9bd92b791199'
+row_minted_identity_that_moves_on_a_warm_re_composestamp='thimble:63d3ee451c257294e30d6572b251264e20988b1ff76719785fec3cbf95028c8a'
 check "T5 minted-identity-that-moves-on-a-warm-re-compose unplanted (the declared spool re-defined to its minted value, no identity moves)" \
   "${row_minted_identity_that_moves_on_a_warm_re_compose/EDIT/{ config.thimbles.pewter.spool = genMerge.mkForce \"linen\"; \}}" 0 "" \
   "$tmpdir/minted-identity-that-moves-on-a-warm-re-compose-green.err" "$row_minted_identity_that_moves_on_a_warm_re_composestamp"

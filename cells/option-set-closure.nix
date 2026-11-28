@@ -2,8 +2,9 @@
 # registry carries an `extraModules` option (`shirring`); the cell asserts the option really landed
 # AND that `thimbles.pewter.id_hash` is byte-identical to
 # `thimble:c6b1aff93c84869aa978d50dbf0ae654f79ce67ee2e6c7a1eb4e917f3864c025`, the stamp pinned
-# before it existed, re-pinned when the mark came to tell `{ }` from `[ ]` (den-hoag-0pwbu). Equality alone would pass for a registry that dropped the caller's modules, so
-# both halves are load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
+# before it existed, re-pinned when the mark came to tell `{ }` from `[ ]` (den-hoag-0pwbu).
+# Equality alone would pass for a registry that dropped the caller's modules, so both halves are
+# load-bearing. It also pins `_identityKeys == [ "name" "spool" ]`, and that
 # `identityHashForKind` — the SOLE recompute path — agrees with that stamp on this kind, declared
 # through gen-aspects' `schemaOption`, whose `options` publishes the plane an instance imports
 # (`aspects`, `spool`) and whose `refs` is empty. Live

@@ -35,7 +35,7 @@ in (genMerge.evalModuleTree { } [
   ]).config.thimbles.t1.id_hash'
 check "T5 collection-name-colliding-with-gen-schemas-own-vocabulary unplanted (an ORDINARY collection name, and the instance's stamp is the assertion)" \
   "${row_collection_name_colliding_with_gen_schemas_own_vocabulary/COLLECTIONNAME/spools}" 0 "" \
-  "$tmpdir/collection-name-colliding-with-gen-schemas-own-vocabulary-green.err" 'thimble:bc45659c8137190eb65eee15ebfa9686e39cfb3c9b2433cb60843237733f14ac'
+  "$tmpdir/collection-name-colliding-with-gen-schemas-own-vocabulary-green.err" 'thimble:b28b82e4832b0f31856b76f6d3d2a582e62ae756512e6eb752223b9334a4241a'
 check "T5 collection-name-colliding-with-gen-schemas-own-vocabulary planted   (the same declaration, the collection renamed to a key gen-schema writes)" \
   "${row_collection_name_colliding_with_gen_schemas_own_vocabulary/COLLECTIONNAME/options}" 1 \
   "gen-schema: collection 'options' is reserved — cannot be used as a collection key" \
